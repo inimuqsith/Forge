@@ -3,7 +3,7 @@ use clap::{Parser, Subcommand};
 use colored::*;
 use forge::{
     CpuProfile, DependencyResolver, ForgeConfig, InstalledDatabase, RecipeBuilder,
-    ToolchainComponent, ToolchainManager,
+    SyncClient, ToolchainComponent, ToolchainManager,
 };
 use std::path::{Path, PathBuf};
 
@@ -59,7 +59,11 @@ enum Commands {
     },
 
     /// Sinkronisasi pohon resep dan metadata dari Forge Server
-    Sync,
+    Sync {
+        /// Override URL server resep (misal: http://127.0.0.1:8080/v1 atau http://<IP>:8080/v1)
+        #[arg(long)]
+        server: Option<String>,
+    },
 
     /// Perbarui dan re-kompilasi seluruh paket yang terpasang
     Update {
@@ -229,9 +233,27 @@ fn main() -> Result<()> {
             }
         }
 
-        Commands::Sync => {
-            println!(">>> Menyinkronkan pohon resep dari Forge Server...",);
-            println!("{} Pohon resep berhasil diperbarui!", "✓".green());
+        Commands::Sync { server } => {
+            let config = ForgeConfig::load_or_default(None);
+            let server_url = server.unwrap_or_else(|| config.server.recipe_server.clone());
+            let target_recipes_dir = PathBuf::from(&config.general.recipes_path);
+            let cache_dir = PathBuf::from(&config.general.cache_path).join("sync");
+
+            println!("{}", "=== Forge Recipe Sync Engine ===".bold().cyan());
+            let rt = tokio::runtime::Runtime::new()?;
+            match rt.block_on(SyncClient::sync_recipes(&server_url, &target_recipes_dir, &cache_dir)) {
+                Ok(updated) => {
+                    if updated {
+                        println!("{} Pohon resep berhasil diperbarui!", "✓".green());
+                    } else {
+                        println!("{} Pohon resep lokal sudah merupakan versi terkini.", "✓".green());
+                    }
+                }
+                Err(e) => {
+                    println!("{} Gagal menyinkronkan pohon resep: {:#}", "✗".red(), e);
+                    std::process::exit(1);
+                }
+            }
         }
 
         Commands::Update { target } => {

@@ -103,12 +103,16 @@
 
 ---
 
-### Fase 10: Server Suite & CI/CD Builder (`forge-server`)
-**Status:** 🟡 **CLI WORKER SELESAI / REAL HTTP DAEMON PENDING**
+### Fase 10: Server Suite & CI/CD Builder (`forge-server`) & Client Sync Engine
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] Implementasi CLI suite `forge-server` di [`crates/forge-server/src/main.rs`](file:///home/admin/Development/Forge/crates/forge-server/src/main.rs).
 - [x] CLI CI/CD Lock-CPU Builder: `forge-server import <pkg> --target-cpu <cpu>`.
 - [x] CLI Catalog Indexer: `forge-server index --storage-path <path>`.
-- [ ] **Pending:** Implementasi HTTP REST API daemon riil (`forge-server serve`) menggunakan `tokio`/`axum` untuk sinkronisasi pohon resep dan serving katalog `packages.db.zst`.
+- [x] **HTTP REST API Daemon (`crates/forge-server/src/server.rs`):** Router `axum` & `tokio` melayani `/v1/health`, `/v1/recipes/latest.sha256`, dan streaming `/v1/recipes/latest.tar.zst`.
+- [x] **Recipe Bundler Engine (`ForgeServer::bundle_recipes`):** Mengompresi direktori recipes menjadi tarball Zstandard deterministik (`recipes.tar.zst`) dan mencatat checksum SHA256 (`recipes.tar.zst.sha256`).
+- [x] **Client Sync Engine (`crates/forge/src/sync.rs`):** Modul `SyncClient::sync_recipes` dengan handshake SHA256, deteksi no-op jika up-to-date, streaming download, validasi kriptografis, ekstraksi atomik Zstandard, dan pembaruan direktori resep resmi `/var/db/forge/recipes/`.
+- [x] **CLI Subcommand `forge sync` & Flag `--server`:** Terintegrasi di `crates/forge/src/main.rs`.
+- [x] **Unit & Integration Tests:** `test_bundle_recipes_and_hash_generation`, `test_server_health_and_endpoints`, `test_sync_recipes_client_full_cycle`, `test_sync_noop_when_up_to_date` lulus 100%.
 
 ---
 
@@ -178,7 +182,7 @@
 ## 4. Panduan Serah Terima AI Agent (Incoming AI Agent Handover Guide)
 
 > **Catatan Penting untuk AI Agent Penerus:**
-> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")**, optimasi compiler **Mentok Ekstrem (Zen 4 AVX-512 / Thin LTO / Mold ICF)**, repositori resep terstandarisasi **`/var/db/forge/recipes/` (ADR-028)**, DAG Dependency Resolver (`resolver.rs`), Transactional Merger (`merger.rs`), and Manifest Database Engine (`db.rs`) dengan tingkat kesiapan **~85%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan 28 ADR telah didokumentasikan secara lengkap.
+> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")**, optimasi compiler **Mentok Ekstrem (Zen 4 AVX-512 / Thin LTO / Mold ICF)**, repositori resep terstandarisasi **`/var/db/forge/recipes/` (ADR-028)**, Client Sync Engine (`sync.rs`), Forge Server HTTP Daemon (`server.rs`), DAG Dependency Resolver (`resolver.rs`), Transactional Merger (`merger.rs`), and Manifest Database Engine (`db.rs`) dengan tingkat kesiapan **~90%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan 28 ADR telah didokumentasikan secara lengkap.
 
 ### 📌 Ringkasan Status & State Workspace:
 - **Workspace:** 2 Crate murni: [`crates/forge`](file:///home/admin/Development/Forge/crates/forge) (Klien & Engine Library) dan [`crates/forge-server`](file:///home/admin/Development/Forge/crates/forge-server) (Server & CI/CD Builder).
@@ -194,10 +198,8 @@
 5. **CCACHE ACCELERATION (ADR-025):** Kompilasi memanfaatkan Ccache 4.13.5 pada build engine.
 6. **OPENRC ONLY:** Tidak boleh ada ketergantungan pada Systemd.
 
-### 🎯 Tugas Prioritas Pengembangan Selanjutnya (Sisa 15%):
+### 🎯 Tugas Prioritas Pengembangan Selanjutnya (Sisa 10%):
 1. **Distro Stage Exporter (`forge stage-export`):**
    - Implementasikan tarball bundler `forge stage-export --output kura-stage.tar.xz` untuk mengemas rootfs aktif menjadi stage distribusi Kura Linux.
-2. **Real Server Daemon & Binary Indexer (`crates/forge-server`):**
-   - Implementasikan HTTP REST API daemon pada `crates/forge-server` (`serve` & `sync`) menggunakan `tokio`/`axum` untuk sinkronisasi pohon resep dan serving katalog `packages.db.zst`.
-3. **Hybrid Streaming Downloader:**
+2. **Hybrid Streaming Downloader:**
    - Live network streaming download & dekompresi zstd untuk biner binhost/CachyOS.

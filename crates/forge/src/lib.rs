@@ -11,6 +11,7 @@ pub mod hybrid;
 pub mod resolver;
 pub mod db;
 pub mod merger;
+pub mod sync;
 
 pub use builder::RecipeBuilder;
 pub use toolchain::{ToolchainComponent, ToolchainManager, ToolchainStatus};
@@ -20,6 +21,7 @@ pub use hybrid::HybridAdapter;
 pub use resolver::*;
 pub use db::*;
 pub use merger::*;
+pub use sync::SyncClient;
 
 /// Konfigurasi Global Forge (/etc/forge/forge.conf)
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -28,5 +28,6 @@ zstd = { workspace = true }
 sha2 = { workspace = true }
 tempfile = { workspace = true }
 reqwest = { workspace = true }
+tokio = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
