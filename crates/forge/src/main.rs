@@ -3,8 +3,8 @@ use clap::{Parser, Subcommand};
 use colored::*;
 use forge::{
     CpuProfile, DependencyResolver, ForgeConfig, ForgeLockGuard, InstalledDatabase,
-    PackageCascadeResolver, PackageProvider, RecipeBuilder, RecipeImporter, SyncClient,
-    ToolchainComponent, ToolchainManager,
+    PackageCascadeResolver, PackageProvider, RecipeBuilder, RecipeImporter, StageExportOptions,
+    StageExporter, StageFormat, SyncClient, ToolchainComponent, ToolchainManager,
 };
 use std::path::{Path, PathBuf};
 
@@ -85,10 +85,27 @@ enum Commands {
         output: String,
     },
 
-    /// Kemas rootfs aktif menjadi tarball stage distribusi (kura-stage.tar.xz)
+    /// Kemas rootfs aktif menjadi tarball stage distribusi (kura-stage.tar.xz / kura-stage.tar.zst)
     StageExport {
-        #[arg(long, default_value = "kura-stage.tar.xz")]
-        output: String,
+        /// Direktori rootfs sumber yang akan dikemas
+        #[arg(short, long, default_value = "/tmp/forge/stage")]
+        root: PathBuf,
+
+        /// Lokasi file keluaran stage tarball
+        #[arg(short, long, default_value = "dist/kura-stage.tar.xz")]
+        output: PathBuf,
+
+        /// Format kompresi tarball (xz atau zstd)
+        #[arg(short, long)]
+        format: Option<StageFormat>,
+
+        /// Lewati validasi UsrMerge dan OpenRC
+        #[arg(long)]
+        no_verify: bool,
+
+        /// Jangan bersihkan direktori cache dan file sementara sebelum pengemasan
+        #[arg(long)]
+        no_clean: bool,
     },
 
     /// Tampilkan daftar seluruh paket yang terpasang
@@ -324,9 +341,61 @@ fn main() -> Result<()> {
             }
         }
 
-        Commands::StageExport { output } => {
-            println!(">>> Mengemas rootfs aktif menjadi stage tarball: {}", output.bold().cyan());
-            println!("{} Stage tarball berhasil diekspor!", "✓".green());
+        Commands::StageExport {
+            root,
+            output,
+            format,
+            no_verify,
+            no_clean,
+        } => {
+            println!("{}", "=== Kura Linux Distro Stage Exporter ===".bold().cyan());
+            let selected_format = format.unwrap_or_else(|| {
+                if output.to_string_lossy().ends_with(".zst") {
+                    StageFormat::Zstd
+                } else {
+                    StageFormat::Xz
+                }
+            });
+
+            println!("  Rootfs Sumber    : {}", root.display().to_string().yellow());
+            println!("  Format Kompresi  : {}", selected_format.to_string().bold().cyan());
+            println!("  Target Output    : {}", output.display().to_string().green());
+            if no_verify {
+                println!("  Validasi Distro  : {}", "Dinonaktifkan (--no-verify)".yellow());
+            } else {
+                println!("  Validasi Distro  : {}", "UsrMerge & OpenRC diaktifkan".green());
+            }
+
+            let options = StageExportOptions {
+                root_dir: root,
+                output_path: output,
+                format: selected_format,
+                strip_binaries: false,
+                verify_usrmerge: !no_verify,
+                verify_openrc: !no_verify,
+                clean_temporary: !no_clean,
+            };
+
+            println!("\n>>> Memulai proses ekspor distro stage...");
+            match StageExporter::export(&options) {
+                Ok(result) => {
+                    let size_mb = result.file_size as f64 / (1024.0 * 1024.0);
+                    println!("\n{} Stage distribusi berhasil diekspor!", "✓".green());
+                    println!("  - Artefak Stage  : {}", result.output_path.display().to_string().bold().green());
+                    println!("  - Ukuran Berkas  : {:.2} MB ({} bytes)", size_mb, result.file_size);
+                    println!("  - SHA256 Checksum: {}", result.sha256_hash.bold().yellow());
+                    println!("  - BLAKE3 Checksum: {}", result.blake3_hash.bold().yellow());
+                    println!(
+                        "  - Berkas Hash    : {} & {}",
+                        result.sha256_path.display().to_string().dimmed(),
+                        result.blake3_path.display().to_string().dimmed()
+                    );
+                }
+                Err(e) => {
+                    println!("{} Gagal mengekspor distro stage: {:#}", "✗".red(), e);
+                    std::process::exit(1);
+                }
+            }
         }
 
         Commands::List => {

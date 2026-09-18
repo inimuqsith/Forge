@@ -16,6 +16,7 @@ pub mod sync;
 pub mod importer;
 pub mod lock;
 pub mod sandbox;
+pub mod stage;
 
 pub use builder::RecipeBuilder;
 pub use toolchain::{ToolchainComponent, ToolchainManager, ToolchainStatus};
@@ -30,6 +31,7 @@ pub use sync::SyncClient;
 pub use importer::RecipeImporter;
 pub use lock::ForgeLockGuard;
 pub use sandbox::SandboxRunner;
+pub use stage::*;
 
 /// Konfigurasi Global Forge (/etc/forge/forge.conf)
 #[derive(Debug, Clone, Serialize, Deserialize)]

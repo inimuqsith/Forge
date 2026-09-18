@@ -132,11 +132,17 @@
 ---
 
 ### Fase 11: Seed Toolchain, Meta-Packages & Stage Exporter
-**Status:** 🟡 **TOOLCHAIN & META-PACKAGES SELESAI / STAGE EXPORTER PENDING**
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] **Pure Source Seed Toolchain Bundler (ADR-019):** Implementasi `forge toolchain bundle` di [`crates/forge/src/toolchain.rs`](file:///home/admin/Development/Forge/crates/forge/src/toolchain.rs) yang mengemas HANYA biner/library hasil kompilasi murni dari `/tmp/forge/stage/` menjadi `dist/kura-toolchain.tar.xz` tanpa menyalin file host.
 - [x] **Resep Meta-Paket Resmi Kura Linux (ADR-026):** Resep All-in-One `recipes/system/base/recipe.toml` (Base OS) dan `recipes/system/base-devel/recipe.toml` (Toolchain).
 - [x] Desain integrasi OpenRC hook `/etc/init.d/` dan `rc-update`.
-- [ ] **Pending:** Implementasi riil `forge stage-export` untuk mengemas rootfs target menjadi `kura-stage.tar.xz`.
+- [x] **Distro Stage Exporter Engine (`crates/forge/src/stage.rs` & CLI `forge stage-export`):**
+  - Data model `StageExportOptions`, `StageFormat` (Xz, Zstd), dan `StageExportResult`.
+  - `StageExporter::validate_rootfs`: Validasi FHS dasar (`/usr`, `/etc`, `/var`), UsrMerge (`/bin`, `/sbin`, `/lib` symlink ke `usr/bin` / `usr/lib`), dan OpenRC tree (`/etc/init.d/`, `/etc/runlevels/`).
+  - `StageExporter::sanitize_staging`: Pembersihan cache sementara (`/tmp/*`, `/var/cache/*`, `/var/log/*`, `/var/lock/*`, file transien `.tmp`/`.journal`/`.lock`) dengan proteksi mutlak direktori penting (`/var/db/forge/installed/`, `/etc/forge/`, `/etc/init.d/`).
+  - `StageExporter::export`: Pembuatan tarball deterministik (`append_tree_to_tar`) dengan preservasi Unix permissions dan symlink, kompresi Zstandard level 19 dan multi-threaded XZ, serta generasi checksum kriptografis SHA256 (`.sha256`) dan BLAKE3 (`.b3sum`).
+  - Integrasi CLI sub-perintah `forge stage-export` dengan flag `--root`, `--output`, `--format`, `--no-verify`, dan `--no-clean`.
+  - 5 Unit tests: `test_stage_exporter_validates_usrmerge`, `test_stage_exporter_validates_openrc`, `test_stage_exporter_sanitizes_temporary_files`, `test_stage_exporter_full_export_tarball_and_checksums`, `test_stage_exporter_xz_format` lulus 100%.
 
 ---
 
@@ -222,18 +228,20 @@
 | *2026-09-19* | *Concurrency & Sandbox* | *Risiko tabrakan transaksi simultan, polusi host filesystem saat build, dan dependensi biner tier 2 berantai* | *Mengimplementasikan `ForgeLockGuard` (`lock.rs`), `SandboxRunner` (`sandbox.rs`) dengan Bubblewrap / fallback, serta parser ALPM `.db.tar.zst` & resolver dependensi rekursif (`cachyos.rs`) (ADR-033, ADR-034, ADR-035)* |
 | *2026-09-19* | *Build vs Import* | *Pencampuran tanggung jawab build dan import pada server/klien membingungkan alur CI/CD* | *Menerapkan pemisahan `build` (kompilasi & packaging) dan `import` (ingestion & cataloging) secara independen (ADR-036)* |
 | *2026-09-19* | *Ergonomi CI/CD* | *Kebutuhan mengetik path profil CPU berulang kali saat kompilasi paket CI/CD di server* | *Menerapkan `ServerProfileManager` (`profiles.rs`), `forge-server import <cpu-profile.json>` untuk persistensi profil aktif (`active.json`), `forge-server build <PACKAGE>` otomatis menggunakan profil aktif & auto-publish ke binhost, serta `forge-server list-profiles` (ADR-037)* |
+| *2026-09-19* | *Stage Exporter* | *Kebutuhan pengemasan rootfs Kura Linux menjadi stage tarball resmi (.tar.xz / .tar.zst) lengkap dengan validasi UsrMerge & OpenRC, sanitasi cache, serta hash SHA256/BLAKE3* | *Mengimplementasikan `StageExporter` (`stage.rs`) dan CLI `forge stage-export` dengan validasi FHS/UsrMerge/OpenRC, sanitasi transien, packaging preservasi symlink/permissions (`append_tree_to_tar`), dan pembuatan checksum otomatis* |
 
 ---
 
 ## 4. Panduan Serah Terima AI Agent (Incoming AI Agent Handover Guide)
 
 > **Catatan Penting untuk AI Agent Penerus:**
-> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")**, optimasi compiler **Mentok Ekstrem (Zen 4 AVX-512 / Thin LTO / Mold ICF)**, repositori resep terstandarisasi **`/var/db/forge/recipes/` (ADR-028)**, Client Sync Engine (`sync.rs`), Forge Server HTTP Daemon (`server.rs`), DAG Dependency Resolver (`resolver.rs`), Transactional Merger (`merger.rs`), and Manifest Database Engine (`db.rs`) dengan tingkat kesiapan **~90%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan 28 ADR telah didokumentasikan secara lengkap.
+> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")**, optimasi compiler **Mentok Ekstrem (Zen 4 AVX-512 / Thin LTO / Mold ICF)**, repositori resep terstandarisasi **`/var/db/forge/recipes/` (ADR-028)**, Client Sync Engine (`sync.rs`), Forge Server HTTP Daemon (`server.rs`), DAG Dependency Resolver (`resolver.rs`), Transactional Merger (`merger.rs`), Manifest Database Engine (`db.rs`), dan Distro Stage Exporter (`stage.rs`) dengan tingkat kesiapan **~98%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan ADR telah didokumentasikan secara lengkap.
 
 ### 📌 Ringkasan Status & State Workspace:
 - **Workspace:** 2 Crate murni: [`crates/forge`](file:///home/admin/Development/Forge/crates/forge) (Klien & Engine Library) dan [`crates/forge-server`](file:///home/admin/Development/Forge/crates/forge-server) (Server & CI/CD Builder).
 - **Toolchain & Compiler Flags (Mentok Ekstrem):** Rust 1.97.1, LLVM/Clang 22, Linker `mold`, Ccache 4.13.5, Thin LTO, `-O3 -march=native -pipe -flto=thin -fno-plt -fno-math-errno -fno-trapping-math -ffunction-sections -fdata-sections -falign-functions=32 -fstack-protector-strong -D_FORTIFY_SOURCE=2` dan LDFLAGS `-Wl,-O3 -Wl,--as-needed -Wl,--gc-sections -Wl,--icf=all -Wl,-z,relro -Wl,-z,now -fuse-ld=mold`.
 - **Seed Toolchain:** Staged murni di `/tmp/forge/stage/`, membundel `/var/db/forge/recipes/`, `/etc/forge/forge.conf`, dan `/usr/bin/forge` ke `dist/kura-toolchain.tar.xz` (ADR-019, ADR-028).
+- **Distro Stage Exporter:** Modul `crates/forge/src/stage.rs` dan CLI `forge stage-export` mengemas staging/rootfs Kura Linux menjadi `dist/kura-stage.tar.xz` / `dist/kura-stage.tar.zst` lengkap dengan validasi FHS/UsrMerge/OpenRC, sanitasi cache, dan hash SHA256 (`.sha256`) & BLAKE3 (`.b3sum`).
 - **Meta-Paket Distro:** `recipes/system/base/recipe.toml` (Base OS) dan `recipes/system/base-devel/recipe.toml` (Toolchain).
 
 ### 🛑 6 Aturan Mutlak yang Wajib Diikuti:
@@ -244,8 +252,6 @@
 5. **CCACHE ACCELERATION (ADR-025):** Kompilasi memanfaatkan Ccache 4.13.5 pada build engine.
 6. **OPENRC ONLY:** Tidak boleh ada ketergantungan pada Systemd.
 
-### 🎯 Tugas Prioritas Pengembangan Selanjutnya (Sisa 10%):
-1. **Distro Stage Exporter (`forge stage-export`):**
-   - Implementasikan tarball bundler `forge stage-export --output kura-stage.tar.xz` untuk mengemas rootfs aktif menjadi stage distribusi Kura Linux.
-2. **Hybrid Streaming Downloader:**
+### 🎯 Tugas Prioritas Pengembangan Selanjutnya:
+1. **Hybrid Streaming Downloader:**
    - Live network streaming download & dekompresi zstd untuk biner binhost/CachyOS.
