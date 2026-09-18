@@ -134,7 +134,19 @@ impl ToolchainManager {
             let _ = make_symlink("mold", &usr_bin.join("ld.mold"));
         }
 
-        // Tulis environment loader Kura Linux dengan flag optimasi native silikon
+        // Sertakan biner Forge ke dalam seed toolchain agar siap pakai di dalam chroot
+        let forge_bin_candidates = [
+            PathBuf::from("target/release/forge"),
+            PathBuf::from("target/debug/forge"),
+        ];
+        if let Some(forge_bin) = forge_bin_candidates.iter().find(|p| p.exists()) {
+            let dest_forge = usr_bin.join("forge");
+            let _ = fs::copy(forge_bin, &dest_forge);
+            let _ = Command::new("chmod").arg("755").arg(&dest_forge).status();
+            copied_binaries.push("forge".to_string());
+        }
+
+        // Tulis environment loader Kura Linux dengan flag optimasi native silikon (Mentok Ekstrem)
         let env_content = r#"# /etc/forge/toolchain.conf
 # Kura Linux Seed Toolchain Environment (LLVM 22 + mold + Native Silicon Optimization)
 export CC="/usr/bin/clang"
@@ -143,9 +155,9 @@ export LD="/usr/bin/mold"
 export AR="/usr/bin/llvm-ar"
 export NM="/usr/bin/llvm-nm"
 export RANLIB="/usr/bin/llvm-ranlib"
-export CFLAGS="-O3 -march=native -pipe -flto=thin -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt"
+export CFLAGS="-O3 -march=native -pipe -flto=thin -fno-plt -fno-math-errno -fno-trapping-math -ffunction-sections -fdata-sections -falign-functions=32 -fstack-protector-strong -D_FORTIFY_SOURCE=2"
 export CXXFLAGS="${CFLAGS}"
-export LDFLAGS="-Wl,-O1 -Wl,--as-needed -fuse-ld=/usr/bin/mold"
+export LDFLAGS="-Wl,-O3 -Wl,--as-needed -Wl,--gc-sections -Wl,--icf=all -fuse-ld=/usr/bin/mold"
 export MAKEFLAGS="-j$(nproc)"
 "#;
         fs::write(etc_forge.join("toolchain.conf"), env_content)?;

@@ -61,13 +61,15 @@ enable_avx2 = true
 profile_file = "/etc/forge/cpu-profile.json"
 
 [build]
-# Flag optimasi native kompilasi Kura Linux (Khusus Silikon & Thin LTO)
-cflags = "-O3 -march=native -pipe -flto=thin -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt"
-cxxflags = "-O3 -march=native -pipe -flto=thin -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt"
-ldflags = "-Wl,-O1 -Wl,--as-needed -Wl,-z,relro -Wl,-z,now"
+# Flag optimasi native kompilasi Kura Linux (Level Mentok Ekstrem Silikon Zen 4, Thin LTO & Mold)
+cflags = "-O3 -march=native -pipe -flto=thin -fno-plt -fno-math-errno -fno-trapping-math -ffunction-sections -fdata-sections -falign-functions=32 -fstack-protector-strong -D_FORTIFY_SOURCE=2"
+cxxflags = "-O3 -march=native -pipe -flto=thin -fno-plt -fno-math-errno -fno-trapping-math -ffunction-sections -fdata-sections -falign-functions=32 -fstack-protector-strong -D_FORTIFY_SOURCE=2"
+ldflags = "-Wl,-O3 -Wl,--as-needed -Wl,--gc-sections -Wl,--icf=all -Wl,-z,relro -Wl,-z,now"
 makeflags = "-j$(nproc)"
 jobs = "auto"
 prefix = "/usr"
+enable_ccache = true
+ccache_dir = "/var/cache/forge/ccache"
 
 [use]
 # USE Flags Global ala Portage (fitur yang diaktifkan/dinonaktifkan secara global)

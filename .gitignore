@@ -24,6 +24,7 @@ distfiles/
 *.out
 coverage/
 *.profraw
+cpu-profile.json
 
 # --- Editor & OS Artifacts ---
 .vscode/
