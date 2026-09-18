@@ -9,6 +9,7 @@ upstream = "https://kuralinux.org"
 
 [dependencies]
 runtime = [
+    "glibc",
     "llvm",
     "mold",
     "make",

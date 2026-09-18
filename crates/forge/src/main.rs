@@ -497,6 +497,10 @@ fn main() -> Result<()> {
                 print_component(&status.cxx_compiler);
                 print_component(&status.linker);
                 print_component(&status.gnu_compiler);
+                print_component(&status.c_library);
+                print_component(&status.dynamic_linker);
+                print_component(&status.kernel_headers);
+                print_component(&status.binutils);
                 print_component(&status.make);
                 print_component(&status.ninja);
                 print_component(&status.pkgconf);

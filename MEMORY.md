@@ -133,8 +133,12 @@
 
 ### Fase 11: Seed Toolchain, Meta-Packages & Stage Exporter
 **Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
-- [x] **Pure Source Seed Toolchain Bundler (ADR-019):** Implementasi `forge toolchain bundle` di [`crates/forge/src/toolchain.rs`](file:///home/admin/Development/Forge/crates/forge/src/toolchain.rs) yang mengemas HANYA biner/library hasil kompilasi murni dari `/tmp/forge/stage/` menjadi `dist/kura-toolchain.tar.xz` tanpa menyalin file host.
-- [x] **Resep Meta-Paket Resmi Kura Linux (ADR-026):** Resep All-in-One `recipes/system/base/recipe.toml` (Base OS) dan `recipes/system/base-devel/recipe.toml` (Toolchain).
+- [x] **Pure Source Seed Toolchain Bundler (ADR-019, ADR-028):** 
+  - Implementasi `forge toolchain bundle` di [`crates/forge/src/toolchain.rs`](file:///home/admin/Development/Forge/crates/forge/src/toolchain.rs) yang mengemas HANYA biner/library hasil kompilasi murni dari `/tmp/forge/stage/` menjadi `dist/kura-toolchain.tar.xz`.
+  - Deteksi lengkap sistem: compiler (`clang`, `gcc`), linker (`mold`), C runtime library (`glibc` / `libc.so.6`), dynamic linker (`ld-linux-x86-64.so.2`), kernel headers (`linux-headers`), binutils (`as`, `ar`), build automation (`make`, `ninja`, `pkgconf`).
+  - Hierarki root UsrMerge otomatis (`/bin`, `/sbin`, `/lib`, `/lib64 -> usr/lib`) dan kerangka direktori sistem lengkap (`/tmp` 1777, `/var/db/forge/`, `/var/cache/forge/`, dll.).
+  - Injeksi konfigurasi bawaan `/etc/forge/forge.conf` (menunjuk `https://pkgkura.amqs.net`) dan `/etc/forge/toolchain.conf` untuk kemandirian chroot instan.
+- [x] **Resep Meta-Paket Resmi Kura Linux (ADR-026):** Resep All-in-One `recipes/system/base/recipe.toml` (Base OS) dan `recipes/system/base-devel/recipe.toml` (Toolchain dengan runtime Glibc eksplisit).
 - [x] Desain integrasi OpenRC hook `/etc/init.d/` dan `rc-update`.
 - [x] **Distro Stage Exporter Engine (`crates/forge/src/stage.rs` & CLI `forge stage-export`):**
   - Data model `StageExportOptions`, `StageFormat` (Xz, Zstd), dan `StageExportResult`.
@@ -142,7 +146,7 @@
   - `StageExporter::sanitize_staging`: Pembersihan cache sementara (`/tmp/*`, `/var/cache/*`, `/var/log/*`, `/var/lock/*`, file transien `.tmp`/`.journal`/`.lock`) dengan proteksi mutlak direktori penting (`/var/db/forge/installed/`, `/etc/forge/`, `/etc/init.d/`).
   - `StageExporter::export`: Pembuatan tarball deterministik (`append_tree_to_tar`) dengan preservasi Unix permissions dan symlink, kompresi Zstandard level 19 dan multi-threaded XZ, serta generasi checksum kriptografis SHA256 (`.sha256`) dan BLAKE3 (`.b3sum`).
   - Integrasi CLI sub-perintah `forge stage-export` dengan flag `--root`, `--output`, `--format`, `--no-verify`, dan `--no-clean`.
-  - 5 Unit tests: `test_stage_exporter_validates_usrmerge`, `test_stage_exporter_validates_openrc`, `test_stage_exporter_sanitizes_temporary_files`, `test_stage_exporter_full_export_tarball_and_checksums`, `test_stage_exporter_xz_format` lulus 100%.
+  - 8 Unit tests: `test_stage_exporter_validates_usrmerge`, `test_stage_exporter_validates_openrc`, `test_stage_exporter_sanitizes_temporary_files`, `test_stage_exporter_full_export_tarball_and_checksums`, `test_stage_exporter_xz_format`, `test_toolchain_status_detection_including_glibc`, `test_bundle_seed_toolchain_usrmerge_structure_and_config`, `test_bundle_seed_toolchain_fails_when_empty_stage` lulus 100%.
 
 ---
 
