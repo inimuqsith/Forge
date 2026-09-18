@@ -1,6 +1,6 @@
 # ARCHITECTURE.md — Blueprint Arsitektur Package Manager `forge` & `forge-server`
 
-> **`forge`** adalah *High-Performance Source-First Hybrid Package Manager* yang dibangun murni menggunakan bahasa **Rust** khusus untuk distribusi **Kura Linux**. Mengadopsi fondasi performa tinggi dari compiler **LLVM**, ultra-fast linker **`mold`**, Link-Time Optimization (**LTO Thin/Full**), dan dukungan **PGO (Profile-Guided Optimization)**, Forge menggabungkan filosofi kompilasi **Gentoo Portage** (*Source-First*, *USE Flags*, *Slots*), paradigma meta-paket modular modern (*`base`*, *`base-devel`*), akselerasi **Ccache (v4.13.5)**, DAG Dependency Resolver, Transactional Merger, Manifest Database, ekosistem **`forge-server` (Lock-CPU Build Farm)**, konfigurasi terpusat (`/etc/forge/forge.conf`), serta akselerasi Binhost / CachyOS.
+> **`forge`** adalah *High-Performance Source-First Hybrid Package Manager* yang dibangun murni menggunakan bahasa **Rust** khusus untuk distribusi **Kura Linux**. Mengadopsi fondasi performa tinggi dari compiler **LLVM 22**, ultra-fast linker **`mold`**, Link-Time Optimization (**LTO Thin/Full**), dan dukungan **PGO (Profile-Guided Optimization)**, Forge menggabungkan filosofi kompilasi **Gentoo Portage** (*Source-First*, *USE Flags*, *Slots*), paradigma meta-paket modular modern (*`base`*, *`base-devel`*), akselerasi **Ccache (v4.13.5)**, DAG Dependency Resolver, Transactional Merger, Manifest Database, ekosistem **`forge-server` (Lock-CPU Build Farm & Upstream Bumper)**, konfigurasi terpusat (`/etc/forge/forge.conf`), repositori **GitOps SSOT**, serta akselerasi 3-Tier Package Cascade.
 
 ---
 
@@ -30,7 +30,9 @@ Forge dirancang menggunakan arsitektur modular yang terkonsolidasi secara rapi d
 |     ├── `src/binhost.rs`   : Forge Binhost Client & Zstd/BLAKE3 streaming verification          |
 |     ├── `src/cachyos.rs`   : CachyOS (Zen4/v4/v3) Adapter & Anti-Brick Core OS Blacklist Engine |
 |     ├── `src/importer.rs`  : Upstream PKGBUILD/APKBUILD Recipe Transpiler                       |
-|     └── `src/cascade.rs`   : 3-Tier Package Cascade Resolver (--native & --binhost)             |
+|     ├── `src/cascade.rs`   : 3-Tier Package Cascade Resolver (--native & --binhost)             |
+|     ├── `src/stage.rs`     : Distro Stage Exporter (kura-stage.tar.xz / .tar.zst)               |
+|     └── `src/sync.rs`      : Client Sync Engine (/var/db/forge/recipes/)                        |
 +=================================================================================================+
                                                  ▲
                                                  │ Sinkronisasi Resep & Unduhan Biner
@@ -39,10 +41,12 @@ Forge dirancang menggunakan arsitektur modular yang terkonsolidasi secara rapi d
 |                                CRATE 2: `crates/forge-server`                                   |
 |                            (Daemon Server & CI/CD Build Farm Suite)                             |
 +=================================================================================================+
-|  1. `forge-server build`  : CI/CD Worker Builder (Lock-CPU CFLAGS -> .forge.tar.zst)            |
-|  2. `forge-server import` : Binary Ingestion (.forge.tar.zst -> /var/db/forge/binhost/ & cat)   |
-|  3. `forge-server index`  : Generator database index repositori biner `packages.db.zst`         |
-|  4. `forge-server serve`  : Recipe Registry HTTP API, Binhost Server & Web Explorer             |
+|  1. `forge-server serve`   : Recipe Registry REST API, Web Explorer & Webhook Receiver          |
+|  2. `forge-server audit`   : Upstream Version Audit Engine (107 resep dalam ~3 detik)           |
+|  3. `forge-server bump`    : Atomic Upstream Recipe Bumper + Auto-Push ke GitHub SSOT           |
+|  4. `forge-server import`  : Profil Silikon Ingestion & Binary Catalog Ingester                 |
+|  5. `forge-server build`   : CI/CD Worker Builder (Lock-CPU CFLAGS -> .forge.tar.zst)            |
+|  6. `forge-server index`   : Generator database index repositori biner `packages.db.zst`        |
 +=================================================================================================+
 ```
 
@@ -82,304 +86,190 @@ flowchart TD
     end
 
     subgraph EPOCH_3["Fase 3: Lingkungan Produksi (Klien & Server Publik)"]
-        J["forge-server\n(Central Recipe Git & Binhost)"]
+        J["forge-server\n(https://pkgkura.amqs.net)"]
         K["User Laptop / PC"]
         K -- "1. forge sync" --> J
         J -- "Resep Terkini" --> K
         K -- "2. forge install <pkg>" --> L["Local Native Compilation"]
         K -- "2b. forge install --binhost" --> M["Download Pre-built Binary\n(Lock-CPU)"]
     end
+```
 
-### 🐣 2-Stage Bootstrapping Pipeline: Menyelesaikan Masalah Paradoks Ayam dan Telur (*The Bootstrap Paradox*)
+---
+
+## 4. Pipeline Bootstrap 2-Tahap: Menyelesaikan Paradoks Ayam dan Telur (*The Bootstrap Paradox*)
 
 > **Pertanyaan Mendasar:** *"Bagaimana kita bisa menjalankan `forge install base-devel` di dalam chroot Kura Linux jika di dalam chroot belum ada toolchain compiler untuk mengompilasi?"*
 
-Masalah ini adalah masalah klasik **The Chicken-and-Egg Problem** dalam pembuatan sistem operasi (seperti Linux From Scratch atau Gentoo). Forge menyelesaikannya secara deterministik melalui **Pipeline Bootstrap 2-Tahap**:
+Masalah ini diselesaikan melalui **Pipeline Bootstrap 2-Tahap**:
 
 ```
-[ TAHAP 1: Di Luar Chroot / Mesin Host Saat Ini ]
-   Host Linux (Menggunakan compiler host sementara)
-        │
-        ▼
-   Forge mengompilasi resep LLVM 22, Mold, Make, Ninja, Glibc dari source ke /tmp/forge/stage/
-        │
-        ▼
-   forge toolchain bundle  ───►  Menghasilkan "dist/kura-toolchain.tar.xz" (SEED TOOLCHAIN)
-                                 (Berisi: clang, mold, make, ninja, gcc, pkgconf, dan biner forge)
+[ TAHAP 1: Di Luar Chroot / Mesin Host ]
+1. Developer mengompilasi resep toolchain sistem (recipes/system/) di host.
+2. Hasil kompilasi disimpan di staging terisolasi `/tmp/forge/stage/`.
+3. Menjalankan `forge toolchain bundle`.
+4. Engine memverifikasi UsrMerge, Glibc, Clang 22, Mold, Make, Ninja, dan menyertakan /var/db/forge/recipes/ serta default /etc/forge/forge.conf ke dalam `dist/kura-toolchain.tar.xz`.
 
-─────────────────────────────────────────────────────────────────────────────
-
-[ TAHAP 2: Masuk ke Lingkungan Chroot /mnt/kura ]
-   1. Ekstrak Seed Toolchain ke rootfs kosong:
-      # mkdir -p /mnt/kura
-      # tar -xpJf dist/kura-toolchain.tar.xz -C /mnt/kura/
-      
-   2. Masuk ke lingkungan chroot:
-      # chroot /mnt/kura /bin/bash
-      
-   3. SEKARANG TOOLCHAIN SUDAH TERSEDIA DI /usr/bin/ !
-      Maka di dalam chroot, Forge dapat mengeksekusi:
-      
-      # forge install base        ──► Mengompilasi paket pondasi OS (bash, coreutils, openrc) 
-                                      menggunakan Seed Toolchain yang ada di /usr/bin/.
-                                      
-      # forge install base-devel  ──► Mengompilasi ulang toolchain generasi ke-2 (Self-Hosted)
-                                      yang 100% murni di-link terhadap Glibc Kura Linux sendiri!
-                                      Setelah ini, Seed Toolchain lama digantikan secara bersih.
-```
-
-Dengan alur 2-tahap ini, Kura Linux bertransformasi dari sistem yang bergantung pada seed awal menjadi **Self-Hosting Operating System** seutuhnya tanpa pernah mengotori sistem host.
-
-
----
-
-## 4. Blueprint Mendalam: DAG Dependency Resolver (`src/resolver.rs`)
-
-### 🎯 Tujuan & Filosofi
-Memetakan seluruh pohon ketergantungan paket dari resep `recipe.toml`, memvalidasi ketiadaan siklus (*cycle detection*), dan menghasilkan urutan eksekusi kompilasi topologis yang deterministik (*Topological Sort*).
-
-```
-                 [ Target: base / base-devel / mold / nginx ]
-                                      │
-                                      ▼
-                        +---------------------------+
-                        |  1. Recipe Loader & Scan  |
-                        | (recipes/system,core,...) |
-                        +---------------------------+
-                                      │
-                                      ▼
-                        +---------------------------+
-                        |  2. USE Flags Evaluator   |
-                        |   (Filter conditional deps|
-                        +---------------------------+
-                                      │
-                                      ▼
-                        +---------------------------+
-                        |  3. Construct Directed    |
-                        |     Acyclic Graph (DAG)   |
-                        +---------------------------+
-                                      │
-                                      ▼
-                        +---------------------------+
-                        | 4. Cycle Detection Check  |
-                        | (Tarjan / Kahn Algorithm) |
-                        +---------------------------+
-                                      │
-                                      ▼
-                        +---------------------------+
-                        | 5. Topological Execution  |
-                        |   Order Resolution Queue  |
-                        +---------------------------+
-```
-
-### 📐 Spesifikasi Data & Algoritma:
-1. **Model Graf Ketergantungan:**
-   - **Node:** Merepresentasikan paket unik dengan atribut `(Name, Version, Slot, ActiveUSE)`.
-   - **Edge:** Merepresentasikan jenis ketergantungan:
-     - `DependencyType::Build` (`makedepends`): Ketergantungan yang wajib terpasang di host/sysroot sebelum kompilasi dimulai (misal: `ninja`, `cmake`, `linux-headers`).
-     - `DependencyType::Runtime` (`depends`): Ketergantungan yang wajib tersedia agar biner dapat dieksekusi (misal: `glibc`, `openssl`, `zlib`).
-2. **USE Flag Dependency Conditionals:**
-   - Engine mengevaluasi conditional dependency format: `ssl? ( >=dev-libs/openssl-3.0 )`. Jika flag `ssl` tidak aktif pada konfigurasi, dependensi tidak akan dimasukkan ke dalam graf.
-3. **Penyelesaian Siklus & Urutan Topologis:**
-   - Menggunakan algoritma **Kahn** atau **Tarjan Strongly Connected Components (SCC)**.
-   - Jika terdeteksi siklus tertutup (circular dependency), resolver menghasilkan laporan diagnostik detail beserta path siklusnya dan membatalkan build dengan pesan error yang jelas.
-
----
-
-## 5. Blueprint Mendalam: Transactional Merger & Collision Detector (`src/merger.rs`)
-
-### 🎯 Tujuan & Filosofi
-Memindahkan berkas hasil kompilasi dari direktori staging `$DESTDIR` (`/tmp/forge/stage/<pkg>`) ke rootfs target `$FORGE_ROOT` (default `/`) secara atomik, dengan jaminan integritas, tanpa risiko merusak file sistem host jika terjadi error.
-
-```
-  +--------------------------+
-  |  Staging DESTDIR         |
-  | (/tmp/forge/stage/<pkg>) |
-  +--------------------------+
-               │
-               ▼
-  +--------------------------+
-  | Pre-flight Collision     |
-  | Scanner vs Installed DB  |
-  +--------------------------+
-     │                    │
-[Ada Konflik]         [Aman / Bersih]
-     │                    │
-     ▼                    ▼
-[Abort / Error]  +--------------------------+
-                 | Atomic Transaction Merge |
-                 | (Copy, Symlink, Chmod)   |
-                 +--------------------------+
-                              │
-                              ▼
-                 +--------------------------+
-                 | Write Package Manifest   |
-                 | & Metadata to /var/db/   |
-                 +--------------------------+
-                              │
-                              ▼
-                 +--------------------------+
-                 | Trigger Post-Hooks       |
-                 | (OpenRC, ldconfig, etc.) |
-                 +--------------------------+
+[ TAHAP 2: Di Dalam Chroot Kura Linux ]
+1. Administrator mengekstrak `dist/kura-toolchain.tar.xz` ke `/mnt/kura/`.
+2. Masuk ke chroot: `chroot /mnt/kura /bin/bash`.
+3. Menjalankan `forge install base` dan `forge install base-devel`.
+4. Seluruh toolchain dan sistem inti Kura Linux terkompilasi ulang secara mandiri (self-hosted).
+5. Menjalankan `forge stage-export` untuk menghasilkan tarball distribusi resmi `dist/kura-stage.tar.xz`.
 ```
 
 ---
 
-## 6. Blueprint Mendalam: Flat-File Manifest Database & Unmerge Cleaner (`src/db.rs`)
+## 5. Arsitektur GitOps Recipe Registry & GitHub Webhook Loop
 
-```
-/var/db/forge/
-├── world                        # Daftar paket eksplisit yang diminta user
-├── installed/
-│   ├── sys-devel/
-│   │   └── mold-2.42.1:0/       # <kategori>/<nama>-<versi>:<slot>
-│   │       ├── manifest         # Daftar seluruh berkas, ukuran, hash SHA256
-│   │       ├── metadata.json    # Info build, target march, compiler flags
-│   │       ├── USE              # USE flags yang aktif saat kompilasi
-│   │       ├── CFLAGS           # CFLAGS yang digunakan
-│   │       └── CONTENTS         # Struktur tree file terpasang
-│   └── sys-libs/
-│       └── glibc-2.44:0/
-│           ├── manifest
-│           └── metadata.json
-```
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin as Maintainer / Bot
+    participant GH as GitHub SSOT (inimuqsith/Forge)
+    participant WH as VPS Webhook (/v1/webhook/github)
+    participant SVR as forge-server (pkgkura.amqs.net)
+    participant CLI as Forge Client (forge sync)
 
-### 🧹 Spesifikasi Unmerge Cleaner (`forge remove <pkg>`):
-1. **Pembacaan Manifest:** Mengambil daftar berkas dan symlink milik paket dari `/var/db/forge/installed/<pkg>/manifest`.
-2. **Proteksi Konfigurasi (`CONFIG_PROTECT`):** Berkas di bawah `/etc/` yang mengalami modifikasi hash tidak akan dihapus sembarangan.
-3. **Reverse Directory Pruning:** Menghapus berkas dari level terdalam ke luar dan hanya menghapus direktori jika sudah kosong.
-4. **Post-Unmerge Hook Trigger:** Menjalankan `ldconfig` dan `rc-update` jika paket menyediakan service OpenRC.
+    Admin->>GH: git push origin main (Pembaruan Resep)
+    GH->>WH: POST /v1/webhook/github (Payload Push Event)
+    WH->>SVR: git pull --rebase & bundle_recipes()
+    SVR->>SVR: Update recipes.tar.zst & latest.sha256
+    SVR->>SVR: Refresh in-memory catalog (107 packages)
+    WH-->>GH: HTTP 200 {"status":"ok","package_count":107}
 
----
-
-## 7. Blueprint Akselerasi Ccache & Hierarki Supremasi Compiler
-
-```
-                      [ Resep: recipe.toml ]
-                                │
-                                ▼
-               +----------------------------------+
-               | Injeksi Ccache & Compiler Flags  |
-               +----------------------------------+
-                                │
-          ┌─────────────────────┴─────────────────────┐
-          ▼                                           ▼
-[ Paket Glibc / Override GCC ]            [ Paket Sistem Standar ]
-(ADR-002: Pengecualian Khusus)            (Supremasi Native LLVM/Mold - Mentok Ekstrem)
-- CC="ccache gcc"                         - CC="ccache clang"
-- CXX="ccache g++"                        - CXX="ccache clang++"
-- LD="ld"                                 - LD="mold"
-- CFLAGS="-O2 -pipe ..."                  - CFLAGS="-O3 -march=native -pipe -flto=thin
-- LDFLAGS="-Wl,-O1 ..."                              -fno-plt -fno-math-errno -fno-trapping-math
-                                                     -ffunction-sections -fdata-sections
-                                                     -falign-functions=32 -fstack-protector-strong
-                                                     -D_FORTIFY_SOURCE=2"
-                                          - LDFLAGS="-Wl,-O3 -Wl,--as-needed -Wl,--gc-sections
-                                                     -Wl,--icf=all -Wl,-z,relro -Wl,-z,now
-                                                     -fuse-ld=mold"
-```
-
-### 🏎️ Rincian Flag Optimasi Silikon "Mentok Ekstrem" (AMD Zen 4 / Native):
-1. **`-march=native` & `-O3`**: Mengaktifkan seluruh set instruksi CPU host (AVX-512 F/DQ/IFMA/CD/BW/VL/BF16/VBMI/VNNI, AVX2, SHA-NI, VAES) dan vektorisasi agresif hingga register 512-bit ZMM (`%zmm0` - `%zmm31`).
-2. **`-flto=thin`**: Link-Time Optimization antar-unit kompilasi paralel untuk inlining fungsi lintas-modul secara efisien.
-3. **`-fuse-ld=mold` + `-Wl,--icf=all` + `-Wl,--gc-sections`**: Identical Code Folding (menghilangkan duplikasi fungsi identik), dead code stripping, dan linking instan dengan ultra-fast linker mold.
-4. **`-fno-math-errno` & `-fno-trapping-math`**: Mengeliminasi overhead pengecekan `errno` matematika POSIX sehingga compiler LLVM bebas melakukan auto-vectorization SIMD AVX-512 penuh pada loop kalkulasi.
-5. **`-falign-functions=32`**: Mengoptimalkan alignment fungsi ke batas 32-byte untuk memaksimalkan throughput AMD Zen 4 Op-Cache dan branch prediction unit.
-
----
-
-## 8. Blueprint Pure Source Seed Toolchain (`dist/kura-toolchain.tar.xz`)
-
-```
-+-------------------------------------------------------------------------------------------------+
-|               PEMBUATAN SEED TOOLCHAIN PURE SOURCE-BUILT: `forge toolchain bundle`              |
-+-------------------------------------------------------------------------------------------------+
-|  1. ATURAN MUTLAK: HARAM MENGAMBIL BINER/LIBRARY DARI HOST (/usr/bin, /usr/lib).               |
-|  2. Mengemas HANYA biner & library yang 100% dikompilasi dari source code oleh Forge ke staging |
-|     `/tmp/forge/stage/<pkg>/` (LLVM 22, Mold 2.42, Ninja 1.13, Pkgconf 3.0.7, Make 4.4.1).      |
-|  3. Menyertakan ekosistem lengkap Forge:                                                        |
-|     - `usr/bin/` (clang, cc, clang++, c++, mold, ld, lld, make, ninja, pkgconf, forge)          |
-|     - `usr/lib/` (runtime LLVM, compiler-rt, libc.so, libm.so, dynamic linker ld-linux)         |
-|     - `usr/include/` (header kernel C/C++ linux-headers & glibc)                                |
-|     - `etc/forge/forge.conf` (konfigurasi tunggal package manager)                              |
-|     - `var/db/forge/recipes/` (seluruh pohon resep resmi Kura Linux: system, core, extra)       |
-|  4. Mengompresi ke `dist/kura-toolchain.tar.xz` + hash BLAKE3/SHA256 deterministik.            |
-+-------------------------------------------------------------------------------------------------+
+    Note over CLI,SVR: Klien menjalankan sinkronisasi
+    CLI->>SVR: GET /v1/recipes/latest.sha256
+    SVR-->>CLI: SHA256 Hash
+    CLI->>SVR: GET /v1/recipes/latest.tar.zst
+    SVR-->>CLI: Stream Zstandard Tarball
+    CLI->>CLI: Ekstrak atomik ke /var/db/forge/recipes/
 ```
 
 ---
 
-## 9. Format All-in-One `recipe.toml`
+## 6. Multi-Tier Zero-Quota Upstream Version Probing & Bumper Engine
+
+Engine `RecipeBumper` (`crates/forge-server/src/bumper.rs`) menggunakan strategi 3-tier probing cerdas untuk mengaudit dan memperbarui resep hulu tanpa pernah terhambat *rate-limiting*:
+
+```mermaid
+flowchart TD
+    Start["Audit / Bump Paket"] --> DetGH{"Apakah URL Upstream GitHub?"}
+    
+    DetGH -- Ya --> T1{"Tersedia GITHUB_TOKEN?"}
+    T1 -- Ya --> API["Tier 1: GitHub REST API (Authenticated)"]
+    T1 -- Tidak --> Atom["Tier 2: GitHub Atom Feed (/releases.atom)<br/>Zero Quota / Bebas Batas Kuota"]
+    
+    API -- Sukses --> ParseVer["Ekstraksi Tag & Semver Cleaning"]
+    API -- Rate Limit / Error --> Atom
+    Atom -- Sukses --> ParseVer
+    
+    DetGH -- Tidak / Fallback --> T3["Tier 3: Anitya / Release-Monitoring.org v2 Projects API"]
+    Atom -- Gagal --> T3
+    T3 --> ParseVer
+    
+    ParseVer --> Comp{"Bandingkan Versi Lokal vs Hulu"}
+    Comp -- Versi Hulu Lebih Baru --> Outdated["Status: [UPDATE] (Perlu Bump)"]
+    Comp -- Versi Sama / Lebih Rendah --> UpToDate["Status: [LATEST] (Mutakhir)"]
+```
+
+---
+
+## 7. 3-Tier Package Cascade Resolution & Anti-Brick Protection
+
+```mermaid
+flowchart TD
+    User["forge install <package>"] --> Mode{"Mode Eksekusi"}
+    
+    Mode -- "--native" / Default --> Source["Tingkat 3: Source-First Portage Compilation<br/>(-march=native, tmpfs sandbox, Ccache)"]
+    
+    Mode -- "--binhost" --> Tier1{"Tingkat 1: Forge Native Binhost<br/>(.forge.tar.zst di pkgkura.amqs.net)"}
+    Tier1 -- "Tersedia" --> DownloadForge["Unduh Biner Native & Merge"]
+    
+    Tier1 -- "Tidak Tersedia" --> Tier2{"Tingkat 2: CachyOS Prebuilt Fallback<br/>(Zen4 / v4 / v3)"}
+    Tier2 -- "Paket Masuk Core OS Blacklist?" --> BlockBlacklist["⛔ TOLAK BINER LUAR (Anti-Brick Protection)<br/>(glibc, openrc, gcc, llvm, mold, base, dll.)"]
+    BlockBlacklist --> Source
+    
+    Tier2 -- "Aman (Bukan Blacklist)" --> DownloadCachy["Unduh Biner CachyOS & Merge"]
+    Tier2 -- "Tidak Tersedia" --> Source
+```
+
+---
+
+## 8. Format Standar Resep All-in-One (`recipe.toml`)
 
 ```toml
 [package]
-name = "pkgconf"
-version = "3.0.7"
+name = "fastfetch"
+version = "2.38.0"
 release = 1
 slot = "0"
-description = "Package compiler and linker metadata toolkit (Latest 3.0.7)"
-license = "ISC"
-upstream = "http://pkgconf.org/"
+description = "Like neofetch, but much faster because written in C"
+license = "MIT"
+upstream = "https://github.com/fastfetch-cli/fastfetch"
 
 [dependencies]
-runtime = ["glibc"]
-build = ["gcc", "make"]
+runtime = ["glibc", "zlib"]
+build = ["cmake", "ninja", "pkgconf", "gcc"]
 
 [sources]
-urls = ["https://distfiles.ariadne.space/pkgconf/pkgconf-3.0.7.tar.xz"]
-sha256 = ["c926ff491cbd9a331a589160811bd97ab1749b4d5198a519338f2cdfabe6940a"]
+urls = ["https://github.com/fastfetch-cli/fastfetch/archive/refs/tags/2.38.0.tar.gz"]
+sha256 = ["d99a9a5fbe7e9eb0eb66da9bc298ff2aa14594c9794cbdb702fa10e7b257da2e"]
 
 [build]
-type = "autotools"
+type = "cmake"
 script = """
-cd "${srcdir}/pkgconf-${pkgver}"
-./configure \
-    --prefix=/usr \
-    --sysconfdir=/etc \
-    --localstatedir=/var \
-    --disable-static
-make ${MAKEFLAGS}
-make DESTDIR="${DESTDIR}" install
-ln -sf pkgconf "${DESTDIR}/usr/bin/pkg-config"
+cd "${srcdir}/fastfetch-${pkgver}"
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+ninja -C build ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install
 """
 ```
 
 ---
 
-## 10. Blueprint Sistem Resep Terdedikasi `/var/db/forge/recipes/` & `forge sync` (ADR-028)
+## 9. Indeks Keputusan Arsitektur Resmi (ADR Index)
 
-### 🎯 Eliminasi Ketergantungan Terhadap Folder Git Lokal
-Forge didesain sebagai package manager sistem operasi sejati yang mandiri. Forge **tidak bergantung** pada repositori Git pengembang (`./recipes/`), melainkan menggunakan standar direktori sistem resmi Kura Linux:
-
-```
-/var/db/forge/
-├── recipes/                    # Pohon Resep Resmi Sistem (Single Source of Truth)
-│   ├── system/                 # Resep set sistem & meta-paket (base, base-devel, glibc, dll.)
-│   ├── core/                   # Resep utilitas inti sistem
-│   └── extra/                  # Resep aplikasi & layanan tambahan
-├── installed/                  # Database paket terpasang & manifest
-└── world                       # Daftar paket yang diminta user
-```
-
-### 🔄 Alur Sinkronisasi Resep (`forge sync`):
-```
-[ Klien Kura Linux ]                                      [ forge-server ]
-       │                                                         │
-       │ ── 1. HTTP GET /v1/recipes/latest.tar.zst ────────────► │
-       │                                                         │
-       │ ◄─ 2. Stream Tarball Resep + Signature BLAKE3 ───────── │
-       │
-       ▼
-   Verifikasi Signature & Checksum
-       │
-       ▼
-   Ekstrak Atomik ke /var/db/forge/recipes/
-```
-
-### 🐣 Jaminan Kemandirian Chroot (Zero-External Dependency):
-Karena `forge toolchain bundle` mengemas `/var/db/forge/recipes/` dan `/etc/forge/forge.conf` langsung ke dalam `dist/kura-toolchain.tar.xz`:
-1. Administrator cukup mengekstrak tarball ke `/mnt/kura/`.
-2. Masuk ke `chroot /mnt/kura /bin/bash`.
-3. Langsung jalankan `forge install base` dan `forge install base-devel` secara offline tanpa perlu mount folder git host atau koneksi internet awal.
-
+| ADR | Judul Keputusan | Status |
+| :--- | :--- | :---: |
+| **ADR-001** | Kompilasi 100% Native Silikon (`-march=native`, Thin LTO, Mold) | ✅ Diterapkan |
+| **ADR-002** | Pengecualian Optimasi Custom pada Paket Glibc (Stabilitas Build System) | ✅ Diterapkan |
+| **ADR-003** | Format Resep Hibrida: Deklaratif + POSIX Shell | ✅ Diterapkan |
+| **ADR-004** | Database Flat-File `/var/db/forge/` Tanpa Ketergantungan Eksternal | ✅ Diterapkan |
+| **ADR-005** | Isolasi Build RAM `tmpfs` & `DESTDIR` Staging | ✅ Diterapkan |
+| **ADR-006** | Pemeriksaan Tabrakan Berkas & Manifest Deterministik | ✅ Diterapkan |
+| **ADR-007** | Integrasi Layanan OpenRC Native (`/etc/init.d/`, `rc-update`) | ✅ Diterapkan |
+| **ADR-008** | Meta-Target & `stage-export` Tarball Distribusi | ✅ Diterapkan |
+| **ADR-009** | Protokol Mutlak HITL (Human-In-The-Loop) & Siklus Verifikasi | ✅ Diterapkan |
+| **ADR-010** | Hierarki Resolusi Source-First Kompilasi Native | ✅ Diterapkan |
+| **ADR-011** | Pohon Resep Terpusat di Server & Sinkronisasi Klien (`forge sync`) | ✅ Diterapkan |
+| **ADR-012** | CI/CD Build Farm Locked to Target CPU Microarchitecture | ✅ Diterapkan |
+| **ADR-013** | Introspeksi Hardware & Profil CPU (`forge cpu-dump`) | ✅ Diterapkan |
+| **ADR-014** | Sistem USE Flags & Multi-Version Slotting ala Portage | ✅ Diterapkan |
+| **ADR-015** | Pemisahan Binary Klien `forge` dan Server `forge-server` | ✅ Diterapkan |
+| **ADR-016** | Konfigurasi Terpusat Single Source of Truth (`/etc/forge/forge.conf`) | ✅ Diterapkan |
+| **ADR-017** | Implementasi Bahasa Rust & Pipeline Kompilasi Ultra-Cepat | ✅ Diterapkan |
+| **ADR-018** | Isolated Seed Toolchain & Sysroot Packaging | ✅ Diterapkan |
+| **ADR-019** | Penegakan Mutlak Pure Source-Built & Zero Host Harvesting | ✅ Diterapkan |
+| **ADR-020** | Format Resep All-in-One `recipe.toml` & Hierarki Supremasi Compiler | ✅ Diterapkan |
+| **ADR-021** | Suite Toolchain Hulu Terbaru 2026 (LLVM 22, Mold 2.42, Glibc 2.44, GCC 16) | ✅ Diterapkan |
+| **ADR-022** | Topological DAG Dependency Resolution & Cycle Detection Engine | ✅ Diterapkan |
+| **ADR-023** | Transactional Atomic Merger, Collision Detector & Manifest Database | ✅ Diterapkan |
+| **ADR-024** | Config-Protected Unmerge Cleaner & Reverse Directory Pruning | ✅ Diterapkan |
+| **ADR-025** | Integrated Compiler Acceleration with Ccache 4.13.5 & tmpfs Isolation | ✅ Diterapkan |
+| **ADR-026** | Paradigma Meta-Paket Murni & Eliminasi Hardcoded @system / system-setup | ✅ Diterapkan |
+| **ADR-027** | Pipeline Bootstrap 2-Tahap & Resolusi Paradoks Ayam-Telur | ✅ Diterapkan |
+| **ADR-028** | Sistem Resep Terdedikasi `/var/db/forge/recipes/` & Kemandirian Chroot | ✅ Diterapkan |
+| **ADR-029** | Disiplin Git Commit Berkala & Pembaruan Kontinu Dokumentasi Markdown | ✅ Diterapkan |
+| **ADR-030** | Penyederhanaan CLI & 3-Tier Package Cascade Resolution | ✅ Diterapkan |
+| **ADR-031** | Garansi Anti-Brick & Core OS Blacklist Protection | ✅ Diterapkan |
+| **ADR-032** | Upstream Recipe Importer & Otomasi Katalog 100+ Resep Kura Linux | ✅ Diterapkan |
+| **ADR-033** | Global Concurrency Lock RAII (`/var/lock/forge.lock`) | ✅ Diterapkan |
+| **ADR-034** | Bubblewrap Sandbox Build Isolation (`--ro-bind / /`) | ✅ Diterapkan |
+| **ADR-035** | ALPM DB Tarball Parser & Recursive Anti-Brick Resolver | ✅ Diterapkan |
+| **ADR-036** | Pemisahan Tanggung Jawab Command Build & Import | ✅ Diterapkan |
+| **ADR-037** | Ergonomis Penyimpanan Profil CPU & CI/CD Streamlined Build Server | ✅ Diterapkan |
+| **ADR-038** | GitHub Webhook & Real-Time Auto-Rebundling GitOps | ✅ Diterapkan |
+| **ADR-039** | Server-Side Multi-Tier Upstream Probing & GitHub SSOT Automated Bumping | ✅ Diterapkan |
