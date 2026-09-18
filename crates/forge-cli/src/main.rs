@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::*;
-use forge_core::{get_default_system_packages, SystemSetupConfig};
+use forge_core::{get_default_system_packages, SystemSetupConfig, ToolchainManager};
 use forge_cpu::CpuProfile;
 use std::path::Path;
 
@@ -96,6 +96,24 @@ enum Commands {
     /// Cari resep paket berdasarkan nama atau deskripsi
     Search {
         query: String,
+    },
+
+    /// Kelola dan kemas seed toolchain terisolasi untuk sysroot Kura Linux
+    Toolchain {
+        #[command(subcommand)]
+        action: ToolchainAction,
+    },
+}
+
+#[derive(Subcommand)]
+enum ToolchainAction {
+    /// Periksa status deteksi compiler (Clang/LLVM 22, GCC, mold, Make, Ninja)
+    Status,
+
+    /// Kemas seed toolchain ke dalam file kura-toolchain.tar.xz untuk sysroot Kura Linux
+    Bundle {
+        #[arg(long, default_value = "dist/kura-toolchain.tar.xz")]
+        output: String,
     },
 }
 
@@ -212,7 +230,60 @@ fn main() -> Result<()> {
         Commands::Search { query } => {
             println!("Mencari paket dengan query: '{}'...", query.bold().yellow());
         }
+
+        Commands::Toolchain { action } => match action {
+            ToolchainAction::Status => {
+                println!("{}", "=== Kura Linux Toolchain Detection Status ===".bold().cyan());
+                let status = ToolchainManager::get_status();
+                print_component(&status.c_compiler);
+                print_component(&status.cxx_compiler);
+                print_component(&status.linker);
+                print_component(&status.gnu_compiler);
+                print_component(&status.make);
+                print_component(&status.ninja);
+                print_component(&status.pkgconf);
+            }
+
+            ToolchainAction::Bundle { output } => {
+                println!("{}", "=== Mengemas Kura Linux Seed Toolchain ===".bold().cyan());
+                println!("Memindai biner Clang, mold, GCC, Make, Ninja, Pkgconf...");
+                let out_path = Path::new(&output);
+                match ToolchainManager::bundle_seed_toolchain(out_path) {
+                    Ok(final_path) => {
+                        println!("{} Seed toolchain berhasil dikemas ke: {}", "✓".green(), final_path.display().to_string().bold().green());
+                        let sha_file = final_path.with_extension("xz.sha256");
+                        if sha_file.exists() {
+                            if let Ok(hash_str) = std::fs::read_to_string(&sha_file) {
+                                println!("{} SHA256 Checksum: {}", "[#]".yellow(), hash_str.trim().bold());
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        println!("{} Gagal mengemas seed toolchain: {:#}", "✗".red(), e);
+                    }
+                }
+            }
+        },
     }
 
     Ok(())
+}
+
+fn print_component(comp: &forge_core::ToolchainComponent) {
+    if comp.is_available {
+        println!(
+            "  [{}] {:<12} : {} ({})",
+            "✓".green(),
+            comp.name.bold(),
+            comp.path.as_deref().unwrap_or(""),
+            comp.version.as_deref().unwrap_or("").dimmed()
+        );
+    } else {
+        println!(
+            "  [{}] {:<12} : {}",
+            "✗".red(),
+            comp.name.bold(),
+            "Tidak ditemukan".red()
+        );
+    }
 }

@@ -88,6 +88,7 @@
 15. **ADR-015 (Pemisahan Binary Klien `forge` dan Server `forge-server`):** Memisahkan secara tegas antarmuka dan paket eksekusi antara aplikasi klien pengguna (`forge`) dan backend suite/CI-CD builder (`forge-server`) demi menjaga footprint klien tetap ringan dan terfokus.
 16. **ADR-016 (Setup Wizards & System Bootstrap Configuration):** Menyediakan perintah `forge setup` untuk inisialisasi package manager dan `forge system-setup` untuk bootstrap distro Kura Linux (pemilihan arsitektur CPU, profil base, opsi kernel monolithic) sebelum memicu eksekusi `forge install @system`, dengan fallback template bawaan jika wizard dilewati.
 17. **ADR-017 (Implementasi Bahasa Rust & Pipeline Kompilasi Ultra-Cepat):** Forge diimplementasikan murni menggunakan bahasa pemrograman Rust dalam Cargo Workspace multi-crate, ditenagai backend LLVM 22, ultra-fast linker `mold` (`-fuse-ld=mold`), optimasi Link-Time Optimization (Thin/Full LTO), `panic = "abort"`, serta dukungan PGO untuk mencapai throughput eksekusi maksimal.
+18. **ADR-018 (Isolated Seed Toolchain & Sysroot Packaging):** Untuk memutus ketergantungan dari toolchain host dan mencegah polusi lingkungan build, Forge menyediakan sub-sistem `forge toolchain bundle` yang mengemas Clang/LLVM 22, GCC, ultra-fast linker `mold`, Make, Ninja, dan Pkgconf ke dalam arsip `kura-toolchain.tar.xz` berstruktur UsrMerge standar untuk diekstrak langsung ke dalam sysroot stage Kura Linux.
 
 ---
 
@@ -99,3 +100,4 @@
 | *2026-09-18* | *Arsitektur* | *Kompilasi source lokal berat di mesin pengguna; butuh opsi biner native & server CI/CD* | *Mengembangkan ekosistem Server & CI/CD Builder Lock-CPU, perintah `cpu-dump` & `import`, serta arsitektur Hybrid Unified* |
 | *2026-09-18* | *Filosofi* | *Prioritas default sempat condong ke binhost; komponen server tercampur dengan klien* | *Mengoreksi prioritas menjadi Source-First (Gentoo-style) dan memisahkan binary klien `forge` dengan server suite `forge-server`* |
 | *2026-09-18* | *Toolchain & UX* | *Dibutuhkan engine performa tinggi, wizard setup interaktif, dan bootstrap Kura Linux* | *Memilih bahasa Rust dengan linker mold + Thin LTO, serta mendesain wizard `forge setup` dan `forge system-setup` sebelum `forge install @system`* |
+| *2026-09-18* | *Isolasi Host* | *Ketergantungan terhadap compiler host saat bootstrap awal Kura Linux* | *Mengembangkan sub-perintah `forge toolchain bundle` dan menghasilkan seed toolchain `dist/kura-toolchain.tar.xz` untuk diekstrak ke sysroot stage Kura Linux* |

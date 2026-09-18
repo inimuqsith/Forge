@@ -47,12 +47,16 @@ forge cpu-dump                  # Dump mikroarsitektur CPU & simpan cpu-profile.
 forge cpu-dump --export-cflags  # Tampilkan rekomendasi CFLAGS untuk CPU saat ini
 forge cpu-dump --upload         # Unggah profil CPU ke Forge Server untuk CI/CD build farm
 
-# --- 4. Informasi & Query ---
+# --- 4. Manajemen & Bundler Seed Toolchain ---
+forge toolchain status          # Cek status Clang/LLVM 22, mold, GCC, Make, Ninja
+forge toolchain bundle          # Kemas seed toolchain ke dist/kura-toolchain.tar.xz
+
+# --- 5. Informasi & Query ---
 forge list                      # Tampilkan daftar seluruh paket terpasang & versinya
 forge query <pkg>               # Tampilkan metadata, USE flags aktif, dependensi, & manifest
 forge search <query>            # Cari resep paket berdasarkan nama/deskripsi
 
-# --- 5. Fitur Distro Khusus ---
+# --- 6. Fitur Distro Khusus ---
 forge install @system           # Rebuild seluruh basis sistem Kura Linux (sesuai system-setup / template)
 forge stage-export --output kura-stage.tar.xz  # Kemas rootfs menjadi stage tarball
 ```

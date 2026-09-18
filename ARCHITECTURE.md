@@ -209,3 +209,34 @@ drivers_builtin = ["ext4", "nvme", "sata_ahci", "virtio", "virtio_pci", "virtio_
 manager = "openrc"
 default_services = ["metalog", "chronyd", "eudev", "dhcpcd", "acpid"]
 ```
+
+---
+
+## 6. Arsitektur Seed Toolchain & Isolasi Sysroot (`kura-toolchain.tar.xz`)
+
+Untuk mencegah polusi dari compiler host dan menjamin Kura Linux dapat melakukan bootstrap secara mandiri (*self-contained*), Forge menyediakan sub-sistem **Seed Toolchain Bundler**:
+
+```
++-------------------------------------------------------------------------------------------------+
+|                        PEMBUATAN SEED TOOLCHAIN: `forge toolchain bundle`                       |
++-------------------------------------------------------------------------------------------------+
+|  1. Memindai & mengemas compiler utama: Clang/LLVM 22, GCC, ultra-fast linker `mold`,            |
+|     GNU make, Ninja, dan Pkgconf.                                                               |
+|  2. Menyusun layout UsrMerge standar:                                                           |
+|     - `usr/bin/` (clang, cc, clang++, c++, mold, gcc, make, ninja, pkgconf, pkg-config)          |
+|     - `usr/lib/` (library pendukung LLVM & mold)                                                |
+|     - `etc/forge/toolchain.conf` (Environment compiler flag: CC=clang, LD=mold, CFLAGS native)   |
+|  3. Mengompresi ke `dist/kura-toolchain.tar.xz` + generasi hash `kura-toolchain.tar.xz.sha256`. |
++-------------------------------------------------------------------------------------------------+
+                                                 │
+                                                 ▼
++-------------------------------------------------------------------------------------------------+
+|                         INTEGRASI SYSROOT: `kura-stage.tar.xz`                                  |
++-------------------------------------------------------------------------------------------------+
+|  1. Developer distro Kura Linux mengekstrak seed toolchain langsung ke rootfs staging:          |
+|     # tar -xpJf kura-toolchain.tar.xz -C $KURA_ROOTFS/ --numeric-owner                          |
+|  2. Saat pengguna masuk chroot, seluruh toolchain sudah tersedia di `/usr/bin/`.                 |
+|  3. Eksekusi `forge install @system` menggunakan seed toolchain ini untuk mengompilasi ulang    |
+|     seluruh sistem operasi secara 100% native untuk silikon pengguna tanpa polusi host.         |
++-------------------------------------------------------------------------------------------------+
+```
