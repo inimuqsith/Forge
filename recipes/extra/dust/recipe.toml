@@ -1,0 +1,26 @@
+[package]
+name = "dust"
+version = "1.2.6"
+release = 1
+slot = "0"
+description = "A more intuitive version of du in rust"
+license = "Apache-2.0"
+upstream = "https://github.com/bootandy/dust"
+
+[dependencies]
+runtime = ["glibc", "libc.so", "gcc"]
+build = ["gcc", "git", "rust"]
+
+[sources]
+urls = [
+    "https://github.com/dust/dust/archive/refs/tags/v1.2.6.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/dust-${pkgver}"
+cargo build --release --locked
+install -Dm755 "target/release/dust" "${DESTDIR}/usr/bin/dust"
+"""

@@ -1,0 +1,26 @@
+[package]
+name = "nushell"
+version = "0.115.1"
+release = 1
+slot = "0"
+description = "A new type of shell"
+license = "MIT"
+upstream = "https://www.nushell.sh"
+
+[dependencies]
+runtime = ["glibc", "curl", "gcc", "libgit2", "libssh2", "openssl", "sqlite3", "zstd"]
+build = ["gcc", "cargo", "git"]
+
+[sources]
+urls = [
+    "https://github.com/nushell/nushell/archive/refs/tags/v0.115.1.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/nushell-${pkgver}"
+cargo build --release --locked
+install -Dm755 "target/release/nushell" "${DESTDIR}/usr/bin/nushell"
+"""

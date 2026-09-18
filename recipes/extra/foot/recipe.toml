@@ -1,0 +1,27 @@
+[package]
+name = "foot"
+version = "1.28.0"
+release = 2
+slot = "0"
+description = "Fast, lightweight, and minimalistic Wayland terminal emulator"
+license = "MIT"
+upstream = "https://codeberg.org/dnkl/$pkgbase"
+
+[dependencies]
+runtime = ["glibc", "fcft", "fontconfig", "libfcft.so", "libutf8proc", "libxkbcommon", "ncurses", "pixman", "wayland"]
+build = ["gcc", "git", "llvm", "meson", "ninja", "python", "scdoc", "sway", "tllist", "wayland-protocols"]
+
+[sources]
+urls = [
+    "https://github.com/foot/foot/archive/refs/tags/v1.28.0.tar.gz"
+]
+sha256 = ["05a057b1145507625d9f548ae546705d58ba60cbb26a8958ce72f0b9c1bdee46"]
+
+[build]
+type = "meson"
+script = """
+cd "${srcdir}/foot-${pkgver}"
+meson setup build --prefix=/usr --buildtype=release
+ninja -C build ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

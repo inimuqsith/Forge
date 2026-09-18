@@ -1,0 +1,27 @@
+[package]
+name = "dbus"
+version = "1.16.2"
+release = 1
+slot = "0"
+description = "Freedesktop.org message bus system"
+license = "("
+upstream = "https://www.freedesktop.org/wiki/Software/dbus/"
+
+[dependencies]
+runtime = ["glibc", "audit", "expat", "libcap-ng", "systemd-libs"]
+build = ["gcc", "docbook-xsl", "doxygen", "git", "glib2", "mallard-ducktype", "meson", "python", "qt5-tools", "xmlto", "yelp-tools"]
+
+[sources]
+urls = [
+    "https://github.com/dbus/dbus/archive/refs/tags/v1.16.2.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "meson"
+script = """
+cd "${srcdir}/dbus-${pkgver}"
+meson setup build --prefix=/usr --buildtype=release
+ninja -C build ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

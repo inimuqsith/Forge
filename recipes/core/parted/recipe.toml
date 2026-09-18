@@ -1,0 +1,27 @@
+[package]
+name = "parted"
+version = "3.7"
+release = 1
+slot = "0"
+description = "A program for creating, destroying, resizing, checking and copying partitions"
+license = "("
+upstream = "https://www.gnu.org/software/parted/parted.html"
+
+[dependencies]
+runtime = ["glibc", "device-mapper", "util-linux-libs"]
+build = ["gcc", "pkg-config"]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/parted/parted-3.7.tar.xz"
+]
+sha256 = ["008de57561a4f3c25a0648e66ed11e7b30be493889b64334a6d70f2c1951ef7b"]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/parted-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

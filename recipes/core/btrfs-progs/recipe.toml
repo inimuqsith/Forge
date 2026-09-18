@@ -1,0 +1,27 @@
+[package]
+name = "btrfs-progs"
+version = "7.1"
+release = 1
+slot = "0"
+description = "Btrfs filesystem utilities"
+license = "("
+upstream = "https://btrfs.readthedocs.io"
+
+[dependencies]
+runtime = ["glibc", "libgcrypt", "lzo", "systemd-libs", "util-linux-libs", "zlib", "zstd"]
+build = ["gcc", "asciidoc", "e2fsprogs", "git", "python", "python-setuptools", "python-sphinx", "python-sphinx_rtd_theme", "xmlto"]
+
+[sources]
+urls = [
+    "https://github.com/btrfs-progs/btrfs-progs/archive/refs/tags/v7.1.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/btrfs-progs-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

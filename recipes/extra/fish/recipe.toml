@@ -1,0 +1,29 @@
+[package]
+name = "fish"
+version = "4.9.3"
+release = 1
+slot = "0"
+description = "Smart and user friendly shell intended mostly for interactive use"
+license = "("
+upstream = "https://fishshell.com/"
+
+[dependencies]
+runtime = ["glibc", "gcc", "pcre2"]
+build = ["gcc", "cmake", "git", "jq", "rust", "python-sphinx"]
+
+[sources]
+urls = [
+    "https://github.com/fish/fish/archive/refs/tags/v4.9.3.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "cmake"
+script = """
+cd "${srcdir}/fish-${pkgver}"
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+ninja -C build ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

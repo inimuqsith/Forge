@@ -1,0 +1,26 @@
+[package]
+name = "efibootmgr"
+version = "18"
+release = 4
+slot = "0"
+description = "Linux user-space application to modify the EFI Boot Manager"
+license = "GPL-2.0-or-later"
+upstream = "https://github.com/rhboot/efibootmgr"
+
+[dependencies]
+runtime = ["glibc", "popt"]
+build = ["gcc", "efivar", "git"]
+
+[sources]
+urls = [
+    "https://github.com/efibootmgr/efibootmgr/archive/refs/tags/v18.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/efibootmgr-${pkgver}"
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

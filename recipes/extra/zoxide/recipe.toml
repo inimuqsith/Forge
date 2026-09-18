@@ -1,0 +1,26 @@
+[package]
+name = "zoxide"
+version = "0.10.0"
+release = 1
+slot = "0"
+description = "A smarter cd command for your terminal"
+license = "("
+upstream = "https://github.com/ajeetdsouza/zoxide"
+
+[dependencies]
+runtime = ["glibc"]
+build = ["gcc", "git", "rust"]
+
+[sources]
+urls = [
+    "https://github.com/zoxide/zoxide/archive/refs/tags/v0.10.0.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/zoxide-${pkgver}"
+cargo build --release --locked
+install -Dm755 "target/release/zoxide" "${DESTDIR}/usr/bin/zoxide"
+"""

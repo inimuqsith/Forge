@@ -1,0 +1,26 @@
+[package]
+name = "zellij"
+version = "0.45.1"
+release = 1
+slot = "0"
+description = "A terminal multiplexer"
+license = "("
+upstream = "https://zellij.dev"
+
+[dependencies]
+runtime = ["glibc", "curl", "libc.so", "libm.so", "gcc", "zlib"]
+build = ["gcc", "cargo", "mandown"]
+
+[sources]
+urls = [
+    "https://github.com/zellij-org/zellij/archive/refs/tags/v0.45.1/zellij-0.45.1.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/zellij-${pkgver}"
+cargo build --release --locked
+install -Dm755 "target/release/zellij" "${DESTDIR}/usr/bin/zellij"
+"""

@@ -1,0 +1,26 @@
+[package]
+name = "bandwhich"
+version = "0.23.1"
+release = 3
+slot = "0"
+description = "Terminal bandwidth utilization tool"
+license = "("
+upstream = "https://github.com/imsnif/bandwhich"
+
+[dependencies]
+runtime = ["glibc", "gcc"]
+build = ["gcc", "cargo"]
+
+[sources]
+urls = [
+    "https://github.com/imsnif/bandwhich/archive/refs/tags/v0.23.1.tar.gz"
+]
+sha256 = ["aafb96d059cf9734da915dca4f5940c319d2e6b54e2ffb884332e9f5e820e6d7"]
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/bandwhich-${pkgver}"
+cargo build --release --locked
+install -Dm755 "target/release/bandwhich" "${DESTDIR}/usr/bin/bandwhich"
+"""

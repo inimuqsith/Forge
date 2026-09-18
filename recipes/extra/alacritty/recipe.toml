@@ -1,0 +1,29 @@
+[package]
+name = "alacritty"
+version = "0.17.0"
+release = 1
+slot = "0"
+description = "A cross-platform, GPU-accelerated terminal emulator"
+license = "("
+upstream = "https://github.com/alacritty/alacritty"
+
+[dependencies]
+runtime = ["glibc", "freetype2", "fontconfig", "libxi", "libxcursor", "libxkbcommon", "libxkbcommon-x11", "libxrandr"]
+build = ["gcc", "git", "rust", "cargo", "cmake", "ncurses", "desktop-file-utils", "gdb", "libxcb", "scdoc"]
+
+[sources]
+urls = [
+    "https://github.com/alacritty/alacritty/archive/refs/tags/v0.17.0.tar.gz"
+]
+sha256 = ["fa03da86b110adcaaf9f476ee5de8ce1e59b913b2cf4e5d0374bf70af9c092c7"]
+
+[build]
+type = "cmake"
+script = """
+cd "${srcdir}/alacritty-${pkgver}"
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+ninja -C build ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

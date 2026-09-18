@@ -1,0 +1,26 @@
+[package]
+name = "helix"
+version = "25.07.1"
+release = 2
+slot = "0"
+description = "A post-modern modal text editor"
+license = "("
+upstream = "https://helix-editor.com"
+
+[dependencies]
+runtime = ["glibc", "hicolor-icon-theme", "gcc", "libstdc++"]
+build = ["gcc", "cargo", "git"]
+
+[sources]
+urls = [
+    "https://github.com/helix-editor/helix/archive/25.07.1.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/helix-${pkgver}"
+cargo build --release --locked
+install -Dm755 "target/release/helix" "${DESTDIR}/usr/bin/helix"
+"""

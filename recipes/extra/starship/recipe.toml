@@ -1,0 +1,29 @@
+[package]
+name = "starship"
+version = "1.26.0"
+release = 1
+slot = "0"
+description = "The cross-shell prompt for astronauts"
+license = "ISC"
+upstream = "https://starship.rs/"
+
+[dependencies]
+runtime = ["glibc", "libc.so", "libm.so", "gcc"]
+build = ["gcc", "cmake", "git", "rust"]
+
+[sources]
+urls = [
+    "https://github.com/starship/starship/archive/refs/tags/v1.26.0.tar.gz"
+]
+sha256 = ["98b0ec0611e7006395bf917547ebd3c3360c2b3d016144cf1637bfae7b37256d"]
+
+[build]
+type = "cmake"
+script = """
+cd "${srcdir}/starship-${pkgver}"
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+ninja -C build ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

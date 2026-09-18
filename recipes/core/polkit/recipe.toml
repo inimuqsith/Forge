@@ -1,0 +1,27 @@
+[package]
+name = "polkit"
+version = "127"
+release = 3
+slot = "0"
+description = "Application development toolkit for controlling system-wide privileges"
+license = "LGPL-2.0-or-later"
+upstream = "https://github.com/polkit-org/polkit"
+
+[dependencies]
+runtime = ["glibc", "duktape", "expat", "glib2", "pam", "required", "by", "polkit.install", "systemd-libs"]
+build = ["gcc", "dbus", "git", "glib2-devel", "gobject-introspection", "gtk-doc", "meson"]
+
+[sources]
+urls = [
+    "https://github.com/polkit/polkit/archive/refs/tags/v127.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "meson"
+script = """
+cd "${srcdir}/polkit-${pkgver}"
+meson setup build --prefix=/usr --buildtype=release
+ninja -C build ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

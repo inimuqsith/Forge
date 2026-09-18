@@ -1,0 +1,27 @@
+[package]
+name = "elogind"
+version = "257.16"
+release = 1
+slot = "0"
+description = "The systemd project"
+license = "("
+upstream = "https://github.com/elogind/elogind"
+
+[dependencies]
+runtime = ["glibc", "libelogind", "pam", "acl"]
+build = ["gcc", "intltool", "libtool", "gperf", "gtk-doc", "git", "libcap", "meson"]
+
+[sources]
+urls = [
+    "https://github.com/elogind/elogind/archive/refs/tags/v257.16.tar.gz"
+]
+sha256 = ["3c8146409bfb9daa77f272212c2b0bf0ae727c782ec87ece0d2d25e0e5bf5f4c"]
+
+[build]
+type = "meson"
+script = """
+cd "${srcdir}/elogind-${pkgver}"
+meson setup build --prefix=/usr --buildtype=release
+ninja -C build ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

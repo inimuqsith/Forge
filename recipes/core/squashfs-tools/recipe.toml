@@ -1,0 +1,26 @@
+[package]
+name = "squashfs-tools"
+version = "4.7.5"
+release = 1
+slot = "0"
+description = "Tools for squashfs, a highly compressed read-only filesystem for Linux"
+license = "GPL-2.0-or-later"
+upstream = "https://github.com/plougher/squashfs-tools"
+
+[dependencies]
+runtime = ["glibc", "gcc", "lz4", "liblz4.so", "lzo", "liblzo2.so", "xz", "zlib", "zstd"]
+build = ["gcc", "help2man"]
+
+[sources]
+urls = [
+    "https://github.com/squashfs-tools/squashfs-tools/archive/refs/tags/v4.7.5.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/squashfs-tools-${pkgver}"
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

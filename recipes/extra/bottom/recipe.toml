@@ -1,0 +1,26 @@
+[package]
+name = "bottom"
+version = "0.14.9"
+release = 1
+slot = "0"
+description = "A graphical process/system monitor"
+license = "MIT"
+upstream = "https://github.com/ClementTsang/bottom"
+
+[dependencies]
+runtime = ["glibc", "libc.so", "libm.so", "gcc"]
+build = ["gcc", "git", "rust"]
+
+[sources]
+urls = [
+    "https://github.com/bottom/bottom/archive/refs/tags/v0.14.9.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/bottom-${pkgver}"
+cargo build --release --locked
+install -Dm755 "target/release/bottom" "${DESTDIR}/usr/bin/bottom"
+"""

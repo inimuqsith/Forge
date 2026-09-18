@@ -1,0 +1,26 @@
+[package]
+name = "eza"
+version = "0.23.5"
+release = 2
+slot = "0"
+description = "A modern replacement for ls (community fork of exa)"
+license = "EUPL-1.2"
+upstream = "https://github.com/eza-community/$pkgname"
+
+[dependencies]
+runtime = ["glibc", "libc.so", "libm.so", "gcc", "libgit2", "libgit2.so"]
+build = ["gcc", "cargo", "pandoc"]
+
+[sources]
+urls = [
+    "https://github.com/eza/eza/archive/refs/tags/v0.23.5.tar.gz"
+]
+sha256 = ["bbf179f2611c904014431740b559e8055276c12fcf978a7e31c271663548337f"]
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/eza-${pkgver}"
+cargo build --release --locked
+install -Dm755 "target/release/eza" "${DESTDIR}/usr/bin/eza"
+"""

@@ -1,0 +1,26 @@
+[package]
+name = "grex"
+version = "1.4.6"
+release = 2
+slot = "0"
+description = "A command-line tool for generating regular expressions from user-provided input strings"
+license = "("
+upstream = "https://github.com/pemistahl/grex"
+
+[dependencies]
+runtime = ["glibc", "gcc"]
+build = ["gcc", "cargo"]
+
+[sources]
+urls = [
+    "https://github.com/grex/grex/archive/refs/tags/v1.4.6.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/grex-${pkgver}"
+cargo build --release --locked
+install -Dm755 "target/release/grex" "${DESTDIR}/usr/bin/grex"
+"""

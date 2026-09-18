@@ -1,0 +1,26 @@
+[package]
+name = "procs"
+version = "0.14.12"
+release = 1
+slot = "0"
+description = "A modern replacement for ps written in Rust"
+license = "MIT"
+upstream = "https://github.com/dalance/$pkgname"
+
+[dependencies]
+runtime = ["glibc", "gcc"]
+build = ["gcc", "cargo", "asciidoctor"]
+
+[sources]
+urls = [
+    "https://github.com/procs/procs/archive/refs/tags/v0.14.12.tar.gz"
+]
+sha256 = ["f2fab583fe98a9ae9505c5eecf4f3d9d4ad9bcb5d478a8222d52c87aa1ac602e"]
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/procs-${pkgver}"
+cargo build --release --locked
+install -Dm755 "target/release/procs" "${DESTDIR}/usr/bin/procs"
+"""

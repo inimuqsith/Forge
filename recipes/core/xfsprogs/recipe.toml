@@ -1,0 +1,27 @@
+[package]
+name = "xfsprogs"
+version = "7.2.0"
+release = 1
+slot = "0"
+description = "XFS filesystem utilities"
+license = "("
+upstream = "https://xfs.wiki.kernel.org"
+
+[dependencies]
+runtime = ["glibc", "device-mapper", "libedit", "libinih", "liburcu", "util-linux-libs"]
+build = ["gcc", "git", "icu"]
+
+[sources]
+urls = [
+    "https://github.com/xfsprogs/xfsprogs/archive/refs/tags/v7.2.0.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/xfsprogs-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""
