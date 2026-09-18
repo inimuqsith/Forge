@@ -202,12 +202,18 @@ impl RecipeBumper {
             }
 
             if in_sources_section {
+                let mut current_line = line.to_string();
+                if current_line.contains(&old_version) {
+                    current_line = current_line.replace(&old_version, new_version);
+                }
                 if let Some(ref sha) = new_sha256 {
                     if trimmed.starts_with("sha256") {
                         modified_lines.push(format!("sha256 = [\"{}\"]", sha));
                         continue;
                     }
                 }
+                modified_lines.push(current_line);
+                continue;
             }
 
             modified_lines.push(line.to_string());
