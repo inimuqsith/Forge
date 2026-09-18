@@ -8,12 +8,18 @@ pub mod toolchain;
 pub mod cpu;
 pub mod binhost;
 pub mod hybrid;
+pub mod resolver;
+pub mod db;
+pub mod merger;
 
 pub use builder::RecipeBuilder;
 pub use toolchain::{ToolchainComponent, ToolchainManager, ToolchainStatus};
 pub use cpu::{CpuProfile, CacheInfo, RecommendedFlags};
 pub use binhost::{BinhostCatalog, BinhostClient, BinhostPackageEntry};
 pub use hybrid::HybridAdapter;
+pub use resolver::*;
+pub use db::*;
+pub use merger::*;
 
 /// Konfigurasi Global Forge (/etc/forge/forge.conf)
 #[derive(Debug, Clone, Serialize, Deserialize)]

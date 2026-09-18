@@ -34,16 +34,20 @@
 ---
 
 ### Fase 4: Core Engine & DAG Dependency Resolver
-**Status:** ⚠️ **BLUEPRINT SELESAI / IMPLEMENTASI KODE PENDING**
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] **Desain Arsitektur:** Blueprint spesifikasi graf asiklis terarah (DAG), model Node/Edge, dan algoritma *Topological Sort* & *Cycle Detection* (Kahn / Tarjan SCC) di [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
 - [x] **USE Flags Engine:** Implementasi `UseFlagsEngine` di [`crates/forge/src/lib.rs`](file:///home/admin/Development/Forge/crates/forge/src/lib.rs) untuk evaluasi flag global dan per-paket (`+flag`, `-flag`). Unit test `test_use_flags_engine` lulus.
 - [x] **Slotting Engine:** Data model slot multi-versi (`pkg:slot`) di [`crates/forge/src/lib.rs`](file:///home/admin/Development/Forge/crates/forge/src/lib.rs).
 - [x] **Resep Parser:** Deserialisasi All-in-One `recipe.toml` (`PackageMeta`, `DependenciesMeta`, `SourcesMeta`, `BuildMeta`).
-- [ ] **Pending Implementasi Kode:** Engine Rust `crates/forge/src/resolver.rs` untuk:
-  - Membaca dan membangun graph dari seluruh pohon resep (`recipes/system/`, `core/`, `extra/`).
-  - Menyusun urutan eksekusi kompilasi topologis otomatis untuk paket dan meta-paket (`base`, `base-devel`).
-  - Filter conditional dependencies berbasis USE flags (`flag? ( dep )`).
-  - Laporan diagnostik jika terjadi siklus dependensi sirkular (*circular dependency error*).
+- [x] **Implementasi Kode:** Engine Rust [`crates/forge/src/resolver.rs`](file:///home/admin/Development/Forge/crates/forge/src/resolver.rs):
+  - `PackageId`, `PackageNode`, `DependencyKind`, `DependencyEdge`, `DependencyGraph`, `ExecutionStep`, `ResolutionPlan`.
+  - Scanner resep `RecipeScanner` memindai direktori `/var/db/forge/recipes/` dan fallback `./recipes/`.
+  - Evaluasi USE flags bersyarat `flag? ( dep )` dan `!flag? ( dep )`.
+  - Ekspansi rekursif meta-paket (`base`, `base-devel`) sesuai filosofi *Everything is a Package*.
+  - Algoritma Kahn (In-Degree Queue) untuk menyusun urutan build linier deterministik.
+  - Deteksi siklus dependensi sirkular (DFS Cycle Tracer) dengan pelaporan diagnostik box-drawing visual.
+  - 5 Unit tests lulus 100% (`test_dag_linear_resolution`, `test_dag_diamond_resolution`, `test_dag_cycle_detection`, `test_use_flags_conditional_filtering`, `test_meta_package_expansion`).
+- [x] Integrasi CLI `forge install <target>` di [`crates/forge/src/main.rs`](file:///home/admin/Development/Forge/crates/forge/src/main.rs) untuk kalkulasi dan visualisasi Topological Resolution Plan.
 
 ---
 
@@ -65,24 +69,28 @@
 ---
 
 ### Fase 7: Transactional Merger & Collision Detector
-**Status:** ⚠️ **BLUEPRINT SELESAI / IMPLEMENTASI KODE PENDING**
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] **Desain Arsitektur:** Blueprint spesifikasi Pre-flight Collision Scanning, Atomic Merge pipeline, dan Rollback Log di [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
-- [ ] **Pending Implementasi Kode:** Engine Rust `crates/forge/src/merger.rs` untuk:
-  - Memindai tabrakan berkas staging terhadap database paket terpasang (`/var/db/forge/installed/`).
-  - Menyalin file dari `$DESTDIR` ke `$FORGE_ROOT` (`/`) dengan preservasi symlink, permissions Unix, dan timestamps.
-  - Pencatatan log transaksi sementara (`/tmp/forge/txn_<id>.log`) untuk auto-rollback jika terjadi kegagalan I/O.
+- [x] **Engine Merger (`crates/forge/src/merger.rs`):**
+  - Implementasi `MergeTransaction`, `StagedEntry`, `CollisionReport`, `JournalAction`.
+  - Pemindaian tabrakan pra-instalasi (`preflight_scan`) terhadap `/var/db/forge/installed/`.
+  - Penulisan berkas atomik (`tempfile` $\rightarrow$ `fsync` $\rightarrow$ `rename`), preservasi hak akses Unix (`chmod`), symlink, dan timestamps.
+  - Pencatatan jurnal transaksi `txn_<id>.journal` dengan auto-rollback LIFO jika terjadi kegagalan I/O.
+  - Proteksi konfigurasi `CONFIG_PROTECT`: penyimpanan `._cfg0000_<file>` untuk berkas `/etc/` yang termodifikasi.
+  - Eksekusi post-merge hooks (deteksi OpenRC `/etc/init.d/`, `ldconfig`).
+- [x] Unit test `test_preflight_collision_detector`, `test_atomic_merge_and_permissions`, `test_config_protect_mechanism`, `test_transactional_rollback_on_failure` lulus 100%.
 
 ---
 
 ### Fase 8: Package Manifest Database & Unmerge Cleaner
-**Status:** ⚠️ **BLUEPRINT SELESAI / IMPLEMENTASI KODE PENDING**
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] **Desain Arsitektur:** Spesifikasi format flat-file database `/var/db/forge/installed/<pkg>/manifest`, *reverse-directory pruning*, dan proteksi `CONFIG_PROTECT` di [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
-- [ ] **Pending Implementasi Kode:** Engine Rust `crates/forge/src/db.rs` untuk:
-  - Menulis manifest berkas, ukuran, hash SHA256, dan metadata build ke database flat-file.
-  - Eksekusi `forge remove <pkg>`: membaca manifest, menghapus file paket, dan membersihkan direktori kosong secara rekursif (*leaf-to-root pruning*).
-  - Melindungi file konfigurasi di `/etc/` dari modifikasi pengguna (`CONFIG_PROTECT`).
-  - Eksekusi post-unmerge hooks (`ldconfig`, `rc-update`).
-  - Implementasi CLI `forge list` dan `forge query <pkg>`.
+- [x] **Engine Database (`crates/forge/src/db.rs`):**
+  - Data model `InstalledDatabase`, `PackageManifest`, `ManifestEntry` (format `obj`, `sym`, `dir` dengan hash SHA256 & mtime/size), dan `PackageMetadata`.
+  - Pencatatan manifest deterministik, `metadata.json`, `USE`, `CFLAGS`, dan `CONTENTS` ke `/var/db/forge/installed/<pkg>-<ver>:<slot>/`.
+  - Implementasi `unmerge_package`: penghapusan berkas & symlink, proteksi `CONFIG_PROTECT` (melindungi `/etc/` termodifikasi), dan *reverse leaf-to-root directory pruning* untuk membersihkan folder kosong tanpa merusak folder sistem bersama.
+  - Integrasi CLI sub-perintah `forge remove <pkg>`, `forge list`, dan `forge query <pkg>` di [`crates/forge/src/main.rs`](file:///home/admin/Development/Forge/crates/forge/src/main.rs).
+- [x] Unit test `test_manifest_entry_serialization`, `test_installed_database_record_and_get`, dan `test_unmerge_reverse_pruning` lulus 100%.
 
 ---
 
@@ -170,7 +178,7 @@
 ## 4. Panduan Serah Terima AI Agent (Incoming AI Agent Handover Guide)
 
 > **Catatan Penting untuk AI Agent Penerus:**
-> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")**, optimasi compiler **Mentok Ekstrem (Zen 4 AVX-512 / Thin LTO / Mold ICF)**, repositori resep terstandarisasi **`/var/db/forge/recipes/` (ADR-028)**, dan tingkat kesiapan **~65%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan 28 ADR telah didokumentasikan secara lengkap.
+> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")**, optimasi compiler **Mentok Ekstrem (Zen 4 AVX-512 / Thin LTO / Mold ICF)**, repositori resep terstandarisasi **`/var/db/forge/recipes/` (ADR-028)**, DAG Dependency Resolver (`resolver.rs`), Transactional Merger (`merger.rs`), and Manifest Database Engine (`db.rs`) dengan tingkat kesiapan **~85%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan 28 ADR telah didokumentasikan secara lengkap.
 
 ### 📌 Ringkasan Status & State Workspace:
 - **Workspace:** 2 Crate murni: [`crates/forge`](file:///home/admin/Development/Forge/crates/forge) (Klien & Engine Library) dan [`crates/forge-server`](file:///home/admin/Development/Forge/crates/forge-server) (Server & CI/CD Builder).
@@ -186,12 +194,10 @@
 5. **CCACHE ACCELERATION (ADR-025):** Kompilasi memanfaatkan Ccache 4.13.5 pada build engine.
 6. **OPENRC ONLY:** Tidak boleh ada ketergantungan pada Systemd.
 
-### 🎯 4 Tugas Prioritas Pengembangan Selanjutnya (Sisa 35%):
-1. **Task 1: DAG Dependency Resolver (`crates/forge/src/resolver.rs`):**
-   - Implementasikan algoritma *Topological Sort* (Kahn / Tarjan SCC) dan deteksi circular dependency dari resep di `/var/db/forge/recipes/` (`[dependencies.runtime]` vs `[dependencies.build]`).
-2. **Task 2: Transactional Merger & Collision Detector (`crates/forge/src/merger.rs`):**
-   - Implementasikan pre-flight collision scanner terhadap `/var/db/forge/installed/`, atomic copy ke `$FORGE_ROOT`, preservasi symlink/permissions, dan rollback handler.
-3. **Task 3: Manifest Database & Unmerge Cleaner (`crates/forge/src/db.rs`):**
-   - Implementasikan pencatatan manifest di `/var/db/forge/installed/<pkg>/manifest`, reverse-directory pruning untuk `forge remove <pkg>`, proteksi `CONFIG_PROTECT` di `/etc/`, dan query/list CLI.
-4. **Task 4: Distro Stage Exporter & Real Server Daemon:**
-   - Implementasikan tarball bundler `forge stage-export` $\rightarrow$ `kura-stage.tar.xz`, dan HTTP REST API daemon pada `crates/forge-server` (`serve` & `sync`).
+### 🎯 Tugas Prioritas Pengembangan Selanjutnya (Sisa 15%):
+1. **Distro Stage Exporter (`forge stage-export`):**
+   - Implementasikan tarball bundler `forge stage-export --output kura-stage.tar.xz` untuk mengemas rootfs aktif menjadi stage distribusi Kura Linux.
+2. **Real Server Daemon & Binary Indexer (`crates/forge-server`):**
+   - Implementasikan HTTP REST API daemon pada `crates/forge-server` (`serve` & `sync`) menggunakan `tokio`/`axum` untuk sinkronisasi pohon resep dan serving katalog `packages.db.zst`.
+3. **Hybrid Streaming Downloader:**
+   - Live network streaming download & dekompresi zstd untuk biner binhost/CachyOS.

@@ -1,7 +1,10 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::*;
-use forge::{CpuProfile, ForgeConfig, RecipeBuilder, ToolchainComponent, ToolchainManager};
+use forge::{
+    CpuProfile, DependencyResolver, ForgeConfig, InstalledDatabase, RecipeBuilder,
+    ToolchainComponent, ToolchainManager,
+};
 use std::path::{Path, PathBuf};
 
 #[derive(Parser)]
@@ -139,10 +142,64 @@ fn main() -> Result<()> {
             } else {
                 println!("{} Mode Default: Source-First Native Compilation (Gentoo Mode).", "[i]".blue());
             }
+
+            let config = ForgeConfig::load_or_default(None);
+            println!("  [🔍] Menghitung graf dependensi (DAG) & USE flags untuk '{}'...", target.bold().yellow());
+            match DependencyResolver::resolve(&target, &config, None, None) {
+                Ok(plan) => {
+                    println!("\n{}", "=== Rencana Eksekusi Instalasi (Topological Resolution Plan) ===".bold().cyan());
+                    println!("  Target Utama     : {}", plan.target.bold().green());
+                    println!("  Total Paket      : {}", plan.total_packages.to_string().bold().yellow());
+                    println!("  Build Depends    : {}", plan.build_only_count.to_string().cyan());
+                    println!("  Runtime Depends  : {}", plan.runtime_only_count.to_string().cyan());
+                    println!("\n{}", "Urutan Kompilasi & Staging:".bold());
+                    for step in &plan.steps {
+                        let kind_badge = if step.is_meta {
+                            "[META]".magenta()
+                        } else {
+                            "[SRC] ".green()
+                        };
+                        println!(
+                            "  {:>2}. {} {:<20} v{:<10} ({})",
+                            step.step_number,
+                            kind_badge,
+                            step.package_id.to_string().bold(),
+                            step.version,
+                            step.recipe_path.display().to_string().dimmed()
+                        );
+                    }
+                    println!("\n{} Pohon dependensi valid & siap dikompilasi!", "✓".green());
+                }
+                Err(e) => {
+                    println!("{} Gagal menyelesaikan dependensi target {}: {:#}", "✗".red(), target.bold(), e);
+                }
+            }
         }
 
         Commands::Remove { package } => {
             println!(">>> Menghapus paket {} berdasarkan manifest...", package.bold().red());
+            let config = ForgeConfig::load_or_default(None);
+            let db = InstalledDatabase::new(PathBuf::from(&config.general.db_path));
+            let target_root = PathBuf::from(&config.general.root);
+            let config_protect = vec![PathBuf::from("/etc"), PathBuf::from("etc")];
+
+            match db.unmerge_package(&package, &target_root, &config_protect) {
+                Ok(report) => {
+                    println!("{} Paket {} berhasil dihapus!", "✓".green(), package.bold());
+                    println!("  - Berkas dihapus       : {}", report.files_removed);
+                    println!("  - Symlink dihapus      : {}", report.symlinks_removed);
+                    println!("  - Direktori dipangkas  : {}", report.dirs_pruned);
+                    if !report.protected_configs_kept.is_empty() {
+                        println!("  - Berkas /etc terlindung (CONFIG_PROTECT):");
+                        for cfg in &report.protected_configs_kept {
+                            println!("    * {} (termodifikasi)", cfg.display().to_string().yellow());
+                        }
+                    }
+                }
+                Err(e) => {
+                    println!("{} Gagal menghapus paket {}: {:#}", "✗".red(), package.bold(), e);
+                }
+            }
         }
 
         Commands::Build { package } => {
@@ -202,11 +259,90 @@ fn main() -> Result<()> {
         }
 
         Commands::List => {
-            println!("{}", "Daftar Paket Terpasang (/var/db/forge/installed/):".bold());
+            let config = ForgeConfig::load_or_default(None);
+            let db = InstalledDatabase::new(PathBuf::from(&config.general.db_path));
+            println!("{}", "=== Daftar Paket Terpasang (/var/db/forge/installed/) ===".bold().cyan());
+            match db.list_installed() {
+                Ok(packages) => {
+                    if packages.is_empty() {
+                        println!("  (Belum ada paket yang terpasang)");
+                    } else {
+                        println!("  {:<25} {:<15} {:<8} {:<10}", "PAKET", "VERSI", "SLOT", "UKURAN");
+                        println!("  {}", "-".repeat(60).dimmed());
+                        for pkg in packages {
+                            let total_size: u64 = pkg.metadata.as_ref().map(|m| m.installed_size).unwrap_or_else(|| {
+                                pkg.entries.iter().map(|e| e.size).sum()
+                            });
+                            let size_str = if total_size > 1024 * 1024 {
+                                format!("{:.2} MB", total_size as f64 / (1024.0 * 1024.0))
+                            } else if total_size > 1024 {
+                                format!("{:.2} KB", total_size as f64 / 1024.0)
+                            } else {
+                                format!("{} B", total_size)
+                            };
+                            println!(
+                                "  {:<25} {:<15} {:<8} {:<10}",
+                                pkg.package_name.bold().green(),
+                                pkg.package_version,
+                                pkg.slot.cyan(),
+                                size_str.dimmed()
+                            );
+                        }
+                    }
+                }
+                Err(e) => {
+                    println!("{} Gagal membaca database paket: {:#}", "✗".red(), e);
+                }
+            }
         }
 
         Commands::Query { package } => {
-            println!("Query metadata untuk paket: {}", package.bold().green());
+            let config = ForgeConfig::load_or_default(None);
+            let db = InstalledDatabase::new(PathBuf::from(&config.general.db_path));
+            match db.get_package(&package) {
+                Ok(Some(pkg)) => {
+                    println!("{}", "=== Informasi Paket ===".bold().cyan());
+                    println!("  Nama         : {}", pkg.package_name.bold().green());
+                    println!("  Versi        : {}-r{}", pkg.package_version, pkg.release);
+                    println!("  Slot         : {}", pkg.slot.cyan());
+                    if let Some(ref meta) = pkg.metadata {
+                        if !meta.description.is_empty() {
+                            println!("  Deskripsi    : {}", meta.description);
+                        }
+                        if !meta.url.is_empty() {
+                            println!("  URL          : {}", meta.url);
+                        }
+                        if !meta.license.is_empty() {
+                            println!("  Lisensi      : {}", meta.license);
+                        }
+                        if meta.build_time > 0 {
+                            println!("  Build Time   : {}", meta.build_time);
+                        }
+                        if !meta.target_march.is_empty() {
+                            println!("  Target March : {}", meta.target_march.yellow());
+                        }
+                    }
+                    if let Some(ref use_f) = pkg.use_flags {
+                        println!("  USE Flags    : {}", use_f.yellow());
+                    }
+                    if let Some(ref cf) = pkg.cflags {
+                        println!("  CFLAGS       : {}", cf.dimmed());
+                    }
+                    println!("\n  Berkas Terpasang (Total {} entri):", pkg.entries.len());
+                    for entry in pkg.entries.iter().take(20) {
+                        println!("    [{}] {}", entry.entry_type.as_str().cyan(), entry.path.display());
+                    }
+                    if pkg.entries.len() > 20 {
+                        println!("    ... dan {} berkas lainnya", pkg.entries.len() - 20);
+                    }
+                }
+                Ok(None) => {
+                    println!("{} Paket '{}' tidak ditemukan di database terpasang.", "✗".red(), package);
+                }
+                Err(e) => {
+                    println!("{} Gagal query paket: {:#}", "✗".red(), e);
+                }
+            }
         }
 
         Commands::Search { query } => {
