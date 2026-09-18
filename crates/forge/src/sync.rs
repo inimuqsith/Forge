@@ -12,7 +12,12 @@ impl SyncClient {
         target_recipes_dir: &Path,
         cache_dir: &Path,
     ) -> Result<bool> {
-        let base_url = server_url.trim_end_matches('/');
+        let trimmed = server_url.trim_end_matches('/');
+        let base_url = if trimmed.ends_with("/v1") {
+            trimmed.to_string()
+        } else {
+            format!("{}/v1", trimmed)
+        };
         println!("  [*] Menghubungi Forge Server di: {}", base_url.cyan());
 
         let client = reqwest::Client::builder()
