@@ -1,6 +1,6 @@
 [package]
 name = "lsof"
-version = "4.99.4"
+version = "4.99.7"
 release = 1
 slot = "0"
 description = "Lists information about files opened by processes"
@@ -18,9 +18,9 @@ build = [
 
 [sources]
 urls = [
-    "https://github.com/lsof-org/lsof/archive/refs/tags/4.99.4.tar.gz",
+    "https://github.com/lsof-org/lsof/archive/refs/tags/4.99.7.tar.gz",
 ]
-sha256 = []
+sha256 = ["bac1b0acbc50aede42fc97dffaa0b0475e97973e36a6351de5f349c6155afc68"]
 
 [build]
 type = "autotools"

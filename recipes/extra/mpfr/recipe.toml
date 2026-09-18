@@ -1,6 +1,6 @@
 [package]
 name = "mpfr"
-version = "4.2.1"
+version = "4.2.2"
 release = 1
 slot = "0"
 description = "Multiple-precision floating-point arithmetic library"
@@ -19,9 +19,9 @@ build = [
 
 [sources]
 urls = [
-    "https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.1.tar.xz",
+    "https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.2.tar.xz",
 ]
-sha256 = []
+sha256 = ["b67ba0383ef7e8a8563734e2e889ef5ec3c3b898a01d00fa0a6869ad81c6ce01"]
 
 [build]
 type = "autotools"

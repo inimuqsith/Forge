@@ -1,6 +1,6 @@
 [package]
 name = "fd"
-version = "10.2.0"
+version = "10.5.0"
 release = 1
 slot = "0"
 description = "Simple, fast and user-friendly alternative to find"
@@ -18,9 +18,9 @@ build = [
 
 [sources]
 urls = [
-    "https://github.com/sharkdp/fd/archive/refs/tags/v10.2.0.tar.gz",
+    "https://github.com/sharkdp/fd/archive/refs/tags/v10.5.0.tar.gz",
 ]
-sha256 = []
+sha256 = ["e6d9e90730bf316101691e49d59cc02565278dc3779d33a77423801569484851"]
 
 [build]
 type = "cargo"

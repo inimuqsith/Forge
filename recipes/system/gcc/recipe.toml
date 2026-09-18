@@ -1,6 +1,6 @@
 [package]
 name = "gcc"
-version = "15.3.0"
+version = "16.2.0"
 release = 1
 slot = "15"
 description = "GNU Compiler Collection (C and C++ Compilers - Latest 15.3)"
@@ -13,7 +13,7 @@ build = ["binutils", "make", "bison", "flex"]
 
 [sources]
 urls = [
-    "https://ftp.gnu.org/gnu/gcc/gcc-15.3.0/gcc-15.3.0.tar.xz"
+    "https://ftp.gnu.org/gnu/gcc/gcc-16.2.0/gcc-16.2.0.tar.xz"
 ]
 sha256 = []
 

@@ -1,6 +1,6 @@
 [package]
 name = "tree"
-version = "2.2.1"
+version = "2.3.2"
 release = 1
 slot = "0"
 description = "Recursive directory indentation and tree-format listing program"
@@ -18,9 +18,9 @@ build = [
 
 [sources]
 urls = [
-    "https://gitlab.com/OldManProgrammer/unix-tree/-/archive/2.2.1/unix-tree-2.2.1.tar.gz",
+    "https://gitlab.com/OldManProgrammer/unix-tree/-/archive/2.3.2/unix-tree-2.3.2.tar.gz",
 ]
-sha256 = []
+sha256 = ["513a53cbc42ca1f4ea06af2bab1f5283524a3848266b1d162416f8033afc4985"]
 
 [build]
 type = "make"

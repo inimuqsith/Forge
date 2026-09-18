@@ -1,6 +1,6 @@
 [package]
 name = "libcap"
-version = "2.73"
+version = "2.78"
 release = 1
 slot = "0"
 description = "POSIX 1003.1e capabilities library and tools (setcap, getcap)"
@@ -18,9 +18,9 @@ build = [
 
 [sources]
 urls = [
-    "https://kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.73.tar.xz",
+    "https://kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.78.tar.xz",
 ]
-sha256 = []
+sha256 = ["0d621e562fd932ccf67b9660fb018e468a683d7b827541df27813228c996bb11"]
 
 [build]
 type = "make"

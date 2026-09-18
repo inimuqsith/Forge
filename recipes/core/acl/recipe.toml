@@ -1,6 +1,6 @@
 [package]
 name = "acl"
-version = "2.3.2"
+version = "2.4.0"
 release = 1
 slot = "0"
 description = "Access control list utilities and library"
@@ -18,9 +18,9 @@ build = [
 
 [sources]
 urls = [
-    "https://download.savannah.nongnu.org/releases/acl/acl-2.3.2.tar.xz",
+    "https://download.savannah.nongnu.org/releases/acl/acl-2.4.0.tar.xz",
 ]
-sha256 = []
+sha256 = ["e661131456d2708a01c614a0f400e11d7d1bfaeb6f3e74b75bb980b72f0161a3"]
 
 [build]
 type = "autotools"

@@ -1,6 +1,6 @@
 [package]
 name = "btop"
-version = "1.4.0"
+version = "1.4.7"
 release = 1
 slot = "0"
 description = "Modern and beautiful resource monitor that shows usage and stats for processor, memory, disks, network and processes"
@@ -18,9 +18,9 @@ build = [
 
 [sources]
 urls = [
-    "https://github.com/aristocratos/btop/archive/refs/tags/v1.4.0.tar.gz",
+    "https://github.com/aristocratos/btop/archive/refs/tags/v1.4.7.tar.gz",
 ]
-sha256 = []
+sha256 = ["933de2e4d1b2211a638be463eb6e8616891bfba73aef5d38060bd8319baeefc6"]
 
 [build]
 type = "make"

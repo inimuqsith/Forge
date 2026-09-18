@@ -1,6 +1,6 @@
 [package]
 name = "dhcpcd"
-version = "10.2.2"
+version = "10.5.2"
 release = 1
 slot = "0"
 description = "RFC2131 and RFC3315 compliant DHCP/DHCPv6 and IPv4LL dual-stack client"
@@ -20,9 +20,9 @@ build = [
 
 [sources]
 urls = [
-    "https://github.com/NetworkConfiguration/dhcpcd/releases/download/v10.2.2/dhcpcd-10.2.2.tar.xz",
+    "https://github.com/NetworkConfiguration/dhcpcd/releases/download/v10.5.2/dhcpcd-10.5.2.tar.xz",
 ]
-sha256 = []
+sha256 = ["3e476657fdb6eeb38b277da3a48d0ac0113ecce5858ebdcddff2b629faed52b4"]
 
 [build]
 type = "autotools"

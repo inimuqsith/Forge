@@ -1,6 +1,6 @@
 [package]
 name = "hwdata"
-version = "0.392"
+version = "0.411"
 release = 1
 slot = "0"
 description = "Hardware identification databases (pci.ids, usb.ids, oui.txt)"
@@ -16,9 +16,9 @@ build = [
 
 [sources]
 urls = [
-    "https://github.com/vcrhonek/hwdata/archive/refs/tags/v0.392.tar.gz",
+    "https://github.com/vcrhonek/hwdata/archive/refs/tags/v0.411.tar.gz",
 ]
-sha256 = []
+sha256 = ["d75462181fbd307228e0a48b8d1449f1773ea4b1f17e8a1d56346907f999ce33"]
 
 [build]
 type = "autotools"

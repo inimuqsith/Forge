@@ -1,6 +1,6 @@
 [package]
 name = "zip"
-version = "3.0"
+version = "8.6.0"
 release = 1
 slot = "0"
 description = "Compressor utility for zipfile archives"
@@ -21,7 +21,7 @@ build = [
 urls = [
     "https://downloads.sourceforge.net/infozip/zip30.tar.gz",
 ]
-sha256 = []
+sha256 = ["d7638871c015f6fea8cfac3ea08cf6202d7ca6fb6e5d739af2fd44f472cd56f1"]
 
 [build]
 type = "make"

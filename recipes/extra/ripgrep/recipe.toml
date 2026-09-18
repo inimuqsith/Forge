@@ -1,6 +1,6 @@
 [package]
 name = "ripgrep"
-version = "14.1.1"
+version = "15.2.0"
 release = 1
 slot = "0"
 description = "Ultra-fast line-oriented search tool combining grep with find"
@@ -20,9 +20,9 @@ build = [
 
 [sources]
 urls = [
-    "https://github.com/BurntSushi/ripgrep/archive/refs/tags/14.1.1.tar.gz",
+    "https://github.com/BurntSushi/ripgrep/archive/refs/tags/15.2.0.tar.gz",
 ]
-sha256 = []
+sha256 = ["7605249d3eb0d5f170e3414498e3344e26b1e7a147aec518b57090b80036a562"]
 
 [build]
 type = "cargo"

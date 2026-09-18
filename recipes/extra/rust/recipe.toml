@@ -1,6 +1,6 @@
 [package]
 name = "rust"
-version = "1.85.0"
+version = "1.98.1"
 release = 1
 slot = "0"
 description = "Empowering everyone to build reliable and efficient systems programming language"
@@ -25,9 +25,9 @@ build = [
 
 [sources]
 urls = [
-    "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz",
+    "https://static.rust-lang.org/dist/rustc-1.98.1-src.tar.xz",
 ]
-sha256 = []
+sha256 = ["be1816e7f6c40abb90245ad6e024bed2a7e88d7dda4561e4d5470207df616b9f"]
 
 [build]
 type = "custom"

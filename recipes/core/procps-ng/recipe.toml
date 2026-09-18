@@ -1,6 +1,6 @@
 [package]
 name = "procps-ng"
-version = "4.0.4"
+version = "4.0.7"
 release = 1
 slot = "0"
 description = "Utilities for monitoring your system and its processes (ps, top, free)"
@@ -20,9 +20,9 @@ build = [
 
 [sources]
 urls = [
-    "https://gitlab.com/procps-ng/procps/-/archive/v4.0.4/procps-v4.0.4.tar.gz",
+    "https://gitlab.com/procps-ng/procps/-/archive/v4.0.7/procps-v4.0.7.tar.gz",
 ]
-sha256 = []
+sha256 = ["468dfe0f29a77498286b459fcc33e24fcc2031c11a890244ba9cf1481a4f5df7"]
 
 [build]
 type = "autotools"

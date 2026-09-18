@@ -1,6 +1,6 @@
 [package]
 name = "cmake"
-version = "3.31.5"
+version = "4.3.5"
 release = 1
 slot = "0"
 description = "Cross-platform open-source build system generator"
@@ -23,9 +23,9 @@ build = [
 
 [sources]
 urls = [
-    "https://github.com/Kitware/CMake/releases/download/v3.31.5/cmake-3.31.5.tar.gz",
+    "https://github.com/Kitware/CMake/releases/download/v4.3.5/cmake-4.3.5.tar.gz",
 ]
-sha256 = []
+sha256 = ["24fc974191ef48da4ff309671fdb5989f43e07ecde0e2589eaf9d72672d8612b"]
 
 [build]
 type = "custom"

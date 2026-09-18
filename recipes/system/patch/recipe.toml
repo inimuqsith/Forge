@@ -1,6 +1,6 @@
 [package]
 name = "patch"
-version = "2.7.6"
+version = "3.1.2"
 release = 1
 slot = "0"
 description = "Utility to apply diffs to files"
@@ -18,7 +18,7 @@ build = [
 
 [sources]
 urls = [
-    "https://ftp.gnu.org/gnu/patch/patch-2.7.6.tar.xz",
+    "https://ftp.gnu.org/gnu/patch/patch-3.1.2.tar.xz",
 ]
 sha256 = []
 

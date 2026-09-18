@@ -1,6 +1,6 @@
 [package]
 name = "glib2"
-version = "2.82.5"
+version = "4.3.9"
 release = 1
 slot = "0"
 description = "Core low-level data structure and utility library from GNOME"
@@ -23,7 +23,7 @@ build = [
 
 [sources]
 urls = [
-    "https://download.gnome.org/sources/glib/2.82/glib-2.82.5.tar.xz",
+    "https://download.gnome.org/sources/glib/2.82/glib-4.3.9.tar.xz",
 ]
 sha256 = []
 

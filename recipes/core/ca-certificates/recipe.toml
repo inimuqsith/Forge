@@ -1,6 +1,6 @@
 [package]
 name = "ca-certificates"
-version = "20241121"
+version = "20260909"
 release = 1
 slot = "0"
 description = "Common CA root certificates bundle from Mozilla"
@@ -19,7 +19,7 @@ build = [
 urls = [
     "https://curl.se/ca/cacert-2024-11-26.pem",
 ]
-sha256 = []
+sha256 = ["bb1782d281fe60d4a2dcf41bc229abe3e46c280212597d4abcc25bddf667739b"]
 
 [build]
 type = "custom"

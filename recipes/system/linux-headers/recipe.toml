@@ -1,6 +1,6 @@
 [package]
 name = "linux-headers"
-version = "6.13"
+version = "7.3-rc3"
 release = 1
 slot = "0"
 description = "Linux kernel API headers for userspace"
@@ -13,7 +13,7 @@ build = ["make", "rsync"]
 
 [sources]
 urls = [
-    "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.13.tar.xz"
+    "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-7.3-rc3.tar.xz"
 ]
 sha256 = []
 

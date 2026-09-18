@@ -1,6 +1,6 @@
 [package]
 name = "usbutils"
-version = "018"
+version = "019"
 release = 1
 slot = "0"
 description = "USB device listing and inspection utilities (lsusb)"
@@ -20,9 +20,9 @@ build = [
 
 [sources]
 urls = [
-    "https://kernel.org/pub/linux/utils/usb/usbutils/usbutils-018.tar.xz",
+    "https://kernel.org/pub/linux/utils/usb/usbutils/usbutils-019.tar.xz",
 ]
-sha256 = []
+sha256 = ["659f40c440e31ba865c52c818a33d3ba6a97349e3353f8b1985179cb2aa71ec5"]
 
 [build]
 type = "autotools"

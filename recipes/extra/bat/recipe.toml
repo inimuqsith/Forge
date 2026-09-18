@@ -1,6 +1,6 @@
 [package]
 name = "bat"
-version = "0.25.0"
+version = "0.26.1"
 release = 1
 slot = "0"
 description = "A cat clone with syntax highlighting and Git integration"
@@ -19,9 +19,9 @@ build = [
 
 [sources]
 urls = [
-    "https://github.com/sharkdp/bat/archive/refs/tags/v0.25.0.tar.gz",
+    "https://github.com/sharkdp/bat/archive/refs/tags/v0.26.1.tar.gz",
 ]
-sha256 = []
+sha256 = ["4474de87e084953eefc1120cf905a79f72bbbf85091e30cf37c9214eafcaa9c9"]
 
 [build]
 type = "cargo"

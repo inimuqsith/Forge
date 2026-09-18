@@ -1,6 +1,6 @@
 [package]
 name = "util-linux"
-version = "2.40.4"
+version = "2.42.3"
 release = 1
 slot = "0"
 description = "Miscellaneous system utilities for Linux"
@@ -23,7 +23,7 @@ build = [
 
 [sources]
 urls = [
-    "https://github.com/util-linux/util-linux/releases/download/v2.40.4/util-linux-2.40.4.tar.xz",
+    "https://github.com/util-linux/util-linux/releases/download/v2.42.3/util-linux-2.42.3.tar.xz",
 ]
 sha256 = []
 

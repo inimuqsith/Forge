@@ -1,6 +1,6 @@
 [package]
 name = "openssh"
-version = "9.9p2"
+version = "10.5p1"
 release = 1
 slot = "0"
 description = "Premier connectivity tool for remote login with the SSH protocol"
@@ -22,9 +22,9 @@ build = [
 
 [sources]
 urls = [
-    "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.9p2.tar.gz",
+    "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-10.5p1.tar.gz",
 ]
-sha256 = []
+sha256 = ["d44d28a839ea9daf969cc69150fde59910b2b39361dad81a3bd6cbd19218db11"]
 
 [build]
 type = "autotools"

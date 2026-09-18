@@ -1,6 +1,6 @@
 [package]
 name = "libtool"
-version = "2.5.4"
+version = "2.6.2"
 release = 1
 slot = "0"
 description = "Generic library support script"
@@ -22,9 +22,9 @@ build = [
 
 [sources]
 urls = [
-    "https://ftp.gnu.org/gnu/libtool/libtool-2.5.4.tar.xz",
+    "https://ftp.gnu.org/gnu/libtool/libtool-2.6.2.tar.xz",
 ]
-sha256 = []
+sha256 = ["2ef1067c16c97db930fd740cc9bc3d3ba9a583804ae5ac42cc3e8719e49e191e"]
 
 [build]
 type = "autotools"

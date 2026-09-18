@@ -1,6 +1,6 @@
 [package]
 name = "nano"
-version = "8.3"
+version = "9.2"
 release = 1
 slot = "0"
 description = "Pico editor clone with enhancements"
@@ -21,7 +21,7 @@ build = [
 
 [sources]
 urls = [
-    "https://nano-editor.org/dist/v8/nano-8.3.tar.xz",
+    "https://nano-editor.org/dist/v8/nano-9.2.tar.xz",
 ]
 sha256 = []
 

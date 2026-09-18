@@ -1,6 +1,6 @@
 [package]
 name = "libxml2"
-version = "2.13.6"
+version = "2.15.4"
 release = 1
 slot = "0"
 description = "XML parsing library and utility toolkit"
@@ -22,7 +22,7 @@ build = [
 
 [sources]
 urls = [
-    "https://download.gnome.org/sources/libxml2/2.13/libxml2-2.13.6.tar.xz",
+    "https://download.gnome.org/sources/libxml2/2.13/libxml2-2.15.4.tar.xz",
 ]
 sha256 = []
 

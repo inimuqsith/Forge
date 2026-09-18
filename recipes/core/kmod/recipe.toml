@@ -1,6 +1,6 @@
 [package]
 name = "kmod"
-version = "33"
+version = "34.2"
 release = 1
 slot = "0"
 description = "Linux kernel module management tools and library (lsmod, modprobe, insmod)"
@@ -23,9 +23,9 @@ build = [
 
 [sources]
 urls = [
-    "https://kernel.org/pub/linux/utils/kernel/kmod/kmod-33.tar.xz",
+    "https://kernel.org/pub/linux/utils/kernel/kmod/kmod-34.2.tar.xz",
 ]
-sha256 = []
+sha256 = ["5a5d5073070cc7e0c7a7a3c6ec2a0e1780850c8b47b3e3892226b93ffcb9cb54"]
 
 [build]
 type = "autotools"

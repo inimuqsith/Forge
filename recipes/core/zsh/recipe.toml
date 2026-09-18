@@ -1,6 +1,6 @@
 [package]
 name = "zsh"
-version = "5.9"
+version = "5.9.2"
 release = 1
 slot = "0"
 description = "Advanced programmable command interpreter"
@@ -21,9 +21,9 @@ build = [
 
 [sources]
 urls = [
-    "https://www.zsh.org/pub/zsh-5.9.tar.xz",
+    "https://www.zsh.org/pub/zsh-5.9.2.tar.xz",
 ]
-sha256 = []
+sha256 = ["36fa734374b44783582cec09bcd67822e2f992c779ec1624ab5596df078d2f81"]
 
 [build]
 type = "autotools"

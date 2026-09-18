@@ -1,6 +1,6 @@
 [package]
 name = "wpa_supplicant"
-version = "2.11"
+version = "2.12"
 release = 1
 slot = "0"
 description = "WPA/WPA2/WPA3 and IEEE 802.1X wireless client daemon"
@@ -21,9 +21,9 @@ build = [
 
 [sources]
 urls = [
-    "https://w1.fi/releases/wpa_supplicant-2.11.tar.gz",
+    "https://w1.fi/releases/wpa_supplicant-2.12.tar.gz",
 ]
-sha256 = []
+sha256 = ["08e23937e16d0155e55cab2b51f51fbe10d80a1aa91c4e15442645059b737ef6"]
 
 [build]
 type = "make"

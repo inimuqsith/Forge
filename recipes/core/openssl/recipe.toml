@@ -1,6 +1,6 @@
 [package]
 name = "openssl"
-version = "3.4.1"
+version = "4.1.0-alpha1"
 release = 1
 slot = "3"
 description = "Robust, commercial-grade TLS/SSL cryptography toolkit"
@@ -19,9 +19,9 @@ build = [
 
 [sources]
 urls = [
-    "https://github.com/openssl/openssl/releases/download/openssl-3.4.1/openssl-3.4.1.tar.gz",
+    "https://github.com/openssl/openssl/releases/download/openssl-4.1.0-alpha1/openssl-4.1.0-alpha1.tar.gz",
 ]
-sha256 = []
+sha256 = ["160271e66902844ee37e776b98df59a903739cd22a44f43126dab9fe9efd59bd"]
 
 [build]
 type = "custom"

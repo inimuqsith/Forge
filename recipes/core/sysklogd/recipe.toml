@@ -1,6 +1,6 @@
 [package]
 name = "sysklogd"
-version = "2.6.1"
+version = "2.7.2"
 release = 1
 slot = "0"
 description = "Standard Linux system and kernel logging daemons (syslogd, klogd)"
@@ -19,9 +19,9 @@ build = [
 
 [sources]
 urls = [
-    "https://github.com/troglobit/sysklogd/releases/download/v2.6.1/sysklogd-2.6.1.tar.gz",
+    "https://github.com/troglobit/sysklogd/releases/download/v2.7.2/sysklogd-2.7.2.tar.gz",
 ]
-sha256 = []
+sha256 = ["bc410ca64551a11fac6518b418fb6b8afbd888a70af2c5eb353334a706727bca"]
 
 [build]
 type = "autotools"

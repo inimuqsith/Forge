@@ -1,6 +1,6 @@
 [package]
 name = "groff"
-version = "1.23.0"
+version = "1.24.1"
 release = 1
 slot = "0"
 description = "GNU troff text-formatting system"
@@ -20,9 +20,9 @@ build = [
 
 [sources]
 urls = [
-    "https://ftp.gnu.org/gnu/groff/groff-1.23.0.tar.gz",
+    "https://ftp.gnu.org/gnu/groff/groff-1.24.1.tar.gz",
 ]
-sha256 = []
+sha256 = ["74e2819795b6aff431aeac983d63a9c8968eeaba2a2eba7df8ba4c7b41e7cfd8"]
 
 [build]
 type = "autotools"
