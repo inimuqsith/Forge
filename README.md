@@ -18,9 +18,9 @@
 - **🎛️ Granular USE Flags:** Mengaktifkan/menonaktifkan fitur perangkat lunak secara presisi di level global (`forge.conf`) atau per-paket (`package.use`).
 - **🏷️ Multi-Version Slots:** Menjalankan beberapa versi mayor paket secara berdampingan tanpa konflik (misal: LLVM 22 vs 21, Python 3.12 & 3.13, GCC multi-versi).
 - **⚙️ Konfigurasi Terpusat (*Single Source of Truth*):** Pengaturan build terpusat di `/etc/forge/forge.conf` (`cflags`, `march`, `use_flags`, `ccache`, `makeflags`).
-- **⚡ Opsi Akselerasi Hybrid & Binhost (Opt-In):**
-  - **Forge Native Binhost (`--binhost`):** Unduh biner terkompilasi native yang di-lock ke profil CPU pengguna dari `forge-server`.
-  - **Hybrid Fallback (`--hybrid`):** Fallback biner opsional ke repositori **CachyOS** (x86-64-v4/v3) atau **Arch Linux**.
+- **⚡ Opsi Akselerasi 3-Tier Package Cascade Resolution (Opt-In):**
+  - **3-Tier Cascade (`--binhost`):** Menjalankan resolusi 3 tingkat: (1) Forge Native Binhost (`.forge.tar.zst`), (2) CachyOS Prebuilt (Zen4/v4/v3) dengan Anti-Brick Core OS protection, (3) Source Code fallback.
+  - **Native Compilation (`--native` / Default):** Kompilasi 100% dari kode sumber secara native (Portage mode) dengan optimasi silikon host.
 - **🔬 Introspeksi Hardware (`forge cpu-dump`):** Menganalisis CPU host, ekstensi ISA (AVX-512, AVX2, SSE4, dll.), cache, dan mengekspor profil hardware `cpu-profile.json`.
 - **🏭 Suite Terpisah `forge-server`:** Daemon server resep terpusat (`serve`) dan worker CI/CD builder (`forge-server import`) yang mengompilasi paket secara massal untuk target CPU pengguna.
 - **⚙️ Integrasi OpenRC Native:** Otomatis mendeteksi skrip di `/etc/init.d/` dan terintegrasi dengan `rc-update`.
@@ -40,9 +40,9 @@ forge setup                     # Inisialisasi konfigurasi package manager (/etc
 forge install base              # Pasang sistem dasar Kura Linux (Meta-Paket)
 forge install base-devel        # Pasang toolchain kompilasi Kura Linux (Meta-Paket)
 forge install <pkg>             # Kompilasi dari source code secara native (Default Gentoo-style)
-forge install --binhost <pkg>   # Opsi Akselerasi: Unduh pre-built binary native dari Forge Server
-forge install --hybrid <pkg>    # Opsi Akselerasi: Gunakan biner CachyOS/Arch jika ada
-forge install --interactive <pkg> # Pilih manual provider (Source vs Binhost vs CachyOS/Arch)
+forge install --native <pkg>    # Paksa kompilasi 100% dari kode sumber (Portage mode)
+forge install --binhost <pkg>   # 3-Tier Cascade: Forge Binhost -> Fallback CachyOS Zen4/v4/v3 -> Source
+forge install --interactive <pkg> # Pilih manual provider (Source vs Binhost vs CachyOS)
 forge remove <pkg>              # Hapus paket secara bersih berdasarkan manifest
 forge sync                      # Sinkronisasi pohon resep dari Forge Server
 forge update @world             # Re-kompilasi / perbarui seluruh paket terpasang

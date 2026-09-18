@@ -75,6 +75,41 @@ impl CpuProfile {
     pub fn to_json(&self) -> Result<String> {
         Ok(serde_json::to_string_pretty(self)?)
     }
+
+    /// Buat mock profil CPU untuk pengujian atau fallback
+    pub fn mock(target_march: &str, isa_extensions: &[&str]) -> Self {
+        let cflags = format!(
+            "-O2 -march={} -pipe -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt",
+            target_march
+        );
+        Self {
+            architecture: "x86_64".to_string(),
+            vendor: if target_march.starts_with("zn") {
+                "AMD".to_string()
+            } else if target_march == "alderlake" || target_march == "sapphirerapids" {
+                "Intel".to_string()
+            } else {
+                "Generic".to_string()
+            },
+            model_name: "Mock Processor".to_string(),
+            family: 25,
+            model: 1,
+            target_march: target_march.to_string(),
+            isa_extensions: isa_extensions.iter().map(|s| s.to_string()).collect(),
+            cache: CacheInfo {
+                l1d: "32 KiB".to_string(),
+                l1i: "32 KiB".to_string(),
+                l2: "512 KiB".to_string(),
+                l3: "16 MiB".to_string(),
+            },
+            recommended_flags: RecommendedFlags {
+                cflags: cflags.clone(),
+                cxxflags: cflags,
+                ldflags: "-Wl,-O1 -Wl,--as-needed -Wl,-z,relro -Wl,-z,now".to_string(),
+                makeflags: "-j4".to_string(),
+            },
+        }
+    }
 }
 
 fn parse_field(cpuinfo: &str, field: &str) -> Option<String> {

@@ -22,8 +22,7 @@ recipes_path = "/var/db/forge/recipes"
 
 # Mode Resolusi Paket Bawaan:
 # - "source": (DEFAULT - Gentoo Portage Mode) Kompilasi 100% native dari kode sumber upstream
-# - "binhost": Utamakan unduhan biner native dari Forge Server
-# - "hybrid": Cek Binhost -> Cek Fallback CachyOS/Arch -> Kompilasi Source
+# - "binhost": 3-Tier Cascade (Forge Binhost -> CachyOS Zen4/v4/v3 Fallback -> Native Source Fallback)
 # - "interactive": Tanyakan opsi provider kepada pengguna saat instalasi
 mode = "source"
 

@@ -94,12 +94,13 @@
 
 ---
 
-### Fase 9: Hybrid Unified Engine (Binhost & CachyOS/Arch Fallback)
-**Status:** 🟡 **LOGIKA MODEL SELESAI / INTEGRASI NETWORK API PENDING**
+### Fase 9: 3-Tier Package Cascade Resolution Engine & Anti-Brick CachyOS Fallback
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] Implementasi data model binhost & client matcher di [`crates/forge/src/binhost.rs`](file:///home/admin/Development/Forge/crates/forge/src/binhost.rs).
-- [x] Implementasi adapter fallback CachyOS (v4/v3) & Arch Linux di [`crates/forge/src/hybrid.rs`](file:///home/admin/Development/Forge/crates/forge/src/hybrid.rs).
-- [x] CLI flag dispatcher (`--binhost`, `--hybrid`, `--interactive`) di [`crates/forge/src/main.rs`](file:///home/admin/Development/Forge/crates/forge/src/main.rs).
-- [ ] **Pending:** Live network streaming download & decompresi zstd untuk biner binhost/CachyOS.
+- [x] **Anti-Brick CachyOS Adapter (`crates/forge/src/cachyos.rs`):** Auto-detection mikroarsitektur CPU (`Znver4`, `X86_64_V4`, `X86_64_V3`, `Generic`) dan Core OS Blacklist Protection mutlak (`glibc`, `openrc`, `gcc`, `llvm`, `mold`, `eudev`, `kmod`, `shadow`, `util-linux`, `base`, `base-devel`, `forge`, `systemd`).
+- [x] **3-Tier Cascade Resolution Engine (`crates/forge/src/cascade.rs`):** Resolusi deterministik: Tingkat 1 (Forge Native Binhost `.forge.tar.zst`) -> Tingkat 2 (CachyOS Prebuilt dengan bypass blacklist) -> Tingkat 3 (Source-First Native Compilation).
+- [x] **Penyederhanaan CLI Flags (ADR-030):** Menghapus `--hybrid`, menyediakan flag `--native` (paksa kompilasi source) dan `--binhost` (aktifkan 3-tier cascade) di `crates/forge/src/main.rs`.
+- [x] **Unit Tests:** `test_cachyos_tier_auto_detection`, `test_core_os_blacklist_protection`, `test_cascade_prefers_forge_binhost`, `test_cascade_fallback_to_cachyos`, `test_cascade_blocks_core_os_from_cachyos`, `test_cascade_fallback_to_source` lulus 100%.
 
 ---
 
@@ -156,6 +157,29 @@
 27. **ADR-027 (Pipeline Bootstrap 2-Tahap & Resolusi Paradoks Ayam-Telur):** Memecahkan masalah bootstrapping OS baru (The Chicken-and-Egg Problem) melalui 2 tahap: Tahap 1 mengompilasi resep toolchain di host menjadi Seed Toolchain `dist/kura-toolchain.tar.xz`, dan Tahap 2 mengekstrak seed tersebut ke dalam chroot `/mnt/kura/` untuk kemudian menjalankan `forge install base` dan `forge install base-devel` secara self-hosted.
 28. **ADR-028 (Sistem Resep Terdedikasi `/var/db/forge/recipes/`, Protokol `forge sync`, & Kemandirian Chroot Toolchain):** Menghapus ketergantungan pada direktori kerja lokal pengembang (`./recipes/`) dan menstandarkan pohon resep sistem resmi di `/var/db/forge/recipes/`. Protokol `forge sync` menyinkronkan tarball resep dari `forge-server` secara atomik. Perintah `forge toolchain bundle` otomatis menyertakan seluruh `/var/db/forge/recipes/`, `/etc/forge/forge.conf`, dan `/usr/bin/forge` ke dalam `dist/kura-toolchain.tar.xz`, memastikan lingkungan chroot `/mnt/kura/` 100% mandiri (*self-contained*) untuk langsung mengompilasi `base` dan `base-devel` tanpa ketergantungan eksternal.
 29. **ADR-029 (Disiplin Git Commit Berkala & Pembaruan Kontinu Dokumentasi Markdown):** Menegakkan kewajiban bahwa setiap tahapan kerja dan pembaruan arsitektur yang telah disetujui User wajib langsung dicatat ke Git dengan Conventional Commits, serta seluruh berkas dokumentasi Markdown (`ARCHITECTURE.md`, `MEMORY.md`, `README.md`, `AGENTS.md`) wajib diperbarui secara terus-menerus (*continuous persistent sync*) agar selalu mencerminkan kondisi arsitektur riil.
+30. **ADR-030 (Penyederhanaan CLI & 3-Tier Package Cascade Resolution):** Menghapus total flag kaku `--hybrid` dan menyederhanakan UX menjadi 2 opsi intuitif: `--native` (Source-First Portage Mode) dan `--binhost` (3-Tier Cascade: Forge Binhost -> CachyOS Zen4/v4/v3 -> Native Source Fallback).
+31. **ADR-031 (Garansi Anti-Brick & Core OS Blacklist Protection):** Menjamin integritas sistem Kura Linux dengan melarang keras paket fondasi dan toolchain OS inti (`glibc`, `openrc`, `gcc`, `llvm`, `mold`, `eudev`, `kmod`, `shadow`, `util-linux`, `base`, `base-devel`, `forge`, `systemd`) diambil dari repo biner luar (CachyOS/Arch), dan mewajibkan fallback kompilasi dari kode sumber resmi Kura Linux.
+
+---
+
+## 3. Log Masalah & Solusi (Troubleshooting)
+
+| Tanggal | Komponen | Masalah | Solusi |
+| :--- | :--- | :--- | :--- |
+| *2026-09-18* | *Inisialisasi* | *Kebutuhan arsitektur dasar Forge terpisah dari KuraLinux* | *Membangun blueprint awal Forge mengadopsi kebutuhan dari IDEA_FOR_FORGE.md* |
+| *2026-09-18* | *Arsitektur* | *Kompilasi source lokal berat di mesin pengguna; butuh opsi biner native & server CI/CD* | *Mengembangkan ekosistem Server & CI/CD Builder Lock-CPU, perintah `cpu-dump` & `import`, serta arsitektur Hybrid Unified* |
+| *2026-09-18* | *Filosofi* | *Prioritas default sempat condong ke binhost; komponen server tercampur dengan klien* | *Mengoreksi prioritas menjadi Source-First (Gentoo-style) dan memisahkan binary klien `forge` dengan server suite `forge-server`* |
+| *2026-09-18* | *Isolasi Host* | *Ketergantungan terhadap compiler host saat bootstrap awal Kura Linux* | *Mengembangkan sub-perintah `forge toolchain bundle` dan menghasilkan seed toolchain `dist/kura-toolchain.tar.xz` untuk diekstrak ke sysroot stage Kura Linux* |
+| *2026-09-18* | *Standarisasi Resep* | *Format terpisah bash + toml rentan fragmentasi; butuh format efisien & hierarki compiler kuat* | *Menerapkan format All-in-One `recipe.toml` berbasis Serde TOML dengan subshell environment injection mutlak* |
+| *2026-09-18* | *Integritas Build* | *Haram mutlak mengambil biner dari host filesystem* | *Menegakkan aturan Pure Source-Built (ADR-019): toolchain bundler hanya mengemas biner yang sah terkompilasi dari source code oleh Forge di staging `/tmp/forge/stage/`* |
+| *2026-09-18* | *Penyederhanaan Crate* | *Layout 6 crate berlebihan dan membingungkan* | *Mengkonsolidasikan workspace menjadi Clean 2-Crate Layout (`crates/forge` dan `crates/forge-server`)* |
+| *2026-09-18* | *Akselerasi Rebuild* | *Kompilasi ulang source code berulang memakan waktu lama* | *Mengintegrasikan Ccache (v4.13.5) secara otomatis pada pipeline builder Forge (ADR-025)* |
+| *2026-09-18* | *Penyederhanaan Desain* | *Wizard system-setup dan @system hardcoded kaku & melanggar prinsip UNIX* | *Menghapus system-setup & @system hardcoded, beralih ke paradigma meta-paket deklaratif `base` dan `base-devel` (ADR-026)* |
+| *2026-09-18* | *Paradoks Bootstrap* | *Bagaimana chroot bisa build base-devel jika belum punya compiler bawaan* | *Merumuskan 2-Stage Bootstrapping Pipeline: Seed Toolchain diekstrak ke chroot, baru mengeksekusi `forge install base-devel` (ADR-027)* |
+| *2026-09-18* | *Optimasi Ekstrem* | *Flag kompilasi belum memaksimalkan seluruh fitur AMD Zen 4 silikon* | *Menerapkan flag 'Mentok Ekstrem' Zen 4: AVX-512 ZMM, Thin LTO, Mold ICF `--icf=all`, Dead-strip `--gc-sections`, `-fno-math-errno`, & 32-byte function alignment* |
+| *2026-09-18* | *Kemandirian Chroot* | *Chroot butuh akses ke resep tanpa mount repo git lokal host* | *Menstandarkan `/var/db/forge/recipes/`, merancang protokol `forge sync`, dan membundel seluruh resep ke `kura-toolchain.tar.xz` (ADR-028)* |
+| *2026-09-18* | *Workflow & Docs* | *Perlunya disiplin Git commit berkala & pembaruan berkas MD berkelanjutan* | *Menetapkan aturan wajib Git commit dan sinkronisasi persisten berkas MD pada setiap tahapan (ADR-029)* |
+| *2026-09-19* | *Cascade & Anti-Brick* | *Paket biner luar (Arch/CachyOS) berisiko menimpa glibc/init system Kura Linux* | *Menerapkan 3-Tier Cascade Resolution Engine (`cascade.rs`) & Core OS Blacklist Anti-Brick Protection (`cachyos.rs`) (ADR-030, ADR-031)* |
 
 ---
 

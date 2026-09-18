@@ -28,7 +28,8 @@ Forge dirancang menggunakan arsitektur modular yang terkonsolidasi secara rapi d
 |     ├── `src/cpu.rs`       : Hardware Introspection (AVX-512/AVX2/Cache), `forge cpu-dump`      |
 |     ├── `src/toolchain.rs` : Pure Source Seed Toolchain Bundler (ADR-019, Zero Host Harvesting) |
 |     ├── `src/binhost.rs`   : Forge Binhost Client & Zstd/BLAKE3 streaming verification          |
-|     └── `src/hybrid.rs`    : CachyOS (v4/v3) & Arch Linux Fallback Provider                     |
+|     ├── `src/cachyos.rs`   : CachyOS (Zen4/v4/v3) Adapter & Anti-Brick Core OS Blacklist Engine |
+|     └── `src/cascade.rs`   : 3-Tier Package Cascade Resolver (--native & --binhost)             |
 +=================================================================================================+
                                                  ▲
                                                  │ Sinkronisasi Resep & Unduhan Biner

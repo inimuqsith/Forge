@@ -2,8 +2,8 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::*;
 use forge::{
-    CpuProfile, DependencyResolver, ForgeConfig, InstalledDatabase, RecipeBuilder,
-    SyncClient, ToolchainComponent, ToolchainManager,
+    CpuProfile, DependencyResolver, ForgeConfig, InstalledDatabase, PackageCascadeResolver,
+    PackageProvider, RecipeBuilder, SyncClient, ToolchainComponent, ToolchainManager,
 };
 use std::path::{Path, PathBuf};
 
@@ -30,23 +30,22 @@ enum Commands {
         /// Nama paket atau meta-paket (misal: base, base-devel, mold, nginx)
         target: String,
 
-        /// Opsi Akselerasi: Prioritaskan unduhan biner native dari Forge Server
+        /// Opsi Akselerasi: Aktifkan 3-Tier Binhost Cascade Resolution (Forge Binhost -> CachyOS -> Source)
         #[arg(long)]
         binhost: bool,
 
-        /// Opsi Akselerasi: Izinkan fallback ke biner CachyOS/Arch Linux
+        /// Paksa kompilasi 100% dari kode sumber secara native (Gentoo Portage mode)
         #[arg(long)]
-        hybrid: bool,
+        native: bool,
 
         /// Tampilkan dialog interaktif untuk memilih provider
         #[arg(long)]
         interactive: bool,
 
-        /// Paksa kompilasi lokal dari source code
-        #[arg(long)]
+        /// Paksa kompilasi lokal dari source code (alias untuk --native)
+        #[arg(long, hide = true)]
         build_source: bool,
     },
-
 
     /// Hapus paket secara bersih berdasarkan manifest
     Remove {
@@ -133,21 +132,53 @@ fn main() -> Result<()> {
             println!("{} Konfigurasi Forge berhasil disimpan!", "✓".green());
         }
 
-        Commands::Install { target, binhost, hybrid, interactive, build_source } => {
+        Commands::Install {
+            target,
+            binhost,
+            native,
+            interactive,
+            build_source,
+        } => {
             println!(">>> Memproses instalasi: {}", target.bold().green());
-            if build_source {
-                println!("{} Mode: Paksa kompilasi lokal dari source code.", "[i]".blue());
-            } else if binhost {
-                println!("{} Mode: Mengutamakan Forge Native Binhost.", "[i]".blue());
-            } else if hybrid {
-                println!("{} Mode: Fallback ke CachyOS/Arch diperbolehkan.", "[i]".blue());
-            } else if interactive {
+            let force_native = native || build_source;
+            let config = ForgeConfig::load_or_default(None);
+
+            if interactive {
                 println!("{} Mode: Membuka pemilihan provider interaktif.", "[i]".blue());
-            } else {
-                println!("{} Mode Default: Source-First Native Compilation (Gentoo Mode).", "[i]".blue());
             }
 
-            let config = ForgeConfig::load_or_default(None);
+            // Jalankan 3-Tier Cascade Resolver untuk paket target
+            let rt = tokio::runtime::Runtime::new()?;
+            let resolution = rt.block_on(PackageCascadeResolver::resolve_and_install(
+                &target,
+                &config,
+                force_native,
+                binhost,
+            ))?;
+
+            match resolution.provider {
+                PackageProvider::ForgeBinhost => {
+                    println!(
+                        "{} Target akan diunduh via Forge Native Binhost: {}",
+                        "✓".green(),
+                        resolution.download_url.as_deref().unwrap_or("")
+                    );
+                }
+                PackageProvider::CachyOsPrebuilt => {
+                    println!(
+                        "{} Target akan diunduh via CachyOS Prebuilt fallback: {}",
+                        "✓".green(),
+                        resolution.download_url.as_deref().unwrap_or("")
+                    );
+                }
+                PackageProvider::ForgeSource => {
+                    println!(
+                        "{} Target akan dikompilasi dari kode sumber upstream.",
+                        "✓".green()
+                    );
+                }
+            }
+
             println!("  [🔍] Menghitung graf dependensi (DAG) & USE flags untuk '{}'...", target.bold().yellow());
             match DependencyResolver::resolve(&target, &config, None, None) {
                 Ok(plan) => {
