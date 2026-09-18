@@ -1,6 +1,6 @@
 # MEMORY.md — Memori & Catatan Teknis Package Manager `forge` & `forge-server`
 
-> Dokumen memori persisten AI untuk melacak progres pengembangan ekosistem package manager **`forge`** (klien) dan **`forge-server`** (server/CI-CD) berbasis **Rust**, keputusan arsitektur (ADR), status roadmap riil (membedakan kode yang sudah diimplementasikan vs blueprint arsitektur), dan log pemecahan masalah teknis.
+> Dokumen memori persisten AI untuk melacak progres pengembangan ekosistem package manager **`forge`** (klien) dan **`forge-server`** (server/CI-CD) berbasis **Rust**, keputusan arsitektur (ADR), status roadmap riil (membedakan kode yang sudah diimplementasikan vs blueprint arsitektur), dan panduan serah-terima (*handover*) antar-agen AI.
 
 ---
 
@@ -81,7 +81,7 @@
 - [x] **Desain Arsitektur:** Spesifikasi format flat-file database `/var/db/forge/installed/<pkg>/manifest`, *reverse-directory pruning*, dan proteksi `CONFIG_PROTECT` di [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
 - [ ] **Pending Implementasi Kode:** Engine Rust `crates/forge/src/db.rs` untuk:
   - Menulis manifest berkas, ukuran, hash SHA256, dan metadata build ke database flat-file.
-  - Eksekusi `forge remove <pkg>`: membaca manifest, menghapus file paket, dan membersihkan direktori kosong yang ditinggalkan secara rekursif (*leaf-to-root pruning*).
+  - Eksekusi `forge remove <pkg>`: membaca manifest, menghapus file paket, dan membersihkan direktori kosong secara rekursif (*leaf-to-root pruning*).
   - Melindungi file konfigurasi di `/etc/` dari modifikasi pengguna (`CONFIG_PROTECT`).
   - Eksekusi post-unmerge hooks (`ldconfig`, `rc-update`).
   - Implementasi CLI `forge list` dan `forge query <pkg>`.
@@ -159,3 +159,33 @@
 | *2026-09-18* | *Penyederhanaan Crate* | *Layout 6 crate berlebihan dan membingungkan* | *Mengkonsolidasikan workspace menjadi Clean 2-Crate Layout (`crates/forge` dan `crates/forge-server`)* |
 | *2026-09-18* | *Akselerasi Rebuild* | *Kompilasi ulang source code berulang memakan waktu lama* | *Mengintegrasikan Ccache (v4.13.5) secara otomatis pada pipeline builder Forge (ADR-025)* |
 | *2026-09-18* | *Fokus Arsitektur & Transparansi* | *Kebutuhan blueprint mendalam dan transparansi status kode vs arsitektur* | *Mendokumentasikan blueprint lengkap DAG, Merger, Manifest DB, memperinci status tiap fase di MEMORY.md, dan menambah ADR-022 s/d ADR-025* |
+
+---
+
+## 4. Panduan Serah Terima AI Agent (Incoming AI Agent Handover Guide)
+
+> **Catatan Penting untuk AI Agent Penerus:**
+> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan tingkat kesiapan **~65%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan ADR telah didokumentasikan secara lengkap.
+
+### 📌 Ringkasan Status & State Workspace:
+- **Workspace:** 2 Crate murni: [`crates/forge`](file:///home/admin/Development/Forge/crates/forge) (Klien & Engine Library) dan [`crates/forge-server`](file:///home/admin/Development/Forge/crates/forge-server) (Server & CI/CD Builder).
+- **Toolchain:** Rust 1.97.1, LLVM/Clang 22, Linker `mold`, Ccache 4.13.5, Thin LTO, `-O3 -march=native`.
+- **Seed Toolchain:** Staged murni di `/tmp/forge/stage/` dan dikemas ke `dist/kura-toolchain.tar.xz` (ADR-019).
+
+### 🛑 6 Aturan Mutlak yang Wajib Diikuti:
+1. **HITL (Human-In-The-Loop):** Wajib ikuti siklus 5-langkah (*Plan $\rightarrow$ Chat $\rightarrow$ ACC $\rightarrow$ Eksekusi $\rightarrow$ Uji*). Jangan edit/buat file tanpa ACC di chat.
+2. **HARAM EDIT KURALINUX:** Dilarang keras menyentuh direktori `/home/admin/Development/KuraLinux/`.
+3. **HARAM AMBIL DARI HOST (ADR-019):** Biner dan toolchain wajib 100% dikompilasi dari source code upstream via resep ke `/tmp/forge/stage/`. Dilarang meng-copy biner dari `/usr/bin/` atau `/usr/lib/`.
+4. **GLIBC EXEMPTION (ADR-002):** Paket Glibc di-build dengan GCC standar tanpa flag `-march` kustom demi stabilitas.
+5. **CCACHE ACCELERATION (ADR-025):** Kompilasi memanfaatkan Ccache 4.13.5 pada build engine.
+6. **OPENRC ONLY:** Tidak boleh ada ketergantungan pada Systemd.
+
+### 🎯 4 Tugas Prioritas Pengembangan Selanjutnya (Sisa 35%):
+1. **Task 1: DAG Dependency Resolver (`crates/forge/src/resolver.rs`):**
+   - Implementasikan algoritma *Topological Sort* (Kahn / Tarjan SCC) dan deteksi circular dependency dari resep `recipe.toml` (`[dependencies.runtime]` vs `[dependencies.build]`).
+2. **Task 2: Transactional Merger & Collision Detector (`crates/forge/src/merger.rs`):**
+   - Implementasikan pre-flight collision scanner terhadap `/var/db/forge/installed/`, atomic copy ke `$FORGE_ROOT`, preservasi symlink/permissions, dan rollback handler.
+3. **Task 3: Manifest Database & Unmerge Cleaner (`crates/forge/src/db.rs`):**
+   - Implementasikan pencatatan manifest di `/var/db/forge/installed/<pkg>/manifest`, reverse-directory pruning untuk `forge remove <pkg>`, proteksi `CONFIG_PROTECT` di `/etc/`, dan query/list CLI.
+4. **Task 4: Distro Stage Exporter & Real Server Daemon:**
+   - Implementasikan tarball bundler `forge stage-export` $\rightarrow$ `kura-stage.tar.xz`, dan HTTP REST API daemon pada `crates/forge-server` (`serve`).

@@ -45,7 +45,59 @@ Forge dirancang menggunakan arsitektur modular yang terkonsolidasi secara rapi d
 
 ---
 
-## 2. Blueprint Mendalam: DAG Dependency Resolver (`src/resolver.rs`)
+## 2. Siklus Hidup & Alur Kerja Ekosistem (The 3 Epochs of Kura Linux & Forge)
+
+Untuk memahami kapan resep lokal digunakan, kapan server beroperasi, dan bagaimana distribusi Kura Linux dibangun secara mandiri, ekosistem Forge dibagi menjadi **3 Fase Hidup (3 Epochs)**:
+
+```mermaid
+flowchart TD
+    subgraph EPOCH_1["Fase 1: Developer Host (Bootstrap Seed Toolchain)"]
+        A["Resep Lokal\n(./recipes/system/)"] --> B["Forge Builder\n+ Ccache 4.13.5"]
+        B --> C["Staging DESTDIR\n(/tmp/forge/stage/)"]
+        C --> D["forge toolchain bundle\n-> dist/kura-toolchain.tar.xz"]
+    end
+
+    subgraph EPOCH_2["Fase 2: Chroot Environment (Rebuild Base OS Kura Linux)"]
+        D --> E["Ekstrak Seed Toolchain\nke Sysroot /mnt/kura/"]
+        E --> F["Masuk chroot /mnt/kura"]
+        F --> G["forge system-setup\n(Pilih CPU, Profil, Kernel)"]
+        G --> H["forge install @system\n(DAG Resolver -> Compile -> Merge)"]
+        H --> I["forge stage-export\n-> kura-stage.tar.xz (OS Siap Pakai)"]
+    end
+
+    subgraph EPOCH_3["Fase 3: Lingkungan Produksi (Klien & Server Publik)"]
+        J["forge-server\n(Central Recipe Git & Binhost)"]
+        K["User Laptop / PC"]
+        K -- "1. forge sync" --> J
+        J -- "Resep Terkini" --> K
+        K -- "2. forge install <pkg>" --> L["Local Native Compilation"]
+        K -- "2b. forge install --binhost" --> M["Download Pre-built Binary\n(Lock-CPU)"]
+    end
+
+    EPOCH_1 --> EPOCH_2
+    EPOCH_2 --> EPOCH_3
+```
+
+### 🔹 Epoch 1: Bootstrap Seed Toolchain (Posisi di Host Saat Ini)
+- **Kondisi:** Kura Linux belum hidup sebagai OS mandiri.
+- **Resep:** Menggunakan resep lokal di `./recipes/system/` (glibc, llvm, mold, make, ninja, linux-headers, gcc, binutils, pkgconf).
+- **Proses:** Forge mengompilasi resep murni dari sumber upstream ke `/tmp/forge/stage/<pkg>/` lalu mengemasnya via `forge toolchain bundle` menjadi `dist/kura-toolchain.tar.xz` (ADR-019: dilarang mengambil biner dari host).
+
+### 🔹 Epoch 2: Inisialisasi Distro Mandiri (Di dalam Lingkungan Chroot)
+- **Kondisi:** Developer mengekstrak `kura-toolchain.tar.xz` ke dalam rootfs `/mnt/kura/` dan masuk ke `chroot /mnt/kura`.
+- **Proses:**
+  1. Jalankan `forge system-setup` untuk memilih profil CPU native, kernel monolithic, dan OpenRC.
+  2. Jalankan `forge install @system`: DAG resolver menyusun antrean 40+ paket dasar, builder mengompilasi di RAM tmpfs dengan ccache, merger memasang file ke `/` dan mencatat manifest.
+  3. Jalankan `forge stage-export --output kura-stage.tar.xz` untuk menghasilkan image distribusi final.
+
+### 🔹 Epoch 3: Operasional Normal Distro (Server + Klien Publik)
+- **Kondisi:** Kura Linux sudah berjalan di komputer pengguna umum.
+- **Sisi Server (`forge-server`):** Menyajikan API sinkronisasi resep (`serve`) dan CI/CD build farm (`import`).
+- **Sisi Klien (`forge`):** Menjalankan `forge sync` untuk memperbarui resep ke `/var/db/forge/recipes/`, dan mengompilasi paket secara native atau mengunduh biner via `--binhost`.
+
+---
+
+## 3. Blueprint Mendalam: DAG Dependency Resolver (`src/resolver.rs`)
 
 ### 🎯 Tujuan & Filosofi
 Memetakan seluruh pohon ketergantungan paket dari resep `recipe.toml`, memvalidasi ketiadaan siklus (*cycle detection*), dan menghasilkan urutan eksekusi kompilasi topologis yang deterministik (*Topological Sort*).
@@ -101,7 +153,7 @@ Memetakan seluruh pohon ketergantungan paket dari resep `recipe.toml`, memvalida
 
 ---
 
-## 3. Blueprint Mendalam: Transactional Merger & Collision Detector (`src/merger.rs`)
+## 4. Blueprint Mendalam: Transactional Merger & Collision Detector (`src/merger.rs`)
 
 ### 🎯 Tujuan & Filosofi
 Memindahkan berkas hasil kompilasi dari direktori staging `$DESTDIR` (`/tmp/forge/stage/<pkg>`) ke rootfs target `$FORGE_ROOT` (default `/`) secara atomik, dengan jaminan integritas, tanpa risiko merusak file sistem host jika terjadi error.
@@ -152,7 +204,7 @@ Memindahkan berkas hasil kompilasi dari direktori staging `$DESTDIR` (`/tmp/forg
 
 ---
 
-## 4. Blueprint Mendalam: Flat-File Manifest Database & Unmerge Cleaner (`src/db.rs`)
+## 5. Blueprint Mendalam: Flat-File Manifest Database & Unmerge Cleaner (`src/db.rs`)
 
 ### 🎯 Tujuan & Filosofi
 Menyimpan state paket terpasang menggunakan format flat-file teks deterministik yang tangguh, mudah dibaca, dan tidak memerlukan database engine eksternal (seperti SQLite atau BerkeleyDB) yang rentan rusak saat proses bootstrap distro.
@@ -196,7 +248,7 @@ dir /usr/lib/mold 0755
 
 ---
 
-## 5. Blueprint Akselerasi Ccache & Hierarki Supremasi Compiler
+## 6. Blueprint Akselerasi Ccache & Hierarki Supremasi Compiler
 
 ```
                       [ Resep: recipe.toml ]
@@ -229,7 +281,7 @@ dir /usr/lib/mold 0755
 
 ---
 
-## 6. Blueprint Pure Source Seed Toolchain & Sysroot Packaging (`dist/kura-toolchain.tar.xz`)
+## 7. Blueprint Pure Source Seed Toolchain & Sysroot Packaging (`dist/kura-toolchain.tar.xz`)
 
 Untuk memutus ketergantungan dari host dan menjamin Kura Linux dapat melakukan bootstrap secara mandiri (*self-contained*):
 
@@ -261,7 +313,7 @@ Untuk memutus ketergantungan dari host dan menjamin Kura Linux dapat melakukan b
 
 ---
 
-## 7. Blueprint Server Registry & CI/CD Builder (`crates/forge-server`)
+## 8. Blueprint Server Registry & CI/CD Builder (`crates/forge-server`)
 
 ```
                           [ forge-server CLI / Daemon ]
@@ -280,7 +332,7 @@ Untuk memutus ketergantungan dari host dan menjamin Kura Linux dapat melakukan b
 
 ---
 
-## 8. Spesifikasi Wizard: `forge setup` & `forge system-setup`
+## 9. Spesifikasi Wizard: `forge setup` & `forge system-setup`
 
 ### A. Wizard Package Manager: `forge setup`
 - Inisialisasi konfigurasi package manager di `/etc/forge/forge.conf`.
@@ -293,7 +345,7 @@ Untuk memutus ketergantungan dari host dan menjamin Kura Linux dapat melakukan b
 
 ---
 
-## 9. Format All-in-One `recipe.toml`
+## 10. Format All-in-One `recipe.toml`
 
 ```toml
 [package]
