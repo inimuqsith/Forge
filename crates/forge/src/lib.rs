@@ -134,8 +134,8 @@ impl Default for ForgeConfig {
                 mode: "source".to_string(),
             },
             server: ServerConfig {
-                recipe_server: "https://recipes.kuralinux.org/v1".to_string(),
-                binhost_url: "https://binhost.kuralinux.org/v1".to_string(),
+                recipe_server: "https://pkgkura.amqs.net/v1".to_string(),
+                binhost_url: "https://pkgkura.amqs.net/v1".to_string(),
             },
             binhost: BinhostConfig {
                 enable_binhost: false,

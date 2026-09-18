@@ -28,10 +28,10 @@ mode = "source"
 
 [server]
 # URL Forge Central Server untuk sinkronisasi resep & katalog
-recipe_server = "https://recipes.kuralinux.org/v1"
+recipe_server = "https://pkgkura.amqs.net/v1"
 
 # URL Forge Central Binary Library (Binhost)
-binhost_url = "https://binhost.kuralinux.org/v1"
+binhost_url = "https://pkgkura.amqs.net/v1"
 
 [binhost]
 # Opsi akselerasi unduh binary native dari Forge Server (Default: false, diaktifkan via --binhost)
