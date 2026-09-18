@@ -142,6 +142,7 @@
 25. **ADR-025 (Integrated Compiler Acceleration with Ccache 4.13.5 & Memory tmpfs Isolation):** Engine kompilasi Forge secara otomatis mengintegrasikan akselerasi compiler cache `ccache` pada `CC` dan `CXX`, serta mengisolasi build directory di RAM `tmpfs` untuk memaksimalkan kecepatan I/O dan efisiensi siklus rebuild.
 26. **ADR-026 (Paradigma Meta-Paket Murni & Eliminasi Hardcoded @system / system-setup):** Menghapus total target magis `@system` yang di-hardcode di kode biner dan menghapus wizard `system-setup`. Basis sistem Kura Linux didefinisikan murni sebagai resep meta-paket deklaratif (`base` dan `base-devel`) mengadopsi filosofi *Everything is a Package* ala Arch Linux/Alpine/Void.
 27. **ADR-027 (Pipeline Bootstrap 2-Tahap & Resolusi Paradoks Ayam-Telur):** Memecahkan masalah bootstrapping OS baru (The Chicken-and-Egg Problem) melalui 2 tahap: Tahap 1 mengompilasi resep toolchain di host menjadi Seed Toolchain `dist/kura-toolchain.tar.xz`, dan Tahap 2 mengekstrak seed tersebut ke dalam chroot `/mnt/kura/` untuk kemudian menjalankan `forge install base` dan `forge install base-devel` secara self-hosted.
+28. **ADR-028 (Sistem Resep Terdedikasi `/var/db/forge/recipes/`, Protokol `forge sync`, & Kemandirian Chroot Toolchain):** Menghapus ketergantungan pada direktori kerja lokal pengembang (`./recipes/`) dan menstandarkan pohon resep sistem resmi di `/var/db/forge/recipes/`. Protokol `forge sync` menyinkronkan tarball resep dari `forge-server` secara atomik. Perintah `forge toolchain bundle` otomatis menyertakan seluruh `/var/db/forge/recipes/`, `/etc/forge/forge.conf`, dan `/usr/bin/forge` ke dalam `dist/kura-toolchain.tar.xz`, memastikan lingkungan chroot `/mnt/kura/` 100% mandiri (*self-contained*) untuk langsung mengompilasi `base` dan `base-devel` tanpa ketergantungan eksternal.
 
 ---
 
@@ -159,19 +160,20 @@
 | *2026-09-18* | *Akselerasi Rebuild* | *Kompilasi ulang source code berulang memakan waktu lama* | *Mengintegrasikan Ccache (v4.13.5) secara otomatis pada pipeline builder Forge (ADR-025)* |
 | *2026-09-18* | *Penyederhanaan Desain* | *Wizard system-setup dan @system hardcoded kaku & melanggar prinsip UNIX* | *Menghapus system-setup & @system hardcoded, beralih ke paradigma meta-paket deklaratif `base` dan `base-devel` (ADR-026)* |
 | *2026-09-18* | *Paradoks Bootstrap* | *Bagaimana chroot bisa build base-devel jika belum punya compiler bawaan* | *Merumuskan 2-Stage Bootstrapping Pipeline: Seed Toolchain diekstrak ke chroot, baru mengeksekusi `forge install base-devel` (ADR-027)* |
-
+| *2026-09-18* | *Optimasi Ekstrem* | *Flag kompilasi belum memaksimalkan seluruh fitur AMD Zen 4 silikon* | *Menerapkan flag 'Mentok Ekstrem' Zen 4: AVX-512 ZMM, Thin LTO, Mold ICF `--icf=all`, Dead-strip `--gc-sections`, `-fno-math-errno`, & 32-byte function alignment* |
+| *2026-09-18* | *Kemandirian Chroot* | *Chroot butuh akses ke resep tanpa mount repo git lokal host* | *Menstandarkan `/var/db/forge/recipes/`, merancang protokol `forge sync`, dan membundel seluruh resep ke `kura-toolchain.tar.xz` (ADR-028)* |
 
 ---
 
 ## 4. Panduan Serah Terima AI Agent (Incoming AI Agent Handover Guide)
 
 > **Catatan Penting untuk AI Agent Penerus:**
-> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")** dan tingkat kesiapan **~65%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan ADR telah didokumentasikan secara lengkap.
+> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")**, optimasi compiler **Mentok Ekstrem (Zen 4 AVX-512 / Thin LTO / Mold ICF)**, repositori resep terstandarisasi **`/var/db/forge/recipes/` (ADR-028)**, dan tingkat kesiapan **~65%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan 28 ADR telah didokumentasikan secara lengkap.
 
 ### 📌 Ringkasan Status & State Workspace:
 - **Workspace:** 2 Crate murni: [`crates/forge`](file:///home/admin/Development/Forge/crates/forge) (Klien & Engine Library) dan [`crates/forge-server`](file:///home/admin/Development/Forge/crates/forge-server) (Server & CI/CD Builder).
-- **Toolchain:** Rust 1.97.1, LLVM/Clang 22, Linker `mold`, Ccache 4.13.5, Thin LTO, `-O3 -march=native`.
-- **Seed Toolchain:** Staged murni di `/tmp/forge/stage/` dan dikemas ke `dist/kura-toolchain.tar.xz` (ADR-019).
+- **Toolchain & Compiler Flags (Mentok Ekstrem):** Rust 1.97.1, LLVM/Clang 22, Linker `mold`, Ccache 4.13.5, Thin LTO, `-O3 -march=native -pipe -flto=thin -fno-plt -fno-math-errno -fno-trapping-math -ffunction-sections -fdata-sections -falign-functions=32 -fstack-protector-strong -D_FORTIFY_SOURCE=2` dan LDFLAGS `-Wl,-O3 -Wl,--as-needed -Wl,--gc-sections -Wl,--icf=all -Wl,-z,relro -Wl,-z,now -fuse-ld=mold`.
+- **Seed Toolchain:** Staged murni di `/tmp/forge/stage/`, membundel `/var/db/forge/recipes/`, `/etc/forge/forge.conf`, dan `/usr/bin/forge` ke `dist/kura-toolchain.tar.xz` (ADR-019, ADR-028).
 - **Meta-Paket Distro:** `recipes/system/base/recipe.toml` (Base OS) dan `recipes/system/base-devel/recipe.toml` (Toolchain).
 
 ### 🛑 6 Aturan Mutlak yang Wajib Diikuti:
@@ -184,10 +186,10 @@
 
 ### 🎯 4 Tugas Prioritas Pengembangan Selanjutnya (Sisa 35%):
 1. **Task 1: DAG Dependency Resolver (`crates/forge/src/resolver.rs`):**
-   - Implementasikan algoritma *Topological Sort* (Kahn / Tarjan SCC) dan deteksi circular dependency dari resep `recipe.toml` (`[dependencies.runtime]` vs `[dependencies.build]`).
+   - Implementasikan algoritma *Topological Sort* (Kahn / Tarjan SCC) dan deteksi circular dependency dari resep di `/var/db/forge/recipes/` (`[dependencies.runtime]` vs `[dependencies.build]`).
 2. **Task 2: Transactional Merger & Collision Detector (`crates/forge/src/merger.rs`):**
    - Implementasikan pre-flight collision scanner terhadap `/var/db/forge/installed/`, atomic copy ke `$FORGE_ROOT`, preservasi symlink/permissions, dan rollback handler.
 3. **Task 3: Manifest Database & Unmerge Cleaner (`crates/forge/src/db.rs`):**
    - Implementasikan pencatatan manifest di `/var/db/forge/installed/<pkg>/manifest`, reverse-directory pruning untuk `forge remove <pkg>`, proteksi `CONFIG_PROTECT` di `/etc/`, dan query/list CLI.
 4. **Task 4: Distro Stage Exporter & Real Server Daemon:**
-   - Implementasikan tarball bundler `forge stage-export` $\rightarrow$ `kura-stage.tar.xz`, dan HTTP REST API daemon pada `crates/forge-server` (`serve`).
+   - Implementasikan tarball bundler `forge stage-export` $\rightarrow$ `kura-stage.tar.xz`, dan HTTP REST API daemon pada `crates/forge-server` (`serve` & `sync`).

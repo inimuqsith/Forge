@@ -263,13 +263,26 @@ Memindahkan berkas hasil kompilasi dari direktori staging `$DESTDIR` (`/tmp/forg
           ┌─────────────────────┴─────────────────────┐
           ▼                                           ▼
 [ Paket Glibc / Override GCC ]            [ Paket Sistem Standar ]
-(ADR-002: Pengecualian Khusus)            (Supremasi Native LLVM/Mold)
+(ADR-002: Pengecualian Khusus)            (Supremasi Native LLVM/Mold - Mentok Ekstrem)
 - CC="ccache gcc"                         - CC="ccache clang"
 - CXX="ccache g++"                        - CXX="ccache clang++"
 - LD="ld"                                 - LD="mold"
-- CFLAGS="-O2 -pipe ..."                  - CFLAGS="-O3 -march=native -flto=thin ..."
-- LDFLAGS="-Wl,-O1 ..."                   - LDFLAGS="-Wl,-O1 ... -fuse-ld=mold"
+- CFLAGS="-O2 -pipe ..."                  - CFLAGS="-O3 -march=native -pipe -flto=thin
+- LDFLAGS="-Wl,-O1 ..."                              -fno-plt -fno-math-errno -fno-trapping-math
+                                                     -ffunction-sections -fdata-sections
+                                                     -falign-functions=32 -fstack-protector-strong
+                                                     -D_FORTIFY_SOURCE=2"
+                                          - LDFLAGS="-Wl,-O3 -Wl,--as-needed -Wl,--gc-sections
+                                                     -Wl,--icf=all -Wl,-z,relro -Wl,-z,now
+                                                     -fuse-ld=mold"
 ```
+
+### 🏎️ Rincian Flag Optimasi Silikon "Mentok Ekstrem" (AMD Zen 4 / Native):
+1. **`-march=native` & `-O3`**: Mengaktifkan seluruh set instruksi CPU host (AVX-512 F/DQ/IFMA/CD/BW/VL/BF16/VBMI/VNNI, AVX2, SHA-NI, VAES) dan vektorisasi agresif hingga register 512-bit ZMM (`%zmm0` - `%zmm31`).
+2. **`-flto=thin`**: Link-Time Optimization antar-unit kompilasi paralel untuk inlining fungsi lintas-modul secara efisien.
+3. **`-fuse-ld=mold` + `-Wl,--icf=all` + `-Wl,--gc-sections`**: Identical Code Folding (menghilangkan duplikasi fungsi identik), dead code stripping, dan linking instan dengan ultra-fast linker mold.
+4. **`-fno-math-errno` & `-fno-trapping-math`**: Mengeliminasi overhead pengecekan `errno` matematika POSIX sehingga compiler LLVM bebas melakukan auto-vectorization SIMD AVX-512 penuh pada loop kalkulasi.
+5. **`-falign-functions=32`**: Mengoptimalkan alignment fungsi ke batas 32-byte untuk memaksimalkan throughput AMD Zen 4 Op-Cache dan branch prediction unit.
 
 ---
 
@@ -282,11 +295,13 @@ Memindahkan berkas hasil kompilasi dari direktori staging `$DESTDIR` (`/tmp/forg
 |  1. ATURAN MUTLAK: HARAM MENGAMBIL BINER/LIBRARY DARI HOST (/usr/bin, /usr/lib).               |
 |  2. Mengemas HANYA biner & library yang 100% dikompilasi dari source code oleh Forge ke staging |
 |     `/tmp/forge/stage/<pkg>/` (LLVM 22, Mold 2.42, Ninja 1.13, Pkgconf 3.0.7, Make 4.4.1).      |
-|  3. Menyusun layout UsrMerge standar:                                                           |
-|     - `usr/bin/` (clang, cc, clang++, c++, mold, ld, lld, llvm-ar, ar, make, ninja, pkgconf)    |
-|     - `usr/lib/` (library pendukung & header compiler Clang/LLVM)                               |
-|     - `etc/forge/toolchain.conf` (CC=clang, LD=mold, CFLAGS="-O3 -march=native -flto=thin")     |
-|  4. Mengompresi ke `dist/kura-toolchain.tar.xz` + generasi hash `kura-toolchain.tar.xz.sha256`. |
+|  3. Menyertakan ekosistem lengkap Forge:                                                        |
+|     - `usr/bin/` (clang, cc, clang++, c++, mold, ld, lld, make, ninja, pkgconf, forge)          |
+|     - `usr/lib/` (runtime LLVM, compiler-rt, libc.so, libm.so, dynamic linker ld-linux)         |
+|     - `usr/include/` (header kernel C/C++ linux-headers & glibc)                                |
+|     - `etc/forge/forge.conf` (konfigurasi tunggal package manager)                              |
+|     - `var/db/forge/recipes/` (seluruh pohon resep resmi Kura Linux: system, core, extra)       |
+|  4. Mengompresi ke `dist/kura-toolchain.tar.xz` + hash BLAKE3/SHA256 deterministik.            |
 +-------------------------------------------------------------------------------------------------+
 ```
 
@@ -326,3 +341,42 @@ make DESTDIR="${DESTDIR}" install
 ln -sf pkgconf "${DESTDIR}/usr/bin/pkg-config"
 """
 ```
+
+---
+
+## 10. Blueprint Sistem Resep Terdedikasi `/var/db/forge/recipes/` & `forge sync` (ADR-028)
+
+### 🎯 Eliminasi Ketergantungan Terhadap Folder Git Lokal
+Forge didesain sebagai package manager sistem operasi sejati yang mandiri. Forge **tidak bergantung** pada repositori Git pengembang (`./recipes/`), melainkan menggunakan standar direktori sistem resmi Kura Linux:
+
+```
+/var/db/forge/
+├── recipes/                    # Pohon Resep Resmi Sistem (Single Source of Truth)
+│   ├── system/                 # Resep set sistem & meta-paket (base, base-devel, glibc, dll.)
+│   ├── core/                   # Resep utilitas inti sistem
+│   └── extra/                  # Resep aplikasi & layanan tambahan
+├── installed/                  # Database paket terpasang & manifest
+└── world                       # Daftar paket yang diminta user
+```
+
+### 🔄 Alur Sinkronisasi Resep (`forge sync`):
+```
+[ Klien Kura Linux ]                                      [ forge-server ]
+       │                                                         │
+       │ ── 1. HTTP GET /v1/recipes/latest.tar.zst ────────────► │
+       │                                                         │
+       │ ◄─ 2. Stream Tarball Resep + Signature BLAKE3 ───────── │
+       │
+       ▼
+   Verifikasi Signature & Checksum
+       │
+       ▼
+   Ekstrak Atomik ke /var/db/forge/recipes/
+```
+
+### 🐣 Jaminan Kemandirian Chroot (Zero-External Dependency):
+Karena `forge toolchain bundle` mengemas `/var/db/forge/recipes/` dan `/etc/forge/forge.conf` langsung ke dalam `dist/kura-toolchain.tar.xz`:
+1. Administrator cukup mengekstrak tarball ke `/mnt/kura/`.
+2. Masuk ke `chroot /mnt/kura /bin/bash`.
+3. Langsung jalankan `forge install base` dan `forge install base-devel` secara offline tanpa perlu mount folder git host atau koneksi internet awal.
+

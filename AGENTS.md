@@ -24,6 +24,7 @@
 1. **Source-First Compilation Engine (Gentoo Portage Mode):**
    - Mengutamakan kompilasi langsung dari kode sumber upstream dengan injeksi CFLAGS native CPU pengguna (`-march=native`) di RAM `tmpfs` dan akselerasi Ccache (v4.13.5).
    - Engine evaluasi *USE Flags* (`UseFlagsEngine`) dan multi-version *Slots* (`pkg:slot`).
+   - Repositori resep resmi terdedikasi di `/var/db/forge/recipes/` dengan dukungan `forge sync` (ADR-028).
    - Dependency graph & DAG resolver dengan pemisahan `depends` dan `makedepends`.
    - DESTDIR staging, pre-flight collision detector, transactional merger, dan unmerge cleaner berbasis manifest.
 2. **Konfigurasi Terpusat (*Single Source of Truth*):**
