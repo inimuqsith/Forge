@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::*;
-use forge::{get_default_system_packages, CpuProfile, ForgeConfig, RecipeBuilder, SystemSetupConfig, ToolchainComponent, ToolchainManager};
+use forge::{CpuProfile, ForgeConfig, RecipeBuilder, ToolchainComponent, ToolchainManager};
 use std::path::{Path, PathBuf};
 
 #[derive(Parser)]
@@ -22,15 +22,9 @@ enum Commands {
         defaults: bool,
     },
 
-    /// Wizard bootstrap sistem Kura Linux (/etc/forge/system.conf)
-    SystemSetup {
-        #[arg(long, help = "Profil sistem: standard, minimal, desktop-ready")]
-        profile: Option<String>,
-    },
-
-    /// Pasang paket (Default: Kompilasi source native secara 100% silikon)
+    /// Pasang paket atau meta-paket (misal: base, base-devel, bash, openssh)
     Install {
-        /// Nama paket atau set paket (misal: bash, openssh, @system)
+        /// Nama paket atau meta-paket (misal: base, base-devel, mold, nginx)
         target: String,
 
         /// Opsi Akselerasi: Prioritaskan unduhan biner native dari Forge Server
@@ -49,6 +43,7 @@ enum Commands {
         #[arg(long)]
         build_source: bool,
     },
+
 
     /// Hapus paket secara bersih berdasarkan manifest
     Remove {
@@ -131,53 +126,18 @@ fn main() -> Result<()> {
             println!("{} Konfigurasi Forge berhasil disimpan!", "✓".green());
         }
 
-        Commands::SystemSetup { profile } => {
-            println!("{}", "=== Kura Linux System Bootstrap Setup ===".bold().cyan());
-            let cpu = CpuProfile::detect()?;
-            println!("{} Deteksi CPU: {} ({})", "[i]".blue(), cpu.model_name.bold(), cpu.target_march.yellow());
-            
-            let chosen_profile = profile.unwrap_or_else(|| "standard".to_string());
-            println!("{} Profil Base Distro Terpilih: {}", "[i]".blue(), chosen_profile.bold().green());
-            
-            let _sys_config = SystemSetupConfig::default();
-            println!("{} Menyimpan konfigurasi bootstrap ke /etc/forge/system.conf...", "[✓]".green());
-            
-            println!("\n{}", "===============================================================".bold().yellow());
-            println!("{}", "✓ Konfigurasi Bootstrap Kura Linux Berhasil Disimpan!".bold().green());
-            println!("Silakan jalankan perintah berikut untuk memulai kompilasi base OS:");
-            println!("  # {}", "forge install @system".bold().cyan());
-            println!("{}", "===============================================================".bold().yellow());
-        }
-
         Commands::Install { target, binhost, hybrid, interactive, build_source } => {
-            if target == "@system" {
-                println!("{}", ">>> Memulai Kompilasi Fondasi Sistem Kura Linux (@system)...".bold().cyan());
-                let config_exists = Path::new("/etc/forge/system.conf").exists();
-                if config_exists {
-                    println!("{} Membaca profil kustom dari /etc/forge/system.conf...", "[i]".blue());
-                } else {
-                    println!("{} Konfigurasi kustom tidak ditemukan. Menggunakan template default standar Kura Linux...", "[i]".yellow());
-                }
-
-                let pkgs = get_default_system_packages();
-                println!("{} Total paket @system yang akan di-build: {}", "[*]".blue(), pkgs.len().to_string().bold());
-                for (i, pkg) in pkgs.iter().enumerate() {
-                    println!("  [{}/{}] Menyiapkan kompilasi native: {}", i + 1, pkgs.len(), pkg.bold().green());
-                }
-                println!("{}", "✓ Kompilasi set @system siap dieksekusi!".green());
+            println!(">>> Memproses instalasi: {}", target.bold().green());
+            if build_source {
+                println!("{} Mode: Paksa kompilasi lokal dari source code.", "[i]".blue());
+            } else if binhost {
+                println!("{} Mode: Mengutamakan Forge Native Binhost.", "[i]".blue());
+            } else if hybrid {
+                println!("{} Mode: Fallback ke CachyOS/Arch diperbolehkan.", "[i]".blue());
+            } else if interactive {
+                println!("{} Mode: Membuka pemilihan provider interaktif.", "[i]".blue());
             } else {
-                println!(">>> Memproses instalasi paket: {}", target.bold().green());
-                if build_source {
-                    println!("{} Mode: Paksa kompilasi lokal dari source code.", "[i]".blue());
-                } else if binhost {
-                    println!("{} Mode: Mengutamakan Forge Native Binhost.", "[i]".blue());
-                } else if hybrid {
-                    println!("{} Mode: Fallback ke CachyOS/Arch diperbolehkan.", "[i]".blue());
-                } else if interactive {
-                    println!("{} Mode: Membuka pemilihan provider interaktif.", "[i]".blue());
-                } else {
-                    println!("{} Mode Default: Source-First Native Compilation (Gentoo Mode).", "[i]".blue());
-                }
+                println!("{} Mode Default: Source-First Native Compilation (Gentoo Mode).", "[i]".blue());
             }
         }
 

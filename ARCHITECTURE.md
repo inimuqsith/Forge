@@ -1,6 +1,6 @@
 # ARCHITECTURE.md — Blueprint Arsitektur Package Manager `forge` & `forge-server`
 
-> **`forge`** adalah *High-Performance Source-First Hybrid Package Manager* yang dibangun murni menggunakan bahasa **Rust** khusus untuk distribusi **Kura Linux**. Mengadopsi fondasi performa tinggi dari compiler **LLVM**, ultra-fast linker **`mold`**, Link-Time Optimization (**LTO Thin/Full**), dan dukungan **PGO (Profile-Guided Optimization)**, Forge menggabungkan filosofi kompilasi **Gentoo Portage** (*Source-First*, *USE Flags*, *Slots*, *Package Sets*), akselerasi **Ccache (v4.13.5)**, DAG Dependency Resolver, Transactional Merger, Manifest Database, ekosistem **`forge-server` (Lock-CPU Build Farm)**, wizard bootstrap (`forge setup` & `forge system-setup`), serta akselerasi Binhost / CachyOS.
+> **`forge`** adalah *High-Performance Source-First Hybrid Package Manager* yang dibangun murni menggunakan bahasa **Rust** khusus untuk distribusi **Kura Linux**. Mengadopsi fondasi performa tinggi dari compiler **LLVM**, ultra-fast linker **`mold`**, Link-Time Optimization (**LTO Thin/Full**), dan dukungan **PGO (Profile-Guided Optimization)**, Forge menggabungkan filosofi kompilasi **Gentoo Portage** (*Source-First*, *USE Flags*, *Slots*), paradigma meta-paket modular modern (*`base`*, *`base-devel`*), akselerasi **Ccache (v4.13.5)**, DAG Dependency Resolver, Transactional Merger, Manifest Database, ekosistem **`forge-server` (Lock-CPU Build Farm)**, konfigurasi terpusat (`/etc/forge/forge.conf`), serta akselerasi Binhost / CachyOS.
 
 ---
 
@@ -17,7 +17,7 @@ Forge dirancang menggunakan arsitektur modular yang terkonsolidasi secara rapi d
 |                          (Binary CLI Klien & Core Engine Library)                               |
 +=================================================================================================+
 |  1. CLI Dispatcher (`src/main.rs`)                                                              |
-|     - `forge setup`, `forge system-setup`, `forge install`, `forge remove`, `forge cpu-dump`    |
+|     - `forge setup`, `forge install`, `forge remove`, `forge cpu-dump`                          |
 |     - `forge toolchain bundle`, `forge stage-export`, `forge list`, `forge query`              |
 |                                                                                                 |
 |  2. Core Engine Library (`src/lib.rs` & sub-modul internal):                                    |
@@ -45,9 +45,22 @@ Forge dirancang menggunakan arsitektur modular yang terkonsolidasi secara rapi d
 
 ---
 
-## 2. Siklus Hidup & Alur Kerja Ekosistem (The 3 Epochs of Kura Linux & Forge)
+## 2. Paradigma Meta-Paket ("Everything is a Package")
 
-Untuk memahami kapan resep lokal digunakan, kapan server beroperasi, dan bagaimana distribusi Kura Linux dibangun secara mandiri, ekosistem Forge dibagi menjadi **3 Fase Hidup (3 Epochs)**:
+Untuk menjaga agar engine Forge tetap ramping, bersih, dan universal (seperti Arch `pacman` atau Alpine `apk`), Forge mengadopsi filosofi **"Everything is a Package"**:
+
+1. **Tidak Ada Target Magis yang Di-Hardcode:**
+   - Tidak ada target `@system` khusus di dalam biner Rust.
+   - Tidak ada wizard `system-setup` yang mencampuri urutan instalasi.
+2. **Sistem Operasi Didefinisikan Sebagai Resep Meta-Paket Deklaratif:**
+   - **`base` (`recipes/system/base/recipe.toml`):** Mendefinisikan fondasi OS minimal (Glibc, Bash, Coreutils, Sed, Grep, OpenRC, Util-linux, Shadow, Eudev, Kmod).
+   - **`base-devel` (`recipes/system/base-devel/recipe.toml`):** Mendefinisikan toolchain kompilasi sistem lengkap (LLVM/Clang, Mold, Make, Ninja, GCC, Binutils, Pkgconf, Linux-Headers).
+3. **Konfigurasi Tunggal Terpusat (`/etc/forge/forge.conf`):**
+   - Menjadi satu-satunya sumber kebenaran (*Single Source of Truth*) untuk variabel compiler (`cflags`, `makeflags`, `ldflags`), target microarchitecture silikon (`target_march`), dan `use_flags` global.
+
+---
+
+## 3. Siklus Hidup & Alur Kerja Ekosistem (The 3 Epochs)
 
 ```mermaid
 flowchart TD
@@ -60,9 +73,9 @@ flowchart TD
     subgraph EPOCH_2["Fase 2: Chroot Environment (Rebuild Base OS Kura Linux)"]
         D --> E["Ekstrak Seed Toolchain\nke Sysroot /mnt/kura/"]
         E --> F["Masuk chroot /mnt/kura"]
-        F --> G["forge system-setup\n(Pilih CPU, Profil, Kernel)"]
-        G --> H["forge install @system\n(DAG Resolver -> Compile -> Merge)"]
-        H --> I["forge stage-export\n-> kura-stage.tar.xz (OS Siap Pakai)"]
+        F --> G["forge install base\n(Memasang Basis OS Minimal)"]
+        F --> H["forge install base-devel\n(Memasang Toolchain Lengkap)"]
+        G & H --> I["forge stage-export\n-> kura-stage.tar.xz (OS Siap Pakai)"]
     end
 
     subgraph EPOCH_3["Fase 3: Lingkungan Produksi (Klien & Server Publik)"]
@@ -78,32 +91,15 @@ flowchart TD
     EPOCH_2 --> EPOCH_3
 ```
 
-### 🔹 Epoch 1: Bootstrap Seed Toolchain (Posisi di Host Saat Ini)
-- **Kondisi:** Kura Linux belum hidup sebagai OS mandiri.
-- **Resep:** Menggunakan resep lokal di `./recipes/system/` (glibc, llvm, mold, make, ninja, linux-headers, gcc, binutils, pkgconf).
-- **Proses:** Forge mengompilasi resep murni dari sumber upstream ke `/tmp/forge/stage/<pkg>/` lalu mengemasnya via `forge toolchain bundle` menjadi `dist/kura-toolchain.tar.xz` (ADR-019: dilarang mengambil biner dari host).
-
-### 🔹 Epoch 2: Inisialisasi Distro Mandiri (Di dalam Lingkungan Chroot)
-- **Kondisi:** Developer mengekstrak `kura-toolchain.tar.xz` ke dalam rootfs `/mnt/kura/` dan masuk ke `chroot /mnt/kura`.
-- **Proses:**
-  1. Jalankan `forge system-setup` untuk memilih profil CPU native, kernel monolithic, dan OpenRC.
-  2. Jalankan `forge install @system`: DAG resolver menyusun antrean 40+ paket dasar, builder mengompilasi di RAM tmpfs dengan ccache, merger memasang file ke `/` dan mencatat manifest.
-  3. Jalankan `forge stage-export --output kura-stage.tar.xz` untuk menghasilkan image distribusi final.
-
-### 🔹 Epoch 3: Operasional Normal Distro (Server + Klien Publik)
-- **Kondisi:** Kura Linux sudah berjalan di komputer pengguna umum.
-- **Sisi Server (`forge-server`):** Menyajikan API sinkronisasi resep (`serve`) dan CI/CD build farm (`import`).
-- **Sisi Klien (`forge`):** Menjalankan `forge sync` untuk memperbarui resep ke `/var/db/forge/recipes/`, dan mengompilasi paket secara native atau mengunduh biner via `--binhost`.
-
 ---
 
-## 3. Blueprint Mendalam: DAG Dependency Resolver (`src/resolver.rs`)
+## 4. Blueprint Mendalam: DAG Dependency Resolver (`src/resolver.rs`)
 
 ### 🎯 Tujuan & Filosofi
 Memetakan seluruh pohon ketergantungan paket dari resep `recipe.toml`, memvalidasi ketiadaan siklus (*cycle detection*), dan menghasilkan urutan eksekusi kompilasi topologis yang deterministik (*Topological Sort*).
 
 ```
-                      [ Target: @system / mold / nginx ]
+                 [ Target: base / base-devel / mold / nginx ]
                                       │
                                       ▼
                         +---------------------------+
@@ -146,14 +142,11 @@ Memetakan seluruh pohon ketergantungan paket dari resep `recipe.toml`, memvalida
    - Engine mengevaluasi conditional dependency format: `ssl? ( >=dev-libs/openssl-3.0 )`. Jika flag `ssl` tidak aktif pada konfigurasi, dependensi tidak akan dimasukkan ke dalam graf.
 3. **Penyelesaian Siklus & Urutan Topologis:**
    - Menggunakan algoritma **Kahn** atau **Tarjan Strongly Connected Components (SCC)**.
-   - Jika terdeteksi siklus tertutup (circular dependency, misal A butuh B dan B butuh A), resolver menghasilkan laporan diagnostik detail beserta path siklusnya dan membatalkan build dengan pesan error yang jelas.
-4. **Resolusi Meta-Target `@system`:**
-   - Menyusun 40+ paket dasar Kura Linux dalam urutan kompilasi fondasi mutlak:
-     `linux-headers` ➔ `glibc` ➔ `binutils` ➔ `gcc` / `llvm` ➔ `make` ➔ `ninja` ➔ `mold` ➔ `openrc` ➔ `coreutils` ➔ dst.
+   - Jika terdeteksi siklus tertutup (circular dependency), resolver menghasilkan laporan diagnostik detail beserta path siklusnya dan membatalkan build dengan pesan error yang jelas.
 
 ---
 
-## 4. Blueprint Mendalam: Transactional Merger & Collision Detector (`src/merger.rs`)
+## 5. Blueprint Mendalam: Transactional Merger & Collision Detector (`src/merger.rs`)
 
 ### 🎯 Tujuan & Filosofi
 Memindahkan berkas hasil kompilasi dari direktori staging `$DESTDIR` (`/tmp/forge/stage/<pkg>`) ke rootfs target `$FORGE_ROOT` (default `/`) secara atomik, dengan jaminan integritas, tanpa risiko merusak file sistem host jika terjadi error.
@@ -191,23 +184,9 @@ Memindahkan berkas hasil kompilasi dari direktori staging `$DESTDIR` (`/tmp/forg
                  +--------------------------+
 ```
 
-### 📐 Spesifikasi Teknis Merger:
-1. **Pre-flight Collision Detector:**
-   - Sebelum satu pun file disalin, merger memindai seluruh file di direktori staging dan mencocokkannya dengan database manifest di `/var/db/forge/installed/`.
-   - Jika suatu berkas sudah terpasang oleh paket lain (dan bukan direktori bersama seperti `/usr/bin/`), merger membatalkan proses (*Abort*) untuk mencegah korupsi paket.
-2. **Preservasi Metadata Unix:**
-   - Symlink dipertahankan secara presisi (*preserve target pointer*).
-   - Permission bit (`0755`, `0644`, dll.), kepemilikan UID/GID (root), dan timestamp disalin utuh.
-3. **Mekanisme Rollback Transaksi:**
-   - Setiap berkas yang berhasil disalin dicatat dalam log transaksi sementara (`/tmp/forge/txn_<id>.log`).
-   - Jika terjadi kegagalan I/O atau interupsi sistem di tengah proses, Forge membaca log transaksi dan menghapus berkas yang baru disalin untuk mengembalikan filesystem ke kondisi awal yang bersih.
-
 ---
 
-## 5. Blueprint Mendalam: Flat-File Manifest Database & Unmerge Cleaner (`src/db.rs`)
-
-### 🎯 Tujuan & Filosofi
-Menyimpan state paket terpasang menggunakan format flat-file teks deterministik yang tangguh, mudah dibaca, dan tidak memerlukan database engine eksternal (seperti SQLite atau BerkeleyDB) yang rentan rusak saat proses bootstrap distro.
+## 6. Blueprint Mendalam: Flat-File Manifest Database & Unmerge Cleaner (`src/db.rs`)
 
 ```
 /var/db/forge/
@@ -226,29 +205,15 @@ Menyimpan state paket terpasang menggunakan format flat-file teks deterministik 
 │           └── metadata.json
 ```
 
-### 📐 Spesifikasi Format `manifest`:
-```text
-file /usr/bin/mold 0755 2415840 7c89a0b1c...
-file /usr/lib/mold/mold-wrapper.so 0755 35120 a98f12c4...
-sym /usr/bin/ld -> mold
-dir /usr/lib/mold 0755
-```
-
 ### 🧹 Spesifikasi Unmerge Cleaner (`forge remove <pkg>`):
 1. **Pembacaan Manifest:** Mengambil daftar berkas dan symlink milik paket dari `/var/db/forge/installed/<pkg>/manifest`.
-2. **Proteksi Konfigurasi (`CONFIG_PROTECT`):**
-   - Berkas di bawah `/etc/` yang mengalami modifikasi hash oleh pengguna tidak akan dihapus sembarangan, melainkan ditinggalkan atau diberi ekstensi `.forge-backup`.
-3. **Reverse Directory Pruning:**
-   - Menghapus berkas dari level terdalam (leaf file) ke luar.
-   - Direktori induk hanya dihapus jika sudah kosong (*empty directory pruning*), sehingga tidak akan menghapus direktori bersama seperti `/usr/bin` atau `/usr/lib`.
-4. **Post-Unmerge Hook Trigger:**
-   - Menjalankan `ldconfig` untuk memperbarui cache dynamic linker.
-   - Menjalankan `rc-update` jika paket menyediakan service OpenRC.
-   - Menghapus entri paket dari `/var/db/forge/installed/`.
+2. **Proteksi Konfigurasi (`CONFIG_PROTECT`):** Berkas di bawah `/etc/` yang mengalami modifikasi hash tidak akan dihapus sembarangan.
+3. **Reverse Directory Pruning:** Menghapus berkas dari level terdalam ke luar dan hanya menghapus direktori jika sudah kosong.
+4. **Post-Unmerge Hook Trigger:** Menjalankan `ldconfig` dan `rc-update` jika paket menyediakan service OpenRC.
 
 ---
 
-## 6. Blueprint Akselerasi Ccache & Hierarki Supremasi Compiler
+## 7. Blueprint Akselerasi Ccache & Hierarki Supremasi Compiler
 
 ```
                       [ Resep: recipe.toml ]
@@ -269,21 +234,9 @@ dir /usr/lib/mold 0755
 - LDFLAGS="-Wl,-O1 ..."                   - LDFLAGS="-Wl,-O1 ... -fuse-ld=mold"
 ```
 
-### ⚡ Fitur Utama Engine Compiler:
-1. **Resolusi Otomatis Ccache (v4.13.5):**
-   - Mengecek ketersediaan `ccache` di host.
-   - Mengarahkan `CCACHE_DIR` ke `/var/cache/forge/ccache` (default) atau `./distfiles/.ccache` (fallback lokal).
-   - Mengurangi waktu kompilasi ulang hingga 80-90% pada rebuild `@system` dan `@world`.
-2. **Hierarki Supremasi Konfigurasi Forge:**
-   - Konfigurasi compiler Forge berada pada hierarki tertinggi, diinjeksikan secara otomatis ke subshell environment script resep (`CC`, `CXX`, `LD`, `CFLAGS`, `CXXFLAGS`, `LDFLAGS`, `MAKEFLAGS`).
-3. **Pengecualian Khusus Glibc (ADR-002):**
-   - Menjaga stabilitas build system Glibc dengan menggunakan compiler GCC tanpa flag `-march` kustom.
-
 ---
 
-## 7. Blueprint Pure Source Seed Toolchain & Sysroot Packaging (`dist/kura-toolchain.tar.xz`)
-
-Untuk memutus ketergantungan dari host dan menjamin Kura Linux dapat melakukan bootstrap secara mandiri (*self-contained*):
+## 8. Blueprint Pure Source Seed Toolchain (`dist/kura-toolchain.tar.xz`)
 
 ```
 +-------------------------------------------------------------------------------------------------+
@@ -298,54 +251,11 @@ Untuk memutus ketergantungan dari host dan menjamin Kura Linux dapat melakukan b
 |     - `etc/forge/toolchain.conf` (CC=clang, LD=mold, CFLAGS="-O3 -march=native -flto=thin")     |
 |  4. Mengompresi ke `dist/kura-toolchain.tar.xz` + generasi hash `kura-toolchain.tar.xz.sha256`. |
 +-------------------------------------------------------------------------------------------------+
-                                                 │
-                                                 ▼
-+-------------------------------------------------------------------------------------------------+
-|                         INTEGRASI SYSROOT: `kura-stage.tar.xz`                                  |
-+-------------------------------------------------------------------------------------------------+
-|  1. Developer distro Kura Linux mengekstrak seed toolchain langsung ke rootfs staging:          |
-|     # tar -xpJf kura-toolchain.tar.xz -C $KURA_ROOTFS/ --numeric-owner                          |
-|  2. Saat pengguna masuk chroot, seluruh toolchain sudah tersedia di `/usr/bin/`.                 |
-|  3. Eksekusi `forge install @system` menggunakan seed toolchain ini untuk mengompilasi ulang    |
-|     seluruh sistem operasi secara 100% native untuk silikon pengguna tanpa polusi host.         |
-+-------------------------------------------------------------------------------------------------+
 ```
 
 ---
 
-## 8. Blueprint Server Registry & CI/CD Builder (`crates/forge-server`)
-
-```
-                          [ forge-server CLI / Daemon ]
-                                       │
-        ┌──────────────────────────────┼──────────────────────────────┐
-        ▼                              ▼                              ▼
-+-----------------------+   +-----------------------+   +-----------------------+
-|  `forge-server serve` |   | `forge-server import` |   |  `forge-server index` |
-+-----------------------+   +-----------------------+   +-----------------------+
-| - Recipe Sync API     |   | - CI/CD Build Farm    |   | - Scan Binary Storage |
-| - Binhost Catalog API |   | - Lock Target CPU     |   | - Index SHA256 & USE  |
-| - Streaming Tarball   |   |   (znver4/alderlake)  |   | - Generate database   |
-|   Download Endpoint   |   | - Package .forge.zst  |   |   `packages.db.zst`   |
-+-----------------------+   +-----------------------+   +-----------------------+
-```
-
----
-
-## 9. Spesifikasi Wizard: `forge setup` & `forge system-setup`
-
-### A. Wizard Package Manager: `forge setup`
-- Inisialisasi konfigurasi package manager di `/etc/forge/forge.conf`.
-- Konfigurasi mode default (`source` / `binhost` / `hybrid`), alokasi thread `makeflags`, USE flags global, dan direktori cache.
-
-### B. Wizard Bootstrap Distro: `forge system-setup`
-- Deteksi hardware silikon (`forge cpu-dump`), pemilihan base profile (`standard`, `minimal`, `desktop-ready`), konfigurasi driver kernel monolithic (`ext4`, `nvme`, `virtio`), dan timezone/locale.
-- Menulis konfigurasi ke `/etc/forge/system.conf`.
-- Menyediakan panduan lanjutan untuk eksekusi `forge install @system`.
-
----
-
-## 10. Format All-in-One `recipe.toml`
+## 9. Format All-in-One `recipe.toml`
 
 ```toml
 [package]

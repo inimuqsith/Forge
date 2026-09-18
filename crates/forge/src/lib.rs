@@ -1,4 +1,3 @@
-use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::fs;
@@ -272,122 +271,6 @@ impl UseFlagsEngine {
     }
 }
 
-/// Konfigurasi Bootstrap Distro Kura Linux (/etc/forge/system.conf)
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SystemSetupConfig {
-    pub system: SystemMeta,
-    pub target: TargetMeta,
-    pub kernel: KernelMeta,
-    pub init: InitMeta,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SystemMeta {
-    pub profile: String,
-    pub hostname: String,
-    pub locale: String,
-    pub keymap: String,
-    pub timezone: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TargetMeta {
-    pub architecture: String,
-    pub march: String,
-    pub enable_avx512: bool,
-    pub enable_avx2: bool,
-    pub cflags: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct KernelMeta {
-    pub r#type: String,
-    pub drivers_builtin: Vec<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct InitMeta {
-    pub manager: String,
-    pub default_services: Vec<String>,
-}
-
-impl Default for SystemSetupConfig {
-    fn default() -> Self {
-        Self {
-            system: SystemMeta {
-                profile: "standard".to_string(),
-                hostname: "kuralinux".to_string(),
-                locale: "en_US.UTF-8".to_string(),
-                keymap: "us".to_string(),
-                timezone: "UTC".to_string(),
-            },
-            target: TargetMeta {
-                architecture: "x86_64".to_string(),
-                march: "native".to_string(),
-                enable_avx512: true,
-                enable_avx2: true,
-                cflags: "-O2 -march=native -pipe -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt".to_string(),
-            },
-            kernel: KernelMeta {
-                r#type: "monolithic".to_string(),
-                drivers_builtin: vec![
-                    "ext4".to_string(),
-                    "nvme".to_string(),
-                    "sata_ahci".to_string(),
-                    "virtio".to_string(),
-                    "virtio_pci".to_string(),
-                    "virtio_blk".to_string(),
-                    "virtio_net".to_string(),
-                ],
-            },
-            init: InitMeta {
-                manager: "openrc".to_string(),
-                default_services: vec![
-                    "metalog".to_string(),
-                    "chronyd".to_string(),
-                    "eudev".to_string(),
-                    "dhcpcd".to_string(),
-                    "acpid".to_string(),
-                ],
-            },
-        }
-    }
-}
-
-impl SystemSetupConfig {
-    pub fn load_or_default(path: Option<&Path>) -> Self {
-        let conf_path = path.unwrap_or_else(|| Path::new("/etc/forge/system.conf"));
-        if let Ok(content) = fs::read_to_string(conf_path) {
-            if let Ok(conf) = toml::from_str::<SystemSetupConfig>(&content) {
-                return conf;
-            }
-        }
-        Self::default()
-    }
-
-    pub fn save_to(&self, path: &Path) -> Result<()> {
-        if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent).with_context(|| format!("Gagal membuat direktori {:?}", parent))?;
-        }
-        let content = toml::to_string_pretty(self)?;
-        fs::write(path, content).with_context(|| format!("Gagal menulis ke {:?}", path))?;
-        Ok(())
-    }
-}
-
-/// Daftar Paket Default Set @system Kura Linux
-pub fn get_default_system_packages() -> Vec<&'static str> {
-    vec![
-        "glibc", "llvm", "mold", "ninja", "gcc", "binutils", "linux-headers",
-        "coreutils", "bash", "sed", "grep", "gawk", "make", "patch",
-        "tar", "xz", "zstd", "findutils", "diffutils", "file", "which",
-        "linux", "grub", "openrc", "eudev", "acpid", "kmod", "util-linux",
-        "shadow", "opendoas", "elogind", "dbus", "dhcpcd", "iwd", "chrony",
-        "openssl", "ca-certificates", "curl", "e2fsprogs", "dosfstools", "pkgconf",
-        "metalog", "cronie", "earlyoom", "nftables", "mandoc", "nano", "less",
-    ]
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -401,12 +284,5 @@ mod tests {
         assert!(!engine.is_enabled("lto"));
         assert!(engine.is_enabled("pam"));
     }
-
-    #[test]
-    fn test_default_system_packages() {
-        let pkgs = get_default_system_packages();
-        assert!(pkgs.contains(&"glibc"));
-        assert!(pkgs.contains(&"openrc"));
-        assert!(pkgs.contains(&"linux"));
-    }
 }
+

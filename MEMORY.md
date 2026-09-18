@@ -11,9 +11,9 @@
 - [x] Inisialisasi repositori Git dan konfigurasi `.gitignore`.
 - [x] Blueprint arsitektur komprehensif di [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
 - [x] Pedoman AI mutlak Human-In-The-Loop (HITL) di [`AGENTS.md`](file:///home/admin/Development/Forge/AGENTS.md).
-- [x] Memori persisten & 25 ADR di [`MEMORY.md`](file:///home/admin/Development/Forge/MEMORY.md).
+- [x] Memori persisten & 26 ADR di [`MEMORY.md`](file:///home/admin/Development/Forge/MEMORY.md).
 - [x] Dokumentasi publik & panduan CLI di [`README.md`](file:///home/admin/Development/Forge/README.md).
-- [x] Template konfigurasi bawaan `config/forge.conf.example` & `config/system.conf.example`.
+- [x] Template konfigurasi tunggal terpusat `config/forge.conf.example`.
 - [x] Konsolidasi ke Clean 2-Crate Workspace Layout: [`crates/forge`](file:///home/admin/Development/Forge/crates/forge) dan [`crates/forge-server`](file:///home/admin/Development/Forge/crates/forge-server).
 
 ---
@@ -21,21 +21,19 @@
 ### Fase 2: CPU Hardware Profiler (`forge cpu-dump`) & Config Engine
 **Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] Implementasi modul CPU profiler di [`crates/forge/src/cpu.rs`](file:///home/admin/Development/Forge/crates/forge/src/cpu.rs): ekstraksi vendor, microarchitecture target (`znver4`, `alderlake`), deteksi ISA extensions (AVX-512, AVX2, SSE4.2), hierarki cache L1-L3, dan generasi `cpu-profile.json`.
-- [x] Parser konfigurasi `/etc/forge/forge.conf` (`ForgeConfig`) dan `/etc/forge/system.conf` (`SystemSetupConfig`) via Serde TOML di [`crates/forge/src/lib.rs`](file:///home/admin/Development/Forge/crates/forge/src/lib.rs).
+- [x] Parser konfigurasi tunggal `/etc/forge/forge.conf` (`ForgeConfig`) via Serde TOML di [`crates/forge/src/lib.rs`](file:///home/admin/Development/Forge/crates/forge/src/lib.rs).
 - [x] Unit test `test_cpu_detection` lulus 100%.
 
 ---
 
-### Fase 3: Wizard `forge setup` & `forge system-setup` (Bootstrap Distro)
+### Fase 3: Wizard Konfigurasi Package Manager (`forge setup`)
 **Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] Implementasi wizard `forge setup` untuk inisialisasi direktori dan konfigurasi package manager di [`crates/forge/src/main.rs`](file:///home/admin/Development/Forge/crates/forge/src/main.rs).
-- [x] Implementasi wizard `forge system-setup` untuk bootstrap Kura Linux (pemilihan arsitektur, base profile, driver kernel monolithic, OpenRC defaults).
-- [x] Integrasi prompt panduan pasca-setup untuk memicu kompilasi base OS `forge install @system`.
-- [x] Mekanisme fallback template bawaan jika `forge install @system` dijalankan sebelum wizard.
+- [x] **Eliminasi `system-setup` (ADR-026):** Menghapus wizard `system-setup` dan file `system.conf` untuk menjaga prinsip *Single Responsibility* & *Single Source of Truth* di `forge.conf`.
 
 ---
 
-### Fase 4: Core Engine (Portage-Inspired) & DAG Dependency Resolver
+### Fase 4: Core Engine & DAG Dependency Resolver
 **Status:** ⚠️ **BLUEPRINT SELESAI / IMPLEMENTASI KODE PENDING**
 - [x] **Desain Arsitektur:** Blueprint spesifikasi graf asiklis terarah (DAG), model Node/Edge, dan algoritma *Topological Sort* & *Cycle Detection* (Kahn / Tarjan SCC) di [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
 - [x] **USE Flags Engine:** Implementasi `UseFlagsEngine` di [`crates/forge/src/lib.rs`](file:///home/admin/Development/Forge/crates/forge/src/lib.rs) untuk evaluasi flag global dan per-paket (`+flag`, `-flag`). Unit test `test_use_flags_engine` lulus.
@@ -43,7 +41,7 @@
 - [x] **Resep Parser:** Deserialisasi All-in-One `recipe.toml` (`PackageMeta`, `DependenciesMeta`, `SourcesMeta`, `BuildMeta`).
 - [ ] **Pending Implementasi Kode:** Engine Rust `crates/forge/src/resolver.rs` untuk:
   - Membaca dan membangun graph dari seluruh pohon resep (`recipes/system/`, `core/`, `extra/`).
-  - Menyusun urutan eksekusi kompilasi topologis otomatis untuk single package dan `@system`.
+  - Menyusun urutan eksekusi kompilasi topologis otomatis untuk paket dan meta-paket (`base`, `base-devel`).
   - Filter conditional dependencies berbasis USE flags (`flag? ( dep )`).
   - Laporan diagnostik jika terjadi siklus dependensi sirkular (*circular dependency error*).
 
@@ -100,16 +98,16 @@
 ### Fase 10: Server Suite & CI/CD Builder (`forge-server`)
 **Status:** 🟡 **CLI WORKER SELESAI / REAL HTTP DAEMON PENDING**
 - [x] Implementasi CLI suite `forge-server` di [`crates/forge-server/src/main.rs`](file:///home/admin/Development/Forge/crates/forge-server/src/main.rs).
-- [x] CLI CI/CD Lock-CPU Builder: `forge-server import <pkg> --target-cpu <cpu>` dan `forge-server import --all-system`.
+- [x] CLI CI/CD Lock-CPU Builder: `forge-server import <pkg> --target-cpu <cpu>`.
 - [x] CLI Catalog Indexer: `forge-server index --storage-path <path>`.
 - [ ] **Pending:** Implementasi HTTP REST API daemon riil (`forge-server serve`) menggunakan `tokio`/`axum` untuk sinkronisasi pohon resep dan serving katalog `packages.db.zst`.
 
 ---
 
-### Fase 11: Seed Toolchain Pure Source, OpenRC Hook & Stage Exporter
-**Status:** 🟡 **SEED TOOLCHAIN SELESAI / STAGE EXPORTER PENDING**
+### Fase 11: Seed Toolchain, Meta-Packages & Stage Exporter
+**Status:** 🟡 **TOOLCHAIN & META-PACKAGES SELESAI / STAGE EXPORTER PENDING**
 - [x] **Pure Source Seed Toolchain Bundler (ADR-019):** Implementasi `forge toolchain bundle` di [`crates/forge/src/toolchain.rs`](file:///home/admin/Development/Forge/crates/forge/src/toolchain.rs) yang mengemas HANYA biner/library hasil kompilasi murni dari `/tmp/forge/stage/` menjadi `dist/kura-toolchain.tar.xz` tanpa menyalin file host.
-- [x] **Resep Hulu Resmi Kura Linux `@system`:** Resep All-in-One di `recipes/system/` (glibc, gcc, llvm, mold, make, ninja, linux-headers, openrc, pkgconf).
+- [x] **Resep Meta-Paket Resmi Kura Linux (ADR-026):** Resep All-in-One `recipes/system/base/recipe.toml` (Base OS) dan `recipes/system/base-devel/recipe.toml` (Toolchain).
 - [x] Desain integrasi OpenRC hook `/etc/init.d/` dan `rc-update`.
 - [ ] **Pending:** Implementasi riil `forge stage-export` untuk mengemas rootfs target menjadi `kura-stage.tar.xz`.
 
@@ -124,7 +122,7 @@
 5. **ADR-005 (Isolasi Build RAM tmpfs & DESTDIR Staging):** Kompilasi berlangsung di `/tmp/forge/build/` (tmpfs) dan staged ke `DESTDIR` sebelum transaksi merge.
 6. **ADR-006 (Pemeriksaan Tabrakan Berkas & Manifest Deterministik):** Validasi collision sebelum merge dan pencatatan seluruh berkas ke manifest untuk proses unmerge 100% bersih tanpa sisa.
 7. **ADR-007 (Integrasi Layanan OpenRC):** Deteksi otomatis berkas layanan `/etc/init.d/` dan penyediaan hook pendaftaran runlevel via `rc-update`.
-8. **ADR-008 (Meta-Target `@system` & `stage-export`):** Dukungan bawaan untuk kompilasi massal base distro Kura Linux dan pembuatan tarball distribusi `kura-stage.tar.xz`.
+8. **ADR-008 (Meta-Target & `stage-export`):** Dukungan bawaan untuk kompilasi meta-paket distro Kura Linux dan pembuatan tarball distribusi `kura-stage.tar.xz`.
 9. **ADR-009 (Protokol Mutlak HITL & Pengujian Terisolasi):** AI pengembang Forge wajib mengikuti protokol 5 langkah (*Plan $\rightarrow$ Chat $\rightarrow$ ACC $\rightarrow$ Eksekusi $\rightarrow$ Uji*) dan menguji perubahan di lingkungan terisolasi.
 10. **ADR-010 (Hierarki Resolusi Source-First Kompilasi Native):** Forge mengutamakan kompilasi lokal langsung dari kode sumber sebagai prioritas utama (Gentoo Portage mode). Opsi *Forge Native Binhost* dan *Hybrid Fallback (CachyOS/Arch)* disediakan sebagai akselerasi opsional (*opt-in*) tanpa memaksakan biner kepada pengguna.
 11. **ADR-011 (Pohon Resep Terpusat di Server & Sinkronisasi Klien):** Seluruh resep Forge di-hosting secara terpusat di server `forge-server` dan disinkronisasi ke klien secara efisien melalui perintah `forge sync`.
@@ -132,7 +130,7 @@
 13. **ADR-013 (Introspeksi Hardware & Profil CPU `forge cpu-dump`):** Forge menyediakan perintah `forge cpu-dump` untuk mengekstrak arsitektur CPU, ekstensi ISA, dan CFLAGS optimal menjadi `cpu-profile.json` untuk disinkronkan ke server/CI/CD.
 14. **ADR-014 (Sistem USE Flags & Multi-Version Slotting ala Portage):** Mengadopsi mekanisme USE flags untuk kontrol fitur granular dan Slots untuk koeksistensi beberapa versi mayor paket secara berdampingan.
 15. **ADR-015 (Pemisahan Binary Klien `forge` dan Server `forge-server`):** Memisahkan secara tegas antarmuka dan paket eksekusi antara aplikasi klien pengguna (`forge`) dan backend suite/CI-CD builder (`forge-server`) demi menjaga footprint klien tetap ringan dan terfokus.
-16. **ADR-016 (Setup Wizards & System Bootstrap Configuration):** Menyediakan perintah `forge setup` untuk inisialisasi package manager dan `forge system-setup` untuk bootstrap distro Kura Linux (pemilihan arsitektur CPU, profil base, opsi kernel monolithic) sebelum memicu eksekusi `forge install @system`, dengan fallback template bawaan jika wizard dilewati.
+16. **ADR-016 (Konfigurasi Terpusat Single Source of Truth):** Menggunakan `/etc/forge/forge.conf` sebagai satu-satunya konfigurasi package manager tanpa fragmentasi file konfigurasi OS.
 17. **ADR-017 (Implementasi Bahasa Rust & Pipeline Kompilasi Ultra-Cepat):** Forge diimplementasikan murni menggunakan bahasa pemrograman Rust dalam Cargo Workspace multi-crate, ditenagai backend LLVM 22, ultra-fast linker `mold` (`-fuse-ld=mold`), optimasi Link-Time Optimization (Thin/Full LTO), `panic = "abort"`, serta dukungan PGO untuk mencapai throughput eksekusi maksimal.
 18. **ADR-018 (Isolated Seed Toolchain & Sysroot Packaging):** Untuk memutus ketergantungan dari toolchain host dan mencegah polusi lingkungan build, Forge menyediakan sub-sistem `forge toolchain bundle` yang mengemas biner hasil kompilasi ke dalam arsip `kura-toolchain.tar.xz` berstruktur UsrMerge standar untuk diekstrak langsung ke dalam sysroot stage Kura Linux.
 19. **ADR-019 (Penegakan Mutlak Pure Source-Built & Zero Host Harvesting):** Dilarang keras menyalin atau memanen (*harvest*) biner, library, atau compiler dari sistem host (`/usr/bin/`, `/usr/lib/llvm/22/`) untuk dimasukkan ke dalam paket distribusi atau seed toolchain. Seluruh isi tarball toolchain dan sistem Kura Linux wajib 100% murni dikompilasi dari kode sumber upstream melalui resep `recipe.toml` di direktori staging Forge (`/tmp/forge/stage/`).
@@ -142,6 +140,7 @@
 23. **ADR-023 (Transactional Atomic Merger, Collision Detector & Flat-File Manifest Database):** Setiap paket yang berhasil dikompilasi ke staging `$DESTDIR` wajib melalui pemindaian tabrakan berkas (*pre-flight collision scan*) sebelum digabungkan secara atomik ke rootfs target `$FORGE_ROOT` dan dicatat ke `/var/db/forge/installed/<pkg>/manifest`.
 24. **ADR-024 (Config-Protected Unmerge Cleaner & Reverse Directory Pruning):** Penghapusan paket dilakukan secara presisi dari leaf files ke root, menghapus folder kosong tanpa merusak direktori bersama sistem, serta melindungi berkas konfigurasi `/etc/` yang telah dimodifikasi oleh pengguna (`CONFIG_PROTECT`).
 25. **ADR-025 (Integrated Compiler Acceleration with Ccache 4.13.5 & Memory tmpfs Isolation):** Engine kompilasi Forge secara otomatis mengintegrasikan akselerasi compiler cache `ccache` pada `CC` dan `CXX`, serta mengisolasi build directory di RAM `tmpfs` untuk memaksimalkan kecepatan I/O dan efisiensi siklus rebuild.
+26. **ADR-026 (Paradigma Meta-Paket Murni & Eliminasi Hardcoded @system / system-setup):** Menghapus total target magis `@system` yang di-hardcode di kode biner dan menghapus wizard `system-setup`. Basis sistem Kura Linux didefinisikan murni sebagai resep meta-paket deklaratif (`base` dan `base-devel`) mengadopsi filosofi *Everything is a Package* ala Arch Linux/Alpine/Void.
 
 ---
 
@@ -152,25 +151,25 @@
 | *2026-09-18* | *Inisialisasi* | *Kebutuhan arsitektur dasar Forge terpisah dari KuraLinux* | *Membangun blueprint awal Forge mengadopsi kebutuhan dari IDEA_FOR_FORGE.md* |
 | *2026-09-18* | *Arsitektur* | *Kompilasi source lokal berat di mesin pengguna; butuh opsi biner native & server CI/CD* | *Mengembangkan ekosistem Server & CI/CD Builder Lock-CPU, perintah `cpu-dump` & `import`, serta arsitektur Hybrid Unified* |
 | *2026-09-18* | *Filosofi* | *Prioritas default sempat condong ke binhost; komponen server tercampur dengan klien* | *Mengoreksi prioritas menjadi Source-First (Gentoo-style) dan memisahkan binary klien `forge` dengan server suite `forge-server`* |
-| *2026-09-18* | *Toolchain & UX* | *Dibutuhkan engine performa tinggi, wizard setup interaktif, dan bootstrap Kura Linux* | *Memilih bahasa Rust dengan linker mold + Thin LTO, serta mendesain wizard `forge setup` dan `forge system-setup` sebelum `forge install @system`* |
 | *2026-09-18* | *Isolasi Host* | *Ketergantungan terhadap compiler host saat bootstrap awal Kura Linux* | *Mengembangkan sub-perintah `forge toolchain bundle` dan menghasilkan seed toolchain `dist/kura-toolchain.tar.xz` untuk diekstrak ke sysroot stage Kura Linux* |
 | *2026-09-18* | *Standarisasi Resep* | *Format terpisah bash + toml rentan fragmentasi; butuh format efisien & hierarki compiler kuat* | *Menerapkan format All-in-One `recipe.toml` berbasis Serde TOML dengan subshell environment injection mutlak* |
 | *2026-09-18* | *Integritas Build* | *Haram mutlak mengambil biner dari host filesystem* | *Menegakkan aturan Pure Source-Built (ADR-019): toolchain bundler hanya mengemas biner yang sah terkompilasi dari source code oleh Forge di staging `/tmp/forge/stage/`* |
 | *2026-09-18* | *Penyederhanaan Crate* | *Layout 6 crate berlebihan dan membingungkan* | *Mengkonsolidasikan workspace menjadi Clean 2-Crate Layout (`crates/forge` dan `crates/forge-server`)* |
 | *2026-09-18* | *Akselerasi Rebuild* | *Kompilasi ulang source code berulang memakan waktu lama* | *Mengintegrasikan Ccache (v4.13.5) secara otomatis pada pipeline builder Forge (ADR-025)* |
-| *2026-09-18* | *Fokus Arsitektur & Transparansi* | *Kebutuhan blueprint mendalam dan transparansi status kode vs arsitektur* | *Mendokumentasikan blueprint lengkap DAG, Merger, Manifest DB, memperinci status tiap fase di MEMORY.md, dan menambah ADR-022 s/d ADR-025* |
+| *2026-09-18* | *Penyederhanaan Desain* | *Wizard system-setup dan @system hardcoded kaku & melanggar prinsip UNIX* | *Menghapus system-setup & @system hardcoded, beralih ke paradigma meta-paket deklaratif `base` dan `base-devel` (ADR-026)* |
 
 ---
 
 ## 4. Panduan Serah Terima AI Agent (Incoming AI Agent Handover Guide)
 
 > **Catatan Penting untuk AI Agent Penerus:**
-> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan tingkat kesiapan **~65%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan ADR telah didokumentasikan secara lengkap.
+> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")** dan tingkat kesiapan **~65%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan ADR telah didokumentasikan secara lengkap.
 
 ### 📌 Ringkasan Status & State Workspace:
 - **Workspace:** 2 Crate murni: [`crates/forge`](file:///home/admin/Development/Forge/crates/forge) (Klien & Engine Library) dan [`crates/forge-server`](file:///home/admin/Development/Forge/crates/forge-server) (Server & CI/CD Builder).
 - **Toolchain:** Rust 1.97.1, LLVM/Clang 22, Linker `mold`, Ccache 4.13.5, Thin LTO, `-O3 -march=native`.
 - **Seed Toolchain:** Staged murni di `/tmp/forge/stage/` dan dikemas ke `dist/kura-toolchain.tar.xz` (ADR-019).
+- **Meta-Paket Distro:** `recipes/system/base/recipe.toml` (Base OS) dan `recipes/system/base-devel/recipe.toml` (Toolchain).
 
 ### 🛑 6 Aturan Mutlak yang Wajib Diikuti:
 1. **HITL (Human-In-The-Loop):** Wajib ikuti siklus 5-langkah (*Plan $\rightarrow$ Chat $\rightarrow$ ACC $\rightarrow$ Eksekusi $\rightarrow$ Uji*). Jangan edit/buat file tanpa ACC di chat.

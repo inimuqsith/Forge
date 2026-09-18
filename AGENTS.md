@@ -1,6 +1,6 @@
 # AGENTS.md — Forge Package Manager Development Guidelines
 
-> **Forge**: *High-Performance Source-First & Hybrid Package Manager* yang ditulis murni menggunakan **Rust** (ditenagai backend compiler **LLVM**, ultra-fast linker **mold**, optimasi **LTO (Thin/Full)**, dan dukungan **PGO**) khusus untuk distribusi **Kura Linux**. Mengadopsi filosofi inti **Gentoo Portage** (*Source-First Native Compilation*, *USE Flags*, *Slots*, *Package Sets*), didukung ekosistem terpisah **`forge-server`** (Registry Resep & **CI/CD Builder Lock-CPU**), kemampuan akselerasi **Forge Binhost**, integrasi repositori biner **CachyOS/Arch**, pelacakan manifest deterministik, integrasi **OpenRC**, isolasi build RAM (`tmpfs`), perintah setup bootstrap (`forge setup` & `forge system-setup`), serta pembuatan stage distribusi (`forge stage-export`).
+> **Forge**: *High-Performance Source-First & Hybrid Package Manager* yang ditulis murni menggunakan **Rust** (ditenagai backend compiler **LLVM**, ultra-fast linker **mold**, optimasi **LTO (Thin/Full)**, dan dukungan **PGO**) khusus untuk distribusi **Kura Linux**. Mengadopsi filosofi inti **Gentoo Portage** (*Source-First Native Compilation*, *USE Flags*, *Slots*) dan arsitektur modular modern ala Arch/Alpine (*Meta-Packages: `base`, `base-devel`*), didukung ekosistem terpisah **`forge-server`** (Registry Resep & **CI/CD Builder Lock-CPU**), kemampuan akselerasi **Forge Binhost**, integrasi repositori biner **CachyOS/Arch**, pelacakan manifest deterministik, integrasi **OpenRC**, akselerasi **Ccache 4.13.5**, isolasi build RAM (`tmpfs`), serta pembuatan stage distribusi (`forge stage-export`).
 
 ---
 
@@ -22,19 +22,18 @@
 
 #### A. Engine Klien Pengguna (`forge` CLI - Rust Workspace):
 1. **Source-First Compilation Engine (Gentoo Portage Mode):**
-   - Mengutamakan kompilasi langsung dari kode sumber upstream dengan injeksi CFLAGS native CPU pengguna (`-march=native`) di RAM `tmpfs`.
-   - Engine evaluasi *USE Flags* (`forge_use`) dan multi-version *Slots* (`pkg:slot`).
+   - Mengutamakan kompilasi langsung dari kode sumber upstream dengan injeksi CFLAGS native CPU pengguna (`-march=native`) di RAM `tmpfs` dan akselerasi Ccache (v4.13.5).
+   - Engine evaluasi *USE Flags* (`UseFlagsEngine`) dan multi-version *Slots* (`pkg:slot`).
    - Dependency graph & DAG resolver dengan pemisahan `depends` dan `makedepends`.
    - DESTDIR staging, pre-flight collision detector, transactional merger, dan unmerge cleaner berbasis manifest.
-2. **Wizard Konfigurasi & Bootstrap Distro:**
+2. **Konfigurasi Terpusat (*Single Source of Truth*):**
    - `forge setup`: Wizard konfigurasi package manager `/etc/forge/forge.conf`.
-   - `forge system-setup`: Wizard bootstrap Kura Linux untuk pemilihan arsitektur silikon, profil base distro, opsi kernel monolithic, dan inisialisasi `@system`.
 3. **Introspeksi Hardware:**
    - Perintah `forge cpu-dump`: Ekstraksi mikroarsitektur, feature ISA flags (AVX-512, AVX2, dll.), cache, dan rekomendasi compiler flags ke `cpu-profile.json`.
 4. **Opsi Akselerasi & Kebebasan Pengguna:**
    - Menyediakan opsi akselerasi Binhost (`forge install --binhost <pkg>`) dan fallback hybrid CachyOS/Arch (`--hybrid`) dengan kebebasan penuh di tangan pengguna.
-5. **Fitur Khusus Distro Kura Linux:**
-   - Meta-target `@system` untuk rebuild seluruh basis sistem Kura Linux (menggunakan konfigurasi dari `forge system-setup` atau template default).
+5. **Filosofi Meta-Paket ("Everything is a Package"):**
+   - Tidak ada target magis `@system` yang di-hardcode. Basis sistem dikelola murni melalui resep meta-paket standar: `forge install base` (sistem inti OS) dan `forge install base-devel` (toolchain kompilasi).
    - Perintah `forge stage-export` untuk membuat arsip stage distribusi (`kura-stage.tar.xz`).
    - Integrasi OpenRC hook `/etc/init.d/` dan `rc-update`.
 
@@ -43,15 +42,15 @@
    - Menyajikan katalog resep terpusat dan melayani sinkronisasi klien (`forge sync`).
 2. **CI/CD Build Farm (Lock-CPU):**
    - Menerima `cpu-profile.json` pengguna dan mengunci (*lock*) worker builder ke CPU target pengguna.
-   - Perintah `forge-server import <pkg>`: Tool otomasi server untuk kompilasi massal, packaging `.forge.tar.zst`, indexing `packages.db.zst`, dan publikasi ke Binary Library.
+   - Perintah `forge-server import <pkg>`: Tool otomasi server untuk kompilasi, packaging `.forge.tar.zst`, indexing `packages.db.zst`, dan publikasi ke Binary Library.
 
 ### ⛔ DILARANG KERAS:
-- **Haram Ambil Biner Dari Host:** Dilarang keras menyalin biner, library, atau compiler dari sistem host (`/usr/bin/`, `/usr/lib/llvm/22/`) untuk dimasukkan ke dalam paket distribusi atau seed toolchain. Seluruh paket dan toolchain wajib murni 100% dikompilasi dari kode sumber upstream melalui resep `recipe.toml` ke staging (`/tmp/forge/stage/`).
+- **Haram Ambil Biner Dari Host (ADR-019):** Dilarang keras menyalin biner, library, atau compiler dari sistem host (`/usr/bin/`, `/usr/lib/llvm/22/`) untuk dimasukkan ke dalam paket distribusi atau seed toolchain. Seluruh paket dan toolchain wajib murni 100% dikompilasi dari kode sumber upstream melalui resep `recipe.toml` ke staging (`/tmp/forge/stage/`).
 - **Dilarang Mengedit Berkas KuraLinux:** Dilarang keras memodifikasi berkas apa pun di luar repositori ini (misal di `/home/admin/Development/KuraLinux/`).
 - **Haram Ketergantungan Systemd:** Seluruh integrasi service wajib menggunakan standar OpenRC (`/etc/init.d/`, `/etc/conf.d/`, `rc-update`).
 - **Dilarang Menulis ke Filesystem Host `/` Tanpa Isolasi:** Seluruh proses build dan testing wajib terisolasi dalam target root dummy (`$FORGE_ROOT` atau staging `/tmp/forge/stage/`).
 - **Dilarang Bypass Verifikasi Integritas:** Pengunduhan source atau binary package wajib divalidasi dengan checksum SHA256/BLAKE3.
-- **Pengecualian Khusus Glibc:** Flag optimasi custom (`-march=native`) diinjeksikan untuk semua paket Kura Linux, **kecuali Glibc** yang tetap di-build via `forge` dengan konfigurasi standar CFLAGS bawaan Glibc demi stabilitas build system.
+- **Pengecualian Khusus Glibc (ADR-002):** Flag optimasi custom (`-march=native`) diinjeksikan untuk semua paket Kura Linux, **kecuali Glibc** yang tetap di-build via `forge` dengan konfigurasi standar CFLAGS bawaan Glibc demi stabilitas build system.
 
 ---
 
@@ -83,10 +82,9 @@ Kompilasi engine `forge` dan `forge-server` dioptimalkan secara ekstrem untuk pe
 │   ├── forge/              # Binary klien 'forge' & library engine (CLI, builder, CPU profiler, binhost, hybrid, toolchain)
 │   └── forge-server/       # Binary daemon 'forge-server' (serve, import, index, CI/CD build farm)
 ├── config/                 # Template konfigurasi bawaan
-│   ├── forge.conf.example  # Konfigurasi package manager
-│   └── system.conf.example # Template konfigurasi bootstrap sistem Kura Linux
+│   └── forge.conf.example  # Konfigurasi tunggal package manager
 ├── recipes/                # Pohon resep paket resmi Kura Linux (di-sync dari server)
-│   ├── system/             # Resep set @system (Glibc, GCC, Kernel, OpenRC, dll.)
+│   ├── system/             # Resep set sistem & meta-paket (base, base-devel, glibc, gcc, llvm, openrc, dll.)
 │   ├── core/               # Resep utilitas inti sistem
 │   └── extra/              # Resep aplikasi & layanan tambahan
 ├── tests/                  # Test suite integrasi & sandbox testing
@@ -99,12 +97,13 @@ Kompilasi engine `forge` dan `forge-server` dioptimalkan secara ekstrem untuk pe
 
 ### A. Klien Pengguna (`forge`):
 ```bash
-# --- 1. Wizard Setup & Inisialisasi Sistem ---
-forge setup                     # Wizard konfigurasi package manager (/etc/forge/forge.conf)
-forge system-setup              # Wizard bootstrap distro Kura Linux (/etc/forge/system.conf)
+# --- 1. Konfigurasi Package Manager ---
+forge setup                     # Inisialisasi konfigurasi package manager (/etc/forge/forge.conf)
 
 # --- 2. Manajemen Paket (Default: Source Compilation First) ---
-forge install <pkg>             # Kompilasi dari source code secara native (Default Gentoo-style)
+forge install base              # Pasang sistem dasar Kura Linux (Meta-Paket)
+forge install base-devel        # Pasang toolchain kompilasi Kura Linux (Meta-Paket)
+forge install <pkg>             # Kompilasi paket dari source code secara native (Gentoo-style)
 forge install --binhost <pkg>   # Opsi Akselerasi: Unduh pre-built binary native dari Forge Server
 forge install --hybrid <pkg>    # Opsi Akselerasi: Gunakan biner CachyOS/Arch jika ada
 forge install --interactive <pkg> # Pilih manual provider (Source vs Binhost vs CachyOS/Arch)
@@ -116,8 +115,8 @@ forge update @world             # Re-kompilasi / perbarui seluruh paket terpasan
 forge cpu-dump                  # Dump mikroarsitektur CPU & export cpu-profile.json
 forge cpu-dump --export-cflags  # Tampilkan rekomendasi CFLAGS untuk CPU saat ini
 
-# --- 4. Fitur Distro Khusus ---
-forge install @system           # Rebuild seluruh base system Kura Linux (sesuai system-setup / template)
+# --- 4. Toolchain & Fitur Distro Khusus ---
+forge toolchain bundle          # Kemas seed toolchain murni ke dist/kura-toolchain.tar.xz (ADR-019)
 forge stage-export --output kura-stage.tar.xz  # Kemas rootfs menjadi stage tarball
 ```
 
@@ -126,7 +125,6 @@ forge stage-export --output kura-stage.tar.xz  # Kemas rootfs menjadi stage tarb
 # --- Server Registry & Build Farm ---
 forge-server serve              # Jalankan service API resep & katalog biner
 forge-server import <pkg>       # CI/CD: Build lock-CPU, kemas .forge.tar.zst, & upload ke binary library
-forge-server import --all-system # CI/CD: Kompilasi massal seluruh paket @system yang di-lock ke CPU target
 forge-server index              # Regenerasi database index repositori packages.db.zst
 ```
 
