@@ -89,51 +89,39 @@ Biner hasil kompilasi:
 
 ---
 
-## 📜 Standar Format Resep (`Recipe.forge`)
+## 📜 Standar Format Resep All-in-One (`recipe.toml`)
 
-```bash
-pkgname="openssh"
-pkgver="9.8p1"
-pkgrel="1"
-slot="0"
-pkgdesc="Premier connectivity tool for remote login with SSH protocol"
-url="https://www.openssh.com/"
-license="BSD-2-Clause"
+```toml
+[package]
+name = "pkgconf"
+version = "3.0.7"
+release = 1
+slot = "0"
+description = "Package compiler and linker metadata toolkit (Latest 3.0.7)"
+license = "ISC"
+upstream = "http://pkgconf.org/"
 
-# Portage-style USE Flags
-use_flags=("pam" "ssl" "kerberos" "ldns")
-default_use=("ssl" "pam")
+[dependencies]
+runtime = ["glibc"]
+build = ["gcc", "make"]
 
-depends=("glibc" "openssl" "zlib")
-makedepends=("gcc" "make" "pkgconf")
+[sources]
+urls = ["https://distfiles.ariadne.space/pkgconf/pkgconf-3.0.7.tar.xz"]
+sha256 = ["c926ff491cbd9a331a589160811bd97ab1749b4d5198a519338f2cdfabe6940a"]
 
-sources=(
-  "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${pkgver}.tar.gz"
-)
-sha256sums=(
-  "dd8b5cedd4da0102d09f1665f14d8627e997f3944354b6dff618d6e3c10444a7"
-)
-
-build() {
-  cd "${srcdir}/openssh-${pkgver}"
-  local conf_args=(
-    --prefix=/usr
-    --sysconfdir=/etc/ssh
-    --with-ssl-dir=/usr
-  )
-
-  if forge_use pam; then
-    conf_args+=( --with-pam )
-  fi
-
-  ./configure "${conf_args[@]}"
-  make
-}
-
-package() {
-  cd "${srcdir}/openssh-${pkgver}"
-  make DESTDIR="${DESTDIR}" install
-}
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/pkgconf-${pkgver}"
+./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+ln -sf pkgconf "${DESTDIR}/usr/bin/pkg-config"
+"""
 ```
 
 ---

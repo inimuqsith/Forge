@@ -1,9 +1,9 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::*;
-use forge_core::{get_default_system_packages, SystemSetupConfig, ToolchainManager};
+use forge_core::{get_default_system_packages, ForgeConfig, RecipeBuilder, SystemSetupConfig, ToolchainManager};
 use forge_cpu::CpuProfile;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 #[derive(Parser)]
 #[command(name = "forge")]
@@ -187,7 +187,30 @@ fn main() -> Result<()> {
         }
 
         Commands::Build { package } => {
-            println!(">>> Membangun paket {} ke staging DESTDIR...", package.bold().cyan());
+            println!("{}", format!(">>> Membangun paket {} dari kode sumber...", package).bold().cyan());
+            let config = ForgeConfig::load_or_default(None);
+
+            let recipe_candidates = [
+                PathBuf::from(&package),
+                PathBuf::from(format!("recipes/system/{}/recipe.toml", package)),
+                PathBuf::from(format!("recipes/core/{}/recipe.toml", package)),
+                PathBuf::from(format!("recipes/extra/{}/recipe.toml", package)),
+            ];
+
+            let found_recipe = recipe_candidates.iter().find(|p| p.exists());
+            if let Some(recipe_path) = found_recipe {
+                let destdir = PathBuf::from(format!("/tmp/forge/stage/{}", package));
+                match RecipeBuilder::build(recipe_path, &config, &destdir, None) {
+                    Ok(staged_dir) => {
+                        println!("{} Paket {} sukses dikompilasi ke staging: {}", "✓".green(), package.bold(), staged_dir.display().to_string().cyan());
+                    }
+                    Err(e) => {
+                        println!("{} Gagal mengompilasi paket {}: {:#}", "✗".red(), package.bold(), e);
+                    }
+                }
+            } else {
+                println!("{} Resep tidak ditemukan untuk paket: {}", "✗".red(), package.bold());
+            }
         }
 
         Commands::Sync => {

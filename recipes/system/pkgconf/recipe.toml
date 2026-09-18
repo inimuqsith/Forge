@@ -1,0 +1,30 @@
+[package]
+name = "pkgconf"
+version = "3.0.7"
+release = 1
+slot = "0"
+description = "Package compiler and linker metadata toolkit (Latest 3.0.7)"
+license = "ISC"
+upstream = "http://pkgconf.org/"
+
+[dependencies]
+runtime = ["glibc"]
+build = ["gcc", "make"]
+
+[sources]
+urls = ["https://distfiles.ariadne.space/pkgconf/pkgconf-3.0.7.tar.xz"]
+sha256 = ["c926ff491cbd9a331a589160811bd97ab1749b4d5198a519338f2cdfabe6940a"]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/pkgconf-${pkgver}"
+./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+ln -sf pkgconf "${DESTDIR}/usr/bin/pkg-config"
+"""

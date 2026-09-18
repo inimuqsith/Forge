@@ -4,7 +4,9 @@ use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
 
+pub mod builder;
 pub mod toolchain;
+pub use builder::RecipeBuilder;
 pub use toolchain::{ToolchainComponent, ToolchainManager, ToolchainStatus};
 
 /// Konfigurasi Global Forge (/etc/forge/forge.conf)
@@ -149,22 +151,72 @@ impl ForgeConfig {
     }
 }
 
-/// Model Resep Forge (Recipe.forge)
+/// Model Resep Forge (recipe.toml)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Recipe {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgrel: u32,
+    pub package: PackageMeta,
+    #[serde(default)]
+    pub dependencies: Option<DependenciesMeta>,
+    #[serde(default)]
+    pub sources: Option<SourcesMeta>,
+    #[serde(default)]
+    pub build: Option<BuildMeta>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PackageMeta {
+    pub name: String,
+    pub version: String,
+    #[serde(default = "default_release")]
+    pub release: u32,
+    #[serde(default = "default_slot")]
     pub slot: String,
-    pub pkgdesc: String,
+    #[serde(default)]
+    pub description: String,
+    #[serde(default)]
     pub url: String,
+    #[serde(default)]
     pub license: String,
-    pub use_flags: Vec<String>,
-    pub default_use: Vec<String>,
-    pub depends: Vec<String>,
-    pub makedepends: Vec<String>,
-    pub sources: Vec<String>,
-    pub sha256sums: Vec<String>,
+    #[serde(default)]
+    pub upstream: String,
+}
+
+fn default_release() -> u32 {
+    1
+}
+
+fn default_slot() -> String {
+    "0".to_string()
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct DependenciesMeta {
+    #[serde(default)]
+    pub runtime: Vec<String>,
+    #[serde(default)]
+    pub build: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct SourcesMeta {
+    #[serde(default)]
+    pub urls: Vec<String>,
+    #[serde(default)]
+    pub sha256: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct BuildMeta {
+    #[serde(default)]
+    pub r#type: String,
+    #[serde(default)]
+    pub configure_args: Vec<String>,
+    #[serde(default)]
+    pub script: String,
+    #[serde(default)]
+    pub compiler_override: Option<String>,
+    #[serde(default)]
+    pub disable_custom_march: bool,
 }
 
 /// Evaluator USE Flags ala Portage

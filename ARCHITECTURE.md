@@ -240,3 +240,56 @@ Untuk mencegah polusi dari compiler host dan menjamin Kura Linux dapat melakukan
 |     seluruh sistem operasi secara 100% native untuk silikon pengguna tanpa polusi host.         |
 +-------------------------------------------------------------------------------------------------+
 ```
+
+---
+
+## 7. Standar Format All-in-One `recipe.toml` & Hierarki Konfigurasi Compiler
+
+Forge mengadopsi format resep **All-in-One `recipe.toml`** yang menyatukan metadata deklaratif dan script build dalam satu berkas tunggal:
+
+```toml
+[package]
+name = "pkgconf"
+version = "3.0.7"
+release = 1
+slot = "0"
+description = "Package compiler and linker metadata toolkit (Latest 3.0.7)"
+license = "ISC"
+upstream = "http://pkgconf.org/"
+
+[dependencies]
+runtime = ["glibc"]
+build = ["gcc", "make"]
+
+[sources]
+urls = ["https://distfiles.ariadne.space/pkgconf/pkgconf-3.0.7.tar.xz"]
+sha256 = ["c926ff491cbd9a331a589160811bd97ab1749b4d5198a519338f2cdfabe6940a"]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/pkgconf-${pkgver}"
+./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+ln -sf pkgconf "${DESTDIR}/usr/bin/pkg-config"
+"""
+```
+
+### 👑 Hierarki Konfigurasi Compiler (*Forge Config Supremacy*):
+Meskipun resep memuat script bash kustom, **Aturan Konfigurasi Forge Tetap Berada pada Hierarki Tertinggi**:
+1. **Injeksi Lingkungan Otomatis:** Sebelum mengeksekusi script resep, Forge secara otomatis mengekspor:
+   - `CC="clang"`
+   - `CXX="clang++"`
+   - `LD="mold"`
+   - `LDFLAGS="-Wl,-O1 -Wl,--as-needed -fuse-ld=mold"`
+   - `CFLAGS="-O2 -march=native -pipe -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt"`
+   - `CXXFLAGS="${CFLAGS}"`
+   - `MAKEFLAGS="-j$(nproc)"`
+2. **Pengecualian Khusus Glibc (ADR-002):**
+   Jika paket adalah `glibc` atau memiliki tag `compiler_override = "gcc"`:
+   - Forge secara otomatis mengalihkan toolchain ke compiler `gcc` standar (`CC=gcc`, `CXX=g++`, `CFLAGS=-O2 -pipe`) tanpa menginjeksikan flag `-march` kustom untuk menjamin kestabilan build system Glibc.

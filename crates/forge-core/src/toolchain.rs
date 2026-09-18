@@ -53,7 +53,6 @@ impl ToolchainManager {
         fs::create_dir_all(&usr_lib)?;
         fs::create_dir_all(&etc_forge)?;
 
-        // Salin biner utama yang terdeteksi
         let mut copied_binaries = Vec::new();
         let components = [
             &status.c_compiler,
@@ -65,16 +64,61 @@ impl ToolchainManager {
             &status.pkgconf,
         ];
 
+        // Salin biner dari staging Forge (/tmp/forge/stage/) jika tersedia hasil kompilasi resep
+        let stage_pkgs = ["pkgconf", "make", "ninja", "mold"];
+        for pkg in stage_pkgs {
+            let pkg_stage_bin = PathBuf::from(format!("/tmp/forge/stage/{}/usr/bin", pkg));
+            if pkg_stage_bin.exists() {
+                if let Ok(entries) = fs::read_dir(&pkg_stage_bin) {
+                    for entry in entries.flatten() {
+                        let path = entry.path();
+                        if path.is_file() || path.is_symlink() {
+                            let file_name = path.file_name().unwrap_or_default();
+                            let dest_file = usr_bin.join(file_name);
+                            if path.is_symlink() {
+                                if let Ok(target) = fs::read_link(&path) {
+                                    let _ = make_symlink(&target.to_string_lossy(), &dest_file);
+                                }
+                            } else {
+                                let _ = fs::copy(&path, &dest_file);
+                            }
+                            copied_binaries.push(pkg.to_string());
+                        }
+                    }
+                }
+            }
+
+            let pkg_stage_lib = PathBuf::from(format!("/tmp/forge/stage/{}/usr/lib", pkg));
+            if pkg_stage_lib.exists() {
+                if let Ok(entries) = fs::read_dir(&pkg_stage_lib) {
+                    for entry in entries.flatten() {
+                        let path = entry.path();
+                        if path.is_file() || path.is_symlink() {
+                            let file_name = path.file_name().unwrap_or_default();
+                            let dest_file = usr_lib.join(file_name);
+                            if path.is_symlink() {
+                                if let Ok(target) = fs::read_link(&path) {
+                                    let _ = make_symlink(&target.to_string_lossy(), &dest_file);
+                                }
+                            } else {
+                                let _ = fs::copy(&path, &dest_file);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Lengkapi compiler utama (Clang, GCC, mold)
         for comp in components {
             if let Some(ref path_str) = comp.path {
                 let src_path = Path::new(path_str);
-                if src_path.exists() {
-                    let dest_name = src_path.file_name().unwrap_or_default();
-                    let dest_path = usr_bin.join(dest_name);
+                let dest_name = src_path.file_name().unwrap_or_default();
+                let dest_path = usr_bin.join(dest_name);
+                if !dest_path.exists() && src_path.exists() {
                     let _ = fs::copy(src_path, &dest_path);
                     copied_binaries.push(comp.name.clone());
 
-                    // Buat symlinks standar jika perlu
                     if comp.name == "clang" {
                         let _ = make_symlink("clang", &usr_bin.join("cc"));
                     } else if comp.name == "clang++" {

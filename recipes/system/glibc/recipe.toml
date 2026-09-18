@@ -1,0 +1,37 @@
+[package]
+name = "glibc"
+version = "2.44"
+release = 1
+slot = "0"
+description = "GNU C Library (Standard Core System C Library - Latest 2.44)"
+license = "LGPL-2.1-or-later"
+upstream = "https://www.gnu.org/software/libc/"
+
+[dependencies]
+runtime = ["linux-headers"]
+build = ["gcc", "binutils", "make", "bison", "gawk", "sed"]
+
+[sources]
+urls = ["https://ftp.gnu.org/gnu/glibc/glibc-2.44.tar.xz"]
+sha256 = []
+
+[build]
+type = "autotools"
+# Catatan Khusus: Glibc menggunakan aturan pengecualian Forge (ADR-002).
+# CFLAGS optimasi custom (-march=native) dinonaktifkan otomatis oleh Forge untuk glibc,
+# dan fallback ke compiler GCC standar untuk stabilitas build system.
+compiler_override = "gcc"
+disable_custom_march = true
+
+script = """
+mkdir -p build && cd build
+../glibc-${pkgver}/configure \
+    --prefix=/usr \
+    --disable-profile \
+    --enable-kernel=6.6.0 \
+    --enable-stack-protector=strong \
+    --disable-werror \
+    libc_cv_slibdir=/usr/lib
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""
