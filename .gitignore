@@ -1,0 +1,33 @@
+# --- Forge Build Artifacts & Binaries ---
+target/
+build/
+bin/
+dist/
+*.o
+*.a
+*.so
+*.dylib
+
+# --- Staging, Temporary, & Distfiles Cache ---
+tmp/
+.cache/
+/var/
+distfiles/
+*.tar.gz
+*.tar.xz
+*.tar.bz2
+*.tar.zst
+*.patch.tmp
+
+# --- Test Outputs & Logs ---
+*.log
+*.out
+coverage/
+*.profraw
+
+# --- Editor & OS Artifacts ---
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store

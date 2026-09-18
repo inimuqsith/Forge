@@ -1,0 +1,37 @@
+# /etc/forge/forge.conf
+# File Konfigurasi Bawaan Forge Package Manager untuk Kura Linux
+
+[general]
+# Target root filesystem (default: "/" untuk sistem hidup)
+root = "/"
+
+# Lokasi penyimpanan database paket terpasang
+db_path = "/var/db/forge"
+
+# Lokasi cache berkas tarball sumber
+cache_path = "/var/cache/forge/distfiles"
+
+# Lokasi build sementara berbasis RAM (tmpfs)
+build_path = "/tmp/forge/build"
+
+# Lokasi staging sementara sebelum merge
+stage_path = "/tmp/forge/stage"
+
+# Lokasi pohon resep lokal
+recipes_path = "/var/db/forge/recipes"
+
+[build]
+# Flag optimasi native kompilasi Kura Linux
+cflags = "-O2 -march=native -pipe -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt"
+cxxflags = "-O2 -march=native -pipe -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt"
+ldflags = "-Wl,-O1 -Wl,--as-needed -Wl,-z,relro -Wl,-z,now"
+makeflags = "-j$(nproc)"
+jobs = "auto"
+prefix = "/usr"
+
+[hooks]
+# Integrasi OpenRC & pemicu post-install
+enable_openrc_hooks = true
+enable_ldconfig_hooks = true
+enable_mandoc_hooks = true
+auto_prompt_services = true
