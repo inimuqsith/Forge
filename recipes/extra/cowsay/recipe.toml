@@ -1,0 +1,23 @@
+[package]
+name = "cowsay"
+version = "3.8.4"
+release = 1
+slot = "0"
+description = "Configurable talking cow (Latest 3.8.4)"
+license = "GPL-3.0-or-later"
+upstream = "https://github.com/cowsay-org/cowsay"
+
+[dependencies]
+runtime = ["bash", "perl"]
+build = ["make"]
+
+[sources]
+urls = ["https://github.com/cowsay-org/cowsay/archive/refs/tags/v3.8.4.tar.gz"]
+sha256 = []
+
+[build]
+type = "generic"
+script = """
+cd "${srcdir}/cowsay-${pkgver}"
+make prefix=/usr DESTDIR="${DESTDIR}" install
+"""
