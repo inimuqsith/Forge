@@ -1,0 +1,40 @@
+[package]
+name = "llvm"
+version = "22.1.0"
+release = 1
+slot = "22"
+description = "LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22)"
+license = "Apache-2.0-with-LLVM-exception"
+upstream = "https://llvm.org/"
+
+[dependencies]
+runtime = ["glibc", "zlib", "zstd", "libxml2"]
+build = ["cmake", "ninja", "pkgconf", "make", "python"]
+
+[sources]
+urls = [
+    "https://github.com/llvm/llvm-project/releases/download/llvmorg-22.1.0/llvm-project-22.1.0.src.tar.xz"
+]
+sha256 = []
+
+[build]
+type = "cmake"
+script = """
+cd "${srcdir}/llvm-project-${pkgver}.src"
+cmake -G Ninja -B build llvm \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLLVM_ENABLE_PROJECTS="clang;lld;compiler-rt" \
+    -DLLVM_ENABLE_RUNTIMES="libunwind" \
+    -DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
+    -DLLVM_USE_LINKER=mold \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLVM_INCLUDE_EXAMPLES=OFF \
+    -DLLVM_ENABLE_ZSTD=ON \
+    -DLLVM_ENABLE_ZLIB=ON \
+    -DCLANG_DEFAULT_LINKER=mold \
+    -DCMAKE_C_FLAGS="${CFLAGS}" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS}"
+ninja -C build ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

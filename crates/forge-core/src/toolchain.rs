@@ -109,7 +109,7 @@ impl ToolchainManager {
             }
         }
 
-        // Lengkapi compiler utama (Clang, GCC, mold)
+        // Lengkapi compiler utama dan utilitas LLVM (Clang 22, LLD, llvm-ar, GCC, mold)
         for comp in components {
             if let Some(ref path_str) = comp.path {
                 let src_path = Path::new(path_str);
@@ -125,18 +125,64 @@ impl ToolchainManager {
                         let _ = make_symlink("clang++", &usr_bin.join("c++"));
                     } else if comp.name == "pkgconf" {
                         let _ = make_symlink("pkgconf", &usr_bin.join("pkg-config"));
+                    } else if comp.name == "mold" {
+                        let _ = make_symlink("mold", &usr_bin.join("ld"));
+                        let _ = make_symlink("mold", &usr_bin.join("ld.mold"));
                     }
                 }
             }
         }
 
-        // Tulis environment loader Kura Linux
+        // Salin biner pembantu LLVM jika ada (lld, llvm-ar, llvm-nm, llvm-objdump)
+        let llvm_extras = ["lld", "llvm-ar", "llvm-as", "llvm-nm", "llvm-objdump", "llvm-ranlib"];
+        for extra in llvm_extras {
+            let candidate_paths = [
+                format!("/usr/lib/llvm/22/bin/{}", extra),
+                format!("/usr/bin/{}", extra),
+            ];
+            for cand in candidate_paths {
+                let p = Path::new(&cand);
+                if p.exists() {
+                    let dest = usr_bin.join(extra);
+                    if !dest.exists() {
+                        let _ = fs::copy(p, &dest);
+                        if extra == "lld" {
+                            let _ = make_symlink("lld", &usr_bin.join("ld.lld"));
+                        } else if extra == "llvm-ar" {
+                            let _ = make_symlink("llvm-ar", &usr_bin.join("ar"));
+                        } else if extra == "llvm-nm" {
+                            let _ = make_symlink("llvm-nm", &usr_bin.join("nm"));
+                        } else if extra == "llvm-objdump" {
+                            let _ = make_symlink("llvm-objdump", &usr_bin.join("objdump"));
+                        } else if extra == "llvm-ranlib" {
+                            let _ = make_symlink("llvm-ranlib", &usr_bin.join("ranlib"));
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Salin header bawaan Clang (/usr/lib/clang) jika ada
+        let clang_lib_dir = Path::new("/usr/lib/clang");
+        if clang_lib_dir.exists() {
+            let _ = Command::new("cp")
+                .arg("-r")
+                .arg(clang_lib_dir)
+                .arg(&usr_lib)
+                .status();
+        }
+
+        // Tulis environment loader Kura Linux dengan flag optimasi native silikon
         let env_content = r#"# /etc/forge/toolchain.conf
-# Kura Linux Seed Toolchain Environment
+# Kura Linux Seed Toolchain Environment (LLVM 22 + mold + Native Silicon Optimization)
 export CC="/usr/bin/clang"
 export CXX="/usr/bin/clang++"
 export LD="/usr/bin/mold"
-export CFLAGS="-O2 -march=native -pipe -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt"
+export AR="/usr/bin/llvm-ar"
+export NM="/usr/bin/llvm-nm"
+export RANLIB="/usr/bin/llvm-ranlib"
+export CFLAGS="-O3 -march=native -pipe -flto=thin -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt"
 export CXXFLAGS="${CFLAGS}"
 export LDFLAGS="-Wl,-O1 -Wl,--as-needed -fuse-ld=/usr/bin/mold"
 export MAKEFLAGS="-j$(nproc)"

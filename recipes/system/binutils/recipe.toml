@@ -1,0 +1,36 @@
+[package]
+name = "binutils"
+version = "2.44"
+release = 1
+slot = "0"
+description = "GNU binary utilities (as, ld, readelf, objdump, strip, ar)"
+license = "GPL-3.0-or-later"
+upstream = "https://www.gnu.org/software/binutils/"
+
+[dependencies]
+runtime = ["glibc", "zlib", "zstd"]
+build = ["gcc", "make", "bison", "flex"]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/binutils/binutils-2.44.tar.xz"
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+mkdir -p build && cd build
+../binutils-${pkgver}/configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --enable-gold \
+    --enable-ld=default \
+    --enable-plugins \
+    --enable-shared \
+    --disable-werror \
+    --with-system-zlib \
+    --enable-64-bit-bfd
+make tooldir=/usr ${MAKEFLAGS}
+make tooldir=/usr DESTDIR="${DESTDIR}" install
+"""

@@ -1,0 +1,33 @@
+[package]
+name = "openrc"
+version = "0.56"
+release = 1
+slot = "0"
+description = "Service and init manager for Kura Linux"
+license = "BSD-2-Clause"
+upstream = "https://github.com/OpenRC/openrc"
+
+[dependencies]
+runtime = ["glibc", "ncurses"]
+build = ["meson", "ninja", "pkgconf", "make"]
+
+[sources]
+urls = [
+    "https://github.com/OpenRC/openrc/archive/refs/tags/0.56.tar.gz"
+]
+sha256 = []
+
+[build]
+type = "meson"
+script = """
+cd "${srcdir}/openrc-${pkgver}"
+meson setup build \
+    --prefix=/ \
+    --sysconfdir=/etc \
+    --libdir=/lib \
+    --sbindir=/sbin \
+    -Dpam=false \
+    -Dnewnet=true
+ninja -C build ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

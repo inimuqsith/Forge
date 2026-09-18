@@ -357,7 +357,7 @@ impl SystemSetupConfig {
 /// Daftar Paket Default Set @system Kura Linux
 pub fn get_default_system_packages() -> Vec<&'static str> {
     vec![
-        "glibc", "gcc", "binutils", "linux-headers",
+        "glibc", "llvm", "mold", "ninja", "gcc", "binutils", "linux-headers",
         "coreutils", "bash", "sed", "grep", "gawk", "make", "patch",
         "tar", "xz", "zstd", "findutils", "diffutils", "file", "which",
         "linux", "grub", "openrc", "eudev", "acpid", "kmod", "util-linux",

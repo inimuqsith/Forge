@@ -1,0 +1,29 @@
+[package]
+name = "linux-headers"
+version = "6.13.0"
+release = 1
+slot = "0"
+description = "Linux kernel API headers for userspace"
+license = "GPL-2.0-only"
+upstream = "https://www.kernel.org/"
+
+[dependencies]
+runtime = []
+build = ["make", "rsync"]
+
+[sources]
+urls = [
+    "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.13.tar.xz"
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/linux-${pkgver}"
+make mrproper
+make headers
+find usr/include -type f ! -name '*.h' -delete
+mkdir -p "${DESTDIR}/usr"
+cp -rv usr/include "${DESTDIR}/usr/"
+"""
