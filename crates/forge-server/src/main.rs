@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::*;
-use forge_core::get_default_system_packages;
+use forge::get_default_system_packages;
 
 #[derive(Parser)]
 #[command(name = "forge-server")]

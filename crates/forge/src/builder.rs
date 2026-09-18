@@ -111,7 +111,26 @@ impl RecipeBuilder {
             || build_meta.compiler_override.as_deref() == Some("gcc")
             || build_meta.disable_custom_march;
 
-        let (cc, cxx, ld, cflags, cxxflags, ldflags) = if is_glibc_or_exempt {
+        let ccache_available = config.build.enable_ccache
+            && Command::new("which")
+                .arg("ccache")
+                .output()
+                .map(|o| o.status.success())
+                .unwrap_or(false);
+
+        let ccache_dir = {
+            let p = PathBuf::from(&config.build.ccache_dir);
+            if fs::create_dir_all(&p).is_ok() && fs::File::create(p.join(".write_test")).is_ok() {
+                let _ = fs::remove_file(p.join(".write_test"));
+                p
+            } else {
+                let fallback = distfiles_dir.join(".ccache");
+                fs::create_dir_all(&fallback).ok();
+                fallback
+            }
+        };
+
+        let (cc_base, cxx_base, ld, cflags, cxxflags, ldflags) = if is_glibc_or_exempt {
             println!("  [!] Menerapkan aturan pengecualian Forge (ADR-002): Compiler GCC standar tanpa CFLAGS custom");
             (
                 "gcc".to_string(),
@@ -133,6 +152,13 @@ impl RecipeBuilder {
             )
         };
 
+        let (cc, cxx) = if ccache_available {
+            println!("  [⚡] Akselerasi Ccache aktif (CCACHE_DIR: {:?})", ccache_dir);
+            (format!("ccache {}", cc_base), format!("ccache {}", cxx_base))
+        } else {
+            (cc_base, cxx_base)
+        };
+
         // 4. Jalankan script build jika ada
         if !build_meta.script.is_empty() {
             println!("  [🔨] Menjalankan script kompilasi dengan CC={}, LD={}...", cc, ld);
@@ -142,6 +168,7 @@ set -e
 export CC="{cc}"
 export CXX="{cxx}"
 export LD="{ld}"
+export CCACHE_DIR="{ccache_dir}"
 export CFLAGS="{cflags}"
 export CXXFLAGS="{cxxflags}"
 export LDFLAGS="{ldflags}"
@@ -157,6 +184,7 @@ export pkgver="{pkgver}"
                 cc = cc,
                 cxx = cxx,
                 ld = ld,
+                ccache_dir = ccache_dir.display(),
                 cflags = cflags,
                 cxxflags = cxxflags,
                 ldflags = ldflags,

@@ -1,0 +1,32 @@
+[package]
+name = "forge"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Forge Package Manager for Kura Linux (High-Performance Source-First & Hybrid)"
+
+[[bin]]
+name = "forge"
+path = "src/main.rs"
+
+[lib]
+name = "forge"
+path = "src/lib.rs"
+
+[dependencies]
+clap = { workspace = true }
+colored = { workspace = true }
+dialoguer = { workspace = true }
+indicatif = { workspace = true }
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
+tar = { workspace = true }
+zstd = { workspace = true }
+sha2 = { workspace = true }
+tempfile = { workspace = true }
+reqwest = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

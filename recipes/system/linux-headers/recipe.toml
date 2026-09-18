@@ -1,6 +1,6 @@
 [package]
 name = "linux-headers"
-version = "6.13.0"
+version = "6.13"
 release = 1
 slot = "0"
 description = "Linux kernel API headers for userspace"

@@ -1,8 +1,7 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::*;
-use forge_core::{get_default_system_packages, ForgeConfig, RecipeBuilder, SystemSetupConfig, ToolchainManager};
-use forge_cpu::CpuProfile;
+use forge::{get_default_system_packages, CpuProfile, ForgeConfig, RecipeBuilder, SystemSetupConfig, ToolchainComponent, ToolchainManager};
 use std::path::{Path, PathBuf};
 
 #[derive(Parser)]
@@ -292,7 +291,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn print_component(comp: &forge_core::ToolchainComponent) {
+fn print_component(comp: &ToolchainComponent) {
     if comp.is_available {
         println!(
             "  [{}] {:<12} : {} ({})",

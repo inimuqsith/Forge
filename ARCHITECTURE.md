@@ -54,51 +54,24 @@ Forge dirancang menggunakan arsitektur modular multi-crate dalam satu Cargo Work
 
 ---
 
-## 2. Rincian Crate dalam Workspace
+## 2. Rincian Crate dalam Workspace (Clean 2-Crate Layout)
 
-### 1️⃣ `crates/forge-core` (The Heart Engine)
-- **DAG & Dependency Graph Resolver:** Menggunakan struktur graf (*Directed Acyclic Graph*) dan algoritma *Topological Sort* untuk menyelesaikan urutan kompilasi `depends` dan `makedepends`.
-- **USE Flags Engine:** Parser dan evaluator flag fitur (`forge_use`).
-- **Slotting Engine:** Manajemen koeksistensi beberapa versi paket (`pkg:slot`).
-- **RAM tmpfs Build Sandbox & CFLAGS Injector:** Mengatur area build di `/tmp/forge/build/` dan menyuntikkan flag optimasi native silikon (dengan pengecualian khusus Glibc sesuai ADR-002).
-- **Transactional Merger & Collision Detector:** Pre-flight scan deteksi tabrakan file dan penulisan manifest di `/var/db/forge/installed/`.
-- **Hook Trigger:** Deteksi otomatis skrip `/etc/init.d/`, integrasi `rc-update`, `ldconfig`, dan `mandoc`.
-
----
-
-### 2️⃣ `crates/forge-cpu` (Hardware Profiler & Introspection)
-- Mengimplementasikan fungsionalitas `forge cpu-dump`.
-- Menganalisis CPUID, feature flags (AVX-512, AVX2, FMA, VAES, SHA-NI, BMI2, SSE4.2), dan ukuran cache L1/L2/L3.
-- Mengidentifikasi target mikroarsitektur (misal: `znver4`, `znver3`, `alderlake`, `x86-64-v4`).
-- Menghasilkan profil `cpu-profile.json` untuk disinkronisasikan ke CI/CD build farm `forge-server`.
+### 1️⃣ `crates/forge` (Biner Klien & Library Engine `forge`)
+Menggabungkan seluruh fungsionalitas klien ke dalam satu crate yang terorganisir rapi:
+- **`src/main.rs` (CLI Binary):** Antarmuka pengguna (`forge setup`, `forge system-setup`, `forge install`, `forge build`, `forge cpu-dump`, `forge toolchain`, `forge stage-export`).
+- **`src/builder.rs` (Compilation Engine):** Eksekusi resep `recipe.toml`, akselerasi `ccache`, isolasi `tmpfs`, injeksi flag native silikon (`-O3 -march=native -pipe -flto=thin`), dan staging `DESTDIR`.
+- **`src/toolchain.rs` (Pure Source Toolchain Bundler):** Mengemas biner hasil kompilasi source di staging `/tmp/forge/stage/` menjadi `dist/kura-toolchain.tar.xz`.
+- **`src/cpu.rs` (Hardware Introspection):** Deteksi ISA flags (AVX-512, AVX2), cache L1-L3, rekomendasi CFLAGS, dan ekspor `cpu-profile.json`.
+- **`src/binhost.rs` & `src/hybrid.rs`:** Modul akselerasi binhost & fallback CachyOS/Arch.
+- **`src/lib.rs`:** DAG dependency graph, USE flag engine, slots, dan konfigurasi.
 
 ---
 
-### 3️⃣ `crates/forge-binhost` (Native Binary Host Client)
-- Mengelola komunikasi klien dengan Forge Central Binary Library.
-- Mengunduh dan memvalidasi katalog repositori `packages.db.zst`.
-- Mengunduh arsip paket biner native `.forge.tar.zst`, dekompresi Zstd performa tinggi, validasi hash BLAKE3/SHA256, dan eksekusi fast merge.
-
----
-
-### 4️⃣ `crates/forge-hybrid` (CachyOS & Arch Linux Adapter)
-- Adapter opsional untuk mengonsumsi paket biner dari repositori eksternal CachyOS (arsip teroptimasi x86-64-v4 / x86-64-v3) dan Arch Linux.
-- Melakukan konversi metadata format Arch/Pacman menjadi format manifest dan database Forge lokal.
-
----
-
-### 5️⃣ `crates/forge-cli` (Binary `forge` untuk Pengguna)
-- Mengompilasi binary utama `/usr/bin/forge`.
-- Antarmuka CLI interaktif (Clap v4, dialog prompt, progress bar indikator build).
-- Mengintegrasikan wizard `forge setup`, wizard bootstrap `forge system-setup`, serta alur `forge install @system`.
-
----
-
-### 6️⃣ `crates/forge-server` (Binary `forge-server` untuk Server/CI-CD)
+### 2️⃣ `crates/forge-server` (Biner Server & CI/CD Suite `forge-server`)
 - Mengompilasi binary server `/usr/bin/forge-server`.
 - Menyajikan service HTTP REST / sync endpoint untuk distribusi resep (`serve`).
-- Menjalankan builder terisolasi yang mengunci (*lock*) kompilasi ke target arsitektur CPU pengguna (`import`).
-- Mengindeks repositori biner server (`index`).
+- Menjalankan CI/CD worker builder yang mengunci (*lock*) kompilasi ke target arsitektur CPU pengguna (`import`).
+- Mengindeks repositori biner server `packages.db.zst` (`index`).
 
 ---
 

@@ -1,11 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/forge-core",
-    "crates/forge-cpu",
-    "crates/forge-binhost",
-    "crates/forge-hybrid",
-    "crates/forge-cli",
+    "crates/forge",
     "crates/forge-server",
 ]
 

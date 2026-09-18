@@ -6,8 +6,15 @@ use std::path::Path;
 
 pub mod builder;
 pub mod toolchain;
+pub mod cpu;
+pub mod binhost;
+pub mod hybrid;
+
 pub use builder::RecipeBuilder;
 pub use toolchain::{ToolchainComponent, ToolchainManager, ToolchainStatus};
+pub use cpu::{CpuProfile, CacheInfo, RecommendedFlags};
+pub use binhost::{BinhostCatalog, BinhostClient, BinhostPackageEntry};
+pub use hybrid::HybridAdapter;
 
 /// Konfigurasi Global Forge (/etc/forge/forge.conf)
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -70,6 +77,18 @@ pub struct BuildConfig {
     pub makeflags: String,
     pub jobs: String,
     pub prefix: String,
+    #[serde(default = "default_true")]
+    pub enable_ccache: bool,
+    #[serde(default = "default_ccache_dir")]
+    pub ccache_dir: String,
+}
+
+fn default_true() -> bool {
+    true
+}
+
+fn default_ccache_dir() -> String {
+    "/var/cache/forge/ccache".to_string()
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -125,6 +144,8 @@ impl Default for ForgeConfig {
                 makeflags: "-j4".to_string(),
                 jobs: "auto".to_string(),
                 prefix: "/usr".to_string(),
+                enable_ccache: true,
+                ccache_dir: "/var/cache/forge/ccache".to_string(),
             },
             use_flags: UseConfig {
                 flags: "ssl openrc alsa -systemd lto pgo".to_string(),

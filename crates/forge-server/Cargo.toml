@@ -10,9 +10,7 @@ name = "forge-server"
 path = "src/main.rs"
 
 [dependencies]
-forge-core = { path = "../forge-core" }
-forge-cpu = { path = "../forge-cpu" }
-forge-binhost = { path = "../forge-binhost" }
+forge = { path = "../forge" }
 clap = { workspace = true }
 colored = { workspace = true }
 anyhow = { workspace = true }

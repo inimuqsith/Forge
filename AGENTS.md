@@ -79,13 +79,9 @@ Kompilasi engine `forge` dan `forge-server` dioptimalkan secara ekstrem untuk pe
 ├── MEMORY.md               # State Engine, Roadmap, ADR, & Log Solusi
 ├── README.md               # Dokumentasi Umum & Panduan Penggunaan Forge
 ├── .gitignore              # Konfigurasi filter berkas Git
-├── crates/                 # Modul-modul crate Rust
-│   ├── forge-core/         # Engine inti, DAG resolver, USE flag & Slot engine, DB
-│   ├── forge-cpu/          # CPU microarchitecture analyzer (forge cpu-dump)
-│   ├── forge-binhost/      # Forge binary host client & package installer
-│   ├── forge-hybrid/       # Provider fallback CachyOS & Arch Linux binary adapter
-│   ├── forge-cli/          # Binary klien 'forge' (CLI, setup, system-setup, stage-export)
-│   └── forge-server/       # Binary daemon 'forge-server' (serve, import, index)
+├── crates/                 # Modul-modul crate Rust (Clean 2-Crate Layout)
+│   ├── forge/              # Binary klien 'forge' & library engine (CLI, builder, CPU profiler, binhost, hybrid, toolchain)
+│   └── forge-server/       # Binary daemon 'forge-server' (serve, import, index, CI/CD build farm)
 ├── config/                 # Template konfigurasi bawaan
 │   ├── forge.conf.example  # Konfigurasi package manager
 │   └── system.conf.example # Template konfigurasi bootstrap sistem Kura Linux
