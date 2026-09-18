@@ -2,7 +2,7 @@ use axum::{
     extract::{Path as AxumPath, State},
     http::StatusCode,
     response::Html,
-    routing::get,
+    routing::{get, post},
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
@@ -29,6 +29,15 @@ pub struct PackageInfo {
     pub upstream: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct SyncWebhookResponse {
+    pub status: String,
+    pub message: String,
+    pub package_count: usize,
+    pub sha256: Option<String>,
+    pub git_updated: bool,
+}
+
 pub struct ForgeServer;
 
 impl ForgeServer {
@@ -45,6 +54,8 @@ impl ForgeServer {
                 get(binhost_catalog_handler),
             )
             .route("/v1/binhost/{march}/{package}", get(binhost_package_handler))
+            .route("/v1/webhook/github", post(github_webhook_handler))
+            .route("/v1/recipes/refresh", post(recipes_refresh_handler))
             .with_state(state)
     }
 
@@ -179,6 +190,93 @@ async fn binhost_package_handler(
     }
     let package_file = state.binhost_dir.join(&march).join(&package);
     std::fs::read(package_file).map_err(|_| StatusCode::NOT_FOUND)
+}
+
+/// Sinkronisasi resep dari Git repo jika tersedia dan bungkus ulang ke recipes.tar.zst
+pub fn sync_and_rebundle_recipes(recipes_dir: &Path, cache_dir: &Path) -> anyhow::Result<(usize, String, bool)> {
+    let mut git_updated = false;
+    let git_dir_candidate1 = recipes_dir.join(".git");
+    let git_dir_candidate2 = recipes_dir.parent().map(|p| p.join(".git"));
+
+    let target_git_dir = if git_dir_candidate1.exists() {
+        Some(recipes_dir)
+    } else if let Some(ref p2) = git_dir_candidate2 {
+        if p2.exists() {
+            recipes_dir.parent()
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
+    if let Some(target_git) = target_git_dir {
+        let output = std::process::Command::new("git")
+            .args(["-C", &target_git.to_string_lossy(), "pull", "--rebase"])
+            .output();
+        if let Ok(out) = output {
+            git_updated = out.status.success();
+        }
+    }
+
+    let tar_file = cache_dir.join("recipes.tar.zst");
+    let hash = ForgeServer::bundle_recipes(recipes_dir, &tar_file)?;
+    let packages = ForgeServer::scan_packages(recipes_dir);
+    Ok((packages.len(), hash, git_updated))
+}
+
+async fn github_webhook_handler(
+    State(state): State<Arc<ServerState>>,
+) -> (StatusCode, Json<SyncWebhookResponse>) {
+    match sync_and_rebundle_recipes(&state.recipes_dir, &state.cache_dir) {
+        Ok((count, hash, git_updated)) => (
+            StatusCode::OK,
+            Json(SyncWebhookResponse {
+                status: "ok".to_string(),
+                message: "Recipes successfully synchronized and rebundled from GitHub webhook".to_string(),
+                package_count: count,
+                sha256: Some(hash),
+                git_updated,
+            }),
+        ),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(SyncWebhookResponse {
+                status: "error".to_string(),
+                message: format!("Failed to synchronize recipes: {:#}", e),
+                package_count: 0,
+                sha256: None,
+                git_updated: false,
+            }),
+        ),
+    }
+}
+
+async fn recipes_refresh_handler(
+    State(state): State<Arc<ServerState>>,
+) -> (StatusCode, Json<SyncWebhookResponse>) {
+    match sync_and_rebundle_recipes(&state.recipes_dir, &state.cache_dir) {
+        Ok((count, hash, git_updated)) => (
+            StatusCode::OK,
+            Json(SyncWebhookResponse {
+                status: "ok".to_string(),
+                message: "Recipes successfully refreshed and rebundled".to_string(),
+                package_count: count,
+                sha256: Some(hash),
+                git_updated,
+            }),
+        ),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(SyncWebhookResponse {
+                status: "error".to_string(),
+                message: format!("Failed to refresh recipes: {:#}", e),
+                package_count: 0,
+                sha256: None,
+                git_updated: false,
+            }),
+        ),
+    }
 }
 
 fn escape_html(s: &str) -> String {
@@ -1558,5 +1656,98 @@ license = "GPL-3.0"
             let pkgs = ForgeServer::scan_packages(&root_recipes);
             assert_eq!(pkgs.len(), 105, "Workspace harus memiliki tepat 105 resep paket");
         }
+    }
+
+    #[tokio::test]
+    async fn test_github_webhook_endpoint_triggers_rebundle() -> anyhow::Result<()> {
+        let temp = tempfile::tempdir()?;
+        let server_recipes_dir = temp.path().join("server_recipes");
+        let base_recipe_dir = server_recipes_dir.join("system").join("base");
+        std::fs::create_dir_all(&base_recipe_dir)?;
+        std::fs::write(
+            base_recipe_dir.join("recipe.toml"),
+            "[package]\nname = \"base\"\nversion = \"1.0.0\"\n",
+        )?;
+
+        let server_cache_dir = temp.path().join("server_cache");
+        let server_binhost_dir = temp.path().join("server_binhost");
+
+        let state = Arc::new(ServerState {
+            recipes_dir: server_recipes_dir.clone(),
+            cache_dir: server_cache_dir.clone(),
+            binhost_dir: server_binhost_dir,
+        });
+
+        let router = ForgeServer::router(state);
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await?;
+        let addr = listener.local_addr()?;
+
+        tokio::spawn(async move {
+            axum::serve(listener, router).await.unwrap();
+        });
+
+        let client = reqwest::Client::new();
+        let webhook_url = format!("http://{}/v1/webhook/github", addr);
+        let resp = client.post(&webhook_url)
+            .header("Content-Type", "application/json")
+            .body(r#"{"action": "push", "ref": "refs/heads/main"}"#)
+            .send()
+            .await?;
+
+        assert_eq!(resp.status(), reqwest::StatusCode::OK);
+        let text = resp.text().await?;
+        let json_body: SyncWebhookResponse = serde_json::from_str(&text)?;
+        assert_eq!(json_body.status, "ok");
+        assert_eq!(json_body.package_count, 1);
+        assert!(json_body.sha256.is_some());
+
+        // Verifikasi file tar.zst dan sha256 benar-benar terbuat
+        let tar_file = server_cache_dir.join("recipes.tar.zst");
+        assert!(tar_file.exists());
+        let hash_file = server_cache_dir.join("recipes.tar.zst.sha256");
+        assert!(hash_file.exists());
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_recipes_refresh_endpoint() -> anyhow::Result<()> {
+        let temp = tempfile::tempdir()?;
+        let server_recipes_dir = temp.path().join("server_recipes");
+        let extra_recipe_dir = server_recipes_dir.join("extra").join("htop");
+        std::fs::create_dir_all(&extra_recipe_dir)?;
+        std::fs::write(
+            extra_recipe_dir.join("recipe.toml"),
+            "[package]\nname = \"htop\"\nversion = \"3.3.0\"\n",
+        )?;
+
+        let server_cache_dir = temp.path().join("server_cache");
+        let server_binhost_dir = temp.path().join("server_binhost");
+
+        let state = Arc::new(ServerState {
+            recipes_dir: server_recipes_dir,
+            cache_dir: server_cache_dir,
+            binhost_dir: server_binhost_dir,
+        });
+
+        let router = ForgeServer::router(state);
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await?;
+        let addr = listener.local_addr()?;
+
+        tokio::spawn(async move {
+            axum::serve(listener, router).await.unwrap();
+        });
+
+        let client = reqwest::Client::new();
+        let refresh_url = format!("http://{}/v1/recipes/refresh", addr);
+        let resp = client.post(&refresh_url).send().await?;
+
+        assert_eq!(resp.status(), reqwest::StatusCode::OK);
+        let text = resp.text().await?;
+        let json_body: SyncWebhookResponse = serde_json::from_str(&text)?;
+        assert_eq!(json_body.status, "ok");
+        assert_eq!(json_body.package_count, 1);
+
+        Ok(())
     }
 }

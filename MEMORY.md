@@ -123,11 +123,11 @@
     * `forge-server index`: Generator global `packages.db.zst`.
     * `forge-server serve`: API daemon (`axum`/`tokio`) & Web Explorer.
 - [x] **Server Profile Manager (`crates/forge-server/src/profiles.rs`):** Modul `ServerProfileManager` (`import_profile`, `load_active_profile`, `list_profiles`, `resolve_profiles_dir`).
-- [x] **HTTP REST API Daemon (`crates/forge-server/src/server.rs`):** Router `axum` & `tokio` melayani `/v1/health`, `/v1/recipes/latest.sha256`, `/v1/recipes/latest.tar.zst`, dan `/v1/binhost/{march}/...`.
-- [x] **Recipe Bundler Engine (`ForgeServer::bundle_recipes`):** Mengompresi direktori recipes menjadi tarball Zstandard deterministik (`recipes.tar.zst`) dan mencatat checksum SHA256 (`recipes.tar.zst.sha256`).
-- [x] **Client Sync Engine (`crates/forge/src/sync.rs`):** Modul `SyncClient::sync_recipes` dengan handshake SHA256, deteksi no-op jika up-to-date, streaming download, validasi kriptografis, ekstraksi atomik Zstandard, dan pembaruan direktori resep resmi `/var/db/forge/recipes/`.
-- [x] **CLI Subcommand `forge sync` & Flag `--server`:** Terintegrasi di `crates/forge/src/main.rs`.
-- [x] **Unit & Integration Tests:** `test_server_import_cpu_profile_saves_active`, `test_server_build_uses_imported_active_profile`, `test_server_build_with_custom_profile_override`, `test_server_list_profiles`, `test_forge_client_build_produces_tarball_without_installing`, `test_forge_server_build_and_import_separation`, `test_forge_server_import_registers_to_catalog`, `test_bundle_recipes_and_hash_generation`, `test_server_health_and_endpoints`, `test_sync_recipes_client_full_cycle`, `test_sync_noop_when_up_to_date` lulus 100%.
+- [x] **GitOps Recipe Registry & GitHub Webhook Auto-Sync (ADR-038):**
+  - Endpoint `POST /v1/webhook/github`: Menerima event push/merge dari GitHub.
+  - Endpoint `POST /v1/recipes/refresh`: Manual on-demand sync & rebundle trigger.
+  - Modul `sync_and_rebundle_recipes`: Otomatis menjalankan `git pull --rebase` jika recipes berupa repository Git, me-regenerasi `recipes.tar.zst`, memperbarui `latest.sha256`, dan me-refresh katalog in-memory Web Explorer.
+- [x] **Unit & Integration Tests:** `test_server_import_cpu_profile_saves_active`, `test_server_build_uses_imported_active_profile`, `test_server_build_with_custom_profile_override`, `test_server_list_profiles`, `test_forge_client_build_produces_tarball_without_installing`, `test_forge_server_build_and_import_separation`, `test_forge_server_import_registers_to_catalog`, `test_bundle_recipes_and_hash_generation`, `test_server_health_and_endpoints`, `test_sync_recipes_client_full_cycle`, `test_sync_noop_when_up_to_date`, `test_github_webhook_endpoint_triggers_rebundle`, `test_recipes_refresh_endpoint` lulus 100%.
 
 ---
 
