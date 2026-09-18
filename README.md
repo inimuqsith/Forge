@@ -1,6 +1,6 @@
 # Forge — The High-Performance Source-First Package Manager
 
-> **Forge** adalah *High-Performance Source-First & Hybrid Package Manager* yang ditulis murni menggunakan bahasa **Rust** untuk distribusi **Kura Linux**. Ditenagai compiler **LLVM**, ultra-fast linker **`mold`**, optimasi **LTO (Thin/Full)**, dan dukungan **PGO**, Forge mengusung filosofi sejati **Gentoo Portage** (*Source-First Native Compilation*, *USE Flags*, *Slots*, *Package Sets*), wizard bootstrap (`forge setup` & `forge system-setup`), serta ekosistem terpisah **`forge-server` (Lock-CPU Build Farm)**.
+> **Forge** adalah *High-Performance Source-First & Hybrid Package Manager* yang ditulis murni menggunakan bahasa **Rust** khusus untuk distribusi **Kura Linux**. Ditenagai compiler **LLVM**, ultra-fast linker **`mold`**, Link-Time Optimization (**LTO Thin/Full**), dan dukungan **PGO**, Forge mengusung filosofi sejati **Gentoo Portage** (*Source-First Native Compilation*, *USE Flags*, *Slots*, *Package Sets*), akselerasi **Ccache (v4.13.5)**, DAG Dependency Resolver, Transactional Merger, wizard bootstrap (`forge setup` & `forge system-setup`), serta ekosistem terpisah **`forge-server` (Lock-CPU Build Farm)**.
 
 ---
 
@@ -8,7 +8,11 @@
 
 - **🦀 Pure Rust & Extreme Optimization:** Ditulis murni dalam Rust, dikompilasi dengan backend LLVM 22, ultra-fast linker `mold`, optimasi Thin LTO, dan flag `-C target-cpu=native`.
 - **🚀 Source-First Native Compilation (Gentoo Mode):** Secara default mengompilasi paket langsung dari kode sumber upstream dengan flag native target (`-O3 -march=native -pipe -flto=thin`) di RAM `tmpfs`.
-- **🌾 Pure Source-Built Seed Toolchain:** Pengemasan `forge toolchain bundle` (`dist/kura-toolchain.tar.xz`) murni 100% dari hasil kompilasi source code di staging tanpa menyalin biner dari host.
+- **⚡ Ccache 4.13.5 Acceleration:** Integrasi otomatis compiler cache untuk memangkas waktu kompilasi ulang hingga 80-90%.
+- **🌾 Pure Source-Built Seed Toolchain (ADR-019):** Pengemasan `forge toolchain bundle` (`dist/kura-toolchain.tar.xz`) murni 100% dari hasil kompilasi source code di staging tanpa menyalin biner dari host.
+- **🌳 DAG Dependency Graph & Cycle Detection:** Resolver dependensi asiklis terarah dengan pemisahan dependensi runtime (`depends`) dan build-time (`makedepends`), evaluasi USE flags, dan pengurutan topologis.
+- **🔒 Transactional Merger & Collision Detector:** Pre-flight scanning untuk mencegah tabrakan berkas dan penggabungan atomik dari staging `$DESTDIR` ke target `$FORGE_ROOT`.
+- **📁 Flat-File Manifest Database:** Pencatatan deterministik berkas, checksum SHA256, dan metadata build di `/var/db/forge/installed/` tanpa ketergantungan DB eksternal yang rapuh.
 - **🎛️ Granular USE Flags:** Mengaktifkan/menonaktifkan fitur perangkat lunak secara presisi di level global (`forge.conf`) atau per-paket (`package.use`).
 - **🏷️ Multi-Version Slots:** Menjalankan beberapa versi mayor paket secara berdampingan tanpa konflik (misal: LLVM 22 vs 21, Python 3.12 & 3.13, GCC multi-versi).
 - **🏗️ Wizard Setup & Bootstrap Distro:**
