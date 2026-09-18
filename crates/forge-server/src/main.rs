@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::*;
-use forge_server::{ForgeServer, ServerBuilder, ServerImporter, ServerIndexer, ServerState};
+use forge_server::{ForgeServer, ServerBuilder, ServerImporter, ServerIndexer, ServerProfileManager, ServerState};
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -36,13 +36,28 @@ enum Commands {
         bundle: bool,
     },
 
-    /// CI/CD Worker: Kompilasi paket yang di-lock ke CPU target menjadi tarball .forge.tar.zst
-    Build {
-        /// Path ke file cpu-profile.json
+    /// Impor berkas profil CPU (cpu-profile.json) dan set sebagai profil aktif CI/CD
+    Import {
+        /// Path ke file profil CPU (cpu-profile.json)
         profile_json: PathBuf,
 
-        /// Nama paket yang akan dikompilasi (misal: base, base-devel, mold)
-        package: Option<String>,
+        /// Direktori penyimpanan profil CPU server
+        #[arg(long)]
+        profiles_dir: Option<PathBuf>,
+
+        /// Simpan profil dengan nama kustom (misal: znver4, custom-ryzen)
+        #[arg(long, name = "as")]
+        r#as: Option<String>,
+    },
+
+    /// CI/CD Worker: Kompilasi paket menggunakan profil CPU aktif yang tersimpan
+    Build {
+        /// Nama paket yang akan dikompilasi (misal: mold, base, curl)
+        package: String,
+
+        /// Override path ke berkas profil CPU custom (opsional)
+        #[arg(long)]
+        profile: Option<PathBuf>,
 
         /// Path direktori resep
         #[arg(long, default_value = "recipes")]
@@ -51,20 +66,25 @@ enum Commands {
         /// Direktori keluaran artefak .forge.tar.zst
         #[arg(long, default_value = "dist")]
         output_dir: PathBuf,
-    },
-
-    /// Ingestion Biner: Impor berkas tarball .forge.tar.zst ke Binhost resmi & perbarui catalog.json
-    Import {
-        /// Path ke berkas tarball biner (.forge.tar.zst)
-        package_tar_zst: PathBuf,
 
         /// Path direktori penyimpanan binhost resmi
         #[arg(long, default_value = "/var/db/forge/binhost")]
         binhost_path: PathBuf,
 
-        /// Override target mikroarsitektur CPU (misal: znver4, x86_64_v3, generic)
+        /// Jangan publikasikan secara otomatis ke binhost
         #[arg(long)]
-        target_march: Option<String>,
+        no_publish: bool,
+
+        /// Direktori profil CPU
+        #[arg(long)]
+        profiles_dir: Option<PathBuf>,
+    },
+
+    /// Tampilkan daftar seluruh profil CPU yang tersimpan di server
+    ListProfiles {
+        /// Direktori penyimpanan profil CPU server
+        #[arg(long)]
+        profiles_dir: Option<PathBuf>,
     },
 
     /// Regenerasi database index repositori biner (packages.db.zst)
@@ -144,30 +164,100 @@ fn main() -> Result<()> {
             })?;
         }
 
-        Commands::Build {
+        Commands::Import {
             profile_json,
-            package,
-            recipes_path,
-            output_dir,
+            profiles_dir,
+            r#as,
         } => {
-            ServerBuilder::build_package(
+            ServerProfileManager::import_profile(
                 &profile_json,
-                package.as_deref(),
-                &recipes_path,
-                &output_dir,
+                profiles_dir.as_deref(),
+                r#as.as_deref(),
             )?;
         }
 
-        Commands::Import {
-            package_tar_zst,
+        Commands::Build {
+            package,
+            profile,
+            recipes_path,
+            output_dir,
             binhost_path,
-            target_march,
+            no_publish,
+            profiles_dir,
         } => {
-            ServerImporter::import_tarball(
-                &package_tar_zst,
-                &binhost_path,
-                target_march.as_deref(),
+            // 1. Tentukan profil CPU yang digunakan
+            let (cpu_profile, source_desc) = ServerProfileManager::load_active_profile(
+                profile.as_deref(),
+                profiles_dir.as_deref(),
             )?;
+
+            println!(
+                "{} Menggunakan Profil CPU [{}]: {} ({})",
+                "[*]".blue(),
+                source_desc.cyan(),
+                cpu_profile.model_name.bold().green(),
+                cpu_profile.target_march.bold().yellow()
+            );
+
+            // 2. Kompilasi paket di staging terisolasi dan kemas ke .forge.tar.zst
+            let built_tarball = ServerBuilder::build_package(
+                &cpu_profile,
+                Some(&package),
+                &recipes_path,
+                &output_dir,
+            )?;
+
+            // 3. Otomatis publikasikan ke Binhost resmi kecuali --no-publish
+            if !no_publish {
+                println!(
+                    "{} Mempublikasikan biner ke Binhost resmi...",
+                    "[*]".blue()
+                );
+                ServerImporter::import_tarball(
+                    &built_tarball,
+                    &binhost_path,
+                    Some(&cpu_profile.target_march),
+                )?;
+            }
+        }
+
+        Commands::ListProfiles { profiles_dir } => {
+            let entries = ServerProfileManager::list_profiles(profiles_dir.as_deref())?;
+            let dir = ServerProfileManager::resolve_profiles_dir(profiles_dir.as_deref());
+
+            println!("{}", "=== Forge Server CPU Profiles ===".bold().cyan());
+            println!("Direktori Profil: {}\n", dir.display().to_string().yellow());
+
+            if entries.is_empty() {
+                println!(
+                    "  {} Belum ada profil CPU yang tersimpan.",
+                    "[!]".yellow()
+                );
+                println!(
+                    "  Jalankan '{}' untuk mengimpor profil silikon.",
+                    "forge-server import <cpu-profile.json>".bold().green()
+                );
+            } else {
+                for entry in &entries {
+                    let status = if entry.is_active {
+                        "[AKTIF]".bold().green()
+                    } else {
+                        "[     ]".dimmed()
+                    };
+                    println!(
+                        "  {} {} ({}) - {}",
+                        status,
+                        entry.name.bold(),
+                        entry.march.bold().yellow(),
+                        entry.model_name
+                    );
+                    println!(
+                        "       Path: {}",
+                        entry.path.display().to_string().cyan()
+                    );
+                    println!("       ISA : {}", entry.isa_summary.dimmed());
+                }
+            }
         }
 
         Commands::Index { storage_path } => {

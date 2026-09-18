@@ -213,17 +213,222 @@ impl ServerImporter {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{ServerBuilder, ServerProfileManager};
     use forge::CpuProfile;
+
+    #[test]
+    fn test_server_import_cpu_profile_saves_active() -> Result<()> {
+        let temp = tempfile::tempdir()?;
+        let temp_path = temp.path();
+        let profiles_dir = temp_path.join("profiles");
+
+        // 1. Buat dummy cpu-profile.json
+        let src_profile_path = temp_path.join("cpu-profile.json");
+        let profile = CpuProfile::mock("znver4", &["avx512f", "avx512dq", "vaes"]);
+        fs::write(&src_profile_path, profile.to_json()?)?;
+
+        // 2. Import profil ke server
+        let (imported, active_path) = ServerProfileManager::import_profile(
+            &src_profile_path,
+            Some(&profiles_dir),
+            None,
+        )?;
+
+        assert_eq!(imported.target_march, "znver4");
+        assert_eq!(imported.model_name, "Mock Processor");
+
+        // 3. Verifikasi file <profiles_dir>/znver4.json ada
+        let march_json = profiles_dir.join("znver4.json");
+        assert!(march_json.exists(), "File znver4.json harus ada di profiles_dir");
+
+        // 4. Verifikasi active.json ada dan isinya cocok
+        assert!(active_path.exists(), "File active.json harus ada di profiles_dir");
+        let active_content = fs::read_to_string(&active_path)?;
+        let active_profile: CpuProfile = serde_json::from_str(&active_content)?;
+        assert_eq!(active_profile.target_march, "znver4");
+        assert_eq!(active_profile.model_name, "Mock Processor");
+
+        // 5. Import dengan parameter --as custom-name
+        let (custom_imported, _) = ServerProfileManager::import_profile(
+            &src_profile_path,
+            Some(&profiles_dir),
+            Some("custom-ryzen"),
+        )?;
+        assert_eq!(custom_imported.target_march, "znver4");
+        assert!(
+            profiles_dir.join("custom-ryzen.json").exists(),
+            "File custom-ryzen.json harus dibuat"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_server_build_uses_imported_active_profile() -> Result<()> {
+        let temp = tempfile::tempdir()?;
+        let temp_path = temp.path();
+
+        let profiles_dir = temp_path.join("profiles");
+        let recipes_dir = temp_path.join("recipes");
+        let dist_dir = temp_path.join("dist");
+        let binhost_dir = temp_path.join("binhost");
+
+        // 1. Siapkan profil znver4 dan impor sebagai profil aktif
+        let profile_path = temp_path.join("cpu-profile.json");
+        let profile = CpuProfile::mock("znver4", &["avx512f", "vaes"]);
+        fs::write(&profile_path, profile.to_json()?)?;
+        ServerProfileManager::import_profile(&profile_path, Some(&profiles_dir), None)?;
+
+        // 2. Siapkan resep base
+        let base_dir = recipes_dir.join("system").join("base");
+        fs::create_dir_all(&base_dir)?;
+        fs::write(
+            base_dir.join("recipe.toml"),
+            r#"
+[package]
+name = "base"
+version = "1.0.0"
+release = 1
+slot = "0"
+description = "Base Package"
+
+[build]
+type = "meta"
+script = """
+mkdir -p "$DESTDIR/etc"
+echo "Kura Linux" > "$DESTDIR/etc/release"
+"""
+"#,
+        )?;
+
+        // 3. Muat profil aktif (tanpa override)
+        let (active_profile, source) = ServerProfileManager::load_active_profile(
+            None,
+            Some(&profiles_dir),
+        )?;
+        assert_eq!(active_profile.target_march, "znver4");
+        assert!(source.contains("active"));
+
+        // 4. Jalankan build menggunakan profil aktif
+        let built_tarball = ServerBuilder::build_package(
+            &active_profile,
+            Some("base"),
+            &recipes_dir,
+            &dist_dir,
+        )?;
+
+        assert!(built_tarball.exists());
+        assert_eq!(built_tarball, dist_dir.join("base-1.0.0-znver4.forge.tar.zst"));
+
+        // 5. Publikasikan ke binhost
+        let entry = ServerImporter::import_tarball(
+            &built_tarball,
+            &binhost_dir,
+            Some(&active_profile.target_march),
+        )?;
+        assert_eq!(entry.pkgname, "base");
+        assert_eq!(entry.target_march, "znver4");
+        assert!(binhost_dir.join("znver4").join("catalog.json").exists());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_server_build_with_custom_profile_override() -> Result<()> {
+        let temp = tempfile::tempdir()?;
+        let temp_path = temp.path();
+
+        let profiles_dir = temp_path.join("profiles");
+        let recipes_dir = temp_path.join("recipes");
+        let dist_dir = temp_path.join("dist");
+
+        // 1. Set profil aktif sebagai znver4
+        let znver4_path = temp_path.join("znver4.json");
+        let znver4_profile = CpuProfile::mock("znver4", &["avx512f"]);
+        fs::write(&znver4_path, znver4_profile.to_json()?)?;
+        ServerProfileManager::import_profile(&znver4_path, Some(&profiles_dir), None)?;
+
+        // 2. Buat berkas profil custom override untuk alderlake
+        let custom_path = temp_path.join("custom-alderlake.json");
+        let alderlake_profile = CpuProfile::mock("alderlake", &["avx2"]);
+        fs::write(&custom_path, alderlake_profile.to_json()?)?;
+
+        // 3. Muat profil dengan flag override --profile custom_path
+        let (loaded_profile, source) = ServerProfileManager::load_active_profile(
+            Some(&custom_path),
+            Some(&profiles_dir),
+        )?;
+        assert_eq!(loaded_profile.target_march, "alderlake");
+        assert!(source.contains("custom"));
+
+        // 4. Siapkan resep base
+        let base_dir = recipes_dir.join("system").join("base");
+        fs::create_dir_all(&base_dir)?;
+        fs::write(
+            base_dir.join("recipe.toml"),
+            r#"
+[package]
+name = "base"
+version = "1.0.0"
+release = 1
+slot = "0"
+description = "Base Package"
+"#,
+        )?;
+
+        // 5. Build dengan profil override
+        let built_tarball = ServerBuilder::build_package(
+            &loaded_profile,
+            Some("base"),
+            &recipes_dir,
+            &dist_dir,
+        )?;
+
+        assert!(built_tarball.exists());
+        assert_eq!(built_tarball, dist_dir.join("base-1.0.0-alderlake.forge.tar.zst"));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_server_list_profiles() -> Result<()> {
+        let temp = tempfile::tempdir()?;
+        let temp_path = temp.path();
+        let profiles_dir = temp_path.join("profiles");
+
+        // 1. Impor profil znver4 (menjadi active)
+        let znver4_path = temp_path.join("znver4.json");
+        let znver4_profile = CpuProfile::mock("znver4", &["avx512f", "vaes"]);
+        fs::write(&znver4_path, znver4_profile.to_json()?)?;
+        ServerProfileManager::import_profile(&znver4_path, Some(&profiles_dir), None)?;
+
+        // 2. Buat profil x86-64-v3 (hanya simpan di profiles_dir tanpa menimpa active.json)
+        let v3_path = profiles_dir.join("x86-64-v3.json");
+        let v3_profile = CpuProfile::mock("x86-64-v3", &["avx2", "fma"]);
+        fs::write(&v3_path, v3_profile.to_json()?)?;
+
+        // 3. List profiles
+        let list = ServerProfileManager::list_profiles(Some(&profiles_dir))?;
+        assert_eq!(list.len(), 2);
+
+        let znver4_entry = list.iter().find(|p| p.name == "znver4").expect("znver4 harus ada");
+        assert!(znver4_entry.is_active, "znver4 harus ditandai aktif");
+        assert_eq!(znver4_entry.march, "znver4");
+
+        let v3_entry = list.iter().find(|p| p.name == "x86-64-v3").expect("x86-64-v3 harus ada");
+        assert!(!v3_entry.is_active, "x86-64-v3 TIDAK boleh aktif");
+        assert_eq!(v3_entry.march, "x86-64-v3");
+
+        Ok(())
+    }
 
     #[test]
     fn test_forge_server_build_and_import_separation() -> Result<()> {
         let temp = tempfile::tempdir()?;
         let temp_path = temp.path();
 
-        // 1. Siapkan cpu-profile.json untuk AMD Ryzen 7 8845HS / znver4
-        let profile_json_path = temp_path.join("cpu-profile.json");
+        // 1. Siapkan cpu-profile untuk AMD Ryzen 7 8845HS / znver4
         let profile = CpuProfile::mock("znver4", &["avx512f", "avx512dq", "vaes", "sha_ni"]);
-        fs::write(&profile_json_path, profile.to_json()?)?;
 
         // 2. Siapkan recipes
         let recipes_dir = temp_path.join("recipes");
@@ -251,8 +456,8 @@ echo "Kura Linux Base v1.0.0" > "$DESTDIR/etc/kura-release"
         let binhost_dir = temp_path.join("binhost");
 
         // STEP 1: Run ServerBuilder::build_package (BUILD ONLY)
-        let built_tarball = crate::ServerBuilder::build_package(
-            &profile_json_path,
+        let built_tarball = ServerBuilder::build_package(
+            &profile,
             Some("base"),
             &recipes_dir,
             &dist_dir,
@@ -298,9 +503,7 @@ echo "Kura Linux Base v1.0.0" > "$DESTDIR/etc/kura-release"
         let temp = tempfile::tempdir()?;
         let temp_path = temp.path();
 
-        let profile_json_path = temp_path.join("cpu-profile.json");
         let profile = CpuProfile::mock("znver4", &["avx512f", "vaes"]);
-        fs::write(&profile_json_path, profile.to_json()?)?;
 
         let recipes_dir = temp_path.join("recipes");
         let base_dir = recipes_dir.join("system").join("base");
@@ -336,16 +539,16 @@ description = "Modern Linker"
         let binhost_dir = temp_path.join("binhost");
 
         // Build 1: base
-        let base_tarball = crate::ServerBuilder::build_package(
-            &profile_json_path,
+        let base_tarball = ServerBuilder::build_package(
+            &profile,
             Some("base"),
             &recipes_dir,
             &dist_dir,
         )?;
 
         // Build 2: mold
-        let mold_tarball = crate::ServerBuilder::build_package(
-            &profile_json_path,
+        let mold_tarball = ServerBuilder::build_package(
+            &profile,
             Some("mold"),
             &recipes_dir,
             &dist_dir,

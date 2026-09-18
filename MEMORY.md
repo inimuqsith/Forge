@@ -114,14 +114,20 @@
 ### Fase 10: Server Suite & CI/CD Builder (`forge-server`) & Client Sync Engine
 **Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] Implementasi CLI suite `forge-server` di [`crates/forge-server/src/main.rs`](crates/forge-server/src/main.rs).
-- [x] **Pemisahan Perintah Build & Import (ADR-036):**
-  - **Klien `forge`:** Sub-perintah `forge build <pkg> [--output-dir <DIR>]` untuk kompilasi lokal ke `.forge.tar.zst` tanpa mengotori host rootfs `/`, `forge install <pkg>` untuk kompilasi + transactional atomic merge, dan `forge recipe-import <url|file>` untuk transpilasi resep upstream.
-  - **Server `forge-server`:** Sub-perintah `forge-server build <cpu-profile.json> [pkg] [--recipes-path <PATH>] [--output-dir <PATH>]` (CI/CD Worker Lock-CPU), `forge-server import <binary.forge.tar.zst> [--binhost-path <PATH>] [--target-march <MARCH>]` (Binary Ingestion ke binhost & `catalog.json`), `forge-server index` (Generator global `packages.db.zst`), dan `forge-server serve` (API daemon & Web Explorer).
+- [x] **Pemisahan Perintah Build & Import & Ergonomis CPU Profile Storage (ADR-036, ADR-037):**
+  - **Klien `forge`:** Sub-perintah `forge build <pkg> [--output-dir <DIR>]` untuk kompilasi lokal ke `.forge.tar.zst` tanpa mengotori host rootfs `/`, `forge install <pkg>` untuk kompilasi + transactional atomic merge, `forge cpu-dump` untuk mengekstrak profil silikon CPU, dan `forge recipe-import <url|file>` untuk transpilasi resep upstream.
+  - **Server `forge-server`:**
+    * `forge-server import <cpu-profile.json> [--profiles-dir <PATH>] [--as <NAME>]`: Ingestion profil CPU target silikon ke `/var/db/forge/profiles/<march>.json` dan mengesetnya sebagai profil aktif (`active.json`).
+    * `forge-server build <PACKAGE> [--profile <PATH>] [--recipes-path <PATH>] [--output-dir <PATH>] [--binhost-path <PATH>] [--no-publish]`: CI/CD Worker otomatis menggunakan profil CPU aktif yang tersimpan (atau custom override), mengompilasi resep di staging sandbox terisolasi, mengemas `.forge.tar.zst`, dan otomatis mempublikasikannya ke `/var/db/forge/binhost/<march>/` & memperbarui `catalog.json`.
+    * `forge-server list-profiles [--profiles-dir <PATH>]`: Menampilkan daftar seluruh profil CPU yang tersimpan dan menandai profil yang aktif.
+    * `forge-server index`: Generator global `packages.db.zst`.
+    * `forge-server serve`: API daemon (`axum`/`tokio`) & Web Explorer.
+- [x] **Server Profile Manager (`crates/forge-server/src/profiles.rs`):** Modul `ServerProfileManager` (`import_profile`, `load_active_profile`, `list_profiles`, `resolve_profiles_dir`).
 - [x] **HTTP REST API Daemon (`crates/forge-server/src/server.rs`):** Router `axum` & `tokio` melayani `/v1/health`, `/v1/recipes/latest.sha256`, `/v1/recipes/latest.tar.zst`, dan `/v1/binhost/{march}/...`.
 - [x] **Recipe Bundler Engine (`ForgeServer::bundle_recipes`):** Mengompresi direktori recipes menjadi tarball Zstandard deterministik (`recipes.tar.zst`) dan mencatat checksum SHA256 (`recipes.tar.zst.sha256`).
 - [x] **Client Sync Engine (`crates/forge/src/sync.rs`):** Modul `SyncClient::sync_recipes` dengan handshake SHA256, deteksi no-op jika up-to-date, streaming download, validasi kriptografis, ekstraksi atomik Zstandard, dan pembaruan direktori resep resmi `/var/db/forge/recipes/`.
 - [x] **CLI Subcommand `forge sync` & Flag `--server`:** Terintegrasi di `crates/forge/src/main.rs`.
-- [x] **Unit & Integration Tests:** `test_forge_client_build_produces_tarball_without_installing`, `test_forge_server_build_and_import_separation`, `test_forge_server_import_registers_to_catalog`, `test_bundle_recipes_and_hash_generation`, `test_server_health_and_endpoints`, `test_sync_recipes_client_full_cycle`, `test_sync_noop_when_up_to_date` lulus 100%.
+- [x] **Unit & Integration Tests:** `test_server_import_cpu_profile_saves_active`, `test_server_build_uses_imported_active_profile`, `test_server_build_with_custom_profile_override`, `test_server_list_profiles`, `test_forge_client_build_produces_tarball_without_installing`, `test_forge_server_build_and_import_separation`, `test_forge_server_import_registers_to_catalog`, `test_bundle_recipes_and_hash_generation`, `test_server_health_and_endpoints`, `test_sync_recipes_client_full_cycle`, `test_sync_noop_when_up_to_date` lulus 100%.
 
 ---
 
@@ -190,6 +196,7 @@
 34. **ADR-034 (Bubblewrap Sandbox Build Isolation):** Mengisolasi siklus eksekusi script build dengan memetakan filesystem host 100% Read-Only (`--ro-bind / /`), hanya mengizinkan penulisan pada direktori build RAM dan staging `$DESTDIR`, serta unshare namespace lengkap dengan graceful fallback mode jika `bwrap` belum terpasang.
 35. **ADR-035 (ALPM DB Tarball Parser & Recursive Anti-Brick Resolver):** Mem-parsing arsip database repositori `.db.tar.zst` CachyOS dan berkas `desc` secara native, serta melakukan penelusuran graf dependensi rekursif (DFS Topological Sort) yang secara otomatis menolak dan memfilter paket Core OS yang masuk dalam blacklist demi stabilitas Kura Linux.
 36. **ADR-036 (Pemisahan Tanggung Jawab Command Build & Import):** Memisahkan secara ketat siklus kompilasi (`build`) dan siklus ingestion/registrasi (`import`) di klien `forge` dan server `forge-server`. `forge build` hanya mengompilasi dan mengemas ke `.forge.tar.zst` tanpa instalasi ke rootfs `/`. `forge-server build` bertindak sebagai CI/CD Worker murni, sedangkan `forge-server import` bertindak sebagai Binary Ingester yang memverifikasi metadata, memindahkan tarball ke direktori binhost resmi `/var/db/forge/binhost/<march>/`, dan memperbarui `catalog.json`.
+37. **ADR-037 (Ergonomis Penyimpanan Profil CPU & CI/CD Streamlined Build Server):** Menyederhanakan alur kerja server CI/CD dengan mengizinkan `forge-server import <cpu-profile.json>` menyimpan profil silikon CPU ke `/var/db/forge/profiles/<march>.json` dan mengesetnya sebagai profil aktif (`active.json`), sehingga perintah `forge-server build <PACKAGE>` dapat langsung dijalankan berulang-ulang tanpa perlu mengetikkan path JSON berkali-kali, mengompilasi di staging sandbox terisolasi, mengemas tarball biner, dan otomatis mempublikasikannya ke `/var/db/forge/binhost/<march>/` & `catalog.json` (dengan opsi override `--profile` dan `--no-publish`).
 
 ---
 
@@ -214,6 +221,7 @@
 | *2026-09-19* | *Importer & 100 Resep* | *Katalog resep kosong dan kebutuhan konversi PKGBUILD/APKBUILD upstream secara deterministik* | *Membangun `RecipeImporter` engine (`importer.rs`), CLI `forge recipe-import`, dan menyusun 105 resep paket esensial Kura Linux di `recipes/` (ADR-032)* |
 | *2026-09-19* | *Concurrency & Sandbox* | *Risiko tabrakan transaksi simultan, polusi host filesystem saat build, dan dependensi biner tier 2 berantai* | *Mengimplementasikan `ForgeLockGuard` (`lock.rs`), `SandboxRunner` (`sandbox.rs`) dengan Bubblewrap / fallback, serta parser ALPM `.db.tar.zst` & resolver dependensi rekursif (`cachyos.rs`) (ADR-033, ADR-034, ADR-035)* |
 | *2026-09-19* | *Build vs Import* | *Pencampuran tanggung jawab build dan import pada server/klien membingungkan alur CI/CD* | *Menerapkan pemisahan `build` (kompilasi & packaging) dan `import` (ingestion & cataloging) secara independen (ADR-036)* |
+| *2026-09-19* | *Ergonomi CI/CD* | *Kebutuhan mengetik path profil CPU berulang kali saat kompilasi paket CI/CD di server* | *Menerapkan `ServerProfileManager` (`profiles.rs`), `forge-server import <cpu-profile.json>` untuk persistensi profil aktif (`active.json`), `forge-server build <PACKAGE>` otomatis menggunakan profil aktif & auto-publish ke binhost, serta `forge-server list-profiles` (ADR-037)* |
 
 ---
 
