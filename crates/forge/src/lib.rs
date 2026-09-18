@@ -171,10 +171,19 @@ impl Default for ForgeConfig {
 
 impl ForgeConfig {
     pub fn load_or_default(path: Option<&Path>) -> Self {
-        let conf_path = path.unwrap_or_else(|| Path::new("/etc/forge/forge.conf"));
-        if let Ok(content) = fs::read_to_string(conf_path) {
-            if let Ok(conf) = toml::from_str::<ForgeConfig>(&content) {
-                return conf;
+        let env_path = std::env::var("FORGE_CONFIG").ok().map(std::path::PathBuf::from);
+        let candidates = [
+            path,
+            env_path.as_deref(),
+            Some(Path::new("/etc/forge/forge.conf")),
+            Some(Path::new("config/forge.conf")),
+        ];
+
+        for cand in candidates.into_iter().flatten() {
+            if let Ok(content) = fs::read_to_string(cand) {
+                if let Ok(conf) = toml::from_str::<ForgeConfig>(&content) {
+                    return conf;
+                }
             }
         }
         Self::default()

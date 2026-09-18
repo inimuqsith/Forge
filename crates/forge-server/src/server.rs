@@ -1,5 +1,5 @@
 use axum::{
-    extract::State,
+    extract::{Path as AxumPath, State},
     http::StatusCode,
     routing::get,
     Router,
@@ -12,6 +12,7 @@ use std::sync::Arc;
 pub struct ServerState {
     pub recipes_dir: PathBuf,
     pub cache_dir: PathBuf,
+    pub binhost_dir: PathBuf,
 }
 
 pub struct ForgeServer;
@@ -23,6 +24,11 @@ impl ForgeServer {
             .route("/v1/health", get(health_handler))
             .route("/v1/recipes/latest.sha256", get(recipes_hash_handler))
             .route("/v1/recipes/latest.tar.zst", get(recipes_tarball_handler))
+            .route(
+                "/v1/binhost/{march}/catalog.json",
+                get(binhost_catalog_handler),
+            )
+            .route("/v1/binhost/{march}/{package}", get(binhost_package_handler))
             .with_state(state)
     }
 
@@ -64,6 +70,34 @@ async fn recipes_tarball_handler(
 ) -> Result<Vec<u8>, StatusCode> {
     let tar_file = state.cache_dir.join("recipes.tar.zst");
     std::fs::read(tar_file).map_err(|_| StatusCode::NOT_FOUND)
+}
+
+async fn binhost_catalog_handler(
+    State(state): State<Arc<ServerState>>,
+    AxumPath(march): AxumPath<String>,
+) -> Result<String, StatusCode> {
+    if march.contains("..") || march.contains('/') || march.contains('\\') {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    let catalog_file = state.binhost_dir.join(&march).join("catalog.json");
+    std::fs::read_to_string(catalog_file).map_err(|_| StatusCode::NOT_FOUND)
+}
+
+async fn binhost_package_handler(
+    State(state): State<Arc<ServerState>>,
+    AxumPath((march, package)): AxumPath<(String, String)>,
+) -> Result<Vec<u8>, StatusCode> {
+    if march.contains("..")
+        || march.contains('/')
+        || march.contains('\\')
+        || package.contains("..")
+        || package.contains('/')
+        || package.contains('\\')
+    {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    let package_file = state.binhost_dir.join(&march).join(&package);
+    std::fs::read(package_file).map_err(|_| StatusCode::NOT_FOUND)
 }
 
 #[cfg(test)]
@@ -118,12 +152,14 @@ description = "Kura Linux Base Meta Package"
         )?;
 
         let cache_dir = temp.path().join("cache");
+        let binhost_dir = temp.path().join("binhost");
         let tar_file = cache_dir.join("recipes.tar.zst");
         let bundle_hash = ForgeServer::bundle_recipes(&recipes_dir, &tar_file)?;
 
         let state = Arc::new(ServerState {
             recipes_dir: recipes_dir.clone(),
             cache_dir: cache_dir.clone(),
+            binhost_dir: binhost_dir.clone(),
         });
 
         let router = ForgeServer::router(state);
@@ -168,6 +204,96 @@ description = "Kura Linux Base Meta Package"
     }
 
     #[tokio::test]
+    async fn test_binhost_catalog_and_package_endpoints() -> anyhow::Result<()> {
+        let temp = tempfile::tempdir()?;
+        let recipes_dir = temp.path().join("recipes");
+        let cache_dir = temp.path().join("cache");
+        let binhost_dir = temp.path().join("binhost");
+
+        let znver4_dir = binhost_dir.join("znver4");
+        std::fs::create_dir_all(&znver4_dir)?;
+
+        let catalog_sample = r#"{
+  "timestamp": 1726700000,
+  "server_version": "0.1.0",
+  "packages": [
+    {
+      "pkgname": "base",
+      "pkgver": "1.0.0",
+      "pkgrel": 1,
+      "slot": "0",
+      "target_march": "znver4",
+      "active_use": [],
+      "sha256": "abcdef1234567890",
+      "size_bytes": 1024,
+      "download_url": "base.forge.tar.zst"
+    }
+  ]
+}"#;
+        std::fs::write(znver4_dir.join("catalog.json"), catalog_sample)?;
+
+        let fake_package_bytes = b"kura-linux-package-binary-data";
+        std::fs::write(
+            znver4_dir.join("base.forge.tar.zst"),
+            fake_package_bytes,
+        )?;
+
+        let state = Arc::new(ServerState {
+            recipes_dir,
+            cache_dir,
+            binhost_dir,
+        });
+
+        let router = ForgeServer::router(state);
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await?;
+        let addr = listener.local_addr()?;
+
+        tokio::spawn(async move {
+            axum::serve(listener, router).await.unwrap();
+        });
+
+        let client = reqwest::Client::new();
+
+        // 1. Valid catalog endpoint
+        let catalog_resp = client
+            .get(format!("http://{}/v1/binhost/znver4/catalog.json", addr))
+            .send()
+            .await?;
+        assert_eq!(catalog_resp.status(), reqwest::StatusCode::OK);
+        let catalog_text = catalog_resp.text().await?;
+        assert!(catalog_text.contains("znver4"));
+        assert!(catalog_text.contains("base"));
+
+        // 2. Valid package binary endpoint
+        let pkg_resp = client
+            .get(format!("http://{}/v1/binhost/znver4/base.forge.tar.zst", addr))
+            .send()
+            .await?;
+        assert_eq!(pkg_resp.status(), reqwest::StatusCode::OK);
+        let pkg_bytes = pkg_resp.bytes().await?;
+        assert_eq!(&pkg_bytes[..], fake_package_bytes);
+
+        // 3. Nonexistent catalog endpoint
+        let non_cat_resp = client
+            .get(format!("http://{}/v1/binhost/intel_core/catalog.json", addr))
+            .send()
+            .await?;
+        assert_eq!(non_cat_resp.status(), reqwest::StatusCode::NOT_FOUND);
+
+        // 4. Nonexistent package endpoint
+        let non_pkg_resp = client
+            .get(format!(
+                "http://{}/v1/binhost/znver4/nonexistent.forge.tar.zst",
+                addr
+            ))
+            .send()
+            .await?;
+        assert_eq!(non_pkg_resp.status(), reqwest::StatusCode::NOT_FOUND);
+
+        Ok(())
+    }
+
+    #[tokio::test]
     async fn test_sync_recipes_client_full_cycle() -> anyhow::Result<()> {
         let temp = tempfile::tempdir()?;
         let server_recipes_dir = temp.path().join("server_recipes");
@@ -181,12 +307,14 @@ description = "Kura Linux Base Meta Package"
         )?;
 
         let server_cache_dir = temp.path().join("server_cache");
+        let server_binhost_dir = temp.path().join("server_binhost");
         let tar_file = server_cache_dir.join("recipes.tar.zst");
         let bundle_hash = ForgeServer::bundle_recipes(&server_recipes_dir, &tar_file)?;
 
         let state = Arc::new(ServerState {
             recipes_dir: server_recipes_dir,
             cache_dir: server_cache_dir,
+            binhost_dir: server_binhost_dir,
         });
 
         let router = ForgeServer::router(state);
@@ -239,12 +367,14 @@ description = "Kura Linux Base Meta Package"
         )?;
 
         let server_cache_dir = temp.path().join("server_cache");
+        let server_binhost_dir = temp.path().join("server_binhost");
         let tar_file = server_cache_dir.join("recipes.tar.zst");
         ForgeServer::bundle_recipes(&server_recipes_dir, &tar_file)?;
 
         let state = Arc::new(ServerState {
             recipes_dir: server_recipes_dir,
             cache_dir: server_cache_dir,
+            binhost_dir: server_binhost_dir,
         });
 
         let router = ForgeServer::router(state);

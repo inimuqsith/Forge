@@ -74,9 +74,21 @@ impl SyncClient {
         }
 
         // 4. Ekstraksi Atomik Zstandard
+        if let Err(e) = std::fs::create_dir_all(cache_dir) {
+            if e.kind() == std::io::ErrorKind::PermissionDenied {
+                let fallback_cache = std::env::temp_dir().join("forge").join("cache").join("sync");
+                let fallback_recipes = if std::fs::create_dir_all(target_recipes_dir).is_err() {
+                    std::env::temp_dir().join("forge").join("recipes")
+                } else {
+                    target_recipes_dir.to_path_buf()
+                };
+                println!("  [!] Izin sistem terbatas di {}. Mengalihkan cache & sync ke: {}", cache_dir.display(), fallback_recipes.display());
+                return Box::pin(Self::sync_recipes(server_url, &fallback_recipes, &fallback_cache)).await;
+            }
+            return Err(e).context(format!("Gagal membuat direktori cache: {}", cache_dir.display()));
+        }
+
         let temp_archive = cache_dir.join("recipes_sync.tar.zst");
-        std::fs::create_dir_all(cache_dir)
-            .with_context(|| format!("Gagal membuat direktori cache: {}", cache_dir.display()))?;
         std::fs::write(&temp_archive, &archive_bytes)
             .with_context(|| format!("Gagal menyimpan arsip sementara ke {}", temp_archive.display()))?;
 
@@ -91,8 +103,14 @@ impl SyncClient {
             .context("Gagal mengekstrak tarball resep ke staging")?;
 
         // 5. Pindahkan ke direktori resep resmi
-        std::fs::create_dir_all(target_recipes_dir)
-            .with_context(|| format!("Gagal membuat target direktori resep: {}", target_recipes_dir.display()))?;
+        if let Err(e) = std::fs::create_dir_all(target_recipes_dir) {
+            if e.kind() == std::io::ErrorKind::PermissionDenied {
+                let fallback_recipes = std::env::temp_dir().join("forge").join("recipes");
+                println!("  [!] Izin sistem terbatas di {}. Mengalihkan sync resep ke: {}", target_recipes_dir.display(), fallback_recipes.display());
+                return Box::pin(Self::sync_recipes(server_url, &fallback_recipes, cache_dir)).await;
+            }
+            return Err(e).context(format!("Gagal membuat target direktori resep: {}", target_recipes_dir.display()));
+        }
 
         for entry in std::fs::read_dir(&staging_extract)? {
             let entry = entry?;

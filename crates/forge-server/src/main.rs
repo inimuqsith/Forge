@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::*;
-use forge_server::{ForgeServer, ServerState};
+use forge_server::{ForgeServer, ServerImporter, ServerState};
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -28,6 +28,9 @@ enum Commands {
         #[arg(long, default_value = "/var/cache/forge/server")]
         cache_path: PathBuf,
 
+        #[arg(long, default_value = "/var/db/forge/binhost")]
+        binhost_path: PathBuf,
+
         /// Bundel ulang recipes sebelum menjalankan server
         #[arg(long)]
         bundle: bool,
@@ -35,13 +38,19 @@ enum Commands {
 
     /// CI/CD: Kompilasi paket yang di-lock ke CPU target & upload ke Binary Library
     Import {
+        /// Path ke file cpu-profile.json
+        #[arg(help = "Path ke berkas cpu-profile.json")]
+        profile_json: PathBuf,
+
         /// Nama paket yang akan dikompilasi (misal: base, base-devel, mold)
-        #[arg(help = "Nama paket atau meta-paket yang akan di-build")]
+        #[arg(help = "Nama paket atau meta-paket yang akan di-build (opsional)")]
         package: Option<String>,
 
-        /// Kunci arsitektur CPU target (misal: znver4, alderlake, x86-64-v4)
-        #[arg(long)]
-        target_cpu: Option<String>,
+        #[arg(long, default_value = "recipes")]
+        recipes_path: PathBuf,
+
+        #[arg(long, default_value = "/var/db/forge/binhost")]
+        binhost_path: PathBuf,
     },
 
     /// Regenerasi database index repositori biner (packages.db.zst)
@@ -60,39 +69,57 @@ fn main() -> Result<()> {
             bind,
             recipes_path,
             cache_path,
+            binhost_path,
             bundle,
         } => {
             println!("{}", "=== Forge Central Server ===".bold().cyan());
             println!("{} Inisialisasi Server Daemon...", "[*]".blue());
             println!("  - Recipes Directory : {}", recipes_path.display());
             println!("  - Cache Directory   : {}", cache_path.display());
+            println!("  - Binhost Directory : {}", binhost_path.display());
 
             let tar_file = cache_path.join("recipes.tar.zst");
             let sha_file = cache_path.join("recipes.tar.zst.sha256");
 
             if bundle || !tar_file.exists() || !sha_file.exists() {
                 if recipes_path.exists() {
-                    println!("{} Mengemas direktori recipes menjadi tarball Zstandard...", "[*]".blue());
+                    println!(
+                        "{} Mengemas direktori recipes menjadi tarball Zstandard...",
+                        "[*]".blue()
+                    );
                     match ForgeServer::bundle_recipes(&recipes_path, &tar_file) {
                         Ok(hash) => {
-                            println!("{} Resep berhasil dikemas! SHA256: {}", "✓".green(), hash.bold().yellow());
+                            println!(
+                                "{} Resep berhasil dikemas! SHA256: {}",
+                                "✓".green(),
+                                hash.bold().yellow()
+                            );
                         }
                         Err(e) => {
                             eprintln!("{} Gagal mengemas recipes: {:#}", "✗".red(), e);
                         }
                     }
                 } else {
-                    println!("{} Direktori recipes '{}' tidak ditemukan. Lewati bundling otomatis.", "[!]".yellow(), recipes_path.display());
+                    println!(
+                        "{} Direktori recipes '{}' tidak ditemukan. Lewati bundling otomatis.",
+                        "[!]".yellow(),
+                        recipes_path.display()
+                    );
                 }
             }
 
             let state = Arc::new(ServerState {
                 recipes_dir: recipes_path,
                 cache_dir: cache_path,
+                binhost_dir: binhost_path,
             });
 
             let app = ForgeServer::router(state);
-            println!("{} Menjalankan Recipe Registry & Binhost API di: {}", "[✓]".green(), bind.bold().yellow());
+            println!(
+                "{} Menjalankan Recipe Registry & Binhost API di: {}",
+                "[✓]".green(),
+                bind.bold().yellow()
+            );
             println!("Melayani sinkronisasi klien...");
 
             let rt = tokio::runtime::Runtime::new()?;
@@ -103,22 +130,26 @@ fn main() -> Result<()> {
             })?;
         }
 
-        Commands::Import { package, target_cpu } => {
-            let cpu = target_cpu.unwrap_or_else(|| "znver4".to_string());
-            println!("{}", "=== Forge CI/CD Builder (Lock-CPU) ===".bold().cyan());
-            println!("{} Mengunci Target CPU ke: {}", "[🔒]".yellow(), cpu.bold().green());
-
-            if let Some(pkg) = package {
-                println!("{} CI/CD Building & Packaging: {}.forge.tar.zst ({})", "[*]".blue(), pkg.bold().green(), cpu);
-                println!("{}", "✓ Paket berhasil dipublikasikan ke Binary Library!".green());
-            } else {
-                println!("{} Tentukan nama paket yang akan di-import (misal: base, base-devel, mold).", "[!]".red());
-            }
+        Commands::Import {
+            profile_json,
+            package,
+            recipes_path,
+            binhost_path,
+        } => {
+            ServerImporter::import_and_build(
+                &profile_json,
+                package.as_deref(),
+                &recipes_path,
+                &binhost_path,
+            )?;
         }
 
         Commands::Index { storage_path } => {
             println!(">>> Memindai repositori biner di {}...", storage_path.bold());
-            println!("{} Database index packages.db.zst berhasil diperbarui!", "✓".green());
+            println!(
+                "{} Database index packages.db.zst berhasil diperbarui!",
+                "✓".green()
+            );
         }
     }
 
