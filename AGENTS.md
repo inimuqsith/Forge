@@ -1,6 +1,6 @@
 # AGENTS.md — Forge Package Manager Development Guidelines
 
-> **Forge**: *Source-First & Hybrid Package Manager* berkecepatan tinggi yang dirancang khusus untuk distribusi **Kura Linux**. Mengadopsi filosofi inti **Gentoo Portage** (*Source-First Native Compilation*, *USE Flags*, *Slots*, *Package Sets*), didukung ekosistem terpisah **`forge-server`** (Registry Resep & **CI/CD Builder Lock-CPU**), kemampuan akselerasi **Forge Binhost**, integrasi opsional repositori biner **CachyOS/Arch**, pelacakan manifest deterministik, integrasi layanan **OpenRC**, isolasi build RAM (`tmpfs`), serta pembuatan stage distribusi (`forge stage-export`).
+> **Forge**: *High-Performance Source-First & Hybrid Package Manager* yang ditulis murni menggunakan **Rust** (ditenagai backend compiler **LLVM**, ultra-fast linker **mold**, optimasi **LTO (Thin/Full)**, dan dukungan **PGO**) khusus untuk distribusi **Kura Linux**. Mengadopsi filosofi inti **Gentoo Portage** (*Source-First Native Compilation*, *USE Flags*, *Slots*, *Package Sets*), didukung ekosistem terpisah **`forge-server`** (Registry Resep & **CI/CD Builder Lock-CPU**), kemampuan akselerasi **Forge Binhost**, integrasi repositori biner **CachyOS/Arch**, pelacakan manifest deterministik, integrasi **OpenRC**, isolasi build RAM (`tmpfs`), perintah setup bootstrap (`forge setup` & `forge system-setup`), serta pembuatan stage distribusi (`forge stage-export`).
 
 ---
 
@@ -12,7 +12,7 @@
    - **Langkah 2 (Chat):** Jelaskan ringkasan perubahan di chat (alasan, file terdampak, tujuan, dan skenario pengujian).
    - **Langkah 3 (Tunggu ACC):** Tunggu User memberikan konfirmasi persetujuan di chat.
    - **Langkah 4 (Eksekusi):** Jalankan perubahan hanya setelah disetujui.
-   - **Langkah 5 (Uji & Verifikasi):** **Wajib diuji dan dites** secara menyeluruh (unit test, integrasi build sandbox, verifikasi hash/manifest). Tugas **baru dianggap berhasil** jika seluruh pengujian lulus. Jika ditemukan error: analisis akar masalah, perbaiki, dan uji ulang sampai berfungsi sempurna.
+   - **Langkah 5 (Uji & Verifikasi):** **Wajib diuji dan dites** secara menyeluruh (`cargo test`, `cargo check`, integrasi sandbox). Tugas **baru dianggap berhasil** jika seluruh pengujian lulus. Jika ditemukan error: analisis akar masalah, perbaiki, dan uji ulang sampai berfungsi sempurna.
 
 ---
 
@@ -20,18 +20,21 @@
 
 ### 🎯 TUGAS & FOKUS AI DI REPOSITORI INI:
 
-#### A. Engine Klien Pengguna (`forge` CLI):
+#### A. Engine Klien Pengguna (`forge` CLI - Rust Workspace):
 1. **Source-First Compilation Engine (Gentoo Portage Mode):**
    - Mengutamakan kompilasi langsung dari kode sumber upstream dengan injeksi CFLAGS native CPU pengguna (`-march=native`) di RAM `tmpfs`.
    - Engine evaluasi *USE Flags* (`forge_use`) dan multi-version *Slots* (`pkg:slot`).
    - Dependency graph & DAG resolver dengan pemisahan `depends` dan `makedepends`.
    - DESTDIR staging, pre-flight collision detector, transactional merger, dan unmerge cleaner berbasis manifest.
-2. **Introspeksi Hardware:**
+2. **Wizard Konfigurasi & Bootstrap Distro:**
+   - `forge setup`: Wizard konfigurasi package manager `/etc/forge/forge.conf`.
+   - `forge system-setup`: Wizard bootstrap Kura Linux untuk pemilihan arsitektur silikon, profil base distro, opsi kernel monolithic, dan inisialisasi `@system`.
+3. **Introspeksi Hardware:**
    - Perintah `forge cpu-dump`: Ekstraksi mikroarsitektur, feature ISA flags (AVX-512, AVX2, dll.), cache, dan rekomendasi compiler flags ke `cpu-profile.json`.
-3. **Opsi Akselerasi & Kebebasan Pengguna:**
+4. **Opsi Akselerasi & Kebebasan Pengguna:**
    - Menyediakan opsi akselerasi Binhost (`forge install --binhost <pkg>`) dan fallback hybrid CachyOS/Arch (`--hybrid`) dengan kebebasan penuh di tangan pengguna.
-4. **Fitur Khusus Distro Kura Linux:**
-   - Meta-target `@system` untuk rebuild seluruh basis sistem Kura Linux.
+5. **Fitur Khusus Distro Kura Linux:**
+   - Meta-target `@system` untuk rebuild seluruh basis sistem Kura Linux (menggunakan konfigurasi dari `forge system-setup` atau template default).
    - Perintah `forge stage-export` untuk membuat arsip stage distribusi (`kura-stage.tar.xz`).
    - Integrasi OpenRC hook `/etc/init.d/` dan `rc-update`.
 
@@ -51,40 +54,59 @@
 
 ---
 
-## 3. Struktur Repositori
+## 3. Standar Toolchain Rust & Konfigurasi Build
+
+Kompilasi engine `forge` dan `forge-server` dioptimalkan secara ekstrem untuk performa maksimal:
+- **Compiler:** Rust 1.97+ dengan backend **LLVM 22**.
+- **Linker:** **`mold`** (High-performance modern linker via `-fuse-ld=mold`).
+- **Optimasi LTO:** Link-Time Optimization (`lto = "thin"` atau `"fat"`).
+- **Target CPU:** Native silicon (`-C target-cpu=native`).
+- **Codegen Units:** `codegen-units = 1` pada release build untuk efisiensi inlining maksimal.
+- **Panic Strategy:** `panic = "abort"` untuk footprint biner yang sangat kecil dan eksekusi cepat.
+
+---
+
+## 4. Struktur Repositori (Cargo Workspace)
 
 ```
 .
+├── Cargo.toml              # Cargo Workspace Configuration (LTO, mold, opt-level 3)
+├── .cargo/
+│   └── config.toml         # Rustflags: -C target-cpu=native & mold linker
 ├── AGENTS.md               # Pedoman AI, Aturan Mutlak HITL, & Siklus Verifikasi
 ├── ARCHITECTURE.md         # Blueprint Arsitektur Source-First, Server, & CI/CD
 ├── MEMORY.md               # State Engine, Roadmap, ADR, & Log Solusi
 ├── README.md               # Dokumentasi Umum & Panduan Penggunaan Forge
 ├── .gitignore              # Konfigurasi filter berkas Git
-├── src/                    # Source code engine, core modules, & CLI binaries
-│   ├── cli/                # Command-line interface klien 'forge'
-│   ├── core/               # Engine inti, DAG resolver, USE flag & Slot engine
-│   ├── cpu/                # CPU microarchitecture analyzer (forge cpu-dump)
-│   ├── binhost/            # Forge binary host client & package installer
-│   ├── hybrid/             # Provider fallback CachyOS & Arch Linux binary adapter
-│   ├── server/             # Daemon 'forge-server' (recipe & binary registry)
-│   └── cicd/               # CI/CD builder worker & importer (forge-server import)
-├── config/                 # Template konfigurasi bawaan (forge.conf.example)
+├── crates/                 # Modul-modul crate Rust
+│   ├── forge-core/         # Engine inti, DAG resolver, USE flag & Slot engine, DB
+│   ├── forge-cpu/          # CPU microarchitecture analyzer (forge cpu-dump)
+│   ├── forge-binhost/      # Forge binary host client & package installer
+│   ├── forge-hybrid/       # Provider fallback CachyOS & Arch Linux binary adapter
+│   ├── forge-cli/          # Binary klien 'forge' (CLI, setup, system-setup, stage-export)
+│   └── forge-server/       # Binary daemon 'forge-server' (serve, import, index)
+├── config/                 # Template konfigurasi bawaan
+│   ├── forge.conf.example  # Konfigurasi package manager
+│   └── system.conf.example # Template konfigurasi bootstrap sistem Kura Linux
 ├── recipes/                # Pohon resep paket resmi Kura Linux (di-sync dari server)
 │   ├── system/             # Resep set @system (Glibc, GCC, Kernel, OpenRC, dll.)
 │   ├── core/               # Resep utilitas inti sistem
 │   └── extra/              # Resep aplikasi & layanan tambahan
-├── tests/                  # Test suite (unit tests, integration sandbox tests)
-├── docs/                   # Spesifikasi teknis resep, hook API, & manual
-└── scripts/                # Helper scripts pengembangan, server setup, & CI/CD
+├── tests/                  # Test suite integrasi & sandbox testing
+└── docs/                   # Spesifikasi teknis resep, hook API, & manual
 ```
 
 ---
 
-## 4. Alur Perintah Utama
+## 5. Alur Perintah Utama
 
 ### A. Klien Pengguna (`forge`):
 ```bash
-# --- 1. Manajemen Paket (Default: Source Compilation First) ---
+# --- 1. Wizard Setup & Inisialisasi Sistem ---
+forge setup                     # Wizard konfigurasi package manager (/etc/forge/forge.conf)
+forge system-setup              # Wizard bootstrap distro Kura Linux (/etc/forge/system.conf)
+
+# --- 2. Manajemen Paket (Default: Source Compilation First) ---
 forge install <pkg>             # Kompilasi dari source code secara native (Default Gentoo-style)
 forge install --binhost <pkg>   # Opsi Akselerasi: Unduh pre-built binary native dari Forge Server
 forge install --hybrid <pkg>    # Opsi Akselerasi: Gunakan biner CachyOS/Arch jika ada
@@ -93,12 +115,12 @@ forge remove <pkg>              # Hapus paket secara bersih berdasarkan manifest
 forge sync                      # Sinkronisasi resep dari Forge Server
 forge update @world             # Re-kompilasi / perbarui seluruh paket terpasang
 
-# --- 2. Introspeksi Hardware ---
+# --- 3. Introspeksi Hardware ---
 forge cpu-dump                  # Dump mikroarsitektur CPU & export cpu-profile.json
 forge cpu-dump --export-cflags  # Tampilkan rekomendasi CFLAGS untuk CPU saat ini
 
-# --- 3. Fitur Distro Khusus ---
-forge install @system           # Rebuild seluruh base system Kura Linux 100% native
+# --- 4. Fitur Distro Khusus ---
+forge install @system           # Rebuild seluruh base system Kura Linux (sesuai system-setup / template)
 forge stage-export --output kura-stage.tar.xz  # Kemas rootfs menjadi stage tarball
 ```
 
@@ -113,7 +135,7 @@ forge-server index              # Regenerasi database index repositori packages.
 
 ---
 
-## 5. Alur & Konvensi Git
+## 6. Alur & Konvensi Git
 
 ### Format Pesan Commit:
 Format commit wajib menggunakan standar Conventional Commits: `<type>: <deskripsi>`
@@ -125,6 +147,6 @@ Format commit wajib menggunakan standar Conventional Commits: `<type>: <deskrips
 - `refactor:` Restrukturisasi kode tanpa mengubah fungsionalitas publik.
 
 ### Aturan Git:
-1. **Verifikasi Sebelum Commit:** Seluruh perubahan kode wajib lulus pengujian (Langkah 5 HITL) sebelum dibuatkan commit.
-2. **Jangan Commit Artefak Build & Tarball:** Binari hasil kompilasi, file `.tar.*`, cache `distfiles/`, dan staging rootfs wajib diabaikan via `.gitignore`.
+1. **Verifikasi Sebelum Commit:** Seluruh perubahan kode wajib lulus pengujian (`cargo test` / `cargo check`) sebelum dibuatkan commit.
+2. **Jangan Commit Artefak Build & Tarball:** Target binary `target/`, file `.tar.*`, cache `distfiles/`, dan staging rootfs wajib diabaikan via `.gitignore`.
 3. **Commit Terfokus & Atomik:** Setiap commit harus mencakup satu tujuan perubahan yang jelas dan terdokumentasi dengan baik.
