@@ -17,8 +17,8 @@ Forge dirancang menggunakan arsitektur modular yang terkonsolidasi secara rapi d
 |                          (Binary CLI Klien & Core Engine Library)                               |
 +=================================================================================================+
 |  1. CLI Dispatcher (`src/main.rs`)                                                              |
-|     - `forge setup`, `forge install`, `forge remove`, `forge cpu-dump`                          |
-|     - `forge toolchain bundle`, `forge stage-export`, `forge list`, `forge query`              |
+|     - `forge setup`, `forge build`, `forge install`, `forge remove`, `forge cpu-dump`           |
+|     - `forge recipe-import`, `forge toolchain bundle`, `forge stage-export`, `forge list`       |
 |                                                                                                 |
 |  2. Core Engine Library (`src/lib.rs` & sub-modul internal):                                    |
 |     ├── `src/builder.rs`   : Compilation Engine, tmpfs sandbox, Ccache 4.13.5, DESTDIR staging   |
@@ -29,6 +29,7 @@ Forge dirancang menggunakan arsitektur modular yang terkonsolidasi secara rapi d
 |     ├── `src/toolchain.rs` : Pure Source Seed Toolchain Bundler (ADR-019, Zero Host Harvesting) |
 |     ├── `src/binhost.rs`   : Forge Binhost Client & Zstd/BLAKE3 streaming verification          |
 |     ├── `src/cachyos.rs`   : CachyOS (Zen4/v4/v3) Adapter & Anti-Brick Core OS Blacklist Engine |
+|     ├── `src/importer.rs`  : Upstream PKGBUILD/APKBUILD Recipe Transpiler                       |
 |     └── `src/cascade.rs`   : 3-Tier Package Cascade Resolver (--native & --binhost)             |
 +=================================================================================================+
                                                  ▲
@@ -38,9 +39,10 @@ Forge dirancang menggunakan arsitektur modular yang terkonsolidasi secara rapi d
 |                                CRATE 2: `crates/forge-server`                                   |
 |                            (Daemon Server & CI/CD Build Farm Suite)                             |
 +=================================================================================================+
-|  1. `forge-server serve`  : Recipe Registry HTTP API & Binary Catalog Server                    |
-|  2. `forge-server import` : CI/CD Worker Builder yang di-lock ke profil CPU target pengguna     |
+|  1. `forge-server build`  : CI/CD Worker Builder (Lock-CPU CFLAGS -> .forge.tar.zst)            |
+|  2. `forge-server import` : Binary Ingestion (.forge.tar.zst -> /var/db/forge/binhost/ & cat)   |
 |  3. `forge-server index`  : Generator database index repositori biner `packages.db.zst`         |
+|  4. `forge-server serve`  : Recipe Registry HTTP API, Binhost Server & Web Explorer             |
 +=================================================================================================+
 ```
 

@@ -53,9 +53,14 @@ enum Commands {
         package: String,
     },
 
-    /// Kompilasi paket dari source hingga tahap staging DESTDIR tanpa merge
+    /// Kompilasi paket dari source dan kemas ke .forge.tar.zst tanpa merge ke host
     Build {
+        /// Nama paket, meta-paket, atau path ke recipe.toml
         package: String,
+
+        /// Direktori keluaran artefak tarball biner .forge.tar.zst
+        #[arg(short, long, default_value = "dist")]
+        output_dir: PathBuf,
     },
 
     /// Sinkronisasi pohon resep dan metadata dari Forge Server
@@ -250,23 +255,21 @@ fn main() -> Result<()> {
             }
         }
 
-        Commands::Build { package } => {
-            println!("{}", format!(">>> Membangun paket {} dari kode sumber...", package).bold().cyan());
+        Commands::Build { package, output_dir } => {
+            println!("{}", "=== Forge Source Builder ===".bold().cyan());
+            println!(">>> Membangun paket {} dari kode sumber...", package.bold().green());
             let config = ForgeConfig::load_or_default(None);
 
-            let recipe_candidates = [
-                PathBuf::from(&package),
-                PathBuf::from(format!("recipes/system/{}/recipe.toml", package)),
-                PathBuf::from(format!("recipes/core/{}/recipe.toml", package)),
-                PathBuf::from(format!("recipes/extra/{}/recipe.toml", package)),
-            ];
+            let recipes_base = PathBuf::from(&config.general.recipes_path);
+            let found_recipe = RecipeBuilder::find_recipe(&package, Some(&recipes_base));
 
-            let found_recipe = recipe_candidates.iter().find(|p| p.exists());
             if let Some(recipe_path) = found_recipe {
-                let destdir = PathBuf::from(format!("/tmp/forge/stage/{}", package));
-                match RecipeBuilder::build(recipe_path, &config, &destdir, None) {
-                    Ok(staged_dir) => {
-                        println!("{} Paket {} sukses dikompilasi ke staging: {}", "✓".green(), package.bold(), staged_dir.display().to_string().cyan());
+                println!("  [🔍] Resep ditemukan: {}", recipe_path.display().to_string().cyan());
+                match RecipeBuilder::build_and_package(&recipe_path, &config, &output_dir, None) {
+                    Ok(tarball) => {
+                        println!("\n{} Paket {} sukses dikompilasi & dikemas ke:", "✓".green(), package.bold());
+                        println!("  -> {}", tarball.display().to_string().bold().green());
+                        println!("{} Sistem host '/' aman tanpa modifikasi.", "🛡️".green());
                     }
                     Err(e) => {
                         println!("{} Gagal mengompilasi paket {}: {:#}", "✗".red(), package.bold(), e);

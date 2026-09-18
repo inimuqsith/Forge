@@ -1,108 +1,97 @@
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use colored::*;
-use forge::{BinhostCatalog, BinhostPackageEntry, CpuProfile, ForgeConfig, RecipeBuilder};
+use forge::{BinhostCatalog, BinhostPackageEntry, PackageMetadata};
 use sha2::{Digest, Sha256};
+use std::fs::{self, File};
 use std::path::{Path, PathBuf};
 
 pub struct ServerImporter;
 
 impl ServerImporter {
-    /// Impor file cpu-profile.json dan kompilasi paket khusus CPU tersebut
-    pub fn import_and_build(
-        profile_path: &Path,
-        package_name: Option<&str>,
-        recipes_root: &Path,
+    /// Ingestion Biner: Membaca berkas tarball biner .forge.tar.zst yang sudah di-build, mengekstrak metadata,
+    /// memindahkannya/menyalinnya ke direktori resmi /var/db/forge/binhost/<march>/, dan memperbarui catalog.json.
+    pub fn import_tarball(
+        tarball_path: &Path,
         binhost_storage: &Path,
-    ) -> Result<()> {
-        // 1. Baca dan parse cpu-profile.json
-        let json_content = std::fs::read_to_string(profile_path)
-            .with_context(|| format!("Gagal membaca file profil CPU di {:?}", profile_path))?;
-        let cpu_profile: CpuProfile = serde_json::from_str(&json_content)
-            .context("Format file JSON bukan merupakan CpuProfile yang valid")?;
-
-        let march = &cpu_profile.target_march;
-        let cflags = &cpu_profile.recommended_flags.cflags;
-        let cxxflags = &cpu_profile.recommended_flags.cxxflags;
-        let ldflags = &cpu_profile.recommended_flags.ldflags;
-        let makeflags = &cpu_profile.recommended_flags.makeflags;
-
-        // 2. Tampilkan log penguncian CPU silikon
-        println!("{}", "=== Forge CI/CD Builder (Lock-CPU) ===".bold().cyan());
-        println!(
-            "{} Mengunci CI/CD Compiler ke : {} ({})",
-            "[🔒]".yellow(),
-            cpu_profile.model_name.bold().green(),
-            march.bold().yellow()
-        );
-        println!("{} CFLAGS Injeksi          : {}", "[⚙]".blue(), cflags.cyan());
-        println!("{} CXXFLAGS Injeksi        : {}", "[⚙]".blue(), cxxflags.cyan());
-        println!("{} LDFLAGS Injeksi         : {}", "[⚙]".blue(), ldflags.cyan());
-        println!("{} MAKEFLAGS Injeksi       : {}", "[⚙]".blue(), makeflags.cyan());
-
-        let target_pkg = package_name.unwrap_or("base");
-        println!(
-            "{} Memulai CI/CD Build untuk paket: {}",
-            "[*]".blue(),
-            target_pkg.bold().green()
-        );
-
-        // 3. Cari resep paket
-        let recipe_path = Self::find_recipe(recipes_root, target_pkg)
-            .with_context(|| format!("Resep untuk paket '{}' tidak ditemukan di {:?}", target_pkg, recipes_root))?;
-
-        // 4. Konfigurasi ForgeConfig dinamis berdasarkan CPU Profile
-        let mut build_config = ForgeConfig::default();
-        build_config.build.cflags = cflags.clone();
-        build_config.build.cxxflags = cxxflags.clone();
-        build_config.build.ldflags = ldflags.clone();
-        build_config.build.makeflags = makeflags.clone();
-        build_config.cpu.target_march = march.clone();
-
-        // 5. Kompilasi ke staging
-        let staging_dir = std::env::temp_dir()
-            .join("forge")
-            .join("server_stage")
-            .join(target_pkg);
-        if staging_dir.exists() {
-            let _ = std::fs::remove_dir_all(&staging_dir);
+        target_march_override: Option<&str>,
+    ) -> Result<BinhostPackageEntry> {
+        if !tarball_path.exists() {
+            bail!("Berkas tarball biner tidak ditemukan: {:?}", tarball_path);
         }
-        std::fs::create_dir_all(&staging_dir)?;
 
-        println!("  [🔨] Mengompilasi dari kode sumber...");
-        RecipeBuilder::build(&recipe_path, &build_config, &staging_dir, None)?;
+        println!("{}", "=== Forge Server Binary Ingestion ===".bold().cyan());
+        println!("{} Memproses tarball: {}", "[*]".blue(), tarball_path.display().to_string().yellow());
 
-        // 6. Kemas ke .forge.tar.zst
-        let march_binhost_dir = binhost_storage.join(march);
-        std::fs::create_dir_all(&march_binhost_dir)?;
-
-        let package_tarball = march_binhost_dir.join(format!("{}.forge.tar.zst", target_pkg));
-        println!(
-            "  [📦] Mengemas biner native ke {}",
-            package_tarball.display().to_string().yellow()
-        );
-
-        let file = std::fs::File::create(&package_tarball)?;
-        let encoder = zstd::Encoder::new(file, 3)?;
-        let mut tar = tar::Builder::new(encoder);
-        tar.append_dir_all(".", &staging_dir)?;
-        let encoder = tar.into_inner()?;
-        let mut finished_file = encoder.finish()?;
-        std::io::Write::flush(&mut finished_file)?;
-        drop(finished_file);
-
-        // 7. Hitung hash SHA256 & ukuran
-        let bytes = std::fs::read(&package_tarball)?;
+        // 1. Hitung SHA256 & ukuran berkas tarball
+        let bytes = fs::read(tarball_path)
+            .with_context(|| format!("Gagal membaca tarball biner di {:?}", tarball_path))?;
         let sha256_hash = format!("{:x}", Sha256::digest(&bytes));
         let size_bytes = bytes.len() as u64;
-        println!(
-            "  [✓] Paket biner berhasil dibuat! SHA256: {}",
-            sha256_hash.green()
-        );
 
-        // 8. Generate / Update catalog.json
+        // 2. Ekstrak metadata dari dalam tarball .forge.tar.zst
+        let metadata = Self::extract_metadata_from_tarball(tarball_path)?;
+
+        // 3. Tentukan nama paket, versi, slot, dan target march
+        let (pkgname, pkgver, pkgrel, slot, target_march) = if let Some(meta) = metadata {
+            let march = if let Some(override_march) = target_march_override {
+                override_march.to_string()
+            } else if !meta.target_march.is_empty() && meta.target_march != "native" {
+                meta.target_march
+            } else {
+                Self::infer_march_from_filename(tarball_path).unwrap_or_else(|| "generic".to_string())
+            };
+            (meta.name, meta.version, meta.release, meta.slot, march)
+        } else {
+            // Fallback parsing dari nama file
+            let inferred = Self::infer_metadata_from_filename(tarball_path)?;
+            let march = target_march_override
+                .map(|s| s.to_string())
+                .unwrap_or(inferred.3);
+            (inferred.0, inferred.1, 1, "0".to_string(), march)
+        };
+
+        println!(
+            "  [📦] Paket: {} v{}-r{} (Slot: {}, March: {})",
+            pkgname.bold().green(),
+            pkgver,
+            pkgrel,
+            slot.cyan(),
+            target_march.yellow()
+        );
+        println!("  [✓] SHA256 Checksum : {}", sha256_hash.green());
+        println!("  [✓] Ukuran File     : {} bytes", size_bytes);
+
+        // 4. Siapkan direktori binhost target: <binhost_storage>/<march>/
+        let march_binhost_dir = binhost_storage.join(&target_march);
+        fs::create_dir_all(&march_binhost_dir)?;
+
+        // 5. Salin/pindahkan tarball ke binhost storage
+        let filename = tarball_path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("package.forge.tar.zst");
+        let dest_tarball = march_binhost_dir.join(filename);
+
+        let is_same_file = if let (Ok(can_src), Ok(can_dst)) = (tarball_path.canonicalize(), dest_tarball.canonicalize()) {
+            can_src == can_dst
+        } else {
+            false
+        };
+
+        if !is_same_file {
+            fs::copy(tarball_path, &dest_tarball)
+                .with_context(|| format!("Gagal menyalin tarball ke {:?}", dest_tarball))?;
+            let sha_source = format!("{}.sha256", tarball_path.display());
+            if Path::new(&sha_source).exists() {
+                let sha_dest = march_binhost_dir.join(format!("{}.sha256", filename));
+                let _ = fs::copy(&sha_source, &sha_dest);
+            }
+        }
+
+        // 6. Perbarui catalog.json di march_binhost_dir
         let catalog_path = march_binhost_dir.join("catalog.json");
         let mut catalog = if catalog_path.exists() {
-            std::fs::read_to_string(&catalog_path)
+            fs::read_to_string(&catalog_path)
                 .ok()
                 .and_then(|s| serde_json::from_str::<BinhostCatalog>(&s).ok())
                 .unwrap_or_else(|| BinhostCatalog {
@@ -122,20 +111,18 @@ impl ServerImporter {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_secs();
-
         catalog.timestamp = now;
 
-        let recipe = RecipeBuilder::load_recipe(&recipe_path)?;
         let entry = BinhostPackageEntry {
-            pkgname: recipe.package.name.clone(),
-            pkgver: recipe.package.version.clone(),
-            pkgrel: recipe.package.release,
-            slot: recipe.package.slot.clone(),
-            target_march: march.clone(),
+            pkgname: pkgname.clone(),
+            pkgver: pkgver.clone(),
+            pkgrel,
+            slot: slot.clone(),
+            target_march: target_march.clone(),
             active_use: Vec::new(),
             sha256: sha256_hash,
             size_bytes,
-            download_url: format!("{}.forge.tar.zst", recipe.package.name),
+            download_url: filename.to_string(),
         };
 
         if let Some(pos) = catalog
@@ -143,70 +130,105 @@ impl ServerImporter {
             .iter()
             .position(|p| p.pkgname == entry.pkgname && p.slot == entry.slot)
         {
-            catalog.packages[pos] = entry;
+            catalog.packages[pos] = entry.clone();
         } else {
-            catalog.packages.push(entry);
+            catalog.packages.push(entry.clone());
         }
 
         let catalog_json = serde_json::to_string_pretty(&catalog)?;
-        std::fs::write(&catalog_path, catalog_json)?;
+        fs::write(&catalog_path, catalog_json)?;
 
         println!(
-            "{} Sukses mempublikasikan paket {} ke Binary Library ({})",
+            "{} Sukses mengimpor dan mempublikasikan paket {} ke Binary Library ({})",
             "✓".green(),
-            target_pkg.bold(),
-            march.bold()
+            pkgname.bold(),
+            target_march.bold().yellow()
         );
 
-        Ok(())
+        Ok(entry)
+    }
+
+    /// Ekstraksi metadata.json dari dalam arsip .forge.tar.zst
+    pub fn extract_metadata_from_tarball(tarball_path: &Path) -> Result<Option<PackageMetadata>> {
+        let file = File::open(tarball_path)?;
+        let decoder = zstd::Decoder::new(file)?;
+        let mut archive = tar::Archive::new(decoder);
+
+        for entry in archive.entries()? {
+            let mut entry = entry?;
+            let path = entry.path()?.to_path_buf();
+            let path_str = path.to_string_lossy();
+            if path_str == "metadata.json" || path_str.ends_with("/metadata.json") {
+                let mut content = String::new();
+                std::io::Read::read_to_string(&mut entry, &mut content)?;
+                if let Ok(meta) = serde_json::from_str::<PackageMetadata>(&content) {
+                    return Ok(Some(meta));
+                }
+            }
+        }
+        Ok(None)
+    }
+
+    /// Ekstraksi mikroarsitektur dari nama file tarball (misal: base-1.0.0-znver4.forge.tar.zst -> znver4)
+    fn infer_march_from_filename(path: &Path) -> Option<String> {
+        let file_name = path.file_name()?.to_str()?;
+        let clean_name = file_name.strip_suffix(".forge.tar.zst")
+            .or_else(|| file_name.strip_suffix(".tar.zst"))?;
+        let parts: Vec<&str> = clean_name.split('-').collect();
+        if parts.len() >= 3 {
+            Some(parts[parts.len() - 1].to_string())
+        } else {
+            None
+        }
+    }
+
+    /// Fallback ekstraksi metadata dari nama file tarball
+    fn infer_metadata_from_filename(path: &Path) -> Result<(String, String, u32, String)> {
+        let file_name = path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .context("Nama file tidak valid")?;
+        let clean_name = file_name.strip_suffix(".forge.tar.zst")
+            .or_else(|| file_name.strip_suffix(".tar.zst"))
+            .unwrap_or(file_name);
+        let parts: Vec<&str> = clean_name.split('-').collect();
+        if parts.len() >= 3 {
+            let march = parts[parts.len() - 1].to_string();
+            let ver = parts[parts.len() - 2].to_string();
+            let name = parts[..parts.len() - 2].join("-");
+            Ok((name, ver, 1, march))
+        } else if parts.len() == 2 {
+            Ok((parts[0].to_string(), parts[1].to_string(), 1, "generic".to_string()))
+        } else {
+            Ok((parts[0].to_string(), "1.0.0".to_string(), 1, "generic".to_string()))
+        }
     }
 
     /// Cari file recipe.toml berdasarkan nama paket di recipes_root
     pub fn find_recipe(root: &Path, pkg: &str) -> Option<PathBuf> {
-        let direct_candidates = [
-            root.join("system").join(pkg).join("recipe.toml"),
-            root.join("core").join(pkg).join("recipe.toml"),
-            root.join("extra").join(pkg).join("recipe.toml"),
-            root.join(pkg).join("recipe.toml"),
-        ];
-        for cand in direct_candidates {
-            if cand.exists() {
-                return Some(cand);
-            }
-        }
-        if let Ok(entries) = std::fs::read_dir(root) {
-            for entry in entries.flatten() {
-                let path = entry.path();
-                if path.is_dir() {
-                    let candidate = path.join(pkg).join("recipe.toml");
-                    if candidate.exists() {
-                        return Some(candidate);
-                    }
-                }
-            }
-        }
-        None
+        forge::RecipeBuilder::find_recipe(pkg, Some(root))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use forge::CpuProfile;
 
     #[test]
-    fn test_import_and_build_lock_cpu() -> Result<()> {
+    fn test_forge_server_build_and_import_separation() -> Result<()> {
         let temp = tempfile::tempdir()?;
         let temp_path = temp.path();
 
         // 1. Siapkan cpu-profile.json untuk AMD Ryzen 7 8845HS / znver4
         let profile_json_path = temp_path.join("cpu-profile.json");
         let profile = CpuProfile::mock("znver4", &["avx512f", "avx512dq", "vaes", "sha_ni"]);
-        std::fs::write(&profile_json_path, profile.to_json()?)?;
+        fs::write(&profile_json_path, profile.to_json()?)?;
 
         // 2. Siapkan recipes
         let recipes_dir = temp_path.join("recipes");
         let pkg_dir = recipes_dir.join("system").join("base");
-        std::fs::create_dir_all(&pkg_dir)?;
+        fs::create_dir_all(&pkg_dir)?;
 
         let recipe_content = r#"
 [package]
@@ -223,62 +245,70 @@ mkdir -p "$DESTDIR/etc"
 echo "Kura Linux Base v1.0.0" > "$DESTDIR/etc/kura-release"
 """
 "#;
-        std::fs::write(pkg_dir.join("recipe.toml"), recipe_content)?;
+        fs::write(pkg_dir.join("recipe.toml"), recipe_content)?;
 
-        // 3. Jalankan ServerImporter::import_and_build
+        let dist_dir = temp_path.join("dist");
         let binhost_dir = temp_path.join("binhost");
-        ServerImporter::import_and_build(
+
+        // STEP 1: Run ServerBuilder::build_package (BUILD ONLY)
+        let built_tarball = crate::ServerBuilder::build_package(
             &profile_json_path,
             Some("base"),
             &recipes_dir,
-            &binhost_dir,
+            &dist_dir,
         )?;
 
-        // 4. Verifikasi hasil binary tarball & catalog.json
-        let march_dir = binhost_dir.join("znver4");
-        let tarball_path = march_dir.join("base.forge.tar.zst");
-        let catalog_path = march_dir.join("catalog.json");
+        // Verifikasi hasil BUILD:
+        // - Tarball biner harus ada di dist_dir
+        assert!(built_tarball.exists(), "Tarball biner harus berhasil dibuat di dist_dir");
+        assert_eq!(built_tarball, dist_dir.join("base-1.0.0-znver4.forge.tar.zst"));
 
-        assert!(tarball_path.exists(), "Tarball biner harus berhasil dibuat");
-        assert!(catalog_path.exists(), "catalog.json harus berhasil dibuat");
+        // - Verifikasi SEPARATION: Direktori binhost/znver4 BELUM dibuat atau masih kosong, dan catalog.json BELUM ADA
+        let binhost_march_dir = binhost_dir.join("znver4");
+        let catalog_path = binhost_march_dir.join("catalog.json");
+        assert!(!catalog_path.exists(), "catalog.json TIDAK BOLEH ada sebelum tahap import!");
 
-        // Verifikasi catalog.json
-        let catalog_content = std::fs::read_to_string(&catalog_path)?;
-        let catalog: BinhostCatalog = serde_json::from_str(&catalog_content)?;
+        // STEP 2: Run ServerImporter::import_tarball (IMPORT ONLY)
+        let entry = ServerImporter::import_tarball(
+            &built_tarball,
+            &binhost_dir,
+            None,
+        )?;
 
-        assert_eq!(catalog.packages.len(), 1);
-        let entry = &catalog.packages[0];
+        // Verifikasi hasil IMPORT:
+        // - Binhost sekarang memiliki file tarball dan catalog.json
+        assert!(binhost_march_dir.exists(), "Direktori binhost/znver4 harus dibuat setelah import");
+        assert!(catalog_path.exists(), "catalog.json harus dibuat setelah import");
         assert_eq!(entry.pkgname, "base");
         assert_eq!(entry.pkgver, "1.0.0");
-        assert_eq!(entry.pkgrel, 1);
-        assert_eq!(entry.slot, "0");
         assert_eq!(entry.target_march, "znver4");
-        assert_eq!(entry.download_url, "base.forge.tar.zst");
 
-        let tarball_bytes = std::fs::read(&tarball_path)?;
-        let expected_sha = format!("{:x}", Sha256::digest(&tarball_bytes));
-        assert_eq!(entry.sha256, expected_sha);
-        assert_eq!(entry.size_bytes, tarball_bytes.len() as u64);
+        // Verifikasi isi catalog.json
+        let catalog_content = fs::read_to_string(&catalog_path)?;
+        let catalog: BinhostCatalog = serde_json::from_str(&catalog_content)?;
+        assert_eq!(catalog.packages.len(), 1);
+        assert_eq!(catalog.packages[0].pkgname, "base");
+        assert_eq!(catalog.packages[0].sha256, entry.sha256);
 
         Ok(())
     }
 
     #[test]
-    fn test_import_multiple_packages_and_updates() -> Result<()> {
+    fn test_forge_server_import_registers_to_catalog() -> Result<()> {
         let temp = tempfile::tempdir()?;
         let temp_path = temp.path();
 
         let profile_json_path = temp_path.join("cpu-profile.json");
         let profile = CpuProfile::mock("znver4", &["avx512f", "vaes"]);
-        std::fs::write(&profile_json_path, profile.to_json()?)?;
+        fs::write(&profile_json_path, profile.to_json()?)?;
 
         let recipes_dir = temp_path.join("recipes");
         let base_dir = recipes_dir.join("system").join("base");
         let mold_dir = recipes_dir.join("extra").join("mold");
-        std::fs::create_dir_all(&base_dir)?;
-        std::fs::create_dir_all(&mold_dir)?;
+        fs::create_dir_all(&base_dir)?;
+        fs::create_dir_all(&mold_dir)?;
 
-        std::fs::write(
+        fs::write(
             base_dir.join("recipe.toml"),
             r#"
 [package]
@@ -290,7 +320,7 @@ description = "Base Package"
 "#,
         )?;
 
-        std::fs::write(
+        fs::write(
             mold_dir.join("recipe.toml"),
             r#"
 [package]
@@ -302,32 +332,39 @@ description = "Modern Linker"
 "#,
         )?;
 
+        let dist_dir = temp_path.join("dist");
         let binhost_dir = temp_path.join("binhost");
 
-        // Build 1: base (using None as package_name -> defaults to "base")
-        ServerImporter::import_and_build(
+        // Build 1: base
+        let base_tarball = crate::ServerBuilder::build_package(
             &profile_json_path,
-            None,
+            Some("base"),
             &recipes_dir,
-            &binhost_dir,
+            &dist_dir,
         )?;
 
         // Build 2: mold
-        ServerImporter::import_and_build(
+        let mold_tarball = crate::ServerBuilder::build_package(
             &profile_json_path,
             Some("mold"),
             &recipes_dir,
-            &binhost_dir,
+            &dist_dir,
         )?;
+
+        // Import 1: base
+        ServerImporter::import_tarball(&base_tarball, &binhost_dir, None)?;
+
+        // Import 2: mold
+        ServerImporter::import_tarball(&mold_tarball, &binhost_dir, None)?;
 
         let catalog_path = binhost_dir.join("znver4").join("catalog.json");
         assert!(catalog_path.exists());
 
-        let catalog_content = std::fs::read_to_string(&catalog_path)?;
+        let catalog_content = fs::read_to_string(&catalog_path)?;
         let catalog: BinhostCatalog = serde_json::from_str(&catalog_content)?;
 
         assert_eq!(catalog.packages.len(), 2);
-        assert!(catalog.packages.iter().any(|p| p.pkgname == "base"));
+        assert!(catalog.packages.iter().any(|p| p.pkgname == "base" && p.pkgver == "1.0.0"));
         assert!(catalog.packages.iter().any(|p| p.pkgname == "mold" && p.pkgver == "2.30.0"));
 
         Ok(())
@@ -343,15 +380,15 @@ description = "Modern Linker"
         let extra_pkg = recipes_dir.join("extra").join("extrapkg");
         let custom_pkg = recipes_dir.join("custom_cat").join("custompkg");
 
-        std::fs::create_dir_all(&system_pkg)?;
-        std::fs::create_dir_all(&core_pkg)?;
-        std::fs::create_dir_all(&extra_pkg)?;
-        std::fs::create_dir_all(&custom_pkg)?;
+        fs::create_dir_all(&system_pkg)?;
+        fs::create_dir_all(&core_pkg)?;
+        fs::create_dir_all(&extra_pkg)?;
+        fs::create_dir_all(&custom_pkg)?;
 
-        std::fs::write(system_pkg.join("recipe.toml"), "[package]\nname = \"syspkg\"\nversion = \"1.0.0\"")?;
-        std::fs::write(core_pkg.join("recipe.toml"), "[package]\nname = \"corepkg\"\nversion = \"1.0.0\"")?;
-        std::fs::write(extra_pkg.join("recipe.toml"), "[package]\nname = \"extrapkg\"\nversion = \"1.0.0\"")?;
-        std::fs::write(custom_pkg.join("recipe.toml"), "[package]\nname = \"custompkg\"\nversion = \"1.0.0\"")?;
+        fs::write(system_pkg.join("recipe.toml"), "[package]\nname = \"syspkg\"\nversion = \"1.0.0\"")?;
+        fs::write(core_pkg.join("recipe.toml"), "[package]\nname = \"corepkg\"\nversion = \"1.0.0\"")?;
+        fs::write(extra_pkg.join("recipe.toml"), "[package]\nname = \"extrapkg\"\nversion = \"1.0.0\"")?;
+        fs::write(custom_pkg.join("recipe.toml"), "[package]\nname = \"custompkg\"\nversion = \"1.0.0\"")?;
 
         assert!(ServerImporter::find_recipe(&recipes_dir, "syspkg").is_some());
         assert!(ServerImporter::find_recipe(&recipes_dir, "corepkg").is_some());

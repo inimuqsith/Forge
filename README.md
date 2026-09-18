@@ -43,6 +43,8 @@ forge install <pkg>             # Kompilasi dari source code secara native (Defa
 forge install --native <pkg>    # Paksa kompilasi 100% dari kode sumber (Portage mode)
 forge install --binhost <pkg>   # 3-Tier Cascade: Forge Binhost -> Fallback CachyOS Zen4/v4/v3 -> Source
 forge install --interactive <pkg> # Pilih manual provider (Source vs Binhost vs CachyOS)
+forge build <pkg>               # Kompilasi dari source & kemas ke .forge.tar.zst tanpa pasang ke host
+forge recipe-import <url|file>  # Transpilasi PKGBUILD Arch / APKBUILD Alpine ke recipe.toml
 forge remove <pkg>              # Hapus paket secara bersih berdasarkan manifest
 forge sync                      # Sinkronisasi pohon resep dari Forge Server
 forge update @world             # Re-kompilasi / perbarui seluruh paket terpasang
@@ -69,9 +71,10 @@ forge stage-export --output kura-stage.tar.xz  # Kemas rootfs menjadi stage tarb
 
 ```bash
 # --- Manajemen Server & CI/CD Builder ---
-forge-server serve              # Jalankan service API resep & katalog biner
-forge-server import <pkg>       # CI/CD: Build lock-CPU, kemas .forge.tar.zst, & upload ke binary library
-forge-server index              # Regenerasi database index repositori packages.db.zst
+forge-server serve              # Jalankan service HTTP API resep & Public Web Explorer
+forge-server build <cpu-profile.json> [pkg] # CI/CD Worker: Build lock-CPU & kemas ke .forge.tar.zst
+forge-server import <binary.forge.tar.zst>  # Ingestion Biner: Impor ke binhost & daftarkan ke catalog.json
+forge-server index              # Regenerasi database index repositori biner packages.db.zst
 ```
 
 ---

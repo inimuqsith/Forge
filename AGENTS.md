@@ -105,9 +105,11 @@ forge setup                     # Inisialisasi konfigurasi package manager (/etc
 forge install base              # Pasang sistem dasar Kura Linux (Meta-Paket)
 forge install base-devel        # Pasang toolchain kompilasi Kura Linux (Meta-Paket)
 forge install <pkg>             # Kompilasi paket dari source code secara native (Gentoo-style)
-forge install --binhost <pkg>   # Opsi Akselerasi: Unduh pre-built binary native dari Forge Server
-forge install --hybrid <pkg>    # Opsi Akselerasi: Gunakan biner CachyOS/Arch jika ada
-forge install --interactive <pkg> # Pilih manual provider (Source vs Binhost vs CachyOS/Arch)
+forge install --native <pkg>    # Paksa kompilasi 100% dari kode sumber (Portage mode)
+forge install --binhost <pkg>   # 3-Tier Cascade: Forge Binhost -> CachyOS -> Native Source
+forge install --interactive <pkg> # Pilih manual provider (Source vs Binhost vs CachyOS)
+forge build <pkg>               # Kompilasi dari source & kemas ke .forge.tar.zst tanpa pasang ke host
+forge recipe-import <url|file>  # Transpilasi PKGBUILD Arch / APKBUILD Alpine ke recipe.toml
 forge remove <pkg>              # Hapus paket secara bersih berdasarkan manifest
 forge sync                      # Sinkronisasi resep dari Forge Server
 forge update @world             # Re-kompilasi / perbarui seluruh paket terpasang
@@ -124,9 +126,10 @@ forge stage-export --output kura-stage.tar.xz  # Kemas rootfs menjadi stage tarb
 ### B. Infrastruktur Server & CI/CD (`forge-server`):
 ```bash
 # --- Server Registry & Build Farm ---
-forge-server serve              # Jalankan service API resep & katalog biner
-forge-server import <pkg>       # CI/CD: Build lock-CPU, kemas .forge.tar.zst, & upload ke binary library
-forge-server index              # Regenerasi database index repositori packages.db.zst
+forge-server serve              # Jalankan service API resep & Public Web Explorer
+forge-server build <cpu-profile.json> [pkg] # CI/CD Worker: Build lock-CPU & kemas ke .forge.tar.zst
+forge-server import <binary.forge.tar.zst>  # Ingestion Biner: Impor ke binhost & daftarkan ke catalog.json
+forge-server index              # Regenerasi database index repositori biner packages.db.zst
 ```
 
 ---

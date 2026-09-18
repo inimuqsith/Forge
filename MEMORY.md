@@ -113,14 +113,15 @@
 
 ### Fase 10: Server Suite & CI/CD Builder (`forge-server`) & Client Sync Engine
 **Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
-- [x] Implementasi CLI suite `forge-server` di [`crates/forge-server/src/main.rs`](file:///home/admin/Development/Forge/crates/forge-server/src/main.rs).
-- [x] CLI CI/CD Lock-CPU Builder: `forge-server import <pkg> --target-cpu <cpu>`.
-- [x] CLI Catalog Indexer: `forge-server index --storage-path <path>`.
-- [x] **HTTP REST API Daemon (`crates/forge-server/src/server.rs`):** Router `axum` & `tokio` melayani `/v1/health`, `/v1/recipes/latest.sha256`, dan streaming `/v1/recipes/latest.tar.zst`.
+- [x] Implementasi CLI suite `forge-server` di [`crates/forge-server/src/main.rs`](crates/forge-server/src/main.rs).
+- [x] **Pemisahan Perintah Build & Import (ADR-036):**
+  - **Klien `forge`:** Sub-perintah `forge build <pkg> [--output-dir <DIR>]` untuk kompilasi lokal ke `.forge.tar.zst` tanpa mengotori host rootfs `/`, `forge install <pkg>` untuk kompilasi + transactional atomic merge, dan `forge recipe-import <url|file>` untuk transpilasi resep upstream.
+  - **Server `forge-server`:** Sub-perintah `forge-server build <cpu-profile.json> [pkg] [--recipes-path <PATH>] [--output-dir <PATH>]` (CI/CD Worker Lock-CPU), `forge-server import <binary.forge.tar.zst> [--binhost-path <PATH>] [--target-march <MARCH>]` (Binary Ingestion ke binhost & `catalog.json`), `forge-server index` (Generator global `packages.db.zst`), dan `forge-server serve` (API daemon & Web Explorer).
+- [x] **HTTP REST API Daemon (`crates/forge-server/src/server.rs`):** Router `axum` & `tokio` melayani `/v1/health`, `/v1/recipes/latest.sha256`, `/v1/recipes/latest.tar.zst`, dan `/v1/binhost/{march}/...`.
 - [x] **Recipe Bundler Engine (`ForgeServer::bundle_recipes`):** Mengompresi direktori recipes menjadi tarball Zstandard deterministik (`recipes.tar.zst`) dan mencatat checksum SHA256 (`recipes.tar.zst.sha256`).
 - [x] **Client Sync Engine (`crates/forge/src/sync.rs`):** Modul `SyncClient::sync_recipes` dengan handshake SHA256, deteksi no-op jika up-to-date, streaming download, validasi kriptografis, ekstraksi atomik Zstandard, dan pembaruan direktori resep resmi `/var/db/forge/recipes/`.
 - [x] **CLI Subcommand `forge sync` & Flag `--server`:** Terintegrasi di `crates/forge/src/main.rs`.
-- [x] **Unit & Integration Tests:** `test_bundle_recipes_and_hash_generation`, `test_server_health_and_endpoints`, `test_sync_recipes_client_full_cycle`, `test_sync_noop_when_up_to_date` lulus 100%.
+- [x] **Unit & Integration Tests:** `test_forge_client_build_produces_tarball_without_installing`, `test_forge_server_build_and_import_separation`, `test_forge_server_import_registers_to_catalog`, `test_bundle_recipes_and_hash_generation`, `test_server_health_and_endpoints`, `test_sync_recipes_client_full_cycle`, `test_sync_noop_when_up_to_date` lulus 100%.
 
 ---
 
@@ -188,6 +189,7 @@
 33. **ADR-033 (Global Concurrency Lock RAII):** Menjamin seluruh operasi mutatif package manager (`install`, `remove`, `sync`, `update`) terlindungi oleh file lock RAII eksklusif (`/var/lock/forge.lock` dengan fallback ke `$TEMP_DIR/forge.lock`) dengan pencatatan PID aktif untuk mencegah race condition dan korupsi database paket.
 34. **ADR-034 (Bubblewrap Sandbox Build Isolation):** Mengisolasi siklus eksekusi script build dengan memetakan filesystem host 100% Read-Only (`--ro-bind / /`), hanya mengizinkan penulisan pada direktori build RAM dan staging `$DESTDIR`, serta unshare namespace lengkap dengan graceful fallback mode jika `bwrap` belum terpasang.
 35. **ADR-035 (ALPM DB Tarball Parser & Recursive Anti-Brick Resolver):** Mem-parsing arsip database repositori `.db.tar.zst` CachyOS dan berkas `desc` secara native, serta melakukan penelusuran graf dependensi rekursif (DFS Topological Sort) yang secara otomatis menolak dan memfilter paket Core OS yang masuk dalam blacklist demi stabilitas Kura Linux.
+36. **ADR-036 (Pemisahan Tanggung Jawab Command Build & Import):** Memisahkan secara ketat siklus kompilasi (`build`) dan siklus ingestion/registrasi (`import`) di klien `forge` dan server `forge-server`. `forge build` hanya mengompilasi dan mengemas ke `.forge.tar.zst` tanpa instalasi ke rootfs `/`. `forge-server build` bertindak sebagai CI/CD Worker murni, sedangkan `forge-server import` bertindak sebagai Binary Ingester yang memverifikasi metadata, memindahkan tarball ke direktori binhost resmi `/var/db/forge/binhost/<march>/`, dan memperbarui `catalog.json`.
 
 ---
 
@@ -211,6 +213,7 @@
 | *2026-09-19* | *Cascade & Anti-Brick* | *Paket biner luar (Arch/CachyOS) berisiko menimpa glibc/init system Kura Linux* | *Menerapkan 3-Tier Cascade Resolution Engine (`cascade.rs`) & Core OS Blacklist Anti-Brick Protection (`cachyos.rs`) (ADR-030, ADR-031)* |
 | *2026-09-19* | *Importer & 100 Resep* | *Katalog resep kosong dan kebutuhan konversi PKGBUILD/APKBUILD upstream secara deterministik* | *Membangun `RecipeImporter` engine (`importer.rs`), CLI `forge recipe-import`, dan menyusun 105 resep paket esensial Kura Linux di `recipes/` (ADR-032)* |
 | *2026-09-19* | *Concurrency & Sandbox* | *Risiko tabrakan transaksi simultan, polusi host filesystem saat build, dan dependensi biner tier 2 berantai* | *Mengimplementasikan `ForgeLockGuard` (`lock.rs`), `SandboxRunner` (`sandbox.rs`) dengan Bubblewrap / fallback, serta parser ALPM `.db.tar.zst` & resolver dependensi rekursif (`cachyos.rs`) (ADR-033, ADR-034, ADR-035)* |
+| *2026-09-19* | *Build vs Import* | *Pencampuran tanggung jawab build dan import pada server/klien membingungkan alur CI/CD* | *Menerapkan pemisahan `build` (kompilasi & packaging) dan `import` (ingestion & cataloging) secara independen (ADR-036)* |
 
 ---
 

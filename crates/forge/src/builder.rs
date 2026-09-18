@@ -1,9 +1,10 @@
 use anyhow::{Context, Result};
+use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use crate::{ForgeConfig, Recipe};
+use crate::{ForgeConfig, PackageMetadata, Recipe};
 
 pub struct RecipeBuilder;
 
@@ -15,6 +16,185 @@ impl RecipeBuilder {
         let recipe = toml::from_str::<Recipe>(&content)
             .with_context(|| format!("Gagal mem-parsing sintaks TOML pada {:?}", path))?;
         Ok(recipe)
+    }
+
+    /// Cari file recipe.toml berdasarkan nama paket di recipes_path atau fallback lokal
+    pub fn find_recipe(pkg: &str, base_path: Option<&Path>) -> Option<PathBuf> {
+        let direct = Path::new(pkg);
+        if direct.exists() && direct.is_file() {
+            return Some(direct.to_path_buf());
+        }
+
+        let check_dir = |base: &Path| -> Option<PathBuf> {
+            let direct_cand = base.join(pkg).join("recipe.toml");
+            if direct_cand.exists() {
+                return Some(direct_cand);
+            }
+            let standard_cands = [
+                base.join("system").join(pkg).join("recipe.toml"),
+                base.join("core").join(pkg).join("recipe.toml"),
+                base.join("extra").join(pkg).join("recipe.toml"),
+            ];
+            for cand in standard_cands {
+                if cand.exists() {
+                    return Some(cand);
+                }
+            }
+            // Scan subdirektori dinamis (misal: custom_cat/pkg/recipe.toml)
+            if let Ok(entries) = std::fs::read_dir(base) {
+                for entry in entries.flatten() {
+                    let path = entry.path();
+                    if path.is_dir() {
+                        let sub_cand = path.join(pkg).join("recipe.toml");
+                        if sub_cand.exists() {
+                            return Some(sub_cand);
+                        }
+                    }
+                }
+            }
+            None
+        };
+
+        if let Some(base) = base_path {
+            if let Some(res) = check_dir(base) {
+                return Some(res);
+            }
+        }
+        let fallback_bases = [
+            PathBuf::from("/var/db/forge/recipes"),
+            PathBuf::from("recipes"),
+        ];
+        for base in fallback_bases {
+            if let Some(res) = check_dir(&base) {
+                return Some(res);
+            }
+        }
+        None
+    }
+
+    /// Kemas direktori staging DESTDIR menjadi tarball biner .forge.tar.zst dengan metadata.json
+    pub fn package_staging(
+        staging_dir: &Path,
+        output_tarball: &Path,
+        recipe: &Recipe,
+        target_march: &str,
+        cflags: &str,
+        use_flags: &str,
+    ) -> Result<(PathBuf, String, u64)> {
+        if let Some(parent) = output_tarball.parent() {
+            fs::create_dir_all(parent)?;
+        }
+
+        // Hitung total size dan files_count
+        let mut files_count = 0usize;
+        let mut installed_size = 0u64;
+        let mut stack = vec![staging_dir.to_path_buf()];
+        while let Some(dir) = stack.pop() {
+            if let Ok(rd) = fs::read_dir(&dir) {
+                for entry in rd.flatten() {
+                    let p = entry.path();
+                    if p.is_dir() {
+                        stack.push(p);
+                    } else if p.is_file() || p.is_symlink() {
+                        files_count += 1;
+                        if let Ok(m) = entry.metadata() {
+                            installed_size += m.len();
+                        }
+                    }
+                }
+            }
+        }
+
+        // Tulis metadata.json ke staging sebelum kompresi
+        let metadata = PackageMetadata {
+            name: recipe.package.name.clone(),
+            version: recipe.package.version.clone(),
+            release: recipe.package.release,
+            slot: recipe.package.slot.clone(),
+            description: recipe.package.description.clone(),
+            url: recipe.package.url.clone(),
+            license: recipe.package.license.clone(),
+            upstream: recipe.package.upstream.clone(),
+            build_time: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs(),
+            target_march: target_march.to_string(),
+            cflags: cflags.to_string(),
+            use_flags: use_flags.to_string(),
+            files_count,
+            installed_size,
+        };
+
+        let meta_path = staging_dir.join("metadata.json");
+        fs::write(&meta_path, serde_json::to_string_pretty(&metadata)?)?;
+
+        let file = fs::File::create(output_tarball)?;
+        let encoder = zstd::Encoder::new(file, 3)?;
+        let mut tar = tar::Builder::new(encoder);
+        tar.append_dir_all(".", staging_dir)?;
+        let encoder = tar.into_inner()?;
+        let mut finished_file = encoder.finish()?;
+        std::io::Write::flush(&mut finished_file)?;
+        drop(finished_file);
+
+        let bytes = fs::read(output_tarball)?;
+        let sha256_hash = format!("{:x}", Sha256::digest(&bytes));
+        let size_bytes = bytes.len() as u64;
+
+        let sha_file = format!("{}.sha256", output_tarball.display());
+        fs::write(sha_file, &sha256_hash)?;
+
+        Ok((output_tarball.to_path_buf(), sha256_hash, size_bytes))
+    }
+
+    /// Kompilasi paket dari source dan kemas langsung ke .forge.tar.zst di output_dir
+    pub fn build_and_package(
+        recipe_path: &Path,
+        config: &ForgeConfig,
+        output_dir: &Path,
+        custom_src_dir: Option<&Path>,
+    ) -> Result<PathBuf> {
+        let recipe = Self::load_recipe(recipe_path)?;
+        let pkg_name = &recipe.package.name;
+        let pkg_ver = &recipe.package.version;
+        let target_march = if config.cpu.target_march.is_empty() || config.cpu.target_march == "native" {
+            "native"
+        } else {
+            &config.cpu.target_march
+        };
+
+        let staging_dir = std::env::temp_dir()
+            .join("forge")
+            .join("stage")
+            .join(format!("{}-{}", pkg_name, pkg_ver));
+        if staging_dir.exists() {
+            let _ = fs::remove_dir_all(&staging_dir);
+        }
+        fs::create_dir_all(&staging_dir)?;
+
+        Self::build(recipe_path, config, &staging_dir, custom_src_dir)?;
+
+        fs::create_dir_all(output_dir)?;
+        let tarball_name = format!("{}-{}-{}.forge.tar.zst", pkg_name, pkg_ver, target_march);
+        let output_tarball = output_dir.join(tarball_name);
+
+        let (final_tarball, sha256, size) = Self::package_staging(
+            &staging_dir,
+            &output_tarball,
+            &recipe,
+            target_march,
+            &config.build.cflags,
+            &config.use_flags.flags,
+        )?;
+
+        println!(
+            "  [✓] Paket biner terkemas: {} ({} bytes, SHA256: {})",
+            final_tarball.display(),
+            size,
+            sha256
+        );
+        Ok(final_tarball)
     }
 
     /// Eksekusi kompilasi lengkap dari kode sumber sesuai hierarki konfigurasi Forge
@@ -193,5 +373,71 @@ impl RecipeBuilder {
 
         println!("  [✓] Kompilasi & staging {} berhasil di {:?}", pkg_name, destdir);
         Ok(destdir.to_path_buf())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_forge_client_build_produces_tarball_without_installing() -> Result<()> {
+        let temp = tempfile::tempdir()?;
+        let recipe_dir = temp.path().join("recipes").join("system").join("client-test-pkg");
+        fs::create_dir_all(&recipe_dir)?;
+
+        let recipe_path = recipe_dir.join("recipe.toml");
+        let recipe_content = r#"
+[package]
+name = "client-test-pkg"
+version = "1.2.3"
+release = 1
+slot = "0"
+description = "Test Package for Client Build"
+
+[build]
+type = "meta"
+script = """
+mkdir -p "$DESTDIR/usr/bin"
+echo "echo client test" > "$DESTDIR/usr/bin/client-test-bin"
+chmod +x "$DESTDIR/usr/bin/client-test-bin"
+"""
+"#;
+        fs::write(&recipe_path, recipe_content)?;
+
+        let output_dir = temp.path().join("dist");
+        let mut config = ForgeConfig::default();
+        config.cpu.target_march = "znver4".to_string();
+
+        let tarball_path = RecipeBuilder::build_and_package(&recipe_path, &config, &output_dir, None)?;
+        assert!(tarball_path.exists(), "Tarball biner .forge.tar.zst harus dibuat di output_dir");
+        assert_eq!(tarball_path, output_dir.join("client-test-pkg-1.2.3-znver4.forge.tar.zst"));
+
+        // Periksa isi tarball
+        let tar_file = fs::File::open(&tarball_path)?;
+        let decoder = zstd::Decoder::new(tar_file)?;
+        let mut archive = tar::Archive::new(decoder);
+        let mut found_bin = false;
+        let mut found_meta = false;
+
+        for entry in archive.entries()? {
+            let entry = entry?;
+            let path = entry.path()?.to_path_buf();
+            let path_str = path.to_string_lossy();
+            if path_str.ends_with("usr/bin/client-test-bin") {
+                found_bin = true;
+            }
+            if path_str.ends_with("metadata.json") {
+                found_meta = true;
+            }
+        }
+
+        assert!(found_bin, "File /usr/bin/client-test-bin harus ada di dalam tarball");
+        assert!(found_meta, "metadata.json harus ada di dalam tarball");
+
+        // Verifikasi bahwa host /usr/bin/client-test-bin TIDAK pernah terpasang
+        assert!(!Path::new("/usr/bin/client-test-bin").exists(), "forge build TIDAK BOLEH memasang ke host filesystem /");
+
+        Ok(())
     }
 }

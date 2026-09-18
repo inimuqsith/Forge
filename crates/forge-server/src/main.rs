@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::*;
-use forge_server::{ForgeServer, ServerImporter, ServerState};
+use forge_server::{ForgeServer, ServerBuilder, ServerImporter, ServerIndexer, ServerState};
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -36,27 +36,41 @@ enum Commands {
         bundle: bool,
     },
 
-    /// CI/CD: Kompilasi paket yang di-lock ke CPU target & upload ke Binary Library
-    Import {
+    /// CI/CD Worker: Kompilasi paket yang di-lock ke CPU target menjadi tarball .forge.tar.zst
+    Build {
         /// Path ke file cpu-profile.json
-        #[arg(help = "Path ke berkas cpu-profile.json")]
         profile_json: PathBuf,
 
         /// Nama paket yang akan dikompilasi (misal: base, base-devel, mold)
-        #[arg(help = "Nama paket atau meta-paket yang akan di-build (opsional)")]
         package: Option<String>,
 
+        /// Path direktori resep
         #[arg(long, default_value = "recipes")]
         recipes_path: PathBuf,
 
+        /// Direktori keluaran artefak .forge.tar.zst
+        #[arg(long, default_value = "dist")]
+        output_dir: PathBuf,
+    },
+
+    /// Ingestion Biner: Impor berkas tarball .forge.tar.zst ke Binhost resmi & perbarui catalog.json
+    Import {
+        /// Path ke berkas tarball biner (.forge.tar.zst)
+        package_tar_zst: PathBuf,
+
+        /// Path direktori penyimpanan binhost resmi
         #[arg(long, default_value = "/var/db/forge/binhost")]
         binhost_path: PathBuf,
+
+        /// Override target mikroarsitektur CPU (misal: znver4, x86_64_v3, generic)
+        #[arg(long)]
+        target_march: Option<String>,
     },
 
     /// Regenerasi database index repositori biner (packages.db.zst)
     Index {
         #[arg(long, default_value = "/var/db/forge/binhost")]
-        storage_path: String,
+        storage_path: PathBuf,
     },
 }
 
@@ -130,26 +144,34 @@ fn main() -> Result<()> {
             })?;
         }
 
-        Commands::Import {
+        Commands::Build {
             profile_json,
             package,
             recipes_path,
-            binhost_path,
+            output_dir,
         } => {
-            ServerImporter::import_and_build(
+            ServerBuilder::build_package(
                 &profile_json,
                 package.as_deref(),
                 &recipes_path,
+                &output_dir,
+            )?;
+        }
+
+        Commands::Import {
+            package_tar_zst,
+            binhost_path,
+            target_march,
+        } => {
+            ServerImporter::import_tarball(
+                &package_tar_zst,
                 &binhost_path,
+                target_march.as_deref(),
             )?;
         }
 
         Commands::Index { storage_path } => {
-            println!(">>> Memindai repositori biner di {}...", storage_path.bold());
-            println!(
-                "{} Database index packages.db.zst berhasil diperbarui!",
-                "✓".green()
-            );
+            ServerIndexer::regenerate_index(&storage_path)?;
         }
     }
 
