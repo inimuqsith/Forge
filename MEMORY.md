@@ -141,6 +141,7 @@
 24. **ADR-024 (Config-Protected Unmerge Cleaner & Reverse Directory Pruning):** Penghapusan paket dilakukan secara presisi dari leaf files ke root, menghapus folder kosong tanpa merusak direktori bersama sistem, serta melindungi berkas konfigurasi `/etc/` yang telah dimodifikasi oleh pengguna (`CONFIG_PROTECT`).
 25. **ADR-025 (Integrated Compiler Acceleration with Ccache 4.13.5 & Memory tmpfs Isolation):** Engine kompilasi Forge secara otomatis mengintegrasikan akselerasi compiler cache `ccache` pada `CC` dan `CXX`, serta mengisolasi build directory di RAM `tmpfs` untuk memaksimalkan kecepatan I/O dan efisiensi siklus rebuild.
 26. **ADR-026 (Paradigma Meta-Paket Murni & Eliminasi Hardcoded @system / system-setup):** Menghapus total target magis `@system` yang di-hardcode di kode biner dan menghapus wizard `system-setup`. Basis sistem Kura Linux didefinisikan murni sebagai resep meta-paket deklaratif (`base` dan `base-devel`) mengadopsi filosofi *Everything is a Package* ala Arch Linux/Alpine/Void.
+27. **ADR-027 (Pipeline Bootstrap 2-Tahap & Resolusi Paradoks Ayam-Telur):** Memecahkan masalah bootstrapping OS baru (The Chicken-and-Egg Problem) melalui 2 tahap: Tahap 1 mengompilasi resep toolchain di host menjadi Seed Toolchain `dist/kura-toolchain.tar.xz`, dan Tahap 2 mengekstrak seed tersebut ke dalam chroot `/mnt/kura/` untuk kemudian menjalankan `forge install base` dan `forge install base-devel` secara self-hosted.
 
 ---
 
@@ -157,6 +158,8 @@
 | *2026-09-18* | *Penyederhanaan Crate* | *Layout 6 crate berlebihan dan membingungkan* | *Mengkonsolidasikan workspace menjadi Clean 2-Crate Layout (`crates/forge` dan `crates/forge-server`)* |
 | *2026-09-18* | *Akselerasi Rebuild* | *Kompilasi ulang source code berulang memakan waktu lama* | *Mengintegrasikan Ccache (v4.13.5) secara otomatis pada pipeline builder Forge (ADR-025)* |
 | *2026-09-18* | *Penyederhanaan Desain* | *Wizard system-setup dan @system hardcoded kaku & melanggar prinsip UNIX* | *Menghapus system-setup & @system hardcoded, beralih ke paradigma meta-paket deklaratif `base` dan `base-devel` (ADR-026)* |
+| *2026-09-18* | *Paradoks Bootstrap* | *Bagaimana chroot bisa build base-devel jika belum punya compiler bawaan* | *Merumuskan 2-Stage Bootstrapping Pipeline: Seed Toolchain diekstrak ke chroot, baru mengeksekusi `forge install base-devel` (ADR-027)* |
+
 
 ---
 

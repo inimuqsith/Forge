@@ -87,9 +87,46 @@ flowchart TD
         K -- "2b. forge install --binhost" --> M["Download Pre-built Binary\n(Lock-CPU)"]
     end
 
-    EPOCH_1 --> EPOCH_2
-    EPOCH_2 --> EPOCH_3
+### 🐣 2-Stage Bootstrapping Pipeline: Menyelesaikan Masalah Paradoks Ayam dan Telur (*The Bootstrap Paradox*)
+
+> **Pertanyaan Mendasar:** *"Bagaimana kita bisa menjalankan `forge install base-devel` di dalam chroot Kura Linux jika di dalam chroot belum ada toolchain compiler untuk mengompilasi?"*
+
+Masalah ini adalah masalah klasik **The Chicken-and-Egg Problem** dalam pembuatan sistem operasi (seperti Linux From Scratch atau Gentoo). Forge menyelesaikannya secara deterministik melalui **Pipeline Bootstrap 2-Tahap**:
+
 ```
+[ TAHAP 1: Di Luar Chroot / Mesin Host Saat Ini ]
+   Host Linux (Menggunakan compiler host sementara)
+        │
+        ▼
+   Forge mengompilasi resep LLVM 22, Mold, Make, Ninja, Glibc dari source ke /tmp/forge/stage/
+        │
+        ▼
+   forge toolchain bundle  ───►  Menghasilkan "dist/kura-toolchain.tar.xz" (SEED TOOLCHAIN)
+                                 (Berisi: clang, mold, make, ninja, gcc, pkgconf, dan biner forge)
+
+─────────────────────────────────────────────────────────────────────────────
+
+[ TAHAP 2: Masuk ke Lingkungan Chroot /mnt/kura ]
+   1. Ekstrak Seed Toolchain ke rootfs kosong:
+      # mkdir -p /mnt/kura
+      # tar -xpJf dist/kura-toolchain.tar.xz -C /mnt/kura/
+      
+   2. Masuk ke lingkungan chroot:
+      # chroot /mnt/kura /bin/bash
+      
+   3. SEKARANG TOOLCHAIN SUDAH TERSEDIA DI /usr/bin/ !
+      Maka di dalam chroot, Forge dapat mengeksekusi:
+      
+      # forge install base        ──► Mengompilasi paket pondasi OS (bash, coreutils, openrc) 
+                                      menggunakan Seed Toolchain yang ada di /usr/bin/.
+                                      
+      # forge install base-devel  ──► Mengompilasi ulang toolchain generasi ke-2 (Self-Hosted)
+                                      yang 100% murni di-link terhadap Glibc Kura Linux sendiri!
+                                      Setelah ini, Seed Toolchain lama digantikan secara bersih.
+```
+
+Dengan alur 2-tahap ini, Kura Linux bertransformasi dari sistem yang bergantung pada seed awal menjadi **Self-Hosting Operating System** seutuhnya tanpa pernah mengotori sistem host.
+
 
 ---
 
