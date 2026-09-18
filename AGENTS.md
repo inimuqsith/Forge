@@ -143,6 +143,15 @@ Format commit wajib menggunakan standar Conventional Commits: `<type>: <deskrips
 - `refactor:` Restrukturisasi kode tanpa mengubah fungsionalitas publik.
 
 ### Aturan Git:
-1. **Verifikasi Sebelum Commit:** Seluruh perubahan kode wajib lulus pengujian (`cargo test` / `cargo check`) sebelum dibuatkan commit.
-2. **Jangan Commit Artefak Build & Tarball:** Target binary `target/`, file `.tar.*`, cache `distfiles/`, dan staging rootfs wajib diabaikan via `.gitignore`.
-3. **Commit Terfokus & Atomik:** Setiap commit harus mencakup satu tujuan perubahan yang jelas dan terdokumentasi dengan baik.
+1. **Wajib Git Berkala:** Setiap tahapan kerja, pembaruan blueprint arsitektur, maupun penyesuaian yang telah disetujui User dan diverifikasi **wajib langsung dicatat ke Git**.
+2. **Verifikasi Sebelum Commit:** Seluruh perubahan kode/arsitektur wajib lulus verifikasi (`cargo test` / `cargo check` jika menyangkut kode) sebelum dibuatkan commit.
+3. **Jangan Commit Artefak Build & Tarball:** Target binary `target/`, file `.tar.*`, cache `distfiles/`, dan staging rootfs wajib diabaikan via `.gitignore`.
+4. **Commit Terfokus & Atomik:** Setiap commit harus mencakup satu tujuan perubahan yang jelas dan terdokumentasi dengan baik sesuai standar Conventional Commits.
+
+---
+
+## 7. Aturan Mutlak Sinkronisasi Berkas Markdown Kontinu
+
+1. **Pembaruan Berkas MD Terus-Menerus:** Seluruh dokumentasi arsitektur dan status ekosistem ([`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md), [`MEMORY.md`](file:///home/admin/Development/Forge/MEMORY.md), [`README.md`](file:///home/admin/Development/Forge/README.md), [`AGENTS.md`](file:///home/admin/Development/Forge/AGENTS.md)) **wajib terus diperbarui secara berkelanjutan dan persisten** setiap kali ada keputusan arsitektural, diagram baru, atau perkembangan status implementasi.
+2. **Kesesuaian Dokumentasi dengan Realita Kode:** Dokumen Markdown adalah sumber kebenaran teknis (*Single Source of Truth*) bagi siapapun yang mengembangkan Forge. Jangan biarkan ada diskrepansi antara dokumentasi dan status riil di repositori.
+

@@ -143,6 +143,7 @@
 26. **ADR-026 (Paradigma Meta-Paket Murni & Eliminasi Hardcoded @system / system-setup):** Menghapus total target magis `@system` yang di-hardcode di kode biner dan menghapus wizard `system-setup`. Basis sistem Kura Linux didefinisikan murni sebagai resep meta-paket deklaratif (`base` dan `base-devel`) mengadopsi filosofi *Everything is a Package* ala Arch Linux/Alpine/Void.
 27. **ADR-027 (Pipeline Bootstrap 2-Tahap & Resolusi Paradoks Ayam-Telur):** Memecahkan masalah bootstrapping OS baru (The Chicken-and-Egg Problem) melalui 2 tahap: Tahap 1 mengompilasi resep toolchain di host menjadi Seed Toolchain `dist/kura-toolchain.tar.xz`, dan Tahap 2 mengekstrak seed tersebut ke dalam chroot `/mnt/kura/` untuk kemudian menjalankan `forge install base` dan `forge install base-devel` secara self-hosted.
 28. **ADR-028 (Sistem Resep Terdedikasi `/var/db/forge/recipes/`, Protokol `forge sync`, & Kemandirian Chroot Toolchain):** Menghapus ketergantungan pada direktori kerja lokal pengembang (`./recipes/`) dan menstandarkan pohon resep sistem resmi di `/var/db/forge/recipes/`. Protokol `forge sync` menyinkronkan tarball resep dari `forge-server` secara atomik. Perintah `forge toolchain bundle` otomatis menyertakan seluruh `/var/db/forge/recipes/`, `/etc/forge/forge.conf`, dan `/usr/bin/forge` ke dalam `dist/kura-toolchain.tar.xz`, memastikan lingkungan chroot `/mnt/kura/` 100% mandiri (*self-contained*) untuk langsung mengompilasi `base` dan `base-devel` tanpa ketergantungan eksternal.
+29. **ADR-029 (Disiplin Git Commit Berkala & Pembaruan Kontinu Dokumentasi Markdown):** Menegakkan kewajiban bahwa setiap tahapan kerja dan pembaruan arsitektur yang telah disetujui User wajib langsung dicatat ke Git dengan Conventional Commits, serta seluruh berkas dokumentasi Markdown (`ARCHITECTURE.md`, `MEMORY.md`, `README.md`, `AGENTS.md`) wajib diperbarui secara terus-menerus (*continuous persistent sync*) agar selalu mencerminkan kondisi arsitektur riil.
 
 ---
 
@@ -162,6 +163,7 @@
 | *2026-09-18* | *Paradoks Bootstrap* | *Bagaimana chroot bisa build base-devel jika belum punya compiler bawaan* | *Merumuskan 2-Stage Bootstrapping Pipeline: Seed Toolchain diekstrak ke chroot, baru mengeksekusi `forge install base-devel` (ADR-027)* |
 | *2026-09-18* | *Optimasi Ekstrem* | *Flag kompilasi belum memaksimalkan seluruh fitur AMD Zen 4 silikon* | *Menerapkan flag 'Mentok Ekstrem' Zen 4: AVX-512 ZMM, Thin LTO, Mold ICF `--icf=all`, Dead-strip `--gc-sections`, `-fno-math-errno`, & 32-byte function alignment* |
 | *2026-09-18* | *Kemandirian Chroot* | *Chroot butuh akses ke resep tanpa mount repo git lokal host* | *Menstandarkan `/var/db/forge/recipes/`, merancang protokol `forge sync`, dan membundel seluruh resep ke `kura-toolchain.tar.xz` (ADR-028)* |
+| *2026-09-18* | *Workflow & Docs* | *Perlunya disiplin Git commit berkala & pembaruan berkas MD berkelanjutan* | *Menetapkan aturan wajib Git commit dan sinkronisasi persisten berkas MD pada setiap tahapan (ADR-029)* |
 
 ---
 
