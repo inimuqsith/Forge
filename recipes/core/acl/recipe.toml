@@ -1,0 +1,32 @@
+[package]
+name = "acl"
+version = "2.3.2"
+release = 1
+slot = "0"
+description = "Access control list utilities and library"
+license = "GPL-2.0-or-later AND LGPL-2.1-or-later"
+upstream = "https://savannah.nongnu.org/projects/acl"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://download.savannah.nongnu.org/releases/acl/acl-2.3.2.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/acl-${pkgver}"
+./configure --prefix=/usr --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

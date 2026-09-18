@@ -1,0 +1,36 @@
+[package]
+name = "libtool"
+version = "2.5.4"
+release = 1
+slot = "0"
+description = "Generic library support script"
+license = "GPL-2.0-or-later"
+upstream = "https://www.gnu.org/software/libtool/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "m4",
+]
+build = [
+    "make",
+    "m4",
+    "autoconf",
+    "automake",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/libtool/libtool-2.5.4.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/libtool-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

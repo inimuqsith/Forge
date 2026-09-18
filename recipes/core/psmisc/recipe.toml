@@ -1,0 +1,33 @@
+[package]
+name = "psmisc"
+version = "23.7"
+release = 1
+slot = "0"
+description = "Miscellaneous proc-based tools (killall, fuser, pstree)"
+license = "GPL-2.0-or-later"
+upstream = "https://gitlab.com/psmisc/psmisc"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "ncurses",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://downloads.sourceforge.net/psmisc/psmisc-23.7.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/psmisc-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

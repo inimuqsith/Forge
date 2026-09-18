@@ -1,0 +1,33 @@
+[package]
+name = "bzip2"
+version = "1.0.8"
+release = 1
+slot = "0"
+description = "A high-quality data compression program"
+license = "bzip2-1.0.6"
+upstream = "https://sourceware.org/bzip2/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "make"
+script = """
+cd "${srcdir}/bzip2-${pkgver}"
+make -f Makefile-libbz2_so ${MAKEFLAGS}
+make ${MAKEFLAGS}
+make PREFIX="${DESTDIR}/usr" install
+cp -a libbz2.so* "${DESTDIR}/usr/lib/"
+"""

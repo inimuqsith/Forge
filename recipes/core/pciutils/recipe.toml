@@ -1,0 +1,34 @@
+[package]
+name = "pciutils"
+version = "3.13.0"
+release = 1
+slot = "0"
+description = "PCI bus configuration and diagnostic tools (lspci, setpci)"
+license = "GPL-2.0-or-later"
+upstream = "https://mj.ucw.cz/sw/pciutils/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "hwdata",
+    "kmod",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://mj.ucw.cz/download/linux/pci/pciutils-3.13.0.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "make"
+script = """
+cd "${srcdir}/pciutils-${pkgver}"
+make PREFIX=/usr SHAREDIR=/usr/share/hwdata SHARED=yes ${MAKEFLAGS}
+make PREFIX=/usr SHAREDIR=/usr/share/hwdata SHARED=yes DESTDIR="${DESTDIR}" install install-lib
+"""

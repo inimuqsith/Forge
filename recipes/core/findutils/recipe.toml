@@ -1,0 +1,32 @@
+[package]
+name = "findutils"
+version = "4.10.0"
+release = 1
+slot = "0"
+description = "GNU utilities for finding files (find, xargs, locate)"
+license = "GPL-3.0-or-later"
+upstream = "https://www.gnu.org/software/findutils/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/findutils/findutils-4.10.0.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/findutils-${pkgver}"
+./configure --prefix=/usr --localstatedir=/var/lib/locate
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

@@ -1,0 +1,37 @@
+[package]
+name = "wpa_supplicant"
+version = "2.11"
+release = 1
+slot = "0"
+description = "WPA/WPA2/WPA3 and IEEE 802.1X wireless client daemon"
+license = "BSD-3-Clause"
+upstream = "https://w1.fi/wpa_supplicant/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "openssl",
+    "readline",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://w1.fi/releases/wpa_supplicant-2.11.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "make"
+script = """
+cd "${srcdir}/wpa_supplicant-${pkgver}/wpa_supplicant"
+cp defconfig .config
+echo "CONFIG_LIBNL32=y" >> .config
+echo "CONFIG_READLINE=y" >> .config
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" BINDIR=/usr/bin install
+"""

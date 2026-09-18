@@ -1,0 +1,35 @@
+[package]
+name = "kbd"
+version = "2.7.1"
+release = 1
+slot = "0"
+description = "Keytable files and keyboard utilities (loadkeys, setfont)"
+license = "GPL-2.0-or-later"
+upstream = "https://kbd-project.org/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+    "bison",
+    "flex",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://kernel.org/pub/linux/utils/kbd/kbd-2.7.1.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/kbd-${pkgver}"
+./configure --prefix=/usr --disable-vlock
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

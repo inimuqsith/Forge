@@ -1,0 +1,34 @@
+[package]
+name = "grep"
+version = "3.11"
+release = 1
+slot = "0"
+description = "GNU grep, egrep and fgrep"
+license = "GPL-3.0-or-later"
+upstream = "https://www.gnu.org/software/grep/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "pcre2",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/grep/grep-3.11.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/grep-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

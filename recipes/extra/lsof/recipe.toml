@@ -1,0 +1,32 @@
+[package]
+name = "lsof"
+version = "4.99.4"
+release = 1
+slot = "0"
+description = "Lists information about files opened by processes"
+license = "custom"
+upstream = "https://github.com/lsof-org/lsof"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://github.com/lsof-org/lsof/archive/refs/tags/4.99.4.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/lsof-${pkgver}"
+./Configure -n linux
+make ${MAKEFLAGS}
+install -Dm755 lsof "${DESTDIR}/usr/bin/lsof"
+"""

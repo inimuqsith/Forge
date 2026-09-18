@@ -1,0 +1,36 @@
+[package]
+name = "openssh"
+version = "9.9p2"
+release = 1
+slot = "0"
+description = "Premier connectivity tool for remote login with the SSH protocol"
+license = "BSD-2-Clause AND BSD-3-Clause AND MIT"
+upstream = "https://www.openssh.com/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "openssl",
+    "zlib",
+    "libcap",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.9p2.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/openssh-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc/ssh --with-ssl-dir=/usr --with-privsep-path=/var/empty --without-pam
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

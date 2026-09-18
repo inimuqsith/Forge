@@ -1,0 +1,32 @@
+[package]
+name = "libseccomp"
+version = "2.5.5"
+release = 1
+slot = "0"
+description = "Enhanced Seccomp library and kernel syscall filtering interface"
+license = "LGPL-2.1-only"
+upstream = "https://github.com/seccomp/libseccomp"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://github.com/seccomp/libseccomp/releases/download/v2.5.5/libseccomp-2.5.5.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/libseccomp-${pkgver}"
+./configure --prefix=/usr --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

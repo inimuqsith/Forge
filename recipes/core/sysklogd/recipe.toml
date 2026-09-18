@@ -1,0 +1,33 @@
+[package]
+name = "sysklogd"
+version = "2.6.1"
+release = 1
+slot = "0"
+description = "Standard Linux system and kernel logging daemons (syslogd, klogd)"
+license = "BSD-3-Clause"
+upstream = "https://troglobit.com/projects/sysklogd/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://github.com/troglobit/sysklogd/releases/download/v2.6.1/sysklogd-2.6.1.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/sysklogd-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --without-logger
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

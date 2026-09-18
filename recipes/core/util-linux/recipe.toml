@@ -1,0 +1,37 @@
+[package]
+name = "util-linux"
+version = "2.40.4"
+release = 1
+slot = "0"
+description = "Miscellaneous system utilities for Linux"
+license = "GPL-2.0-or-later"
+upstream = "https://github.com/util-linux/util-linux"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "ncurses",
+    "zlib",
+    "libcap",
+    "libseccomp",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://github.com/util-linux/util-linux/releases/download/v2.40.4/util-linux-2.40.4.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/util-linux-${pkgver}"
+./configure --prefix=/usr --disable-chfn-chsh --disable-login --disable-nologin --disable-su --disable-setpriv --disable-runuser --without-systemd
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

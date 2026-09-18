@@ -1,0 +1,31 @@
+[package]
+name = "tree"
+version = "2.2.1"
+release = 1
+slot = "0"
+description = "Recursive directory indentation and tree-format listing program"
+license = "GPL-2.0-or-later"
+upstream = "http://mama.indstate.edu/users/ice/tree/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://gitlab.com/OldManProgrammer/unix-tree/-/archive/2.2.1/unix-tree-2.2.1.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "make"
+script = """
+cd "${srcdir}/unix-tree-${pkgver}"
+make PREFIX=/usr ${MAKEFLAGS}
+make PREFIX=/usr DESTDIR="${DESTDIR}" install
+"""

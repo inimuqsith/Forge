@@ -1,0 +1,35 @@
+[package]
+name = "sqlite"
+version = "3.49.1"
+release = 1
+slot = "0"
+description = "Self-contained serverless SQL database engine"
+license = "blessing"
+upstream = "https://www.sqlite.org/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "readline",
+    "zlib",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://www.sqlite.org/2025/sqlite-autoconf-3490100.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/sqlite-autoconf-3490100"
+./configure --prefix=/usr --enable-readline --enable-threadsafe
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

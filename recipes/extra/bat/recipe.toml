@@ -1,0 +1,32 @@
+[package]
+name = "bat"
+version = "0.25.0"
+release = 1
+slot = "0"
+description = "A cat clone with syntax highlighting and Git integration"
+license = "Apache-2.0 OR MIT"
+upstream = "https://github.com/sharkdp/bat"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "zlib",
+]
+build = [
+    "cargo",
+    "rust",
+]
+
+[sources]
+urls = [
+    "https://github.com/sharkdp/bat/archive/refs/tags/v0.25.0.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "cargo"
+script = """
+cd "${srcdir}/bat-${pkgver}"
+cargo build --release
+install -Dm755 target/release/bat "${DESTDIR}/usr/bin/bat"
+"""

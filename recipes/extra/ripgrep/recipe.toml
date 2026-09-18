@@ -1,0 +1,33 @@
+[package]
+name = "ripgrep"
+version = "14.1.1"
+release = 1
+slot = "0"
+description = "Ultra-fast line-oriented search tool combining grep with find"
+license = "MIT OR Unlicense"
+upstream = "https://github.com/BurntSushi/ripgrep"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "pcre2",
+]
+build = [
+    "cargo",
+    "rust",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://github.com/BurntSushi/ripgrep/archive/refs/tags/14.1.1.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "cargo"
+script = """
+cd "${srcdir}/ripgrep-${pkgver}"
+cargo build --release --features pcre2
+install -Dm755 target/release/rg "${DESTDIR}/usr/bin/rg"
+"""

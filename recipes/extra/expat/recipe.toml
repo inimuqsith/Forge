@@ -1,0 +1,32 @@
+[package]
+name = "expat"
+version = "2.6.4"
+release = 1
+slot = "0"
+description = "XML parser library written in C"
+license = "MIT"
+upstream = "https://libexpat.github.io/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-2.6.4.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/expat-${pkgver}"
+./configure --prefix=/usr --without-docbook
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

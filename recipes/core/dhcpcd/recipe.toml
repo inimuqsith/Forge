@@ -1,0 +1,34 @@
+[package]
+name = "dhcpcd"
+version = "10.2.2"
+release = 1
+slot = "0"
+description = "RFC2131 and RFC3315 compliant DHCP/DHCPv6 and IPv4LL dual-stack client"
+license = "BSD-2-Clause"
+upstream = "https://roy.marples.name/projects/dhcpcd"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "openssl",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://github.com/NetworkConfiguration/dhcpcd/releases/download/v10.2.2/dhcpcd-10.2.2.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/dhcpcd-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --rundir=/run
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

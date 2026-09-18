@@ -1,0 +1,36 @@
+[package]
+name = "clang"
+version = "22.1.0"
+release = 1
+slot = "22"
+description = "C, C++, and Objective-C front-end for LLVM (v22)"
+license = "Apache-2.0-with-LLVM-exception"
+upstream = "https://clang.llvm.org/"
+
+[dependencies]
+runtime = [
+    "llvm",
+    "glibc",
+]
+build = [
+    "cmake",
+    "ninja",
+    "pkgconf",
+    "make",
+    "python",
+]
+
+[sources]
+urls = [
+    "https://github.com/llvm/llvm-project/releases/download/llvmorg-22.1.0/llvm-project-22.1.0.src.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "cmake"
+script = """
+cd "${srcdir}/llvm-project-${pkgver}.src"
+cmake -G Ninja -B build llvm -DLLVM_ENABLE_PROJECTS="clang" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DLLVM_USE_LINKER=mold
+ninja -C build clang ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install-clang install-clang-headers
+"""

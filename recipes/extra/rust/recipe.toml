@@ -1,0 +1,51 @@
+[package]
+name = "rust"
+version = "1.85.0"
+release = 1
+slot = "0"
+description = "Empowering everyone to build reliable and efficient systems programming language"
+license = "Apache-2.0 OR MIT"
+upstream = "https://www.rust-lang.org/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "llvm",
+    "zlib",
+    "openssl",
+    "curl",
+]
+build = [
+    "python",
+    "cmake",
+    "ninja",
+    "gcc",
+    "make",
+]
+
+[sources]
+urls = [
+    "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/rustc-${pkgver}-src"
+cat << 'EOF' > config.toml
+[llvm]
+link-shared = true
+[rust]
+channel = "stable"
+rpath = false
+[build]
+vendor = true
+extended = true
+tools = ["cargo", "rustfmt", "clippy"]
+[install]
+prefix = "/usr"
+EOF
+python x.py build -j ${MAKEFLAGS#-j}
+DESTDIR="${DESTDIR}" python x.py install
+"""

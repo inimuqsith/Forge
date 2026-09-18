@@ -1,0 +1,39 @@
+[package]
+name = "libarchive"
+version = "3.7.7"
+release = 1
+slot = "0"
+description = "Multi-format archive and compression library (bsdtar, bsdcpio)"
+license = "BSD-2-Clause"
+upstream = "https://libarchive.org/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "zlib",
+    "bzip2",
+    "xz",
+    "zstd",
+    "openssl",
+    "expat",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://github.com/libarchive/libarchive/releases/download/v3.7.7/libarchive-3.7.7.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/libarchive-${pkgver}"
+./configure --prefix=/usr --without-xml2 --with-expat --with-zstd --with-lz4 --with-bz2lib --with-zlib
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

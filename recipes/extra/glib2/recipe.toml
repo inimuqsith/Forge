@@ -1,0 +1,37 @@
+[package]
+name = "glib2"
+version = "2.82.5"
+release = 1
+slot = "0"
+description = "Core low-level data structure and utility library from GNOME"
+license = "LGPL-2.1-or-later"
+upstream = "https://gitlab.gnome.org/GNOME/glib"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "libffi",
+    "pcre2",
+    "zlib",
+]
+build = [
+    "meson",
+    "ninja",
+    "pkgconf",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://download.gnome.org/sources/glib/2.82/glib-2.82.5.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "meson"
+script = """
+cd "${srcdir}/glib-${pkgver}"
+meson setup build --prefix=/usr -Dlibmount=disabled -Dman=false
+ninja -C build ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

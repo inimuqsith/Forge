@@ -1,0 +1,33 @@
+[package]
+name = "less"
+version = "668"
+release = 1
+slot = "0"
+description = "A terminal based program for viewing text files"
+license = "GPL-3.0-or-later"
+upstream = "https://www.greenwoodsoftware.com/less/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "ncurses",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://www.greenwoodsoftware.com/less/less-668.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/less-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

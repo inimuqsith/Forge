@@ -1,0 +1,32 @@
+[package]
+name = "zlib"
+version = "1.3.1"
+release = 1
+slot = "0"
+description = "Standard compression library implementing DEFLATE algorithm"
+license = "Zlib"
+upstream = "https://zlib.net/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://zlib.net/zlib-1.3.1.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/zlib-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

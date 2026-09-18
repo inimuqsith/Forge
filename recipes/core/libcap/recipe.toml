@@ -1,0 +1,31 @@
+[package]
+name = "libcap"
+version = "2.73"
+release = 1
+slot = "0"
+description = "POSIX 1003.1e capabilities library and tools (setcap, getcap)"
+license = "BSD-3-Clause OR GPL-2.0-only"
+upstream = "https://sites.google.com/site/fullycapable/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.73.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "make"
+script = """
+cd "${srcdir}/libcap-${pkgver}"
+make prefix=/usr lib=lib ${MAKEFLAGS}
+make prefix=/usr lib=lib DESTDIR="${DESTDIR}" install
+"""

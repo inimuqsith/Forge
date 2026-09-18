@@ -1,0 +1,37 @@
+[package]
+name = "nftables"
+version = "1.1.1"
+release = 1
+slot = "0"
+description = "Netfilter userspace packet filtering framework"
+license = "GPL-2.0-only"
+upstream = "https://netfilter.org/projects/nftables/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "gmp",
+    "readline",
+]
+build = [
+    "make",
+    "gcc",
+    "bison",
+    "flex",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://netfilter.org/projects/nftables/files/nftables-1.1.1.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/nftables-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --with-cli=readline
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

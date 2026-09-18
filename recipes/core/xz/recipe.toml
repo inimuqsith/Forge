@@ -1,0 +1,32 @@
+[package]
+name = "xz"
+version = "5.6.4"
+release = 1
+slot = "0"
+description = "Free general-purpose data compression software with high compression ratio (LZMA2)"
+license = "GPL-2.0-or-later AND LGPL-2.1-or-later"
+upstream = "https://tukaani.org/xz/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://github.com/tukaani-project/xz/releases/download/v5.6.4/xz-5.6.4.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/xz-${pkgver}"
+./configure --prefix=/usr --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

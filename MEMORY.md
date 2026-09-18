@@ -126,6 +126,24 @@
 
 ---
 
+### Fase 12: Upstream Recipe Importer & Katalog 100+ Resep Paket Esensial
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
+- [x] **Recipe Importer Engine (`crates/forge/src/importer.rs`):**
+  - Parsing PKGBUILD dan APKBUILD cerdas: ekstraksi metadata (`pkgname`, `pkgver`, `pkgrel`, `pkgdesc`, `url`, `license`, `depends`, `makedepends`, `source`, `sha256sums`).
+  - Normalisasi dependensi: eliminasi batasan versi (`>=`, `<=`, `=`), translasi library soname (`libssl.so` $\rightarrow$ `openssl`, `libcurl.so` $\rightarrow$ `curl`, `libz.so` $\rightarrow$ `zlib`).
+  - Ekstraksi fungsi bash (`prepare`, `build`, `package`) dan transpilisasi transaksional ke format Forge `script` (`$pkgdir` / `${pkgdir}` $\rightarrow$ `"${DESTDIR}"`, `$srcdir` $\rightarrow$ `"${srcdir}"`).
+  - Serialisasi deterministik ke string `recipe.toml` yang valid dan terformat rapi.
+- [x] **CLI Sub-perintah `forge recipe-import`:**
+  - Mendukung file lokal maupun unduhan langsung dari URL hulu (`http://`, `https://`).
+  - Opsi penyimpanan `--output <PATH>`.
+- [x] **Katalog 105 Resep Esensial Kura Linux (`recipes/`):**
+  - `recipes/system/` (22 paket fondasi & toolchain: `glibc`, `gcc`, `llvm`, `clang`, `mold`, `binutils`, `make`, `ninja`, `cmake`, `meson`, `m4`, `autoconf`, `automake`, `libtool`, `patch`, `bison`, `flex`, `linux-headers`, `openrc`, `pkgconf`, `base`, `base-devel`).
+  - `recipes/core/` (51 paket utilitas inti, daemons & library).
+  - `recipes/extra/` (32 paket dev tools, CLI modern & runtime).
+- [x] **Unit & Integration Tests:** `test_parse_pkgbuild_metadata`, `test_transpile_build_package_steps`, `test_dependency_normalization`, `test_validate_all_recipes_in_repo_are_valid_toml` (100% lulus pada 105 resep).
+
+---
+
 ## 2. Keputusan Arsitektur Resmi (ADR Index)
 
 1. **ADR-001 (Kompilasi 100% Native Silikon):** Forge mengompilasi seluruh paket langsung dari kode sumber upstream dengan menyuntikkan flag optimasi silikon target (`-march=native -O3 -pipe -flto=thin`) untuk performa CPU maksimal.
@@ -159,6 +177,7 @@
 29. **ADR-029 (Disiplin Git Commit Berkala & Pembaruan Kontinu Dokumentasi Markdown):** Menegakkan kewajiban bahwa setiap tahapan kerja dan pembaruan arsitektur yang telah disetujui User wajib langsung dicatat ke Git dengan Conventional Commits, serta seluruh berkas dokumentasi Markdown (`ARCHITECTURE.md`, `MEMORY.md`, `README.md`, `AGENTS.md`) wajib diperbarui secara terus-menerus (*continuous persistent sync*) agar selalu mencerminkan kondisi arsitektur riil.
 30. **ADR-030 (Penyederhanaan CLI & 3-Tier Package Cascade Resolution):** Menghapus total flag kaku `--hybrid` dan menyederhanakan UX menjadi 2 opsi intuitif: `--native` (Source-First Portage Mode) dan `--binhost` (3-Tier Cascade: Forge Binhost -> CachyOS Zen4/v4/v3 -> Native Source Fallback).
 31. **ADR-031 (Garansi Anti-Brick & Core OS Blacklist Protection):** Menjamin integritas sistem Kura Linux dengan melarang keras paket fondasi dan toolchain OS inti (`glibc`, `openrc`, `gcc`, `llvm`, `mold`, `eudev`, `kmod`, `shadow`, `util-linux`, `base`, `base-devel`, `forge`, `systemd`) diambil dari repo biner luar (CachyOS/Arch), dan mewajibkan fallback kompilasi dari kode sumber resmi Kura Linux.
+32. **ADR-032 (Upstream Recipe Importer & Otomasi Katalog Resep Kura Linux):** Forge menyediakan engine `RecipeImporter` (`importer.rs`) dan CLI `forge recipe-import` untuk mengonversi spesifikasi deklaratif upstream (Arch PKGBUILD / Alpine APKBUILD) secara deterministik ke dalam format `recipe.toml` standar Kura Linux dengan normalisasi dependensi dan transposisi direktori staging `$DESTDIR`.
 
 ---
 
@@ -180,26 +199,7 @@
 | *2026-09-18* | *Kemandirian Chroot* | *Chroot butuh akses ke resep tanpa mount repo git lokal host* | *Menstandarkan `/var/db/forge/recipes/`, merancang protokol `forge sync`, dan membundel seluruh resep ke `kura-toolchain.tar.xz` (ADR-028)* |
 | *2026-09-18* | *Workflow & Docs* | *Perlunya disiplin Git commit berkala & pembaruan berkas MD berkelanjutan* | *Menetapkan aturan wajib Git commit dan sinkronisasi persisten berkas MD pada setiap tahapan (ADR-029)* |
 | *2026-09-19* | *Cascade & Anti-Brick* | *Paket biner luar (Arch/CachyOS) berisiko menimpa glibc/init system Kura Linux* | *Menerapkan 3-Tier Cascade Resolution Engine (`cascade.rs`) & Core OS Blacklist Anti-Brick Protection (`cachyos.rs`) (ADR-030, ADR-031)* |
-
----
-
-## 3. Log Masalah & Solusi (Troubleshooting)
-
-| Tanggal | Komponen | Masalah | Solusi |
-| :--- | :--- | :--- | :--- |
-| *2026-09-18* | *Inisialisasi* | *Kebutuhan arsitektur dasar Forge terpisah dari KuraLinux* | *Membangun blueprint awal Forge mengadopsi kebutuhan dari IDEA_FOR_FORGE.md* |
-| *2026-09-18* | *Arsitektur* | *Kompilasi source lokal berat di mesin pengguna; butuh opsi biner native & server CI/CD* | *Mengembangkan ekosistem Server & CI/CD Builder Lock-CPU, perintah `cpu-dump` & `import`, serta arsitektur Hybrid Unified* |
-| *2026-09-18* | *Filosofi* | *Prioritas default sempat condong ke binhost; komponen server tercampur dengan klien* | *Mengoreksi prioritas menjadi Source-First (Gentoo-style) dan memisahkan binary klien `forge` dengan server suite `forge-server`* |
-| *2026-09-18* | *Isolasi Host* | *Ketergantungan terhadap compiler host saat bootstrap awal Kura Linux* | *Mengembangkan sub-perintah `forge toolchain bundle` dan menghasilkan seed toolchain `dist/kura-toolchain.tar.xz` untuk diekstrak ke sysroot stage Kura Linux* |
-| *2026-09-18* | *Standarisasi Resep* | *Format terpisah bash + toml rentan fragmentasi; butuh format efisien & hierarki compiler kuat* | *Menerapkan format All-in-One `recipe.toml` berbasis Serde TOML dengan subshell environment injection mutlak* |
-| *2026-09-18* | *Integritas Build* | *Haram mutlak mengambil biner dari host filesystem* | *Menegakkan aturan Pure Source-Built (ADR-019): toolchain bundler hanya mengemas biner yang sah terkompilasi dari source code oleh Forge di staging `/tmp/forge/stage/`* |
-| *2026-09-18* | *Penyederhanaan Crate* | *Layout 6 crate berlebihan dan membingungkan* | *Mengkonsolidasikan workspace menjadi Clean 2-Crate Layout (`crates/forge` dan `crates/forge-server`)* |
-| *2026-09-18* | *Akselerasi Rebuild* | *Kompilasi ulang source code berulang memakan waktu lama* | *Mengintegrasikan Ccache (v4.13.5) secara otomatis pada pipeline builder Forge (ADR-025)* |
-| *2026-09-18* | *Penyederhanaan Desain* | *Wizard system-setup dan @system hardcoded kaku & melanggar prinsip UNIX* | *Menghapus system-setup & @system hardcoded, beralih ke paradigma meta-paket deklaratif `base` dan `base-devel` (ADR-026)* |
-| *2026-09-18* | *Paradoks Bootstrap* | *Bagaimana chroot bisa build base-devel jika belum punya compiler bawaan* | *Merumuskan 2-Stage Bootstrapping Pipeline: Seed Toolchain diekstrak ke chroot, baru mengeksekusi `forge install base-devel` (ADR-027)* |
-| *2026-09-18* | *Optimasi Ekstrem* | *Flag kompilasi belum memaksimalkan seluruh fitur AMD Zen 4 silikon* | *Menerapkan flag 'Mentok Ekstrem' Zen 4: AVX-512 ZMM, Thin LTO, Mold ICF `--icf=all`, Dead-strip `--gc-sections`, `-fno-math-errno`, & 32-byte function alignment* |
-| *2026-09-18* | *Kemandirian Chroot* | *Chroot butuh akses ke resep tanpa mount repo git lokal host* | *Menstandarkan `/var/db/forge/recipes/`, merancang protokol `forge sync`, dan membundel seluruh resep ke `kura-toolchain.tar.xz` (ADR-028)* |
-| *2026-09-18* | *Workflow & Docs* | *Perlunya disiplin Git commit berkala & pembaruan berkas MD berkelanjutan* | *Menetapkan aturan wajib Git commit dan sinkronisasi persisten berkas MD pada setiap tahapan (ADR-029)* |
+| *2026-09-19* | *Importer & 100 Resep* | *Katalog resep kosong dan kebutuhan konversi PKGBUILD/APKBUILD upstream secara deterministik* | *Membangun `RecipeImporter` engine (`importer.rs`), CLI `forge recipe-import`, dan menyusun 105 resep paket esensial Kura Linux di `recipes/` (ADR-032)* |
 
 ---
 

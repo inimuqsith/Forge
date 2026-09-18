@@ -1,0 +1,33 @@
+[package]
+name = "readline"
+version = "8.2.13"
+release = 1
+slot = "0"
+description = "GNU Readline command line editing library"
+license = "GPL-3.0-or-later"
+upstream = "https://tiswww.case.edu/php/chet/readline/rltop.html"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "ncurses",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/readline-8.2"
+./configure --prefix=/usr --with-curses --disable-static
+make SHLIB_LIBS="-lncursesw" ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

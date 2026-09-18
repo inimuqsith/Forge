@@ -1,0 +1,37 @@
+[package]
+name = "cmake"
+version = "3.31.5"
+release = 1
+slot = "0"
+description = "Cross-platform open-source build system generator"
+license = "BSD-3-Clause"
+upstream = "https://cmake.org/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "openssl",
+    "zlib",
+    "libarchive",
+]
+build = [
+    "make",
+    "gcc",
+    "binutils",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://github.com/Kitware/CMake/releases/download/v3.31.5/cmake-3.31.5.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/cmake-${pkgver}"
+./bootstrap --prefix=/usr --parallel=${MAKEFLAGS#-j} --system-libs --no-system-jsoncpp --no-system-cppdap
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

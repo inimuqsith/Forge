@@ -1,0 +1,36 @@
+[package]
+name = "rsync"
+version = "3.4.1"
+release = 1
+slot = "0"
+description = "Fast and versatile remote file copying tool"
+license = "GPL-3.0-or-later"
+upstream = "https://rsync.samba.org/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "zstd",
+    "openssl",
+    "acl",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://download.samba.org/pub/rsync/src/rsync-3.4.1.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/rsync-${pkgver}"
+./configure --prefix=/usr --with-included-popt=yes --with-included-zlib=no --disable-lz4 --disable-xxhash
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

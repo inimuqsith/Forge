@@ -1,0 +1,33 @@
+[package]
+name = "cargo"
+version = "1.85.0"
+release = 1
+slot = "0"
+description = "Rust Package Manager and Build Tool"
+license = "Apache-2.0 OR MIT"
+upstream = "https://crates.io/"
+
+[dependencies]
+runtime = [
+    "rust",
+    "openssl",
+    "curl",
+    "zlib",
+]
+build = [
+    "rust",
+]
+
+[sources]
+urls = [
+    "https://github.com/rust-lang/cargo/archive/refs/tags/0.85.0.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "cargo"
+script = """
+cd "${srcdir}/cargo-0.85.0"
+cargo build --release
+install -Dm755 target/release/cargo "${DESTDIR}/usr/bin/cargo"
+"""

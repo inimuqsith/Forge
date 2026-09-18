@@ -1,0 +1,33 @@
+[package]
+name = "tar"
+version = "1.35"
+release = 1
+slot = "0"
+description = "Utility used to store, backup, and transport files"
+license = "GPL-3.0-or-later"
+upstream = "https://www.gnu.org/software/tar/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "acl",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/tar/tar-1.35.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/tar-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

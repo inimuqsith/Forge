@@ -1,0 +1,32 @@
+[package]
+name = "m4"
+version = "1.4.19"
+release = 1
+slot = "0"
+description = "GNU Macro Processor"
+license = "GPL-3.0-or-later"
+upstream = "https://www.gnu.org/software/m4/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/m4-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

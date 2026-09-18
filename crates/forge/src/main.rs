@@ -1,9 +1,9 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use colored::*;
 use forge::{
     CpuProfile, DependencyResolver, ForgeConfig, InstalledDatabase, PackageCascadeResolver,
-    PackageProvider, RecipeBuilder, SyncClient, ToolchainComponent, ToolchainManager,
+    PackageProvider, RecipeBuilder, RecipeImporter, SyncClient, ToolchainComponent, ToolchainManager,
 };
 use std::path::{Path, PathBuf};
 
@@ -102,6 +102,16 @@ enum Commands {
     Toolchain {
         #[command(subcommand)]
         action: ToolchainAction,
+    },
+
+    /// Impor resep dari PKGBUILD/APKBUILD upstream ke format recipe.toml Kura Linux
+    RecipeImport {
+        /// Path berkas PKGBUILD lokal atau URL hulu
+        source: String,
+
+        /// Path keluaran recipe.toml (opsional)
+        #[arg(short, long)]
+        output: Option<String>,
     },
 }
 
@@ -435,6 +445,37 @@ fn main() -> Result<()> {
                 }
             }
         },
+
+        Commands::RecipeImport { source, output } => {
+            println!("{}", "=== Forge Recipe Importer ===".bold().cyan());
+            println!("Memproses sumber: {}", source.yellow());
+
+            let recipe = if source.starts_with("http://") || source.starts_with("https://") {
+                let rt = tokio::runtime::Runtime::new()?;
+                rt.block_on(RecipeImporter::import_from_url(&source))?
+            } else {
+                let content = std::fs::read_to_string(&source)
+                    .with_context(|| format!("Gagal membaca berkas {}", source))?;
+                RecipeImporter::parse_pkgbuild(&content)?
+            };
+
+            let toml_output = RecipeImporter::to_toml_string(&recipe)?;
+
+            if let Some(out_path_str) = output {
+                let out_path = PathBuf::from(&out_path_str);
+                if let Some(parent) = out_path.parent() {
+                    std::fs::create_dir_all(parent)?;
+                }
+                std::fs::write(&out_path, &toml_output)?;
+                println!("{} Resep berhasil disimpan ke: {}", "✓".green(), out_path.display().to_string().bold().green());
+            } else {
+                let default_dest = PathBuf::from(format!("recipes/extra/{}/recipe.toml", recipe.package.name));
+                println!("\n{}", "--- Hasil Transpilasi recipe.toml ---".bold());
+                println!("{}", toml_output);
+                println!("\n{} Resep berhasil diimpor untuk paket '{}' v{}", "✓".green(), recipe.package.name.bold(), recipe.package.version);
+                println!("  Tip: Gunakan flag --output <PATH> untuk menyimpan langsung ke file (misal: {})", default_dest.display().to_string().cyan());
+            }
+        }
     }
 
     Ok(())

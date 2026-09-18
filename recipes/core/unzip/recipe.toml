@@ -1,0 +1,32 @@
+[package]
+name = "unzip"
+version = "6.0"
+release = 1
+slot = "0"
+description = "Extraction utility for archives compressed in .zip format"
+license = "Info-ZIP"
+upstream = "http://infozip.sourceforge.net/UnZip.html"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "bzip2",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://downloads.sourceforge.net/infozip/unzip60.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "make"
+script = """
+cd "${srcdir}/unzip60"
+make -f unix/Makefile generic ${MAKEFLAGS}
+make -f unix/Makefile prefix="${DESTDIR}/usr" MANDIR="${DESTDIR}/usr/share/man/man1" install
+"""

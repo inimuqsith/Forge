@@ -1,0 +1,37 @@
+[package]
+name = "file"
+version = "5.46"
+release = 1
+slot = "0"
+description = "File type identification utility and libmagic"
+license = "BSD-2-Clause"
+upstream = "https://darwinsys.com/file/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "zlib",
+    "bzip2",
+    "xz",
+    "zstd",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://astron.com/pub/file/file-5.46.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/file-${pkgver}"
+./configure --prefix=/usr --enable-zlib --enable-bzlib --enable-xzlib --enable-zstdlib
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

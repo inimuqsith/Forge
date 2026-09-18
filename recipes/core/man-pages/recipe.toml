@@ -1,0 +1,28 @@
+[package]
+name = "man-pages"
+version = "6.13"
+release = 1
+slot = "0"
+description = "Linux system documentation manual pages"
+license = "GPL-2.0-or-later"
+upstream = "https://kernel.org/pub/linux/docs/man-pages/"
+
+[dependencies]
+runtime = [
+]
+build = [
+    "make",
+]
+
+[sources]
+urls = [
+    "https://kernel.org/pub/linux/docs/man-pages/man-pages-6.13.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "make"
+script = """
+cd "${srcdir}/man-pages-${pkgver}"
+make prefix=/usr DESTDIR="${DESTDIR}" install
+"""

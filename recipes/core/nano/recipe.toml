@@ -1,0 +1,35 @@
+[package]
+name = "nano"
+version = "8.3"
+release = 1
+slot = "0"
+description = "Pico editor clone with enhancements"
+license = "GPL-3.0-or-later"
+upstream = "https://nano-editor.org/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "ncurses",
+    "file",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://nano-editor.org/dist/v8/nano-8.3.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/nano-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --enable-utf8 --enable-color --enable-extra
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

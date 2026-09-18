@@ -1,0 +1,32 @@
+[package]
+name = "zip"
+version = "3.0"
+release = 1
+slot = "0"
+description = "Compressor utility for zipfile archives"
+license = "Info-ZIP"
+upstream = "http://infozip.sourceforge.net/Zip.html"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "bzip2",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://downloads.sourceforge.net/infozip/zip30.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "make"
+script = """
+cd "${srcdir}/zip30"
+make -f unix/Makefile generic ${MAKEFLAGS}
+make -f unix/Makefile prefix="${DESTDIR}/usr" MANDIR="${DESTDIR}/usr/share/man/man1" install
+"""

@@ -1,0 +1,34 @@
+[package]
+name = "automake"
+version = "1.17"
+release = 1
+slot = "0"
+description = "Tool for automatically generating Makefile.in files"
+license = "GPL-2.0-or-later"
+upstream = "https://www.gnu.org/software/automake/"
+
+[dependencies]
+runtime = [
+    "autoconf",
+    "glibc",
+]
+build = [
+    "make",
+    "autoconf",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/automake/automake-1.17.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/automake-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

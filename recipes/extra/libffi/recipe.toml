@@ -1,0 +1,32 @@
+[package]
+name = "libffi"
+version = "3.4.7"
+release = 1
+slot = "0"
+description = "Portable foreign function interface library"
+license = "MIT"
+upstream = "https://sourceware.org/libffi/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://github.com/libffi/libffi/releases/download/v3.4.7/libffi-3.4.7.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/libffi-${pkgver}"
+./configure --prefix=/usr --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

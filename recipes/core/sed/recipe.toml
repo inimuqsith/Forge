@@ -1,0 +1,33 @@
+[package]
+name = "sed"
+version = "4.9"
+release = 1
+slot = "0"
+description = "GNU stream editor"
+license = "GPL-3.0-or-later"
+upstream = "https://www.gnu.org/software/sed/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "acl",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/sed/sed-4.9.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/sed-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

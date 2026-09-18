@@ -1,0 +1,33 @@
+[package]
+name = "openssl"
+version = "3.4.1"
+release = 1
+slot = "3"
+description = "Robust, commercial-grade TLS/SSL cryptography toolkit"
+license = "Apache-2.0"
+upstream = "https://www.openssl.org/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+    "perl",
+]
+
+[sources]
+urls = [
+    "https://github.com/openssl/openssl/releases/download/openssl-3.4.1/openssl-3.4.1.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/openssl-${pkgver}"
+./Configure --prefix=/usr --openssldir=/etc/ssl --libdir=lib shared zlib-dynamic enable-ec_nistp_64_gcc_128
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install_sw install_ssldirs
+"""

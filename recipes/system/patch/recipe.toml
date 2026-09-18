@@ -1,0 +1,32 @@
+[package]
+name = "patch"
+version = "2.7.6"
+release = 1
+slot = "0"
+description = "Utility to apply diffs to files"
+license = "GPL-3.0-or-later"
+upstream = "https://savannah.gnu.org/projects/patch/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/patch/patch-2.7.6.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/patch-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

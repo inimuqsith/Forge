@@ -13,6 +13,7 @@ pub mod resolver;
 pub mod db;
 pub mod merger;
 pub mod sync;
+pub mod importer;
 
 pub use builder::RecipeBuilder;
 pub use toolchain::{ToolchainComponent, ToolchainManager, ToolchainStatus};
@@ -24,6 +25,7 @@ pub use resolver::*;
 pub use db::*;
 pub use merger::*;
 pub use sync::SyncClient;
+pub use importer::RecipeImporter;
 
 /// Konfigurasi Global Forge (/etc/forge/forge.conf)
 #[derive(Debug, Clone, Serialize, Deserialize)]

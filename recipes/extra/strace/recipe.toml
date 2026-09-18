@@ -1,0 +1,32 @@
+[package]
+name = "strace"
+version = "6.13"
+release = 1
+slot = "0"
+description = "Diagnostic, debugging and instructional userspace utility for Linux syscall tracing"
+license = "LGPL-2.1-or-later"
+upstream = "https://strace.io/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://github.com/strace/strace/releases/download/v6.13/strace-6.13.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/strace-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

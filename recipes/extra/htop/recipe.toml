@@ -1,0 +1,34 @@
+[package]
+name = "htop"
+version = "3.3.0"
+release = 1
+slot = "0"
+description = "Interactive process viewer for Unix systems"
+license = "GPL-2.0-or-later"
+upstream = "https://htop.dev/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "ncurses",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://github.com/htop-dev/htop/releases/download/3.3.0/htop-3.3.0.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/htop-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --enable-unicode
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

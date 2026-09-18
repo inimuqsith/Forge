@@ -1,0 +1,36 @@
+[package]
+name = "eudev"
+version = "3.2.14"
+release = 1
+slot = "0"
+description = "Standalone device manager fork of systemd-udev for OpenRC"
+license = "GPL-2.0-or-later"
+upstream = "https://github.com/eudev-project/eudev"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "kmod",
+    "hwdata",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+    "gperf",
+]
+
+[sources]
+urls = [
+    "https://github.com/eudev-project/eudev/releases/download/v3.2.14/eudev-3.2.14.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/eudev-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --sbindir=/usr/bin --enable-split-usr=no --enable-hwdb
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

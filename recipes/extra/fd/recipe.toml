@@ -1,0 +1,31 @@
+[package]
+name = "fd"
+version = "10.2.0"
+release = 1
+slot = "0"
+description = "Simple, fast and user-friendly alternative to find"
+license = "Apache-2.0 OR MIT"
+upstream = "https://github.com/sharkdp/fd"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "cargo",
+    "rust",
+]
+
+[sources]
+urls = [
+    "https://github.com/sharkdp/fd/archive/refs/tags/v10.2.0.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "cargo"
+script = """
+cd "${srcdir}/fd-${pkgver}"
+cargo build --release
+install -Dm755 target/release/fd "${DESTDIR}/usr/bin/fd"
+"""

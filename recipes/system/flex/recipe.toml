@@ -1,0 +1,35 @@
+[package]
+name = "flex"
+version = "2.6.4"
+release = 1
+slot = "0"
+description = "Fast lexical analyzer generator"
+license = "BSD-2-Clause"
+upstream = "https://github.com/westes/flex"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "m4",
+]
+build = [
+    "make",
+    "m4",
+    "bison",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/flex-${pkgver}"
+./configure --prefix=/usr --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

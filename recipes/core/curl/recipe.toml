@@ -1,0 +1,36 @@
+[package]
+name = "curl"
+version = "8.12.1"
+release = 1
+slot = "0"
+description = "Command line tool and library for transferring data with URLs"
+license = "curl"
+upstream = "https://curl.se/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "openssl",
+    "zlib",
+    "zstd",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://curl.se/download/curl-8.12.1.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/curl-${pkgver}"
+./configure --prefix=/usr --with-ssl --with-zlib --with-zstd --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

@@ -1,0 +1,36 @@
+[package]
+name = "shadow"
+version = "4.17.3"
+release = 1
+slot = "0"
+description = "Password and account management utilities"
+license = "BSD-3-Clause"
+upstream = "https://github.com/shadow-maint/shadow"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "acl",
+    "libcap",
+    "libseccomp",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://github.com/shadow-maint/shadow/releases/download/v4.17.3/shadow-4.17.3.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/shadow-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --with-libsubid --without-libpam
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

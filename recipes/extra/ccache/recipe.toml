@@ -1,0 +1,35 @@
+[package]
+name = "ccache"
+version = "4.10.2"
+release = 1
+slot = "0"
+description = "Fast compiler cache for C/C++"
+license = "GPL-3.0-or-later"
+upstream = "https://ccache.dev/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "zstd",
+]
+build = [
+    "cmake",
+    "ninja",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://github.com/ccache/ccache/releases/download/v4.10.2/ccache-4.10.2.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "cmake"
+script = """
+cd "${srcdir}/ccache-${pkgver}"
+cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DREDIS_STORAGE_BACKEND=OFF
+ninja -C build ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

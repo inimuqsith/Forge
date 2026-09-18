@@ -1,0 +1,33 @@
+[package]
+name = "ethtool"
+version = "6.11"
+release = 1
+slot = "0"
+description = "Utility for examining and tuning network interfaces and drivers"
+license = "GPL-2.0-only"
+upstream = "https://kernel.org/pub/software/network/ethtool/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://kernel.org/pub/software/network/ethtool/ethtool-6.11.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/ethtool-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

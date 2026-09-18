@@ -1,0 +1,32 @@
+[package]
+name = "which"
+version = "2.21"
+release = 1
+slot = "0"
+description = "Displays where a particular program is found in the path"
+license = "GPL-3.0-or-later"
+upstream = "https://savannah.gnu.org/projects/which/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/which/which-2.21.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/which-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

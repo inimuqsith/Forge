@@ -1,0 +1,43 @@
+[package]
+name = "python"
+version = "3.13.2"
+release = 1
+slot = "3.13"
+description = "Next generation of the high-level scripting language Python"
+license = "Python-2.0"
+upstream = "https://www.python.org/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "openssl",
+    "zlib",
+    "bzip2",
+    "xz",
+    "sqlite",
+    "libffi",
+    "expat",
+    "ncurses",
+    "readline",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://www.python.org/ftp/python/3.13.2/Python-3.13.2.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/Python-${pkgver}"
+./configure --prefix=/usr --enable-shared --with-system-expat --with-system-ffi --enable-optimizations
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+ln -sf python3 "${DESTDIR}/usr/bin/python"
+"""

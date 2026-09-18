@@ -1,0 +1,35 @@
+[package]
+name = "zsh"
+version = "5.9"
+release = 1
+slot = "0"
+description = "Advanced programmable command interpreter"
+license = "MIT-Modern-Variant"
+upstream = "https://www.zsh.org/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "ncurses",
+    "pcre2",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://www.zsh.org/pub/zsh-5.9.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/zsh-${pkgver}"
+./configure --prefix=/usr --enable-pcre --enable-cap --enable-multibyte
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

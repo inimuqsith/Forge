@@ -1,0 +1,34 @@
+[package]
+name = "procps-ng"
+version = "4.0.4"
+release = 1
+slot = "0"
+description = "Utilities for monitoring your system and its processes (ps, top, free)"
+license = "GPL-2.0-or-later"
+upstream = "https://gitlab.com/procps-ng/procps"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "ncurses",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://gitlab.com/procps-ng/procps/-/archive/v4.0.4/procps-v4.0.4.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/procps-v4.0.4"
+./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc --without-systemd
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

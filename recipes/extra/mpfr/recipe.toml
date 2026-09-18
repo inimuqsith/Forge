@@ -1,0 +1,33 @@
+[package]
+name = "mpfr"
+version = "4.2.1"
+release = 1
+slot = "0"
+description = "Multiple-precision floating-point arithmetic library"
+license = "LGPL-3.0-or-later"
+upstream = "https://www.mpfr.org/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "gmp",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.1.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/mpfr-${pkgver}"
+./configure --prefix=/usr --enable-thread-safe
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

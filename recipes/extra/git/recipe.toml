@@ -1,0 +1,37 @@
+[package]
+name = "git"
+version = "2.48.1"
+release = 1
+slot = "0"
+description = "Fast, scalable, distributed revision control system"
+license = "GPL-2.0-only"
+upstream = "https://git-scm.com/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "curl",
+    "openssl",
+    "zlib",
+    "expat",
+    "pcre2",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://www.kernel.org/pub/software/scm/git/git-2.48.1.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "make"
+script = """
+cd "${srcdir}/git-${pkgver}"
+make prefix=/usr NO_PERL=1 NO_TCLTK=1 USE_LIBPCRE2=1 ${MAKEFLAGS}
+make prefix=/usr NO_PERL=1 NO_TCLTK=1 DESTDIR="${DESTDIR}" install
+"""

@@ -1,0 +1,33 @@
+[package]
+name = "iptables"
+version = "1.8.11"
+release = 1
+slot = "0"
+description = "Linux kernel packet filtering and NAT control utility"
+license = "GPL-2.0-only"
+upstream = "https://netfilter.org/projects/iptables/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://netfilter.org/projects/iptables/files/iptables-1.8.11.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/iptables-${pkgver}"
+./configure --prefix=/usr --sbindir=/usr/bin --disable-nftables
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

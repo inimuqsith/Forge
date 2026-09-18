@@ -1,0 +1,36 @@
+[package]
+name = "libxml2"
+version = "2.13.6"
+release = 1
+slot = "0"
+description = "XML parsing library and utility toolkit"
+license = "MIT"
+upstream = "https://gitlab.gnome.org/GNOME/libxml2"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "zlib",
+    "xz",
+    "icu",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://download.gnome.org/sources/libxml2/2.13/libxml2-2.13.6.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/libxml2-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --with-threads --with-history --with-icu
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

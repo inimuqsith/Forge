@@ -1,0 +1,30 @@
+[package]
+name = "hwdata"
+version = "0.392"
+release = 1
+slot = "0"
+description = "Hardware identification databases (pci.ids, usb.ids, oui.txt)"
+license = "GPL-2.0-or-later"
+upstream = "https://github.com/vcrhonek/hwdata"
+
+[dependencies]
+runtime = [
+]
+build = [
+    "make",
+]
+
+[sources]
+urls = [
+    "https://github.com/vcrhonek/hwdata/archive/refs/tags/v0.392.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/hwdata-0.392"
+./configure --prefix=/usr --sysconfdir=/etc --datadir=/usr/share
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

@@ -1,0 +1,34 @@
+[package]
+name = "usbutils"
+version = "018"
+release = 1
+slot = "0"
+description = "USB device listing and inspection utilities (lsusb)"
+license = "GPL-2.0-or-later"
+upstream = "http://linux-usb.sourceforge.net/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "hwdata",
+]
+build = [
+    "make",
+    "gcc",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://kernel.org/pub/linux/utils/usb/usbutils/usbutils-018.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/usbutils-${pkgver}"
+./configure --prefix=/usr --datadir=/usr/share/hwdata
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

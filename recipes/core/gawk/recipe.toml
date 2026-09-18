@@ -1,0 +1,35 @@
+[package]
+name = "gawk"
+version = "5.3.1"
+release = 1
+slot = "0"
+description = "GNU awk pattern scanning and processing language"
+license = "GPL-3.0-or-later"
+upstream = "https://www.gnu.org/software/gawk/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "readline",
+    "gmp",
+    "mpfr",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/gawk-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

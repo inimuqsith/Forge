@@ -1,0 +1,37 @@
+[package]
+name = "bash"
+version = "5.2.37"
+release = 1
+slot = "0"
+description = "GNU Bourne Again SHell"
+license = "GPL-3.0-or-later"
+upstream = "https://www.gnu.org/software/bash/"
+
+[dependencies]
+runtime = [
+    "glibc",
+    "readline",
+    "ncurses",
+]
+build = [
+    "make",
+    "gcc",
+    "bison",
+    "pkgconf",
+]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/bash/bash-5.2.37.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/bash-${pkgver}"
+./configure --prefix=/usr --with-installed-readline --without-bash-malloc
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+ln -sf bash "${DESTDIR}/usr/bin/sh"
+"""

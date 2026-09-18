@@ -1,0 +1,32 @@
+[package]
+name = "acpid"
+version = "2.0.34"
+release = 1
+slot = "0"
+description = "Flexible and extensible ACPI event daemon"
+license = "GPL-2.0-or-later"
+upstream = "https://sourceforge.net/projects/acpid2/"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://downloads.sourceforge.net/acpid2/acpid-2.0.34.tar.xz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/acpid-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

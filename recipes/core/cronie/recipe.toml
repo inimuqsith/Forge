@@ -1,0 +1,32 @@
+[package]
+name = "cronie"
+version = "1.7.2"
+release = 1
+slot = "0"
+description = "Standard cron daemon and crontab scheduler"
+license = "MIT AND BSD-3-Clause"
+upstream = "https://github.com/cronie-crond/cronie"
+
+[dependencies]
+runtime = [
+    "glibc",
+]
+build = [
+    "make",
+    "gcc",
+]
+
+[sources]
+urls = [
+    "https://github.com/cronie-crond/cronie/releases/download/cronie-1.7.2/cronie-1.7.2.tar.gz",
+]
+sha256 = []
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/cronie-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --without-pam
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""
