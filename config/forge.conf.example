@@ -21,11 +21,11 @@ stage_path = "/tmp/forge/stage"
 recipes_path = "/var/db/forge/recipes"
 
 # Mode Resolusi Paket Bawaan:
-# - "hybrid": Cek Binhost -> Cek Hybrid Fallback -> Kompilasi Source
-# - "binhost": Prioritaskan unduhan biner terkompilasi native
-# - "source": Kompilasi lokal dari source code
+# - "source": (DEFAULT - Gentoo Portage Mode) Kompilasi 100% native dari kode sumber upstream
+# - "binhost": Utamakan unduhan biner native dari Forge Server
+# - "hybrid": Cek Binhost -> Cek Fallback CachyOS/Arch -> Kompilasi Source
 # - "interactive": Tanyakan opsi provider kepada pengguna saat instalasi
-mode = "hybrid"
+mode = "source"
 
 [server]
 # URL Forge Central Server untuk sinkronisasi resep & katalog
@@ -34,12 +34,9 @@ recipe_server = "https://recipes.kuralinux.org/v1"
 # URL Forge Central Binary Library (Binhost)
 binhost_url = "https://binhost.kuralinux.org/v1"
 
-# API Token untuk otentikasi upload CI/CD (hanya diatur pada worker server)
-server_api_token = ""
-
 [binhost]
-# Aktifkan penggunaan pre-built binary native dari Forge Server
-enable_binhost = true
+# Opsi akselerasi unduh binary native dari Forge Server (Default: false, diaktifkan via --binhost)
+enable_binhost = false
 
 # Otomatis cocokkan paket biner dengan arsitektur CPU pengguna
 auto_match_cpu = true
@@ -49,7 +46,7 @@ fallback_to_source = true
 
 [hybrid]
 # Fallback opsional ke repositori biner teroptimasi CachyOS (x86-64-v4 / v3)
-enable_cachyos_fallback = true
+enable_cachyos_fallback = false
 cachyos_repo_url = "https://mirror.cachyos.org/repo/x86_64_v4/cachyos_v4"
 
 # Fallback opsional ke repositori biner standar Arch Linux

@@ -1,192 +1,166 @@
-# ARCHITECTURE.md — Blueprint Arsitektur Package Manager `forge`
+# ARCHITECTURE.md — Blueprint Arsitektur Package Manager `forge` & `forge-server`
 
-> **`forge`** adalah *Hybrid Unified & Source-based package manager* modern untuk **Kura Linux**. Forge memadukan fleksibilitas kompilasi sumber ala **Gentoo Portage** (*USE Flags*, *Slots*, *Package Sets*, kompilasi native silikon) dengan kecepatan deployment **Forge Server & CI/CD Builder Lock-CPU**, **Native Binhost**, serta kemampuan **Hybrid Fallback** terhadap repositori biner **CachyOS** (x86-64-v3/v4) dan **Arch Linux**.
-
----
-
-## 1. Topologi & Lapisan Arsitektur Hybrid Forge
-
-```
-                                +--------------------------------------------+
-                                |             Forge User Client              |
-                                |  [ CLI Dispatcher, DAG Resolver, Profiler] |
-                                +--------------------------------------------+
-                                       |              |               |
-               ┌───────────────────────┘              |               └───────────────────────┐
-               │ (Level 1: Native Binhost)            │ (Level 2: Hybrid Fallback)            │ (Level 3: Source Build)
-               v                                      v                                       v
-+-----------------------------+        +-----------------------------+        +-----------------------------+
-|    Forge Server Binhost     |        |    CachyOS / Arch Repos     |        |   Local RAM tmpfs Sandbox   |
-| - Pre-compiled 100% Native  |        | - x86-64-v4 / v3 Binaries   |        | - Source fetch upstream     |
-| - Locked to Target CPU/USE  |        | - Pacman/Zst Binary Adapter |        | - SHA256 integrity check    |
-| - Zero Local Compilation    |        | - Fallback jika Forge biner |        | - Native silicon CFLAGS     |
-| - Manifest-based Fast Merge |        |   belum tersedia di server  |        | - DESTDIR Staging & Merge   |
-+-----------------------------+        +-----------------------------+        +-----------------------------+
-               ^                                                                              ^
-               │                                                                              │
-               │               +---------------------------------------------+                │
-               └────────────── |        Forge Server & CI/CD Builder         | ───────────────┘
-                               | - Central Recipe Registry (Server-Hosted)   |   Sync Recipes
-                               | - CI/CD Build Farm locked to Target CPU     |
-                               | - `forge import`: Build, Package & Upload   |
-                               | - `forge cpu-dump`: Profiling target CPU    |
-                               +---------------------------------------------+
-```
+> **`forge`** adalah *Source-First Hybrid Package Manager* modern untuk **Kura Linux**. Berakar kuat pada filosofi **Gentoo Portage** (*Source-First Native Compilation*, *Granular USE Flags*, *Multi-Version Slots*, *Package Sets*), Forge mengutamakan kompilasi kode sumber 100% native silikon di mesin pengguna, didukung suite terpisah **`forge-server`** untuk penyediaan repositori resep terpusat dan **CI/CD Build Farm Lock-CPU** untuk akselerasi biner opsional.
 
 ---
 
-## 2. Tiga Tingkat Resolusi Paket (Hybrid Unified Engine)
-
-Forge memberikan **kebebasan penuh kepada pengguna** untuk memilih strategi instalasi paket:
-
-### 🥇 Tingkat 1: Forge Native Binhost (Rekomendasi Kecepatan & Native Maksimal)
-- Klien menghubungi Forge Server Binhost.
-- Server mencocokkan target **CPU Microarchitecture Profile** pengguna (misal: AMD Zen 4 `znver4` dengan AVX-512, atau `cpu-dump` hash) dan kumpulan **USE Flags** yang aktif.
-- Jika biner yang cocok ditemukan: Forge langsung mengunduh paket biner `.forge.tar.zst` dan memasangnya secara deterministik via manifest (kecepatan setara binary distro, namun 100% native CPU pengguna).
-
-### 🥈 Tingkat 2: Hybrid Fallback (CachyOS x86-64-v4/v3 & Arch Linux)
-- Jika paket biner belum tersedia di Forge Server Binhost dan pengguna mengaktifkan opsi `enable_hybrid = true` di `/etc/forge/forge.conf` (atau flag `--allow-hybrid`):
-- Forge menghubungi repositori biner teroptimasi **CachyOS** (target x86-64-v4 / x86-64-v3) atau **Arch Linux**.
-- Binary adapter Forge mengekstrak paket `.pkg.tar.zst`, menyesuaikan layout UsrMerge & OpenRC Kura Linux, membuat manifest lokal, dan memasangnya ke sistem.
-
-### 🥉 Tingkat 3: Local Source Compilation (Gentoo Portage Mode)
-- Jika biner tidak tersedia, atau pengguna secara eksplisit meminta kompilasi lokal (`forge install --build-source <pkg>` atau preferensi `mode = "source"`):
-- Forge mengunduh kode sumber upstream dari entri `sources` resep.
-- Memvalidasi hash SHA256, mengekstrak ke RAM tmpfs (`/tmp/forge/build/`), menginjeksi CFLAGS native CPU pengguna, melakukan kompilasi terisolasi, memasang ke `DESTDIR`, dan melakukan transactional merge ke rootfs.
-
----
-
-## 3. Ekosistem Server Forge & CI/CD Builder (Lock-CPU)
-
-Untuk menghindari kompilasi berat berjam-jam di mesin laptop/klien lokal, ekosistem Forge menyertakan subsistem **Forge Server & CI/CD Builder**:
+## 1. Topologi Sistem: Pemisahan `forge` (Klien) & `forge-server` (Server)
 
 ```
-+-------------------------------------------------------------------------------+
-|                       Forge Server & Build Farm                               |
-+-------------------------------------------------------------------------------+
-|                                                                               |
-|  1. Recipe Registry Server:                                                   |
-|     - Menyimpan seluruh resep resmi Kura Linux (di-hosting di server).        |
-|     - Klien menyinkronkan resep via `forge sync`.                             |
-|                                                                               |
-|  2. Target CPU Profile Registry:                                              |
-|     - Menerima `cpu-profile.json` hasil `forge cpu-dump` dari pengguna.       |
-|     - Mengunci (*locks*) target compiler ke CPU pengguna (misal: `znver4`).   |
-|                                                                               |
-|  3. CI/CD Build Farm:                                                         |
-|     - Worker node menjalankan kompilasi massal terisolasi.                    |
-|     - Menggunakan tool internal: `forge import <pkg>`                         |
-|     - Otomatis menghasilkan `.forge.tar.zst` + manifest + metadata.           |
-|                                                                               |
-|  4. Binary Library & Storage:                                                 |
-|     - Menyimpan database repositori `packages.db.zst`.                        |
-|     - CDN / HTTP Server melayani unduhan binary ke seluruh klien Kura Linux.  |
-|                                                                               |
-+-------------------------------------------------------------------------------+
+                                      [ PENGGUNA KURA LINUX ]
+                                                 │
+                                                 ▼
++-------------------------------------------------------------------------------------------------+
+|                                 Forge Client CLI (`forge`)                                      |
++-------------------------------------------------------------------------------------------------+
+|  - CLI Dispatcher & Interactive Prompt Layer                                                    |
+|  - Dependency Graph & Topological DAG Resolver (depends & makedepends)                         |
+|  - USE Flags Engine (`forge_use`) & Multi-Version Slotting (`pkg:slot`)                         |
+|  - Hardware Profiler (`forge cpu-dump`) -> Ekspor cpu-profile.json                             |
+|  - Manifest Tracker & Transactional Merger (/var/db/forge/)                                    |
+|  - OpenRC Service Discovery & System Hooks Trigger                                              |
++-------------------------------------------------------------------------------------------------+
+          │                                      │                                      │
+          │ 🥇 PRIORITAS UTAMA (DEFAULT)         │ 🥈 OPSI AKSELERASI (OPT-IN)          │ 🥉 OPSI FALLBACK (OPT-IN)
+          ▼                                      ▼                                      ▼
++-------------------------+            +-------------------------+            +-------------------------+
+| Local RAM tmpfs Builder |            |  Forge Native Binhost   |            |  CachyOS / Arch Adapter |
+| - Fetch source upstream |            | - Unduh .forge.tar.zst  |            | - Unduh .pkg.tar.zst    |
+| - Verify SHA256/BLAKE3  |            | - Dicocokkan ke profil  |            | - Adaptasi layout root  |
+| - Inject native CFLAGS  |            |   CPU user (znver4) &   |            |   & buat manifest local |
+| - RAM tmpfs compilation |            |   USE flags aktif       |            |                         |
+| - DESTDIR Staging       |            |                         |            |                         |
++-------------------------+            +-------------------------+            +-------------------------+
+          ▲                                      ▲
+          │ Sync Recipes                         │ Unduh Pre-compiled Binaries
+          └──────────────────┐ ┌─────────────────┘
+                             │ │
++-------------------------------------------------------------------------------------------------+
+|                               Forge Server Suite (`forge-server`)                               |
++-------------------------------------------------------------------------------------------------+
+|  1. `forge-server serve` : Recipe Registry HTTP/API & Binary Catalog Server (`packages.db.zst`)|
+|  2. `forge-server import`: CI/CD Worker Builder yang di-lock ke profil CPU pengguna           |
+|  3. `forge-server index` : Generator database index katalog resep & paket biner                 |
+|  4. Binary Storage       : Object Storage / CDN penampung arsip `.forge.tar.zst`                |
++-------------------------------------------------------------------------------------------------+
 ```
 
 ---
 
-## 4. Rincian Perintah Baru
+## 2. Hierarki Resolusi Paket: Source-First (Gentoo Portage Philosophy)
 
-### 🔬 1. `forge cpu-dump` (CPU Profiler & Hardware Introspection)
-Mengekstrak identitas presisi prosesor, ekstensi instruksi (ISA), geometri cache, dan compiler flags optimal dari CPU mesin saat ini:
-- **Perintah:**
+Forge menganut filosofi **Source-First Compilation**: software paling optimal, aman, dan berdaya guna tinggi adalah software yang dikompilasi langsung dari kode sumber untuk mikroarsitektur silikon pengguna.
+
+### 🥇 Tingkat 1: Local Source Compilation (Prioritas Bawaan / Default)
+- **Alur Utama:** Ketika pengguna menjalankan `forge install <pkg>`:
+  1. Forge membaca resep mandiri (`Recipe.forge`) dari pohon resep lokal (hasil `forge sync`).
+  2. Memeriksa ketersediaan dependensi runtime (`depends`) dan build-time (`makedepends`).
+  3. Mengunduh source code upstream ke cache `/var/cache/forge/distfiles/`.
+  4. Memvalidasi hash kriptografis SHA256/BLAKE3.
+  5. Mengekstrak berkas ke area RAM `tmpfs` berkecepatan tinggi (`/tmp/forge/build/<pkg>`).
+  6. Menginjeksi compiler flags native silikon (`-O2 -march=native -pipe`) dan mengaktifkan cabang kode sesuai *USE Flags* pengguna.
+  7. Memasang ke staging directory (`DESTDIR`) `/tmp/forge/stage/<pkg>`.
+  8. Menjalankan pre-flight collision check, melakukan transactional merge ke rootfs (`/`), mencatat manifest di `/var/db/forge/installed/`, dan memicu hook OpenRC.
+
+---
+
+### 🥈 Tingkat 2: Forge Native Binhost (Opsi Akselerasi Terpusat)
+- Pengguna yang memiliki koneksi internet cepat atau ingin melewati kompilasi lokal yang berat (misal: Chromium, LLVM) dapat mengaktifkan opsi Binhost melalui flag `--binhost` atau konfigurasi `mode = "binhost"` / `prefer_binhost = true`.
+- Forge Klien mengirimkan hash profil CPU (dari `cpu-profile.json`) dan daftar USE flags aktif ke `forge-server`.
+- Jika `forge-server` memiliki biner yang telah di-build secara identik oleh worker CI/CD, paket `.forge.tar.zst` langsung diunduh dan dipasang secara instan.
+
+---
+
+### 🥉 Tingkat 3: Hybrid Fallback (CachyOS x86-64-v4/v3 & Arch Linux)
+- Opsi fallback opsional bagi pengguna yang membutuhkan software yang belum memiliki resep Forge resmi atau belum di-build di binhost.
+- Diaktifkan melalui flag `--hybrid` / `--allow-hybrid` atau konfigurasi `enable_cachyos_fallback = true`.
+- Adapter `src/hybrid/` mengekstrak arsip `.pkg.tar.zst`, menyesuaikan skema UsrMerge & OpenRC, serta menyusun manifest Forge lokal agar unmerge tetap 100% bersih.
+
+---
+
+## 3. Komponen Pengguna: `forge` CLI Client
+
+Klien baris perintah yang dijalankan oleh pengguna di workstation Kura Linux:
+
+| Perintah | Deskripsi |
+| :--- | :--- |
+| `forge install <pkg>` | **(Default)** Mengompilasi dan memasang paket langsung dari source code secara native |
+| `forge install --binhost <pkg>` | Mengutamakan unduhan biner pre-compiled dari Forge Server |
+| `forge install --hybrid <pkg>` | Mengizinkan fallback ke repositori CachyOS / Arch Linux |
+| `forge install --interactive <pkg>` | Menampilkan menu interaktif bagi pengguna untuk memilih provider instalasi |
+| `forge build <pkg>` | Mengompilasi paket dari source code hanya sampai tahap staging `DESTDIR` |
+| `forge remove <pkg>` | Menghapus paket secara bersih berdasarkan manifest di `/var/db/forge/` |
+| `forge sync` | Menyinkronisasikan pohon resep terbaru dari `forge-server` |
+| `forge update @world` | Memperbarui dan mengompilasi ulang seluruh software terpasang di sistem |
+| `forge cpu-dump` | Menganalisis CPU host, ekstensi ISA, cache, dan mengekspor `cpu-profile.json` |
+| `forge cpu-dump --export-cflags` | Menampilkan CFLAGS yang paling optimal untuk silikon saat ini |
+| `forge stage-export` | Mengemas rootfs aktif menjadi arsip stage distribusi (`kura-stage.tar.xz`) |
+| `forge list` | Menampilkan seluruh paket terpasang beserta versi dan slot |
+| `forge query <pkg>` | Menampilkan metadata rinci, USE flags aktif, dan manifest file |
+| `forge search <query>` | Mencari resep paket dalam katalog lokal |
+
+---
+
+## 4. Komponen Server & CI/CD: `forge-server` Suite
+
+Suite aplikasi backend terpisah untuk pengelolaan repositori terpusat dan otomasi build farm:
+
+### 🌐 1. `forge-server serve` (Registry & Catalog Server)
+- Menyajikan endpoint HTTP REST / WebSocket untuk:
+  - Distribusi tarball pohon resep ke klien (`/v1/recipes/sync`).
+  - Katalog biner terkompilasi dan metadata dependensi (`/v1/binhost/packages.db.zst`).
+  - Endpoint pendaftaran profil CPU (`/v1/cpu-profiles/register`).
+
+### 🏭 2. `forge-server import` (CI/CD Worker Lock-CPU)
+- Perintah otomasi di sisi worker CI/CD untuk:
+  1. Membaca target profil CPU pengguna (misal: `znver4` dengan AVX-512 dari `cpu-profile.json`).
+  2. Mengunci compiler ke flag silikon target tersebut.
+  3. Mengompilasi resep paket di lingkungan container/chroot sandbox terisolasi.
+  4. Memasang ke staging `DESTDIR`.
+  5. Mengemas menjadi arsip biner `.forge.tar.zst` yang memuat `data.tar.zst`, `manifest`, `metadata.json`, dan `hooks.sh`.
+  6. Mengindeks paket ke dalam database katalog repositori `packages.db.zst`.
+  7. Mengunggah biner secara otomatis ke Binary Library Storage / CDN.
+- **Sintaks:**
   ```bash
-  forge cpu-dump                    # Tampilkan info & simpan cpu-profile.json
-  forge cpu-dump --export-cflags    # Tampilkan flag CFLAGS yang optimal
-  forge cpu-dump --upload           # Unggah profil ke Forge Server untuk build farm
-  ```
-- **Contoh Struktur Output `cpu-profile.json`:**
-  ```json
-  {
-    "architecture": "x86_64",
-    "vendor": "AuthenticAMD",
-    "model_name": "AMD Ryzen 7 8845HS w/ Radeon 780M Graphics",
-    "family": 25,
-    "model": 117,
-    "target_march": "znver4",
-    "isa_extensions": [
-      "avx512f", "avx512vl", "avx512bw", "avx512dq", "avx512cd",
-      "avx512_bf16", "avx512_vnni", "avx2", "fma", "vaes", "sha_ni",
-      "bmi1", "bmi2", "aes", "sse4_2"
-    ],
-    "cache": {
-      "l1d": "256 KiB",
-      "l1i": "256 KiB",
-      "l2": "8 MiB",
-      "l3": "16 MiB"
-    },
-    "recommended_flags": {
-      "cflags": "-O2 -march=znver4 -pipe -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt",
-      "cxxflags": "-O2 -march=znver4 -pipe -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt",
-      "ldflags": "-Wl,-O1 -Wl,--as-needed -Wl,-z,relro -Wl,-z,now",
-      "makeflags": "-j16"
-    }
-  }
+  forge-server import <pkg>                     # Build & upload 1 paket
+  forge-server import --target-cpu znver4 <pkg> # Kunci arsitektur target ke znver4
+  forge-server import --all-system              # Rebuild seluruh set @system di CI/CD
   ```
 
----
-
-### 📦 2. `forge import` / `forge impor` (Server Build, Package, & Auto-Upload)
-Perintah sisi server / automated CI/CD worker untuk mengompilasi, mengemas, dan mempublikasikan paket ke Binary Library:
-- **Alur Kerja `forge import`:**
-  1. Membaca spesifikasi resep dari pohon resep server.
-  2. Mengunci compiler ke target profil CPU pengguna (`--target-cpu=znver4` atau membaca `cpu-profile.json`).
-  3. Mengompilasi paket di lingkungan sandbox chroot/container yang terisolasi.
-  4. Memasang hasil ke staging `$DESTDIR`.
-  5. Mengemas direktori staging menjadi arsip terkompresi `.forge.tar.zst` yang memuat:
-     - `data.tar.zst` (seluruh payload berkas biner, library, konfigurasi).
-     - `manifest` (daftar absolut berkas, izin hak akses, dan hash SHA256).
-     - `metadata.json` (nama, versi, release, target CPU march, USE flags aktif, dependensi, slot).
-  6. Mengindeks paket ke dalam database katalog repositori biner (`packages.db.zst`).
-  7. Mengunggah berkas paket secara otomatis ke Forge Central Binary Library / Object Storage / CDN.
-- **Perintah:**
-  ```bash
-  forge import <pkg>                          # Build & publish 1 paket
-  forge import --target-cpu znver4 <pkg>      # Build untuk arsitektur CPU tertentu
-  forge import --all-system                   # Build seluruh set @system untuk binhost
-  ```
+### 🗂️ 3. `forge-server index` (Catalog Indexer)
+- Memindai seluruh berkas `.forge.tar.zst` dalam direktori storage dan membangun ulang database index terkompresi `packages.db.zst`.
 
 ---
 
 ## 5. Fitur Filosofi Gentoo Portage di Forge
 
-### 🎛️ 1. USE Flags (Granular Feature Control)
-Memungkinkan pengguna mengaktifkan atau menonaktifkan fitur tertentu pada saat kompilasi paket:
-- **Konfigurasi Global:** `/etc/forge/forge.conf` (`use = ["ssl", "openrc", "-systemd", "lto", "pgo"]`).
-- **Konfigurasi Per-Paket:** `/etc/forge/package.use` (misal: `sys-apps/util-linux ncurses udev -systemd`).
-- **Penerapan di Resep:**
+### 🎛️ 1. Granular USE Flags
+Memungkinkan pengguna menyesuaikan fitur software sebelum kompilasi:
+- Global: `/etc/forge/forge.conf` (`flags = "ssl openrc alsa -systemd lto pgo"`).
+- Per-Paket: `/etc/forge/package.use` (`sys-apps/util-linux ncurses udev -systemd`).
+- Pengujian di Resep:
   ```bash
   if forge_use ssl; then
-    CONFIG_FLAGS+=( "--with-openssl" )
-  else
-    CONFIG_FLAGS+=( "--without-openssl" )
+    conf_args+=( --with-openssl )
   fi
   ```
 
-### 🏷️ 2. Package Slots (Multi-Version Coexistence)
-Memungkinkan beberapa versi mayor dari satu paket terpasang secara bersamaan tanpa konflik:
-- Contoh: `dev-lang/python:3.12` dan `dev-lang/python:3.13` atau `sys-devel/gcc:14` dan `sys-devel/gcc:15`.
-- Manifest dan database di `/var/db/forge/installed/<pkg>-<ver>:<slot>/` melacak kepemilikan berkas secara independen.
+### 🏷️ 2. Multi-Version Slots
+Mendukung koeksistensi beberapa versi mayor tanpa tabrakan berkas:
+- Contoh: `dev-lang/python:3.12` dan `dev-lang/python:3.13`.
+- Database `/var/db/forge/installed/<pkg>-<ver>:<slot>/` mencatat manifest masing-masing versi.
 
 ### 📦 3. Package Sets (`@system` & `@world`)
-- **`@system`**: Kumpulan paket esensial pembangun fondasi Kura Linux (Toolchain, Glibc, Kernel Linux Monolithic, OpenRC, Coreutils).
-- **`@world`**: Seluruh paket yang diminta secara eksplisit oleh pengguna ditambah set `@system`.
-- **Perintah:**
-  ```bash
-  forge install @system       # Rebuild seluruh basis sistem Kura Linux
-  forge update @world         # Perbarui seluruh software yang terpasang di sistem
-  ```
+- **`@system`**: Fondasi distro Kura Linux (Toolchain, Glibc, Linux Kernel Monolithic, OpenRC, Coreutils).
+- **`@world`**: Seluruh aplikasi yang terpasang secara eksplisit oleh pengguna + `@system`.
+- Kompilasi ulang seluruh basis OS secara native: `forge install @system`.
 
 ---
 
 ## 6. Format Resep Mandiri (`Recipe.forge`)
 
-Seluruh resep Forge disimpan terpusat di server (`recipes/`) dan diunduh oleh klien melalui `forge sync`:
-
 ```bash
-# Forge Recipe Format Standard
+# Forge Package Recipe Standard
 pkgname="openssh"
 pkgver="9.8p1"
 pkgrel="1"
@@ -196,19 +170,11 @@ url="https://www.openssh.com/"
 license="BSD-2-Clause"
 
 # Gentoo-Style USE Flags
-use_flags=("pam" "ssl" "kerberos" "ldns" "livecd")
+use_flags=("pam" "ssl" "kerberos" "ldns")
 default_use=("ssl" "pam")
 
-depends=(
-  "glibc"
-  "openssl"
-  "zlib"
-)
-makedepends=(
-  "gcc"
-  "make"
-  "pkgconf"
-)
+depends=("glibc" "openssl" "zlib")
+makedepends=("gcc" "make" "pkgconf")
 
 sources=(
   "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${pkgver}.tar.gz"
@@ -249,7 +215,7 @@ package() {
   cd "${srcdir}/openssh-${pkgver}"
   make DESTDIR="${DESTDIR}" install
 
-  # Pasang OpenRC Init Script bawaan Kura Linux
+  # Pasang skrip layanan OpenRC Kura Linux
   install -Dm755 "${filesdir}/sshd.initd" "${DESTDIR}/etc/init.d/sshd"
   install -Dm644 "${filesdir}/sshd.confd" "${DESTDIR}/etc/conf.d/sshd"
 }
@@ -259,7 +225,7 @@ package() {
 
 ## 7. Format Paket Biner Forge (`.forge.tar.zst`)
 
-Paket biner yang dihasilkan oleh `forge import` atau diunduh dari Binhost memiliki struktur arsip terstandarisasi:
+Paket biner yang dihasilkan oleh `forge-server import` memiliki struktur arsip terstandarisasi:
 
 ```
 package-name-1.0.0-1-znver4.forge.tar.zst
@@ -271,7 +237,7 @@ package-name-1.0.0-1-znver4.forge.tar.zst
 
 ---
 
-## 8. Standar File Konfigurasi Lengkap (`/etc/forge/forge.conf`)
+## 8. Konfigurasi Klien Default (`/etc/forge/forge.conf`)
 
 ```ini
 [general]
@@ -282,25 +248,25 @@ build_path = "/tmp/forge/build"
 stage_path = "/tmp/forge/stage"
 recipes_path = "/var/db/forge/recipes"
 
-# Mode Resolusi Paket: "binhost" (prioritas biner), "source" (kompilasi lokal), "hybrid" (binhost -> fallback -> source), "interactive" (tanya pengguna)
-mode = "hybrid"
+# Mode Bawaan: "source" (Source-First Kompilasi Lokal ala Gentoo)
+# Opsi Lain: "binhost", "hybrid", "interactive"
+mode = "source"
 
 [server]
-# URL Forge Central Server untuk sinkronisasi resep & metadata
+# URL Forge Central Server untuk sinkronisasi resep
 recipe_server = "https://recipes.kuralinux.org/v1"
-# URL Forge Binary Library (Binhost)
+# URL Forge Central Binary Library (Binhost)
 binhost_url = "https://binhost.kuralinux.org/v1"
-# API Token untuk otentikasi upload CI/CD (hanya di server)
-server_api_token = ""
 
 [binhost]
-enable_binhost = true
+# Opsi akselerasi unduh binary native dari Forge Server
+enable_binhost = false
 auto_match_cpu = true
 fallback_to_source = true
 
 [hybrid]
-# Fallback opsional ke binary repo CachyOS atau Arch Linux
-enable_cachyos_fallback = true
+# Opsi akselerasi fallback ke binary CachyOS / Arch Linux
+enable_cachyos_fallback = false
 cachyos_repo_url = "https://mirror.cachyos.org/repo/x86_64_v4/cachyos_v4"
 enable_arch_fallback = false
 arch_repo_url = "https://geo.mirror.pkgbuild.com/core/os/x86_64"
@@ -321,7 +287,7 @@ jobs = "auto"
 prefix = "/usr"
 
 [use]
-# USE Flags Global ala Portage
+# USE Flags Global Kura Linux
 flags = "ssl openrc alsa -systemd lto pgo"
 
 [hooks]
