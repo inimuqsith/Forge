@@ -61,9 +61,9 @@ enable_avx2 = true
 profile_file = "/etc/forge/cpu-profile.json"
 
 [build]
-# Flag optimasi native kompilasi Kura Linux
-cflags = "-O2 -march=native -pipe -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt"
-cxxflags = "-O2 -march=native -pipe -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt"
+# Flag optimasi native kompilasi Kura Linux (Khusus Silikon & Thin LTO)
+cflags = "-O3 -march=native -pipe -flto=thin -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt"
+cxxflags = "-O3 -march=native -pipe -flto=thin -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt"
 ldflags = "-Wl,-O1 -Wl,--as-needed -Wl,-z,relro -Wl,-z,now"
 makeflags = "-j$(nproc)"
 jobs = "auto"

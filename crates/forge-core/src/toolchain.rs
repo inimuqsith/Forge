@@ -41,7 +41,7 @@ impl ToolchainManager {
 
     /// Kemas seed toolchain ke dalam file tar.xz atau tar.zst
     pub fn bundle_seed_toolchain(output_path: &Path) -> Result<PathBuf> {
-        let status = Self::get_status();
+        let _status = Self::get_status();
         let temp_dir = tempfile::tempdir().context("Gagal membuat temporary directory untuk staging toolchain")?;
         let stage_root = temp_dir.path();
 
@@ -54,123 +54,84 @@ impl ToolchainManager {
         fs::create_dir_all(&etc_forge)?;
 
         let mut copied_binaries = Vec::new();
-        let components = [
-            &status.c_compiler,
-            &status.cxx_compiler,
-            &status.linker,
-            &status.gnu_compiler,
-            &status.make,
-            &status.ninja,
-            &status.pkgconf,
-        ];
 
-        // Salin biner dari staging Forge (/tmp/forge/stage/) jika tersedia hasil kompilasi resep
-        let stage_pkgs = ["pkgconf", "make", "ninja", "mold"];
-        for pkg in stage_pkgs {
-            let pkg_stage_bin = PathBuf::from(format!("/tmp/forge/stage/{}/usr/bin", pkg));
-            if pkg_stage_bin.exists() {
-                if let Ok(entries) = fs::read_dir(&pkg_stage_bin) {
-                    for entry in entries.flatten() {
-                        let path = entry.path();
-                        if path.is_file() || path.is_symlink() {
-                            let file_name = path.file_name().unwrap_or_default();
-                            let dest_file = usr_bin.join(file_name);
-                            if path.is_symlink() {
-                                if let Ok(target) = fs::read_link(&path) {
-                                    let _ = make_symlink(&target.to_string_lossy(), &dest_file);
-                                }
-                            } else {
-                                let _ = fs::copy(&path, &dest_file);
-                            }
-                            copied_binaries.push(pkg.to_string());
-                        }
-                    }
-                }
-            }
+        // HARAM AMBIL DARI HOST: Salin HANYA biner, library, dan header yang 100% dikompilasi dari source code oleh Forge ke /tmp/forge/stage/
+        let stage_root_src = Path::new("/tmp/forge/stage");
+        if stage_root_src.exists() {
+            if let Ok(pkg_dirs) = fs::read_dir(stage_root_src) {
+                for pkg_dir in pkg_dirs.flatten() {
+                    let pkg_path = pkg_dir.path();
+                    let pkg_name = pkg_path.file_name().unwrap_or_default().to_string_lossy().to_string();
 
-            let pkg_stage_lib = PathBuf::from(format!("/tmp/forge/stage/{}/usr/lib", pkg));
-            if pkg_stage_lib.exists() {
-                if let Ok(entries) = fs::read_dir(&pkg_stage_lib) {
-                    for entry in entries.flatten() {
-                        let path = entry.path();
-                        if path.is_file() || path.is_symlink() {
-                            let file_name = path.file_name().unwrap_or_default();
-                            let dest_file = usr_lib.join(file_name);
-                            if path.is_symlink() {
-                                if let Ok(target) = fs::read_link(&path) {
-                                    let _ = make_symlink(&target.to_string_lossy(), &dest_file);
+                    // Salin usr/bin dari staging paket
+                    let stage_bin = pkg_path.join("usr/bin");
+                    if stage_bin.exists() {
+                        if let Ok(entries) = fs::read_dir(&stage_bin) {
+                            for entry in entries.flatten() {
+                                let path = entry.path();
+                                let file_name = path.file_name().unwrap_or_default();
+                                let dest_file = usr_bin.join(file_name);
+                                if path.is_symlink() {
+                                    if let Ok(target) = fs::read_link(&path) {
+                                        let _ = make_symlink(&target.to_string_lossy(), &dest_file);
+                                    }
+                                } else {
+                                    let _ = fs::copy(&path, &dest_file);
                                 }
-                            } else {
-                                let _ = fs::copy(&path, &dest_file);
+                                copied_binaries.push(pkg_name.clone());
                             }
                         }
                     }
-                }
-            }
-        }
 
-        // Lengkapi compiler utama dan utilitas LLVM (Clang 22, LLD, llvm-ar, GCC, mold)
-        for comp in components {
-            if let Some(ref path_str) = comp.path {
-                let src_path = Path::new(path_str);
-                let dest_name = src_path.file_name().unwrap_or_default();
-                let dest_path = usr_bin.join(dest_name);
-                if !dest_path.exists() && src_path.exists() {
-                    let _ = fs::copy(src_path, &dest_path);
-                    copied_binaries.push(comp.name.clone());
-
-                    if comp.name == "clang" {
-                        let _ = make_symlink("clang", &usr_bin.join("cc"));
-                    } else if comp.name == "clang++" {
-                        let _ = make_symlink("clang++", &usr_bin.join("c++"));
-                    } else if comp.name == "pkgconf" {
-                        let _ = make_symlink("pkgconf", &usr_bin.join("pkg-config"));
-                    } else if comp.name == "mold" {
-                        let _ = make_symlink("mold", &usr_bin.join("ld"));
-                        let _ = make_symlink("mold", &usr_bin.join("ld.mold"));
-                    }
-                }
-            }
-        }
-
-        // Salin biner pembantu LLVM jika ada (lld, llvm-ar, llvm-nm, llvm-objdump)
-        let llvm_extras = ["lld", "llvm-ar", "llvm-as", "llvm-nm", "llvm-objdump", "llvm-ranlib"];
-        for extra in llvm_extras {
-            let candidate_paths = [
-                format!("/usr/lib/llvm/22/bin/{}", extra),
-                format!("/usr/bin/{}", extra),
-            ];
-            for cand in candidate_paths {
-                let p = Path::new(&cand);
-                if p.exists() {
-                    let dest = usr_bin.join(extra);
-                    if !dest.exists() {
-                        let _ = fs::copy(p, &dest);
-                        if extra == "lld" {
-                            let _ = make_symlink("lld", &usr_bin.join("ld.lld"));
-                        } else if extra == "llvm-ar" {
-                            let _ = make_symlink("llvm-ar", &usr_bin.join("ar"));
-                        } else if extra == "llvm-nm" {
-                            let _ = make_symlink("llvm-nm", &usr_bin.join("nm"));
-                        } else if extra == "llvm-objdump" {
-                            let _ = make_symlink("llvm-objdump", &usr_bin.join("objdump"));
-                        } else if extra == "llvm-ranlib" {
-                            let _ = make_symlink("llvm-ranlib", &usr_bin.join("ranlib"));
+                    // Salin usr/lib dari staging paket
+                    let stage_lib = pkg_path.join("usr/lib");
+                    if stage_lib.exists() {
+                        if let Ok(entries) = fs::read_dir(&stage_lib) {
+                            for entry in entries.flatten() {
+                                let path = entry.path();
+                                let file_name = path.file_name().unwrap_or_default();
+                                let dest_file = usr_lib.join(file_name);
+                                if path.is_symlink() {
+                                    if let Ok(target) = fs::read_link(&path) {
+                                        let _ = make_symlink(&target.to_string_lossy(), &dest_file);
+                                    }
+                                } else if path.is_dir() {
+                                    let _ = Command::new("cp").arg("-r").arg(&path).arg(&dest_file).status();
+                                } else {
+                                    let _ = fs::copy(&path, &dest_file);
+                                }
+                            }
                         }
                     }
-                    break;
+
+                    // Salin usr/include dari staging paket
+                    let stage_include = pkg_path.join("usr/include");
+                    if stage_include.exists() {
+                        let usr_inc = stage_root.join("usr/include");
+                        fs::create_dir_all(&usr_inc)?;
+                        let _ = Command::new("cp").arg("-r").arg(&stage_include).arg(&usr_inc).status();
+                    }
                 }
             }
         }
 
-        // Salin header bawaan Clang (/usr/lib/clang) jika ada
-        let clang_lib_dir = Path::new("/usr/lib/clang");
-        if clang_lib_dir.exists() {
-            let _ = Command::new("cp")
-                .arg("-r")
-                .arg(clang_lib_dir)
-                .arg(&usr_lib)
-                .status();
+        if copied_binaries.is_empty() {
+            anyhow::bail!("Tidak ada paket hasil kompilasi source di /tmp/forge/stage/. Silakan kompilasi paket toolchain via 'forge build <pkg>' terlebih dahulu! (Haram ambil dari host)");
+        }
+
+        // Terapkan symlink standar pada biner yang terkompilasi dari source
+        if usr_bin.join("clang").exists() {
+            let _ = make_symlink("clang", &usr_bin.join("cc"));
+        }
+        if usr_bin.join("clang++").exists() {
+            let _ = make_symlink("clang++", &usr_bin.join("c++"));
+        }
+        if usr_bin.join("pkgconf").exists() {
+            let _ = make_symlink("pkgconf", &usr_bin.join("pkg-config"));
+        }
+        if usr_bin.join("mold").exists() {
+            let _ = make_symlink("mold", &usr_bin.join("ld"));
+            let _ = make_symlink("mold", &usr_bin.join("ld.mold"));
         }
 
         // Tulis environment loader Kura Linux dengan flag optimasi native silikon

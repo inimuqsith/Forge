@@ -46,6 +46,7 @@
    - Perintah `forge-server import <pkg>`: Tool otomasi server untuk kompilasi massal, packaging `.forge.tar.zst`, indexing `packages.db.zst`, dan publikasi ke Binary Library.
 
 ### ⛔ DILARANG KERAS:
+- **Haram Ambil Biner Dari Host:** Dilarang keras menyalin biner, library, atau compiler dari sistem host (`/usr/bin/`, `/usr/lib/llvm/22/`) untuk dimasukkan ke dalam paket distribusi atau seed toolchain. Seluruh paket dan toolchain wajib murni 100% dikompilasi dari kode sumber upstream melalui resep `recipe.toml` ke staging (`/tmp/forge/stage/`).
 - **Dilarang Mengedit Berkas KuraLinux:** Dilarang keras memodifikasi berkas apa pun di luar repositori ini (misal di `/home/admin/Development/KuraLinux/`).
 - **Haram Ketergantungan Systemd:** Seluruh integrasi service wajib menggunakan standar OpenRC (`/etc/init.d/`, `/etc/conf.d/`, `rc-update`).
 - **Dilarang Menulis ke Filesystem Host `/` Tanpa Isolasi:** Seluruh proses build dan testing wajib terisolasi dalam target root dummy (`$FORGE_ROOT` atau staging `/tmp/forge/stage/`).

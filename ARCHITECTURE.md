@@ -212,21 +212,22 @@ default_services = ["metalog", "chronyd", "eudev", "dhcpcd", "acpid"]
 
 ---
 
-## 6. Arsitektur Seed Toolchain & Isolasi Sysroot (`kura-toolchain.tar.xz`)
+## 6. Arsitektur Seed Toolchain Pure Source-Built (`kura-toolchain.tar.xz`)
 
 Untuk mencegah polusi dari compiler host dan menjamin Kura Linux dapat melakukan bootstrap secara mandiri (*self-contained*), Forge menyediakan sub-sistem **Seed Toolchain Bundler**:
 
 ```
 +-------------------------------------------------------------------------------------------------+
-|                        PEMBUATAN SEED TOOLCHAIN: `forge toolchain bundle`                       |
+|               PEMBUATAN SEED TOOLCHAIN PURE SOURCE-BUILT: `forge toolchain bundle`              |
 +-------------------------------------------------------------------------------------------------+
-|  1. Memindai & mengemas compiler utama: Clang/LLVM 22, GCC, ultra-fast linker `mold`,            |
-|     GNU make, Ninja, dan Pkgconf.                                                               |
-|  2. Menyusun layout UsrMerge standar:                                                           |
-|     - `usr/bin/` (clang, cc, clang++, c++, mold, gcc, make, ninja, pkgconf, pkg-config)          |
-|     - `usr/lib/` (library pendukung LLVM & mold)                                                |
-|     - `etc/forge/toolchain.conf` (Environment compiler flag: CC=clang, LD=mold, CFLAGS native)   |
-|  3. Mengompresi ke `dist/kura-toolchain.tar.xz` + generasi hash `kura-toolchain.tar.xz.sha256`. |
+|  1. ATURAN MUTLAK: HARAM MENGAMBIL BINER/LIBRARY DARI HOST (/usr/bin, /usr/lib).               |
+|  2. Mengemas HANYA biner & library yang 100% dikompilasi dari source code oleh Forge ke staging |
+|     `/tmp/forge/stage/<pkg>/` (LLVM 22, Mold 2.42, Ninja 1.13, Pkgconf 3.0.7, Make 4.4.1).      |
+|  3. Menyusun layout UsrMerge standar:                                                           |
+|     - `usr/bin/` (clang, cc, clang++, c++, mold, ld, lld, llvm-ar, ar, make, ninja, pkgconf)    |
+|     - `usr/lib/` (library pendukung & header compiler Clang)                                    |
+|     - `etc/forge/toolchain.conf` (CC=clang, LD=mold, CFLAGS="-O3 -march=native -flto=thin")     |
+|  4. Mengompresi ke `dist/kura-toolchain.tar.xz` + generasi hash `kura-toolchain.tar.xz.sha256`. |
 +-------------------------------------------------------------------------------------------------+
                                                  │
                                                  ▼

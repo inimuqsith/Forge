@@ -119,8 +119,8 @@ impl Default for ForgeConfig {
                 profile_file: "/etc/forge/cpu-profile.json".to_string(),
             },
             build: BuildConfig {
-                cflags: "-O2 -march=native -pipe -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt".to_string(),
-                cxxflags: "-O2 -march=native -pipe -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt".to_string(),
+                cflags: "-O3 -march=native -pipe -flto=thin -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt".to_string(),
+                cxxflags: "-O3 -march=native -pipe -flto=thin -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt".to_string(),
                 ldflags: "-Wl,-O1 -Wl,--as-needed -Wl,-z,relro -Wl,-z,now".to_string(),
                 makeflags: "-j4".to_string(),
                 jobs: "auto".to_string(),

@@ -7,9 +7,10 @@
 ## ⚡ Fitur Utama & Filosofi Desain
 
 - **🦀 Pure Rust & Extreme Optimization:** Ditulis murni dalam Rust, dikompilasi dengan backend LLVM 22, ultra-fast linker `mold`, optimasi Thin LTO, dan flag `-C target-cpu=native`.
-- **🚀 Source-First Native Compilation (Gentoo Mode):** Secara default mengompilasi paket langsung dari kode sumber upstream dengan flag native target (`-O2 -march=native -pipe`) di RAM `tmpfs`.
+- **🚀 Source-First Native Compilation (Gentoo Mode):** Secara default mengompilasi paket langsung dari kode sumber upstream dengan flag native target (`-O3 -march=native -pipe -flto=thin`) di RAM `tmpfs`.
+- **🌾 Pure Source-Built Seed Toolchain:** Pengemasan `forge toolchain bundle` (`dist/kura-toolchain.tar.xz`) murni 100% dari hasil kompilasi source code di staging tanpa menyalin biner dari host.
 - **🎛️ Granular USE Flags:** Mengaktifkan/menonaktifkan fitur perangkat lunak secara presisi di level global (`forge.conf`) atau per-paket (`package.use`).
-- **🏷️ Multi-Version Slots:** Menjalankan beberapa versi mayor paket secara berdampingan tanpa konflik (misal: Python 3.12 & 3.13, GCC multi-versi).
+- **🏷️ Multi-Version Slots:** Menjalankan beberapa versi mayor paket secara berdampingan tanpa konflik (misal: LLVM 22 vs 21, Python 3.12 & 3.13, GCC multi-versi).
 - **🏗️ Wizard Setup & Bootstrap Distro:**
   - **`forge setup`:** Wizard inisialisasi dan konfigurasi package manager (`/etc/forge/forge.conf`).
   - **`forge system-setup`:** Wizard bootstrap Kura Linux untuk pemilihan arsitektur silikon, profil base, dan opsi kernel monolithic sebelum eksekusi `forge install @system`.
