@@ -168,6 +168,40 @@
 
 ---
 
+### Fase 13: GitOps Recipe Registry, Real-Time Webhook & Domain Deployment (`https://pkgkura.amqs.net`)
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED & DEPLOYED)**
+- [x] **GitOps Webhook Engine (`crates/forge-server/src/server.rs`):**
+  - Endpoint `POST /v1/webhook/github`: Menerima event push/merge dari GitHub repo `inimuqsith/Forge`.
+  - Endpoint `GET /v1/webhook/github`: Browser-friendly readiness status JSON response.
+  - Endpoint `POST /v1/recipes/refresh`: Manual on-demand sync & rebundle trigger.
+  - Modul `sync_and_rebundle_recipes`: Otomatis menjalankan `git pull --rebase`, me-regenerasi `recipes.tar.zst`, memperbarui `latest.sha256`, dan me-refresh katalog in-memory Web Explorer secara instan.
+- [x] **Domain Publik & Deployment VPS:**
+  - Layanan live di domain resmi `https://pkgkura.amqs.net` via reverse proxy Nginx + SSL.
+  - Webhook GitHub ID `681556356` terverifikasi aktif (HTTP 200 delivery).
+  - Target CPU server di-build dengan `RUSTFLAGS="-C target-cpu=x86-64-v3"` untuk kompatibilitas CPU AMD EPYC VPS.
+
+---
+
+### Fase 14: Server-Side Upstream Recipe Bumper, Zero-Quota Audit Engine & GitHub SSOT GitOps Automation
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
+- [x] **Upstream Recipe Bumper & Audit Engine (`crates/forge-server/src/bumper.rs`):**
+  - Multi-Tier Upstream Probing (Bebas Rate-Limit):
+    * Tier 1: GitHub REST API dengan injeksi header `Authorization: Bearer <GITHUB_TOKEN>` jika tersedia.
+    * Tier 2: GitHub Atom Feed (`https://github.com/{owner}/{repo}/releases.atom`) untuk parsing rilis terbaru bebas rate-limit (zero quota).
+    * Tier 3: Anitya / Release-Monitoring.org v2 Projects API (`https://release-monitoring.org/api/v2/projects/?name={pkg}`) untuk repositori non-GitHub (GNU, kernel.org, Sourceforge, dll.).
+  - `RecipeBumper::audit_all`: Pemindaian paralel asinkron (Tokio tasks) mengaudit 107 resep paket dalam ~3 detik dengan format status tabel CLI (`[LATEST]`, `[UPDATE]`, `[UNK]`).
+  - `RecipeBumper::bump_recipe_file`: Manipulasi atomik berkas `recipe.toml` (update `version`, reset `release = 1`, unduh tarball & hitung hash SHA256 baru secara otomatis).
+  - `RecipeBumper::bump_package_by_name`: Targeted bumping per-paket atau `--all`.
+- [x] **GitHub Single Source of Truth (SSOT) Auto-Push:**
+  - Perintah `forge-server bump <pkg|--all>` otomatis melakukan `git add recipes/`, `git commit -m "chore(recipes): ..."` dan `git push origin main` ke GitHub SSOT.
+  - Begitu push masuk ke GitHub, GitHub Webhook otomatis menyengat `forge-server` di VPS $\rightarrow$ auto-rebundle $\rightarrow$ `forge sync` langsung mendapatkan versi terbaru!
+- [x] **GitHub Actions Auto-Updater Bot (`.github/workflows/recipe-auto-updater.yml`):**
+  - Berjalan otomatis setiap 6 jam via Cron (`0 */6 * * *`) atau manual via `workflow_dispatch`.
+  - Mengompilasi `forge-server`, menjalankan `audit`, menjalankan `bump --all`, dan auto-commit ke cabang `main`.
+- [x] **Unit Tests:** 24/24 unit test `forge-server` (termasuk `test_extract_tag_from_atom_feed`, `test_version_tag_cleaning`, `test_version_comparison`, `test_bump_recipe_toml_manipulation`, `test_github_webhook_endpoint_triggers_rebundle`) lulus 100%.
+
+---
+
 ## 2. Keputusan Arsitektur Resmi (ADR Index)
 
 1. **ADR-001 (Kompilasi 100% Native Silikon):** Forge mengompilasi seluruh paket langsung dari kode sumber upstream dengan menyuntikkan flag optimasi silikon target (`-march=native -O3 -pipe -flto=thin`) untuk performa CPU maksimal.
@@ -207,6 +241,8 @@
 35. **ADR-035 (ALPM DB Tarball Parser & Recursive Anti-Brick Resolver):** Mem-parsing arsip database repositori `.db.tar.zst` CachyOS dan berkas `desc` secara native, serta melakukan penelusuran graf dependensi rekursif (DFS Topological Sort) yang secara otomatis menolak dan memfilter paket Core OS yang masuk dalam blacklist demi stabilitas Kura Linux.
 36. **ADR-036 (Pemisahan Tanggung Jawab Command Build & Import):** Memisahkan secara ketat siklus kompilasi (`build`) dan siklus ingestion/registrasi (`import`) di klien `forge` dan server `forge-server`. `forge build` hanya mengompilasi dan mengemas ke `.forge.tar.zst` tanpa instalasi ke rootfs `/`. `forge-server build` bertindak sebagai CI/CD Worker murni, sedangkan `forge-server import` bertindak sebagai Binary Ingester yang memverifikasi metadata, memindahkan tarball ke direktori binhost resmi `/var/db/forge/binhost/<march>/`, dan memperbarui `catalog.json`.
 37. **ADR-037 (Ergonomis Penyimpanan Profil CPU & CI/CD Streamlined Build Server):** Menyederhanakan alur kerja server CI/CD dengan mengizinkan `forge-server import <cpu-profile.json>` menyimpan profil silikon CPU ke `/var/db/forge/profiles/<march>.json` dan mengesetnya sebagai profil aktif (`active.json`), sehingga perintah `forge-server build <PACKAGE>` dapat langsung dijalankan berulang-ulang tanpa perlu mengetikkan path JSON berkali-kali, mengompilasi di staging sandbox terisolasi, mengemas tarball biner, dan otomatis mempublikasikannya ke `/var/db/forge/binhost/<march>/` & `catalog.json` (dengan opsi override `--profile` dan `--no-publish`).
+38. **ADR-038 (GitHub Webhook & Real-Time Auto-Rebundling GitOps):** Menghubungkan endpoint `POST /v1/webhook/github` pada `forge-server` dengan GitHub Repository (`inimuqsith/Forge`), sehingga setiap commit pada resep memicu `git pull --rebase` otomatis, rebundling `recipes.tar.zst`, update `latest.sha256`, dan pembaruan katalog tanpa intervensi manual.
+39. **ADR-039 (Server-Side Multi-Tier Upstream Probing & GitHub SSOT Automated Bumping):** Menyediakan sub-perintah `forge-server audit` dan `forge-server bump <pkg|--all>` berbasis Multi-Tier Probing (GitHub REST API dengan Auth Token, GitHub Atom Feed `/releases.atom` bebas kuota, dan Anitya v2 Projects API) yang memperbarui resep dan langsung mem-push perubahan ke GitHub SSOT (`origin main`) dengan integrasi GitHub Actions Cron Bot 6-jam.
 
 ---
 

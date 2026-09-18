@@ -1,0 +1,60 @@
+name: Automated Upstream Recipe Updater
+
+on:
+  schedule:
+    # Berjalan otomatis setiap 6 jam
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-recipes:
+    name: Probe Upstream & Auto-Bump Recipes
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-forge-server-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-forge-server-
+
+      - name: Build forge-server Tool
+        run: cargo build --release -p forge-server
+
+      - name: Audit Upstream Recipes Status
+        run: ./target/release/forge-server audit --recipes-path recipes
+
+      - name: Auto-Bump Outdated Recipes
+        run: ./target/release/forge-server bump --all --recipes-path recipes --no-push
+
+      - name: Commit and Push Updated Recipes
+        run: |
+          if [[ -n $(git status --porcelain recipes/) ]]; then
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add recipes/
+            git commit -m "chore(recipes): automated upstream recipe version bump [skip ci]"
+            git push origin main
+            echo "✓ Resep berhasil diperbarui dan di-push ke GitHub!"
+          else
+            echo "✓ Seluruh resep sudah up-to-date. Tidak ada perubahan."
+          fi
