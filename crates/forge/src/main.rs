@@ -2,8 +2,9 @@ use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use colored::*;
 use forge::{
-    CpuProfile, DependencyResolver, ForgeConfig, InstalledDatabase, PackageCascadeResolver,
-    PackageProvider, RecipeBuilder, RecipeImporter, SyncClient, ToolchainComponent, ToolchainManager,
+    CpuProfile, DependencyResolver, ForgeConfig, ForgeLockGuard, InstalledDatabase,
+    PackageCascadeResolver, PackageProvider, RecipeBuilder, RecipeImporter, SyncClient,
+    ToolchainComponent, ToolchainManager,
 };
 use std::path::{Path, PathBuf};
 
@@ -149,6 +150,7 @@ fn main() -> Result<()> {
             interactive,
             build_source,
         } => {
+            let _lock = ForgeLockGuard::acquire("forge", true)?;
             println!(">>> Memproses instalasi: {}", target.bold().green());
             let force_native = native || build_source;
             let config = ForgeConfig::load_or_default(None);
@@ -222,6 +224,7 @@ fn main() -> Result<()> {
         }
 
         Commands::Remove { package } => {
+            let _lock = ForgeLockGuard::acquire("forge", true)?;
             println!(">>> Menghapus paket {} berdasarkan manifest...", package.bold().red());
             let config = ForgeConfig::load_or_default(None);
             let db = InstalledDatabase::new(PathBuf::from(&config.general.db_path));
@@ -275,6 +278,7 @@ fn main() -> Result<()> {
         }
 
         Commands::Sync { server } => {
+            let _lock = ForgeLockGuard::acquire("forge", true)?;
             let config = ForgeConfig::load_or_default(None);
             let server_url = server.unwrap_or_else(|| config.server.recipe_server.clone());
             let target_recipes_dir = PathBuf::from(&config.general.recipes_path);
@@ -298,6 +302,7 @@ fn main() -> Result<()> {
         }
 
         Commands::Update { target } => {
+            let _lock = ForgeLockGuard::acquire("forge", true)?;
             println!(">>> Memeriksa pembaruan untuk target: {}", target.bold().yellow());
         }
 

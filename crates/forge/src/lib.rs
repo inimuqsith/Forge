@@ -14,18 +14,22 @@ pub mod db;
 pub mod merger;
 pub mod sync;
 pub mod importer;
+pub mod lock;
+pub mod sandbox;
 
 pub use builder::RecipeBuilder;
 pub use toolchain::{ToolchainComponent, ToolchainManager, ToolchainStatus};
 pub use cpu::{CpuProfile, CacheInfo, RecommendedFlags};
 pub use binhost::{BinhostCatalog, BinhostClient, BinhostPackageEntry};
-pub use cachyos::{CachyOsAdapter, CachyOsTier};
+pub use cachyos::{CachyOsAdapter, CachyOsTier, CachyOsPackageMeta, parse_alpm_desc, parse_repo_db_tar_zst};
 pub use cascade::{CascadeResolution, PackageCascadeResolver, PackageProvider};
 pub use resolver::*;
 pub use db::*;
 pub use merger::*;
 pub use sync::SyncClient;
 pub use importer::RecipeImporter;
+pub use lock::ForgeLockGuard;
+pub use sandbox::SandboxRunner;
 
 /// Konfigurasi Global Forge (/etc/forge/forge.conf)
 #[derive(Debug, Clone, Serialize, Deserialize)]

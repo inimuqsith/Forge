@@ -61,15 +61,18 @@
 ### Fase 6: Sandbox Build Engine & DESTDIR Staging
 **Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] Isolasi direktori build di RAM tmpfs (`/tmp/forge/build/<pkg>-<ver>/`).
+- [x] **Sandbox Build Isolation Engine (`crates/forge/src/sandbox.rs`):** Auto-detection Bubblewrap (`bwrap`) dengan isolasi mutlak: `--ro-bind / /` (Host filesystem 100% Read-Only), `--bind <build_dir>`, `--bind <destdir>`, `--bind /tmp /tmp`, `--proc /proc`, `--dev /dev`, `--unshare-all`, `--die-with-parent`, serta graceful fallback mode untuk host tanpa `bwrap`. Terintegrasi pada `RecipeBuilder::build`.
 - [x] Injeksi otomatis compiler flags Kura Linux (`-O3 -march=native -pipe -flto=thin -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt`) dan linker `mold` (`-fuse-ld=mold`).
 - [x] **Akselerasi Ccache (v4.13.5):** Auto-detection binary `ccache`, resolusi direktori `CCACHE_DIR` (`/var/cache/forge/ccache` / `distfiles/.ccache`), dan injeksi `CC="ccache clang"`, `CXX="ccache clang++"`.
 - [x] **Pengecualian Glibc (ADR-002):** Otomatis dialihkan ke GCC bawaan (`CC="ccache gcc"`) tanpa flag `-march` kustom demi kestabilan build system Glibc.
 - [x] Staging hasil kompilasi ke direktori terisolasi `DESTDIR` (`/tmp/forge/stage/<pkg>/`).
+- [x] Unit test `test_sandbox_command_construction` dan `test_sandbox_fallback_execution` lulus 100%.
 
 ---
 
-### Fase 7: Transactional Merger & Collision Detector
+### Fase 7: Transactional Merger & Global Concurrency Guard
 **Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
+- [x] **Global Concurrency Guard (`crates/forge/src/lock.rs`):** File locking RAII (`fs2` / `flock(2)`) pada `/var/lock/forge.lock` (fallback otomatis ke `$TEMP_DIR/forge.lock` untuk non-root), pencatatan PID proses aktif, penanganan error informatif ("Proses forge lain sedang berjalan..."), dan proteksi mutatif pada `install`, `remove`, `sync`, dan `update`.
 - [x] **Desain Arsitektur:** Blueprint spesifikasi Pre-flight Collision Scanning, Atomic Merge pipeline, dan Rollback Log di [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
 - [x] **Engine Merger (`crates/forge/src/merger.rs`):**
   - Implementasi `MergeTransaction`, `StagedEntry`, `CollisionReport`, `JournalAction`.
@@ -78,7 +81,7 @@
   - Pencatatan jurnal transaksi `txn_<id>.journal` dengan auto-rollback LIFO jika terjadi kegagalan I/O.
   - Proteksi konfigurasi `CONFIG_PROTECT`: penyimpanan `._cfg0000_<file>` untuk berkas `/etc/` yang termodifikasi.
   - Eksekusi post-merge hooks (deteksi OpenRC `/etc/init.d/`, `ldconfig`).
-- [x] Unit test `test_preflight_collision_detector`, `test_atomic_merge_and_permissions`, `test_config_protect_mechanism`, `test_transactional_rollback_on_failure` lulus 100%.
+- [x] Unit test `test_acquire_and_release_lock`, `test_contended_lock_rejection`, `test_preflight_collision_detector`, `test_atomic_merge_and_permissions`, `test_config_protect_mechanism`, `test_transactional_rollback_on_failure` lulus 100%.
 
 ---
 
@@ -94,13 +97,17 @@
 
 ---
 
-### Fase 9: 3-Tier Package Cascade Resolution Engine & Anti-Brick CachyOS Fallback
+### Fase 9: 3-Tier Package Cascade Resolution & Recursive CachyOS ALPM Engine
 **Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] Implementasi data model binhost & client matcher di [`crates/forge/src/binhost.rs`](file:///home/admin/Development/Forge/crates/forge/src/binhost.rs).
-- [x] **Anti-Brick CachyOS Adapter (`crates/forge/src/cachyos.rs`):** Auto-detection mikroarsitektur CPU (`Znver4`, `X86_64_V4`, `X86_64_V3`, `Generic`) dan Core OS Blacklist Protection mutlak (`glibc`, `openrc`, `gcc`, `llvm`, `mold`, `eudev`, `kmod`, `shadow`, `util-linux`, `base`, `base-devel`, `forge`, `systemd`).
+- [x] **Anti-Brick CachyOS Adapter & ALPM Parser (`crates/forge/src/cachyos.rs`):**
+  - Auto-detection mikroarsitektur CPU (`Znver4`, `X86_64_V4`, `X86_64_V3`, `Generic`).
+  - Core OS Blacklist Protection mutlak (`glibc`, `openrc`, `gcc`, `llvm`, `mold`, `eudev`, `kmod`, `shadow`, `util-linux`, `base`, `base-devel`, `forge`, `systemd`).
+  - ALPM Database Parser: `parse_alpm_desc` dan `parse_repo_db_tar_zst` untuk mengekstrak `%NAME%`, `%VERSION%`, `%DESC%`, `%DEPENDS%`, `%PROVIDES%`, `%FILENAME%`, `%CSIZE%`, `%ISIZE%`, `%SHA256SUM%`.
+  - Penelusuran graf dependensi rekursif (`resolve_dependencies_recursive`) menghasilkan topological order dan mengeliminasi paket yang diblacklist dengan peringatan Anti-Brick.
 - [x] **3-Tier Cascade Resolution Engine (`crates/forge/src/cascade.rs`):** Resolusi deterministik: Tingkat 1 (Forge Native Binhost `.forge.tar.zst`) -> Tingkat 2 (CachyOS Prebuilt dengan bypass blacklist) -> Tingkat 3 (Source-First Native Compilation).
 - [x] **Penyederhanaan CLI Flags (ADR-030):** Menghapus `--hybrid`, menyediakan flag `--native` (paksa kompilasi source) dan `--binhost` (aktifkan 3-tier cascade) di `crates/forge/src/main.rs`.
-- [x] **Unit Tests:** `test_cachyos_tier_auto_detection`, `test_core_os_blacklist_protection`, `test_cascade_prefers_forge_binhost`, `test_cascade_fallback_to_cachyos`, `test_cascade_blocks_core_os_from_cachyos`, `test_cascade_fallback_to_source` lulus 100%.
+- [x] **Unit Tests:** `test_cachyos_tier_auto_detection`, `test_core_os_blacklist_protection`, `test_parse_cachyos_desc_format`, `test_cachyos_recursive_dependency_chain`, `test_cachyos_recursive_respects_blacklist`, `test_parse_repo_db_tar_zst`, `test_cascade_prefers_forge_binhost`, `test_cascade_fallback_to_cachyos`, `test_cascade_blocks_core_os_from_cachyos`, `test_cascade_fallback_to_source` lulus 100%.
 
 ---
 
@@ -178,6 +185,9 @@
 30. **ADR-030 (Penyederhanaan CLI & 3-Tier Package Cascade Resolution):** Menghapus total flag kaku `--hybrid` dan menyederhanakan UX menjadi 2 opsi intuitif: `--native` (Source-First Portage Mode) dan `--binhost` (3-Tier Cascade: Forge Binhost -> CachyOS Zen4/v4/v3 -> Native Source Fallback).
 31. **ADR-031 (Garansi Anti-Brick & Core OS Blacklist Protection):** Menjamin integritas sistem Kura Linux dengan melarang keras paket fondasi dan toolchain OS inti (`glibc`, `openrc`, `gcc`, `llvm`, `mold`, `eudev`, `kmod`, `shadow`, `util-linux`, `base`, `base-devel`, `forge`, `systemd`) diambil dari repo biner luar (CachyOS/Arch), dan mewajibkan fallback kompilasi dari kode sumber resmi Kura Linux.
 32. **ADR-032 (Upstream Recipe Importer & Otomasi Katalog Resep Kura Linux):** Forge menyediakan engine `RecipeImporter` (`importer.rs`) dan CLI `forge recipe-import` untuk mengonversi spesifikasi deklaratif upstream (Arch PKGBUILD / Alpine APKBUILD) secara deterministik ke dalam format `recipe.toml` standar Kura Linux dengan normalisasi dependensi dan transposisi direktori staging `$DESTDIR`.
+33. **ADR-033 (Global Concurrency Lock RAII):** Menjamin seluruh operasi mutatif package manager (`install`, `remove`, `sync`, `update`) terlindungi oleh file lock RAII eksklusif (`/var/lock/forge.lock` dengan fallback ke `$TEMP_DIR/forge.lock`) dengan pencatatan PID aktif untuk mencegah race condition dan korupsi database paket.
+34. **ADR-034 (Bubblewrap Sandbox Build Isolation):** Mengisolasi siklus eksekusi script build dengan memetakan filesystem host 100% Read-Only (`--ro-bind / /`), hanya mengizinkan penulisan pada direktori build RAM dan staging `$DESTDIR`, serta unshare namespace lengkap dengan graceful fallback mode jika `bwrap` belum terpasang.
+35. **ADR-035 (ALPM DB Tarball Parser & Recursive Anti-Brick Resolver):** Mem-parsing arsip database repositori `.db.tar.zst` CachyOS dan berkas `desc` secara native, serta melakukan penelusuran graf dependensi rekursif (DFS Topological Sort) yang secara otomatis menolak dan memfilter paket Core OS yang masuk dalam blacklist demi stabilitas Kura Linux.
 
 ---
 
@@ -200,6 +210,7 @@
 | *2026-09-18* | *Workflow & Docs* | *Perlunya disiplin Git commit berkala & pembaruan berkas MD berkelanjutan* | *Menetapkan aturan wajib Git commit dan sinkronisasi persisten berkas MD pada setiap tahapan (ADR-029)* |
 | *2026-09-19* | *Cascade & Anti-Brick* | *Paket biner luar (Arch/CachyOS) berisiko menimpa glibc/init system Kura Linux* | *Menerapkan 3-Tier Cascade Resolution Engine (`cascade.rs`) & Core OS Blacklist Anti-Brick Protection (`cachyos.rs`) (ADR-030, ADR-031)* |
 | *2026-09-19* | *Importer & 100 Resep* | *Katalog resep kosong dan kebutuhan konversi PKGBUILD/APKBUILD upstream secara deterministik* | *Membangun `RecipeImporter` engine (`importer.rs`), CLI `forge recipe-import`, dan menyusun 105 resep paket esensial Kura Linux di `recipes/` (ADR-032)* |
+| *2026-09-19* | *Concurrency & Sandbox* | *Risiko tabrakan transaksi simultan, polusi host filesystem saat build, dan dependensi biner tier 2 berantai* | *Mengimplementasikan `ForgeLockGuard` (`lock.rs`), `SandboxRunner` (`sandbox.rs`) dengan Bubblewrap / fallback, serta parser ALPM `.db.tar.zst` & resolver dependensi rekursif (`cachyos.rs`) (ADR-033, ADR-034, ADR-035)* |
 
 ---
 

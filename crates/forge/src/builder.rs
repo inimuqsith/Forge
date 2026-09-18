@@ -162,48 +162,31 @@ impl RecipeBuilder {
         // 4. Jalankan script build jika ada
         if !build_meta.script.is_empty() {
             println!("  [🔨] Menjalankan script kompilasi dengan CC={}, LD={}...", cc, ld);
-            let script_runner = format!(
-                r#"
-set -e
-export CC="{cc}"
-export CXX="{cxx}"
-export LD="{ld}"
-export CCACHE_DIR="{ccache_dir}"
-export CFLAGS="{cflags}"
-export CXXFLAGS="{cxxflags}"
-export LDFLAGS="{ldflags}"
-export MAKEFLAGS="{makeflags}"
-export DESTDIR="{destdir}"
-export PREFIX="{prefix}"
-export srcdir="{srcdir}"
-export pkgname="{pkgname}"
-export pkgver="{pkgver}"
+            let mut env_vars = std::collections::HashMap::new();
+            env_vars.insert("CC".to_string(), cc.clone());
+            env_vars.insert("CXX".to_string(), cxx.clone());
+            env_vars.insert("LD".to_string(), ld.clone());
+            env_vars.insert("CCACHE_DIR".to_string(), ccache_dir.display().to_string());
+            env_vars.insert("CFLAGS".to_string(), cflags.clone());
+            env_vars.insert("CXXFLAGS".to_string(), cxxflags.clone());
+            env_vars.insert("LDFLAGS".to_string(), ldflags.clone());
+            env_vars.insert("MAKEFLAGS".to_string(), config.build.makeflags.clone());
+            env_vars.insert("DESTDIR".to_string(), destdir.display().to_string());
+            env_vars.insert("PREFIX".to_string(), config.build.prefix.clone());
+            env_vars.insert("srcdir".to_string(), build_root.display().to_string());
+            env_vars.insert("pkgname".to_string(), pkg_name.clone());
+            env_vars.insert("pkgver".to_string(), pkg_ver.clone());
 
-{script}
-"#,
-                cc = cc,
-                cxx = cxx,
-                ld = ld,
-                ccache_dir = ccache_dir.display(),
-                cflags = cflags,
-                cxxflags = cxxflags,
-                ldflags = ldflags,
-                makeflags = config.build.makeflags,
-                destdir = destdir.display(),
-                prefix = config.build.prefix,
-                srcdir = build_root.display(),
-                pkgname = pkg_name,
-                pkgver = pkg_ver,
-                script = build_meta.script
-            );
+            let runner = crate::sandbox::SandboxRunner::new();
+            if runner.is_bwrap_available() {
+                println!("  [🛡️] Sandbox Bubblewrap aktif (--ro-bind / /, namespace terisolasi)");
+            }
 
-            let bash_status = Command::new("bash")
-                .arg("-c")
-                .arg(&script_runner)
-                .status()
-                .context("Gagal mengeksekusi bash script kompilasi")?;
+            let script_content = format!("set -e\n{}", build_meta.script);
+            let exit_status = runner.run_script(&script_content, &build_root, destdir, &env_vars)
+                .context("Gagal mengeksekusi script kompilasi di dalam sandbox")?;
 
-            if !bash_status.success() {
+            if !exit_status.success() {
                 anyhow::bail!("Proses kompilasi resep {} gagal!", pkg_name);
             }
         }
