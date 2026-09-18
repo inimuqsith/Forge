@@ -8,7 +8,7 @@ root = "/"
 # Lokasi penyimpanan database paket terpasang
 db_path = "/var/db/forge"
 
-# Lokasi cache berkas tarball sumber
+# Lokasi cache berkas tarball sumber dan binari
 cache_path = "/var/cache/forge/distfiles"
 
 # Lokasi build sementara berbasis RAM (tmpfs)
@@ -17,8 +17,51 @@ build_path = "/tmp/forge/build"
 # Lokasi staging sementara sebelum merge
 stage_path = "/tmp/forge/stage"
 
-# Lokasi pohon resep lokal
+# Lokasi pohon resep lokal (disinkronisasi dari server)
 recipes_path = "/var/db/forge/recipes"
+
+# Mode Resolusi Paket Bawaan:
+# - "hybrid": Cek Binhost -> Cek Hybrid Fallback -> Kompilasi Source
+# - "binhost": Prioritaskan unduhan biner terkompilasi native
+# - "source": Kompilasi lokal dari source code
+# - "interactive": Tanyakan opsi provider kepada pengguna saat instalasi
+mode = "hybrid"
+
+[server]
+# URL Forge Central Server untuk sinkronisasi resep & katalog
+recipe_server = "https://recipes.kuralinux.org/v1"
+
+# URL Forge Central Binary Library (Binhost)
+binhost_url = "https://binhost.kuralinux.org/v1"
+
+# API Token untuk otentikasi upload CI/CD (hanya diatur pada worker server)
+server_api_token = ""
+
+[binhost]
+# Aktifkan penggunaan pre-built binary native dari Forge Server
+enable_binhost = true
+
+# Otomatis cocokkan paket biner dengan arsitektur CPU pengguna
+auto_match_cpu = true
+
+# Otomatis fallback ke kompilasi lokal jika biner tidak ditemukan di server
+fallback_to_source = true
+
+[hybrid]
+# Fallback opsional ke repositori biner teroptimasi CachyOS (x86-64-v4 / v3)
+enable_cachyos_fallback = true
+cachyos_repo_url = "https://mirror.cachyos.org/repo/x86_64_v4/cachyos_v4"
+
+# Fallback opsional ke repositori biner standar Arch Linux
+enable_arch_fallback = false
+arch_repo_url = "https://geo.mirror.pkgbuild.com/core/os/x86_64"
+
+[cpu]
+# Target arsitektur CPU (otomatis diisi dari `forge cpu-dump`)
+target_march = "native"
+enable_avx512 = true
+enable_avx2 = true
+profile_file = "/etc/forge/cpu-profile.json"
 
 [build]
 # Flag optimasi native kompilasi Kura Linux
@@ -28,6 +71,10 @@ ldflags = "-Wl,-O1 -Wl,--as-needed -Wl,-z,relro -Wl,-z,now"
 makeflags = "-j$(nproc)"
 jobs = "auto"
 prefix = "/usr"
+
+[use]
+# USE Flags Global ala Portage (fitur yang diaktifkan/dinonaktifkan secara global)
+flags = "ssl openrc alsa -systemd lto pgo"
 
 [hooks]
 # Integrasi OpenRC & pemicu post-install

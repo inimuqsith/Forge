@@ -1,94 +1,110 @@
-# Forge — The High-Performance Source Package Manager
+# Forge — The High-Performance Hybrid & Source Package Manager
 
-> **Forge** adalah *source-based package manager* modern, cepat, deterministik, dan berbobot ringan yang dirancang khusus sebagai penggerak ekosistem distribusi **Kura Linux**.
-
----
-
-## ⚡ Fitur Utama
-
-- **🚀 100% Native Silicon Compilation:** Mengompilasi seluruh software langsung dari sumber dengan menyuntikkan flag arsitektur native target (`-O2 -march=native -pipe`).
-- **🛡️ Manifest-Driven Precision:** Pelacakan berkas absolut saat instalasi dan penghapusan paket untuk menjamin sistem bebas sampah (*zero cruft*).
-- **⚡ Fast RAM tmpfs Builds:** Proses ekstraksi dan kompilasi terisolasi di `/tmp/forge/build/` berbasis memori RAM tmpfs.
-- **🔄 Staging Sandboxing (DESTDIR):** Paket dikompilasi dan dipasang ke staging area sebelum transaksi merge ke rootfs riil.
-- **⚙️ OpenRC Native Integration:** Mendeteksi otomatis skrip daemon di `/etc/init.d/` dan terintegrasi mulus dengan `rc-update`.
-- **📦 Meta-Target `@system`:** Mendukung kompilasi dan pembaruan massal seluruh base system Kura Linux dalam satu perintah.
-- **🏗️ Stage Exporter (`forge stage-export`):** Utilitas bawaan untuk mengemas rootfs menjadi tarball distribusi Kura Linux (`kura-stage.tar.xz`).
-- **🔒 Flat-File Database:** Database `/var/db/forge/` yang tangguh dan mandiri tanpa ketergantungan pada runtime SQL eksternal.
+> **Forge** adalah *Hybrid Unified & Source-based package manager* modern, deterministik, dan berkecepatan tinggi yang dirancang khusus untuk distribusi **Kura Linux**.
 
 ---
 
-## 📁 Standar Lokasi Filesystem
+## ⚡ Fitur Utama & Filosofi Desain
 
-| Jalur | Fungsi |
-| :--- | :--- |
-| `/etc/forge/forge.conf` | Berkas konfigurasi global Forge & flag kompilasi distro |
-| `/var/db/forge/installed/` | Database paket terpasang (manifest, metadata.json, dependencies) |
-| `/var/db/forge/world` | Daftar paket eksplisit yang diminta oleh pengguna |
-| `/var/cache/forge/distfiles/` | Cache penyimpanan berkas arsip sumber (tarball / zip) |
-| `/tmp/forge/build/` | Area ekstraksi dan kompilasi sumber (RAM tmpfs) |
-| `/tmp/forge/stage/` | Area staging sementara sebelum merge ke sistem |
+- **🎛️ Filosofi Gentoo Portage:** Mendukung penuh *USE Flags* granular, *Slots* multi-versioning, *Package Sets* (`@system`, `@world`), dan kompilasi sumber terisolasi.
+- **⚡ 3 Tingkat Resolusi Hybrid (Kebebasan Penuh Pengguna):**
+  - **Tingkat 1 (Forge Native Binhost):** Unduh paket biner siap pakai yang 100% cocok dengan profil CPU & USE flags dari Forge Server.
+  - **Tingkat 2 (Hybrid Fallback):** Fallback opsional ke repositori biner teroptimasi **CachyOS** (x86-64-v4 / v3) atau **Arch Linux**.
+  - **Tingkat 3 (Local Source Compilation):** Kompilasi lokal dari source code dengan RAM tmpfs dan flag native silikon.
+- **🔒 Server & CI/CD Builder (Lock CPU):** Server sentral dan build farm yang dikunci (*locked*) khusus ke arsitektur CPU pengguna (misal: AMD Zen 4 `znver4`, AVX-512) untuk mengompilasi paket secara terpusat.
+- **🔬 Introspeksi Hardware (`forge cpu-dump`):** Menganalisis CPU host, instruksi ISA (AVX-512, AVX2, SSE4, dll.), cache, dan mengekspor `cpu-profile.json` untuk CI/CD.
+- **📦 Server Build & Auto-Upload (`forge import`):** Tool server/CI/CD untuk kompilasi massal, packaging `.forge.tar.zst`, dan otomatisasi publikasi ke Binary Library.
+- **🌐 Resep Terpusat di Server:** Seluruh resep resmi disimpan di server dan disinkronisasi ke klien via `forge sync`.
+- **🛡️ Manifest Deterministik & Zero-Cruft:** Pelacakan berkas absolut untuk instalasi aman dan penghapusan bersih tanpa sisa.
+- **⚙️ Integrasi OpenRC Native:** Otomatis mendeteksi skrip di `/etc/init.d/` dan terintegrasi dengan `rc-update`.
+- **🏗️ Stage Exporter (`forge stage-export`):** Utilitas pengemas rootfs menjadi tarball distribusi Kura Linux (`kura-stage.tar.xz`).
 
 ---
 
-## 🛠️ Perintah CLI Dasar
+## 🛠️ Ringkasan Perintah CLI
 
 ```bash
-# --- Manajemen Paket ---
-forge install <pkg>         # Unduh, verifikasi, kompilasi, & pasang paket ke rootfs
-forge build <pkg>           # Kompilasi paket hanya sampai tahap staging (tanpa pasang)
-forge remove <pkg>          # Hapus paket secara bersih berdasarkan manifest
-forge update                # Sinkronisasi & perbarui pohon resep lokal
-forge clean                 # Bersihkan cache sementara di /tmp/forge/
+# --- 1. Manajemen Paket (Klien) ---
+forge install <pkg>             # Pasang paket (otomatis pilih Binhost / Fallback / Source)
+forge install --binhost <pkg>   # Paksa prioritaskan unduh pre-built binary native
+forge install --build-source <pkg> # Paksa kompilasi lokal dari source code
+forge install --interactive <pkg>  # Pilih manual provider (Forge Binhost vs CachyOS/Arch vs Source)
+forge remove <pkg>              # Hapus paket secara bersih berdasarkan manifest
+forge sync                      # Sinkronisasi pohon resep & index biner dari Forge Server
+forge update @world             # Perbarui seluruh paket terpasang di sistem
 
-# --- Informasi & Query ---
-forge list                  # Tampilkan daftar seluruh paket yang terpasang
-forge query <pkg>           # Tampilkan metadata, dependensi, dan isi file paket
-forge search <query>        # Cari resep paket berdasarkan nama/deskripsi
+# --- 2. Analisis Hardware & Profil CPU ---
+forge cpu-dump                  # Dump mikroarsitektur CPU & simpan cpu-profile.json
+forge cpu-dump --export-cflags  # Tampilkan rekomendasi CFLAGS untuk CPU saat ini
+forge cpu-dump --upload         # Unggah profil CPU ke Forge Server untuk build farm
 
-# --- Fitur Distro Khusus ---
-forge install @system       # Rebuild seluruh sistem Kura Linux 100% native
+# --- 3. Server & CI/CD Builder Tools ---
+forge import <pkg>              # Server/CI/CD: Build, kemas ke .forge.tar.zst, & upload ke binary library
+forge import --all-system       # Server/CI/CD: Kompilasi massal seluruh paket @system yang di-lock ke CPU target
+
+# --- 4. Informasi & Query ---
+forge list                      # Tampilkan daftar seluruh paket terpasang & versinya
+forge query <pkg>               # Tampilkan metadata, USE flags aktif, dependensi, & manifest
+forge search <query>            # Cari resep paket berdasarkan nama/deskripsi
+
+# --- 5. Fitur Distro Khusus ---
+forge install @system           # Rebuild seluruh basis sistem Kura Linux 100% native
 forge stage-export --output kura-stage.tar.xz  # Kemas rootfs menjadi stage tarball
 ```
 
 ---
 
-## 📜 Standar Format Resep (`recipe`)
+## 📜 Standar Format Resep (`Recipe.forge`)
 
 ```bash
-pkgname="nano"
-pkgver="8.3"
+pkgname="openssh"
+pkgver="9.8p1"
 pkgrel="1"
-pkgdesc="Pico editor clone with enhanced features"
-url="https://www.nano-editor.org/"
-license="GPL-3.0-or-later"
-depends=("glibc" "ncurses")
+slot="0"
+pkgdesc="Premier connectivity tool for remote login with SSH protocol"
+url="https://www.openssh.com/"
+license="BSD-2-Clause"
+
+# Portage-style USE Flags
+use_flags=("pam" "ssl" "kerberos" "ldns")
+default_use=("ssl" "pam")
+
+depends=("glibc" "openssl" "zlib")
 makedepends=("gcc" "make" "pkgconf")
+
 sources=(
-  "https://www.nano-editor.org/dist/v8/nano-${pkgver}.tar.xz"
+  "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${pkgver}.tar.gz"
 )
 sha256sums=(
-  "5fb7d206f582f3496f30a91ca5dc6f9de5efb2beab314227f465c490a2a5dc94"
+  "dd8b5cedd4da0102d09f1665f14d8627e997f3944354b6dff618d6e3c10444a7"
 )
 
 build() {
-  cd "${srcdir}/nano-${pkgver}"
-  ./configure \
-    --prefix=/usr \
-    --sysconfdir=/etc \
-    --enable-utf8
+  cd "${srcdir}/openssh-${pkgver}"
+  local conf_args=(
+    --prefix=/usr
+    --sysconfdir=/etc/ssh
+    --with-ssl-dir=/usr
+  )
+
+  if forge_use pam; then
+    conf_args+=( --with-pam )
+  fi
+
+  ./configure "${conf_args[@]}"
   make
 }
 
 package() {
-  cd "${srcdir}/nano-${pkgver}"
+  cd "${srcdir}/openssh-${pkgver}"
   make DESTDIR="${DESTDIR}" install
 }
 ```
 
 ---
 
-## 🧭 Dokumentasi Pengembangan & Pedoman AI
+## 🧭 Dokumentasi Pengembangan & Panduan AI
 
-- **Panduan Pengembangan & Aturan HITL:** Lihat [`AGENTS.md`](file:///home/admin/Development/Forge/AGENTS.md).
-- **Blueprint & Desain Arsitektur:** Lihat [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
+- **Pedoman AI & Protokol Mutlak HITL:** Lihat [`AGENTS.md`](file:///home/admin/Development/Forge/AGENTS.md).
+- **Blueprint Arsitektur & Desain Sistem:** Lihat [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
 - **Memori Persisten, Roadmap & ADR:** Lihat [`MEMORY.md`](file:///home/admin/Development/Forge/MEMORY.md).

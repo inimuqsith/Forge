@@ -1,6 +1,6 @@
 # AGENTS.md — Forge Package Manager Development Guidelines
 
-> **Forge**: *Source-based package manager* berkecepatan tinggi yang dirancang khusus untuk distribusi **Kura Linux**. Berfokus pada kompilasi 100% native silikon (`-march=native`), pelacakan manifest file deterministik, integrasi layanan **OpenRC**, isolasi build berbasis RAM (`tmpfs`), meta-target `@system`, dan kemampuan pembuatan stage distribusi (`forge stage-export`).
+> **Forge**: *Hybrid Unified & Source-based package manager* berkecepatan tinggi yang dirancang khusus untuk distribusi **Kura Linux**. Mengadopsi keunggulan **Gentoo Portage** (*USE Flags*, *Slots*, *Package Sets*, *Source-based Compilation*), didukung ekosistem **Forge Server & CI/CD Builder Lock-CPU**, kemampuan **Binhost Native**, integrasi opsional repositori biner **CachyOS/Arch**, pelacakan manifest deterministik, integrasi layanan **OpenRC**, isolasi build RAM (`tmpfs`), serta pembuatan stage distribusi (`forge stage-export`).
 
 ---
 
@@ -19,21 +19,38 @@
 ## 2. Batasan & Ruang Lingkup AI
 
 ### 🎯 TUGAS & FOKUS AI DI REPOSITORI INI:
-1. **Pembangunan Engine `forge`:** Mengembangkan CLI parser, dependency graph & DAG resolver, source fetcher & checksum verifier, sandbox compilation runner, DESTDIR staging engine, manifest-based transactional merger, dan unmerge cleaner.
-2. **Manajemen Database & Konfigurasi:** Mengelola format flat-file database `/var/db/forge/` (`installed/`, `manifest`, `metadata.json`, `world`) dan parser konfigurasi `/etc/forge/forge.conf`.
-3. **Integrasi OpenRC & Hook System:** Menyediakan mekanisme deteksi skrip `/etc/init.d/`, pendaftaran runlevel otomatis, `ldconfig`, dan hook pasca-instalasi.
-4. **Fitur Khas Kura Linux:**
+1. **Pembangunan Engine `forge` (Portage-Inspired & Hybrid Unified):**
+   - Mengembangkan CLI parser, dependency graph & DAG resolver dengan dukungan *USE Flags* dan *Slots*.
+   - Source fetcher & checksum verifier (SHA256/BLAKE3).
+   - Sandbox compilation runner berbasis RAM (`tmpfs`) dengan injeksi flag native CPU.
+   - DESTDIR staging engine, transactional manifest merger, dan unmerge cleaner.
+2. **Sistem Deteksi CPU & CI/CD Builder (Lock CPU):**
+   - Perintah `forge cpu-dump`: Ekstraksi mikroarsitektur, feature ISA flags (AVX-512, AVX2, dll.), cache, dan rekomendasi compiler flags ke `cpu-profile.json`.
+   - Perintah `forge import` / `forge impor`: Tool server & CI/CD worker untuk kompilasi massal, packaging `.forge.tar.zst`, indexing repository, dan upload otomatis ke Forge Binary Library.
+3. **Arsitektur Hybrid Unified & Kebebasan Pengguna:**
+   - Menyediakan 3 tingkat resolusi paket di mana **pengguna memiliki kebebasan penuh memilih mode**:
+     - *Tingkat 1:* Forge Native Binhost (unduh binary terkompilasi native dari server).
+     - *Tingkat 2:* Hybrid Fallback (opsional fallback ke binary CachyOS x86-64-v3/v4 atau Arch Linux).
+     - *Tingkat 3:* Local Source Compilation (kompilasi dari kode sumber upstream via resep).
+   - Mendukung opsi konfigurasi dan flag CLI (`--binhost`, `--build-source`, `--allow-hybrid`, `--interactive-select`).
+4. **Manajemen Resep Terpusat di Server (`recipes/`):**
+   - Format resep mandiri (`Recipe.forge` / `recipe`) yang disimpan terpusat di server dan disinkronisasi ke klien via `forge sync`.
+5. **Manajemen Database & Konfigurasi:**
+   - Mengelola flat-file database `/var/db/forge/` (`installed/`, `manifest`, `metadata.json`, `world`, `use.mask`, `package.use`) dan parser konfigurasi `/etc/forge/forge.conf`.
+6. **Integrasi OpenRC & Hook System:**
+   - Deteksi otomatis `/etc/init.d/`, pendaftaran runlevel, `ldconfig`, dan pemicu pasca-instalasi.
+7. **Fitur Khas Kura Linux:**
    - Meta-target `@system` untuk kompilasi ulang seluruh base system secara native.
    - Tool `forge stage-export` untuk mengemas rootfs menjadi tarball stage distribusi (`kura-stage.tar.xz`).
-5. **Pohon Resep Paket (`recipes/`):** Menyusun resep build paket resmi (`core/`, `system/`, `extra/`) sesuai standar POSIX/bash lifecycle resep Forge.
-6. **Harness Pengujian Komprehensif:** Menyusun unit tests dan integration tests dengan mock rootfs/chroot sandbox agar aman diuji tanpa menyentuh host system.
+8. **Harness Pengujian Komprehensif:**
+   - Unit tests & integration sandbox tests terisolasi tanpa menyentuh host system.
 
 ### ⛔ DILARANG KERAS:
 - **Dilarang Mengedit Berkas KuraLinux:** Dilarang keras memodifikasi berkas apa pun di luar repositori ini (misal di `/home/admin/Development/KuraLinux/`).
 - **Haram Ketergantungan Systemd:** Seluruh integrasi service wajib menggunakan standar OpenRC (`/etc/init.d/`, `/etc/conf.d/`, `rc-update`).
-- **Dilarang Menulis ke Filesystem Host `/` Tanpa Isolasi:** Seluruh proses build dan testing wajib terisolasi dalam target root dummy (`$FORGE_ROOT` atau `/tmp/forge/stage/`). Jangan pernah memasang file uji coba ke sistem host nyata.
-- **Dilarang Bypass Verifikasi Integritas:** Pengunduhan source wajib divalidasi dengan hash SHA256. Resep tanpa checksum yang valid dilarang diproses untuk instalasi.
-- **Pengecualian Khusus Glibc:** Flag optimasi custom (`-march=native`) wajib diinjeksikan untuk semua paket Kura Linux, **kecuali Glibc** yang harus tetap di-build via `forge` dengan konfigurasi standar CFLAGS bawaan Glibc demi stabilitas build system Glibc.
+- **Dilarang Menulis ke Filesystem Host `/` Tanpa Isolasi:** Seluruh proses build dan testing wajib terisolasi dalam target root dummy (`$FORGE_ROOT` atau staging `/tmp/forge/stage/`).
+- **Dilarang Bypass Verifikasi Integritas:** Pengunduhan source atau binary package wajib divalidasi dengan checksum SHA256/BLAKE3.
+- **Pengecualian Khusus Glibc:** Flag optimasi custom (`-march=native`) diinjeksikan untuk semua paket Kura Linux, **kecuali Glibc** yang tetap di-build via `forge` dengan konfigurasi standar CFLAGS bawaan Glibc demi stabilitas build system.
 
 ---
 
@@ -42,19 +59,26 @@
 ```
 .
 ├── AGENTS.md               # Pedoman AI, Aturan Mutlak HITL, & Siklus Verifikasi
-├── ARCHITECTURE.md         # Blueprint & Desain Arsitektur Engine Forge
+├── ARCHITECTURE.md         # Blueprint Arsitektur Hybrid Unified, Server, & CI/CD
 ├── MEMORY.md               # State Engine, Roadmap, ADR, & Log Solusi
 ├── README.md               # Dokumentasi Umum & Panduan Penggunaan Forge
 ├── .gitignore              # Konfigurasi filter berkas Git
 ├── src/                    # Source code engine, core modules, & CLI binary
+│   ├── cli/                # Command-line interface & subcommands
+│   ├── core/               # Engine inti, DAG resolver, USE flag & Slot engine
+│   ├── cpu/                # CPU microarchitecture analyzer (forge cpu-dump)
+│   ├── binhost/            # Forge binary host client & package installer
+│   ├── hybrid/             # Provider fallback CachyOS & Arch Linux binary adapter
+│   ├── server/             # Modul backend server (recipe & binary registry)
+│   └── cicd/               # CI/CD builder worker & automated import (forge import)
 ├── config/                 # Template konfigurasi bawaan (forge.conf.example)
-├── recipes/                # Pohon resep paket resmi Kura Linux
+├── recipes/                # Pohon resep paket resmi Kura Linux (di-sync dari server)
 │   ├── system/             # Resep set @system (Glibc, GCC, Kernel, OpenRC, dll.)
 │   ├── core/               # Resep utilitas inti sistem
 │   └── extra/              # Resep aplikasi & layanan tambahan
 ├── tests/                  # Test suite (unit tests, integration sandbox tests)
 ├── docs/                   # Spesifikasi teknis resep, hook API, & manual
-└── scripts/                # Helper scripts pengembangan & CI/CD
+└── scripts/                # Helper scripts pengembangan, server setup, & CI/CD
 ```
 
 ---
@@ -62,19 +86,29 @@
 ## 4. Alur Perintah Utama
 
 ```bash
-# --- 1. Manajemen Paket ---
-forge build <pkg>           # Kompilasi paket ke staging tanpa instalasi ke root
-forge install <pkg>         # Fetch -> Verify -> Build -> Stage -> Merge ke rootfs
-forge remove <pkg>          # Hapus paket secara bersih berdasarkan manifest
-forge update                # Sinkronisasi & perbarui pohon resep lokal
+# --- 1. Manajemen Paket Klien ---
+forge install <pkg>             # Pasang paket (otomatis pilih Binhost / Fallback / Source sesuai config)
+forge install --binhost <pkg>   # Paksa prioritaskan unduh pre-built binary native
+forge install --build-source <pkg> # Paksa kompilasi lokal dari source code
+forge install --interactive <pkg>  # Pilih manual provider (Forge Binhost vs CachyOS/Arch vs Source)
+forge remove <pkg>              # Hapus paket secara bersih berdasarkan manifest
+forge sync / forge update       # Sinkronisasi resep & index biner dari Forge Server
 
-# --- 2. Query & Inspeksi ---
-forge list                  # Tampilkan daftar paket terpasang & versinya
-forge query <pkg>           # Tampilkan metadata, dependensi, & daftar file paket
-forge search <query>        # Cari paket dalam pohon resep lokal
+# --- 2. Analisis Hardware & Profil CPU ---
+forge cpu-dump                  # Dump mikroarsitektur CPU & export cpu-profile.json
+forge cpu-dump --export-cflags  # Tampilkan rekomendasi CFLAGS untuk CPU saat ini
 
-# --- 3. Fitur Distro Khusus ---
-forge install @system       # Kompilasi seluruh base system Kura Linux 100% native
+# --- 3. Server & CI/CD Builder Tools ---
+forge import <pkg>              # Server/CI/CD: Build, kemas ke .forge.tar.zst, & upload ke binary library
+forge import --all-system       # Server/CI/CD: Kompilasi massal seluruh paket @system yang di-lock ke CPU target
+
+# --- 4. Query & Inspeksi ---
+forge list                      # Tampilkan daftar paket terpasang & versinya
+forge query <pkg>               # Tampilkan metadata, USE flags aktif, dependensi, & manifest
+forge search <query>            # Cari paket dalam katalog server/lokal
+
+# --- 5. Fitur Distro Khusus ---
+forge install @system           # Rebuild seluruh base system Kura Linux
 forge stage-export --output kura-stage.tar.xz  # Kemas rootfs menjadi stage tarball
 ```
 
@@ -84,7 +118,7 @@ forge stage-export --output kura-stage.tar.xz  # Kemas rootfs menjadi stage tarb
 
 ### Format Pesan Commit:
 Format commit wajib menggunakan standar Conventional Commits: `<type>: <deskripsi>`
-- `feat:` Fitur baru engine Forge, modul CLI, atau resep paket baru.
+- `feat:` Fitur baru engine Forge, modul CLI, server/CI/CD, atau resep paket baru.
 - `fix:` Perbaikan bug pada resolver dependensi, parser, atau siklus build.
 - `docs:` Pembaruan dokumentasi, blueprint arsitektur, atau catatan memori.
 - `test:` Penambahan atau perbaikan unit test / integration test.
