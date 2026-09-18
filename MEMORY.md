@@ -1,77 +1,117 @@
 # MEMORY.md — Memori & Catatan Teknis Package Manager `forge` & `forge-server`
 
-> Dokumen memori persisten AI untuk melacak progres pengembangan ekosistem package manager **`forge`** (klien) dan **`forge-server`** (server/CI-CD) berbasis **Rust**, keputusan arsitektur (ADR), status roadmap, dan log pemecahan masalah teknis.
+> Dokumen memori persisten AI untuk melacak progres pengembangan ekosistem package manager **`forge`** (klien) dan **`forge-server`** (server/CI-CD) berbasis **Rust**, keputusan arsitektur (ADR), status roadmap riil (membedakan kode yang sudah diimplementasikan vs blueprint arsitektur), dan log pemecahan masalah teknis.
 
 ---
 
-## 1. Status & Roadmap Pengembangan
+## 1. Status & Roadmap Pengembangan Riil (Detailed Status Tracker)
 
-### Fase 1: Inisialisasi Arsitektur, Dokumentasi & Standarisasi (Selesai)
+### Fase 1: Inisialisasi Arsitektur, Dokumentasi & Standarisasi
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] Inisialisasi repositori Git dan konfigurasi `.gitignore`.
-- [x] Blueprint arsitektur Rust, Source-First, wizard `forge setup` & `forge system-setup` di [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
-- [x] Panduan AI, aturan mutlak HITL & siklus verifikasi di [`AGENTS.md`](file:///home/admin/Development/Forge/AGENTS.md).
-- [x] Memori persisten & ADR di [`MEMORY.md`](file:///home/admin/Development/Forge/MEMORY.md).
+- [x] Blueprint arsitektur komprehensif di [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
+- [x] Pedoman AI mutlak Human-In-The-Loop (HITL) di [`AGENTS.md`](file:///home/admin/Development/Forge/AGENTS.md).
+- [x] Memori persisten & 25 ADR di [`MEMORY.md`](file:///home/admin/Development/Forge/MEMORY.md).
 - [x] Dokumentasi publik & panduan CLI di [`README.md`](file:///home/admin/Development/Forge/README.md).
 - [x] Template konfigurasi bawaan `config/forge.conf.example` & `config/system.conf.example`.
-- [x] Konsolidasi ke Clean 2-Crate Workspace Layout (`crates/forge` dan `crates/forge-server`).
+- [x] Konsolidasi ke Clean 2-Crate Workspace Layout: [`crates/forge`](file:///home/admin/Development/Forge/crates/forge) dan [`crates/forge-server`](file:///home/admin/Development/Forge/crates/forge-server).
 
-### Fase 2: CPU Hardware Profiler (`forge cpu-dump`) & Config Engine (Selesai)
-- [x] Implementasi modul CPU profiler: ekstraksi microarchitecture target (`znver4`, `alderlake`), deteksi ISA extensions (AVX-512, AVX2, SSE4.2), hierarki cache L1-L3, dan generasi `cpu-profile.json`.
-- [x] Parser konfigurasi `/etc/forge/forge.conf` dan `/etc/forge/system.conf`.
+---
 
-### Fase 3: Wizard `forge setup` & `forge system-setup` (Bootstrap Distro) (Selesai)
-- [x] Implementasi wizard interaktif `forge setup` untuk inisialisasi direktori dan konfigurasi package manager.
+### Fase 2: CPU Hardware Profiler (`forge cpu-dump`) & Config Engine
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
+- [x] Implementasi modul CPU profiler di [`crates/forge/src/cpu.rs`](file:///home/admin/Development/Forge/crates/forge/src/cpu.rs): ekstraksi vendor, microarchitecture target (`znver4`, `alderlake`), deteksi ISA extensions (AVX-512, AVX2, SSE4.2), hierarki cache L1-L3, dan generasi `cpu-profile.json`.
+- [x] Parser konfigurasi `/etc/forge/forge.conf` (`ForgeConfig`) dan `/etc/forge/system.conf` (`SystemSetupConfig`) via Serde TOML di [`crates/forge/src/lib.rs`](file:///home/admin/Development/Forge/crates/forge/src/lib.rs).
+- [x] Unit test `test_cpu_detection` lulus 100%.
+
+---
+
+### Fase 3: Wizard `forge setup` & `forge system-setup` (Bootstrap Distro)
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
+- [x] Implementasi wizard `forge setup` untuk inisialisasi direktori dan konfigurasi package manager di [`crates/forge/src/main.rs`](file:///home/admin/Development/Forge/crates/forge/src/main.rs).
 - [x] Implementasi wizard `forge system-setup` untuk bootstrap Kura Linux (pemilihan arsitektur, base profile, driver kernel monolithic, OpenRC defaults).
-- [x] Integrasi prompt panduan pasca-setup untuk menjalankan `forge install @system`.
-- [x] Mekanisme fallback template bawaan jika `forge install @system` dijalankan tanpa wizard.
+- [x] Integrasi prompt panduan pasca-setup untuk memicu kompilasi base OS `forge install @system`.
+- [x] Mekanisme fallback template bawaan jika `forge install @system` dijalankan sebelum wizard.
 
-### Fase 4: Core Engine (Portage-Inspired) & DAG Resolver (Desain Arsitektur Lengkap)
-- [x] Blueprint mendalam DAG resolver berbasis Directed Acyclic Graph untuk dependensi (`depends`, `makedepends`).
-- [x] Algoritma Topological Sort & Cycle Detection (Kahn / Tarjan SCC).
-- [x] Engine USE flags & evaluasi status fitur paket (`UseFlagsEngine`).
-- [x] Evaluasi conditional dependencies berbasis USE flags (`flag? ( dep )`).
-- [x] Engine multi-version slots (`pkg:slot`).
-- [x] Parser resep All-in-One `recipe.toml` dengan embedded script dan compiler supremacy hierarchy.
+---
 
-### Fase 5: Source Fetcher & Kriptografi Integritas (Selesai)
-- [x] Fetcher berkas sumber (HTTP/HTTPS via curl) ke cache path (`/var/cache/forge/distfiles/` atau `./distfiles/`).
-- [x] Verifikasi kriptografis SHA256 untuk sumber dan paket biner.
+### Fase 4: Core Engine (Portage-Inspired) & DAG Dependency Resolver
+**Status:** ⚠️ **BLUEPRINT SELESAI / IMPLEMENTASI KODE PENDING**
+- [x] **Desain Arsitektur:** Blueprint spesifikasi graf asiklis terarah (DAG), model Node/Edge, dan algoritma *Topological Sort* & *Cycle Detection* (Kahn / Tarjan SCC) di [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
+- [x] **USE Flags Engine:** Implementasi `UseFlagsEngine` di [`crates/forge/src/lib.rs`](file:///home/admin/Development/Forge/crates/forge/src/lib.rs) untuk evaluasi flag global dan per-paket (`+flag`, `-flag`). Unit test `test_use_flags_engine` lulus.
+- [x] **Slotting Engine:** Data model slot multi-versi (`pkg:slot`) di [`crates/forge/src/lib.rs`](file:///home/admin/Development/Forge/crates/forge/src/lib.rs).
+- [x] **Resep Parser:** Deserialisasi All-in-One `recipe.toml` (`PackageMeta`, `DependenciesMeta`, `SourcesMeta`, `BuildMeta`).
+- [ ] **Pending Implementasi Kode:** Engine Rust `crates/forge/src/resolver.rs` untuk:
+  - Membaca dan membangun graph dari seluruh pohon resep (`recipes/system/`, `core/`, `extra/`).
+  - Menyusun urutan eksekusi kompilasi topologis otomatis untuk single package dan `@system`.
+  - Filter conditional dependencies berbasis USE flags (`flag? ( dep )`).
+  - Laporan diagnostik jika terjadi siklus dependensi sirkular (*circular dependency error*).
 
-### Fase 6: Sandbox Build Engine & DESTDIR Staging (Selesai)
-- [x] Isolasi build di RAM tmpfs (`/tmp/forge/build/`).
-- [x] Injeksi otomatis compiler flags Kura Linux (`-march=native -O3 -pipe -flto=thin -fuse-ld=mold`).
-- [x] Akselerasi kompilasi menggunakan **Ccache (v4.13.5)** dengan auto-detection `CCACHE_DIR`.
-- [x] Pengecualian optimasi custom untuk Glibc (ADR-002: GCC standard CFLAGS).
-- [x] Staging hasil kompilasi ke `/tmp/forge/stage/` (`DESTDIR`).
+---
 
-### Fase 7: Transactional Merger, Collision Detector, & Flat-File DB (Desain Arsitektur Lengkap)
-- [x] Blueprint pre-flight collision scan terhadap `/var/db/forge/installed/`.
-- [x] Blueprint penyalinan berkas atomik dari `$DESTDIR` ke rootfs (`/`).
-- [x] Preservasi symlink Unix, permission bit, UID/GID, dan timestamps.
-- [x] Format pencatatan manifest berkas, symlink, permission, slot, dan metadata JSON.
-- [x] Pengelolaan daftar paket aktif (`/var/db/forge/world`).
+### Fase 5: Source Fetcher & Kriptografi Integritas
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
+- [x] Fetcher berkas sumber (HTTP/HTTPS via curl) ke direktori cache (`/var/cache/forge/distfiles/` atau `./distfiles/`) di [`crates/forge/src/builder.rs`](file:///home/admin/Development/Forge/crates/forge/src/builder.rs).
+- [x] Verifikasi kriptografis hash SHA256 otomatis sebelum ekstraksi tarball.
 
-### Fase 8: Unmerge Cleaner & Proteksi Konfigurasi (Desain Arsitektur Lengkap)
-- [x] Algoritma penghapusan presisi berdasarkan manifest berkas.
-- [x] Reverse-directory pruning untuk membersihkan direktori kosong tanpa merusak rootfs bersama.
-- [x] Mekanisme proteksi file konfigurasi pengguna di `/etc/` (`CONFIG_PROTECT`).
-- [x] Analisis orphan packages dan pemicu hooks post-unmerge (`ldconfig`, `rc-update`).
+---
 
-### Fase 9: Hybrid Unified Engine (Binhost & CachyOS/Arch Fallback) (Selesai)
-- [x] Implementasi modul binhost: pencocokan target CPU hash & USE flags.
-- [x] Implementasi modul hybrid: adapter repositori biner CachyOS (x86-64-v4/v3) & Arch Linux.
-- [x] Mekanisme seleksi provider interaktif bagi pengguna (`--interactive`).
+### Fase 6: Sandbox Build Engine & DESTDIR Staging
+**Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
+- [x] Isolasi direktori build di RAM tmpfs (`/tmp/forge/build/<pkg>-<ver>/`).
+- [x] Injeksi otomatis compiler flags Kura Linux (`-O3 -march=native -pipe -flto=thin -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-plt`) dan linker `mold` (`-fuse-ld=mold`).
+- [x] **Akselerasi Ccache (v4.13.5):** Auto-detection binary `ccache`, resolusi direktori `CCACHE_DIR` (`/var/cache/forge/ccache` / `distfiles/.ccache`), dan injeksi `CC="ccache clang"`, `CXX="ccache clang++"`.
+- [x] **Pengecualian Glibc (ADR-002):** Otomatis dialihkan ke GCC bawaan (`CC="ccache gcc"`) tanpa flag `-march` kustom demi kestabilan build system Glibc.
+- [x] Staging hasil kompilasi ke direktori terisolasi `DESTDIR` (`/tmp/forge/stage/<pkg>/`).
 
-### Fase 10: Server Suite & CI/CD Builder (`forge-server`) (Selesai)
-- [x] Implementasi biner `forge-server`: endpoint `serve` untuk resep dan katalog biner `packages.db.zst`.
-- [x] CI/CD worker tool: eksekusi `forge-server import` untuk build lock-CPU, packaging `.forge.tar.zst`, dan otomatisasi upload ke binary library.
-- [x] Catalog indexer tool (`forge-server index`).
+---
 
-### Fase 11: OpenRC Hook, Stage Exporter, & Seed Toolchain Pure Source (Selesai)
-- [x] OpenRC service auto-discovery di `/etc/init.d/` dan post-install triggers.
-- [x] Utilitas pembuatan stage distribusi: `forge stage-export` $\rightarrow$ `kura-stage.tar.xz`.
-- [x] Bundler seed toolchain murni: `forge toolchain bundle` $\rightarrow$ `dist/kura-toolchain.tar.xz` (ADR-019: 100% dari `/tmp/forge/stage/`, zero host harvesting).
-- [x] Pohon resep awal Kura Linux `@system` (LLVM 22, Mold, Ninja, Pkgconf, Make, Glibc, GCC, Binutils, OpenRC, Linux-Headers).
+### Fase 7: Transactional Merger & Collision Detector
+**Status:** ⚠️ **BLUEPRINT SELESAI / IMPLEMENTASI KODE PENDING**
+- [x] **Desain Arsitektur:** Blueprint spesifikasi Pre-flight Collision Scanning, Atomic Merge pipeline, dan Rollback Log di [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
+- [ ] **Pending Implementasi Kode:** Engine Rust `crates/forge/src/merger.rs` untuk:
+  - Memindai tabrakan berkas staging terhadap database paket terpasang (`/var/db/forge/installed/`).
+  - Menyalin file dari `$DESTDIR` ke `$FORGE_ROOT` (`/`) dengan preservasi symlink, permissions Unix, dan timestamps.
+  - Pencatatan log transaksi sementara (`/tmp/forge/txn_<id>.log`) untuk auto-rollback jika terjadi kegagalan I/O.
+
+---
+
+### Fase 8: Package Manifest Database & Unmerge Cleaner
+**Status:** ⚠️ **BLUEPRINT SELESAI / IMPLEMENTASI KODE PENDING**
+- [x] **Desain Arsitektur:** Spesifikasi format flat-file database `/var/db/forge/installed/<pkg>/manifest`, *reverse-directory pruning*, dan proteksi `CONFIG_PROTECT` di [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
+- [ ] **Pending Implementasi Kode:** Engine Rust `crates/forge/src/db.rs` untuk:
+  - Menulis manifest berkas, ukuran, hash SHA256, dan metadata build ke database flat-file.
+  - Eksekusi `forge remove <pkg>`: membaca manifest, menghapus file paket, dan membersihkan direktori kosong yang ditinggalkan secara rekursif (*leaf-to-root pruning*).
+  - Melindungi file konfigurasi di `/etc/` dari modifikasi pengguna (`CONFIG_PROTECT`).
+  - Eksekusi post-unmerge hooks (`ldconfig`, `rc-update`).
+  - Implementasi CLI `forge list` dan `forge query <pkg>`.
+
+---
+
+### Fase 9: Hybrid Unified Engine (Binhost & CachyOS/Arch Fallback)
+**Status:** 🟡 **LOGIKA MODEL SELESAI / INTEGRASI NETWORK API PENDING**
+- [x] Implementasi data model binhost & client matcher di [`crates/forge/src/binhost.rs`](file:///home/admin/Development/Forge/crates/forge/src/binhost.rs).
+- [x] Implementasi adapter fallback CachyOS (v4/v3) & Arch Linux di [`crates/forge/src/hybrid.rs`](file:///home/admin/Development/Forge/crates/forge/src/hybrid.rs).
+- [x] CLI flag dispatcher (`--binhost`, `--hybrid`, `--interactive`) di [`crates/forge/src/main.rs`](file:///home/admin/Development/Forge/crates/forge/src/main.rs).
+- [ ] **Pending:** Live network streaming download & decompresi zstd untuk biner binhost/CachyOS.
+
+---
+
+### Fase 10: Server Suite & CI/CD Builder (`forge-server`)
+**Status:** 🟡 **CLI WORKER SELESAI / REAL HTTP DAEMON PENDING**
+- [x] Implementasi CLI suite `forge-server` di [`crates/forge-server/src/main.rs`](file:///home/admin/Development/Forge/crates/forge-server/src/main.rs).
+- [x] CLI CI/CD Lock-CPU Builder: `forge-server import <pkg> --target-cpu <cpu>` dan `forge-server import --all-system`.
+- [x] CLI Catalog Indexer: `forge-server index --storage-path <path>`.
+- [ ] **Pending:** Implementasi HTTP REST API daemon riil (`forge-server serve`) menggunakan `tokio`/`axum` untuk sinkronisasi pohon resep dan serving katalog `packages.db.zst`.
+
+---
+
+### Fase 11: Seed Toolchain Pure Source, OpenRC Hook & Stage Exporter
+**Status:** 🟡 **SEED TOOLCHAIN SELESAI / STAGE EXPORTER PENDING**
+- [x] **Pure Source Seed Toolchain Bundler (ADR-019):** Implementasi `forge toolchain bundle` di [`crates/forge/src/toolchain.rs`](file:///home/admin/Development/Forge/crates/forge/src/toolchain.rs) yang mengemas HANYA biner/library hasil kompilasi murni dari `/tmp/forge/stage/` menjadi `dist/kura-toolchain.tar.xz` tanpa menyalin file host.
+- [x] **Resep Hulu Resmi Kura Linux `@system`:** Resep All-in-One di `recipes/system/` (glibc, gcc, llvm, mold, make, ninja, linux-headers, openrc, pkgconf).
+- [x] Desain integrasi OpenRC hook `/etc/init.d/` dan `rc-update`.
+- [ ] **Pending:** Implementasi riil `forge stage-export` untuk mengemas rootfs target menjadi `kura-stage.tar.xz`.
 
 ---
 
@@ -118,4 +158,4 @@
 | *2026-09-18* | *Integritas Build* | *Haram mutlak mengambil biner dari host filesystem* | *Menegakkan aturan Pure Source-Built (ADR-019): toolchain bundler hanya mengemas biner yang sah terkompilasi dari source code oleh Forge di staging `/tmp/forge/stage/`* |
 | *2026-09-18* | *Penyederhanaan Crate* | *Layout 6 crate berlebihan dan membingungkan* | *Mengkonsolidasikan workspace menjadi Clean 2-Crate Layout (`crates/forge` dan `crates/forge-server`)* |
 | *2026-09-18* | *Akselerasi Rebuild* | *Kompilasi ulang source code berulang memakan waktu lama* | *Mengintegrasikan Ccache (v4.13.5) secara otomatis pada pipeline builder Forge (ADR-025)* |
-| *2026-09-18* | *Fokus Arsitektur* | *Kebutuhan blueprint mendalam untuk siklus hidup paket (DAG, Merger, Manifest DB)* | *Mendokumentasikan blueprint lengkap DAG Dependency Resolver, Transactional Merger, Flat-File Manifest DB, dan menambah ADR-022 s/d ADR-025* |
+| *2026-09-18* | *Fokus Arsitektur & Transparansi* | *Kebutuhan blueprint mendalam dan transparansi status kode vs arsitektur* | *Mendokumentasikan blueprint lengkap DAG, Merger, Manifest DB, memperinci status tiap fase di MEMORY.md, dan menambah ADR-022 s/d ADR-025* |
