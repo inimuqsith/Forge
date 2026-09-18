@@ -48,11 +48,13 @@ impl SyncClient {
             }
         }
 
-        // 2. Download Tarball Zstandard
-        let tarball_url = format!("{}/recipes/latest.tar.zst", base_url);
+        // 2. Download Tarball Zstandard (include hash query parameter for CDN cache-busting)
+        let tarball_url = format!("{}/recipes/latest.tar.zst?h={}", base_url, remote_hash);
         println!("  [↓] Mengunduh arsip resep: {}", tarball_url);
         let tar_resp = client
             .get(&tarball_url)
+            .header("Cache-Control", "no-cache")
+            .header("Pragma", "no-cache")
             .send()
             .await
             .with_context(|| format!("Gagal mengunduh arsip resep dari {}", tarball_url))?;
