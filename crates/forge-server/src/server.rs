@@ -54,8 +54,14 @@ impl ForgeServer {
                 get(binhost_catalog_handler),
             )
             .route("/v1/binhost/{march}/{package}", get(binhost_package_handler))
-            .route("/v1/webhook/github", post(github_webhook_handler))
-            .route("/v1/recipes/refresh", post(recipes_refresh_handler))
+            .route(
+                "/v1/webhook/github",
+                post(github_webhook_handler).get(github_webhook_info_handler),
+            )
+            .route(
+                "/v1/recipes/refresh",
+                post(recipes_refresh_handler).get(recipes_refresh_handler),
+            )
             .with_state(state)
     }
 
@@ -250,6 +256,21 @@ async fn github_webhook_handler(
             }),
         ),
     }
+}
+
+async fn github_webhook_info_handler(
+    State(state): State<Arc<ServerState>>,
+) -> Json<SyncWebhookResponse> {
+    let packages = ForgeServer::scan_packages(&state.recipes_dir);
+    let hash_file = state.cache_dir.join("recipes.tar.zst.sha256");
+    let sha256 = std::fs::read_to_string(hash_file).ok().map(|s| s.trim().to_string());
+    Json(SyncWebhookResponse {
+        status: "ready".to_string(),
+        message: "Forge GitHub Webhook Receiver is active. Send POST requests from GitHub Webhooks (push event) to trigger automatic recipe rebundle.".to_string(),
+        package_count: packages.len(),
+        sha256,
+        git_updated: false,
+    })
 }
 
 async fn recipes_refresh_handler(
