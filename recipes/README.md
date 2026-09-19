@@ -44,11 +44,17 @@ recipes/
 
 ---
 
-## 🛠️ Script Scaffolder & Otomasi Resep
+## 🛠️ Maintainer Power Tool & Otomasi Resep
 
-Untuk mengunduh dan mentranspilasi paket baru secara massal dari Arch Linux / AUR / Alpine ke pohon resep Kura Linux:
+Untuk mengelola katalog resep secara interaktif (inspeksi DAG, tree visualizer, audit hulu, auto-bump, verifikasi SHA256, dan linter):
 ```bash
-python3 scripts/dump_recipes.py <package_name>
+# Mode Interaktif Terminal TUI
+python3 scripts/maintainer.py
+
+# Atau via CLI flag
+python3 scripts/maintainer.py --tree <package_name>
+python3 scripts/maintainer.py --dag <package_name>
+python3 scripts/maintainer.py --audit
 ```
 
 ---
