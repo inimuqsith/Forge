@@ -158,6 +158,10 @@ fn main() -> Result<()> {
     match cli.command {
         Commands::Setup { defaults } => {
             println!("{}", "=== Forge Package Manager Setup ===".bold().cyan());
+            let config = ForgeConfig::load_or_default(None);
+            let target_root = PathBuf::from(&config.general.root);
+            forge::PrivilegeManager::ensure_root_or_escalate(&target_root, "setup")?;
+
             if defaults {
                 println!("{} Menerapkan konfigurasi default Kura Linux ke /etc/forge/forge.conf...", "[✓]".green());
             } else {
@@ -173,12 +177,14 @@ fn main() -> Result<()> {
             interactive,
             build_source,
         } => {
+            let config = ForgeConfig::load_or_default(None);
+            let target_root = PathBuf::from(&config.general.root);
+            forge::PrivilegeManager::ensure_root_or_escalate(&target_root, "install")?;
+
             let _lock = ForgeLockGuard::acquire("forge", true)?;
             println!(">>> Memproses instalasi: {}", target.bold().green());
             let force_native = native || build_source;
-            let config = ForgeConfig::load_or_default(None);
             let db = InstalledDatabase::new(PathBuf::from(&config.general.db_path));
-            let target_root = PathBuf::from(&config.general.root);
 
             if interactive {
                 println!("{} Mode: Membuka pemilihan provider interaktif.", "[i]".blue());
@@ -402,11 +408,13 @@ fn main() -> Result<()> {
         }
 
         Commands::Remove { package } => {
+            let config = ForgeConfig::load_or_default(None);
+            let target_root = PathBuf::from(&config.general.root);
+            forge::PrivilegeManager::ensure_root_or_escalate(&target_root, "remove")?;
+
             let _lock = ForgeLockGuard::acquire("forge", true)?;
             println!(">>> Menghapus paket {} berdasarkan manifest...", package.bold().red());
-            let config = ForgeConfig::load_or_default(None);
             let db = InstalledDatabase::new(PathBuf::from(&config.general.db_path));
-            let target_root = PathBuf::from(&config.general.root);
             let config_protect = vec![PathBuf::from("/etc"), PathBuf::from("etc")];
 
             match db.unmerge_package(&package, &target_root, &config_protect) {
@@ -454,10 +462,14 @@ fn main() -> Result<()> {
         }
 
         Commands::Sync { server } => {
-            let _lock = ForgeLockGuard::acquire("forge", true)?;
             let config = ForgeConfig::load_or_default(None);
-            let server_url = server.unwrap_or_else(|| config.server.recipe_server.clone());
             let target_recipes_dir = PathBuf::from(&config.general.recipes_path);
+            if target_recipes_dir.starts_with("/var") || target_recipes_dir.starts_with("/usr") || target_recipes_dir.starts_with("/etc") {
+                forge::PrivilegeManager::ensure_root_or_escalate(Path::new("/"), "sync")?;
+            }
+
+            let _lock = ForgeLockGuard::acquire("forge", true)?;
+            let server_url = server.unwrap_or_else(|| config.server.recipe_server.clone());
             let cache_dir = PathBuf::from(&config.general.cache_path).join("sync");
 
             println!("{}", "=== Forge Recipe Sync Engine ===".bold().cyan());
@@ -478,6 +490,10 @@ fn main() -> Result<()> {
         }
 
         Commands::Update { target } => {
+            let config = ForgeConfig::load_or_default(None);
+            let target_root = PathBuf::from(&config.general.root);
+            forge::PrivilegeManager::ensure_root_or_escalate(&target_root, "update")?;
+
             let _lock = ForgeLockGuard::acquire("forge", true)?;
             println!(">>> Memeriksa pembaruan untuk target: {}", target.bold().yellow());
         }

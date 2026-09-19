@@ -18,6 +18,7 @@ pub mod lock;
 pub mod sandbox;
 pub mod stage;
 pub mod crypto;
+pub mod privilege;
 
 pub use builder::RecipeBuilder;
 pub use toolchain::{ToolchainComponent, ToolchainManager, ToolchainStatus};
@@ -34,6 +35,7 @@ pub use lock::ForgeLockGuard;
 pub use sandbox::SandboxRunner;
 pub use stage::*;
 pub use crypto::*;
+pub use privilege::*;
 
 /// Konfigurasi Global Forge (/etc/forge/forge.conf)
 #[derive(Debug, Clone, Serialize, Deserialize)]
