@@ -168,8 +168,10 @@ class RecipeChecker:
                     res.errors.append(f"Source count mismatch: {len(urls)} URLs but {len(sha256_list)} SHA256 checksums")
 
                 for idx, sha in enumerate(sha256_list):
+                    if sha in ("SKIP", "NONE"):
+                        continue
                     if not isinstance(sha, str) or not HEX64_REGEX.match(sha):
-                        res.errors.append(f"Invalid SHA256 hash at index {idx}: '{sha}' (must be 64 hexadecimal characters)")
+                        res.errors.append(f"Invalid SHA256 hash at index {idx}: '{sha}' (must be 64 hexadecimal characters or 'SKIP')")
 
         # 3. Build & Package steps safety
         build_tab = data.get("build", {})

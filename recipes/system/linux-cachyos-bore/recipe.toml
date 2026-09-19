@@ -1,0 +1,87 @@
+[package]
+name = "linux-cachyos-bore"
+version = "6.14.0_git"
+release = 1
+slot = "cachyos-bore"
+description = "Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO"
+license = "GPL-2.0-only"
+upstream = "https://github.com/CachyOS/linux-cachyos"
+
+[dependencies]
+runtime = ["kmod", "eudev"]
+build = [
+    "clang", "llvm", "mold", "make", "bc", "bison", "flex",
+    "elfutils", "openssl", "rsync", "kmod", "zstd", "diffutils"
+]
+
+[sources]
+urls = [
+    "https://github.com/CachyOS/linux-cachyos.git"
+]
+sha256 = [
+    "SKIP"
+]
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/linux-cachyos"
+
+# 1. Base Config CachyOS BORE
+if [ -f "config-cachyos" ]; then
+    cp config-cachyos .config
+elif [ -f "arch/x86/configs/cachyos_defconfig" ]; then
+    cp arch/x86/configs/cachyos_defconfig .config
+else
+    make defconfig
+fi
+
+# 2. Injeksi Optimasi Kura Linux (BORE, 1000Hz, Preempt Dynamic, BBRv3, MGLRU, Zstd 19)
+./scripts/config --set-val CONFIG_HZ_1000 y
+./scripts/config --set-val CONFIG_HZ 1000
+./scripts/config --enable CONFIG_PREEMPT_DYNAMIC
+./scripts/config --enable CONFIG_MODULE_COMPRESS_ZSTD
+./scripts/config --set-val CONFIG_MODULE_COMPRESS_ZSTD_LEVEL 19
+./scripts/config --enable CONFIG_TCP_CONG_BBR
+./scripts/config --set-str CONFIG_DEFAULT_TCP_CONG "bbr"
+./scripts/config --enable CONFIG_LRU_GEN
+./scripts/config --enable CONFIG_LRU_GEN_ENABLED
+
+# 3. Dynamic Stripping Detection (Dikontrol via argumen Forge / USE Flag)
+MOD_STRIP_ARG=""
+if [ "${FORGE_STRIP:-1}" = "1" ]; then
+    echo "  [✓] Dynamic Stripping: AKTIF (Ukuran modul ramping, debug symbols dibuang)"
+    ./scripts/config --disable CONFIG_DEBUG_INFO
+    ./scripts/config --enable CONFIG_DEBUG_INFO_NONE
+    ./scripts/config --disable CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
+    MOD_STRIP_ARG="INSTALL_MOD_STRIP=1 STRIP=llvm-strip"
+else
+    echo "  [i] Dynamic Stripping: NON-AKTIF (Debug symbols utuh untuk tracing/gdb)"
+fi
+
+# 4. Validasi Tree Kconfig & Kompilasi LLVM 22
+make LLVM=1 LLVM_IAS=1 olddefconfig
+make LLVM=1 LLVM_IAS=1 -j$(nproc) bzImage modules
+
+# 5. Ekstraksi Versi Kernel Riil
+KERNEL_RELEASE=$(make -s kernelrelease)
+
+# 6. Pasang Modul ke Staging DESTDIR dengan Dynamic Stripping
+mkdir -p "${DESTDIR}/usr"
+make LLVM=1 LLVM_IAS=1 ${MOD_STRIP_ARG} \
+     INSTALL_MOD_PATH="${DESTDIR}/usr" modules_install
+
+# Sanitasi symlink development yang tidak diperlukan di staging
+rm -f "${DESTDIR}/usr/lib/modules/${KERNEL_RELEASE}/build"
+rm -f "${DESTDIR}/usr/lib/modules/${KERNEL_RELEASE}/source"
+
+# 7. Pasang Kernel Binary ke /boot (dengan backup otomatis .old untuk fase update)
+mkdir -p "${DESTDIR}/boot"
+if [ -f "${DESTDIR}/boot/vmlinuz-linux-cachyos-bore" ]; then
+    cp "${DESTDIR}/boot/vmlinuz-linux-cachyos-bore" "${DESTDIR}/boot/vmlinuz-linux-cachyos-bore.old"
+fi
+
+cp arch/x86/boot/bzImage "${DESTDIR}/boot/vmlinuz-linux-cachyos-bore"
+cp .config "${DESTDIR}/boot/config-linux-cachyos-bore"
+cp System.map "${DESTDIR}/boot/System.map-linux-cachyos-bore"
+"""
