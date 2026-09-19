@@ -160,11 +160,11 @@
 - [x] **CLI Sub-perintah `forge recipe-import`:**
   - Mendukung file lokal maupun unduhan langsung dari URL hulu (`http://`, `https://`).
   - Opsi penyimpanan `--output <PATH>`.
-- [x] **Katalog 157 Resep Esensial Kura Linux (`recipes/`):**
+- [x] **Katalog 161 Resep Esensial Kura Linux (`recipes/`):**
   - `recipes/system/` (22 paket fondasi & toolchain: `glibc`, `gcc`, `llvm`, `clang`, `mold`, `binutils`, `make`, `ninja`, `cmake`, `meson`, `m4`, `autoconf`, `automake`, `libtool`, `patch`, `bison`, `flex`, `linux-headers`, `openrc`, `pkgconf`, `base`, `base-devel`).
   - `recipes/core/` (62 paket utilitas inti, daemons & library).
-  - `recipes/extra/` (73 paket dev tools, CLI modern, desktop apps, serta fondasi grafis & font: `libdrm`, `libinput`, `libxkbcommon`, `pixman`, `freetype`, `fontconfig`, `harfbuzz`, `cairo`, `vulkan-headers`, `vulkan-loader`, `mesa`, `helium-browser`, `antigravity-cli`, `intellij-idea`, `vscode-oss`, `tailscale`, dll.).
-- [x] **Unit & Integration Tests:** `test_parse_pkgbuild_metadata`, `test_transpile_build_package_steps`, `test_dependency_normalization`, `test_validate_all_recipes_in_repo_are_valid_toml`, `test_scan_actual_workspace_recipes` (100% lulus pada 157 resep riil).
+  - `recipes/extra/` (77 paket dev tools, CLI modern, desktop apps, fondasi grafis, font, serta audio stack: `alsa-lib`, `alsa-utils`, `pipewire`, `wireplumber`, `libdrm`, `libinput`, `libxkbcommon`, `pixman`, `freetype`, `fontconfig`, `harfbuzz`, `cairo`, `vulkan-headers`, `vulkan-loader`, `mesa`, `helium-browser`, `antigravity-cli`, `intellij-idea`, `vscode-oss`, `tailscale`, dll.).
+- [x] **Unit & Integration Tests:** `test_parse_pkgbuild_metadata`, `test_transpile_build_package_steps`, `test_dependency_normalization`, `test_validate_all_recipes_in_repo_are_valid_toml`, `test_scan_actual_workspace_recipes` (100% lulus pada 161 resep riil).
 
 ---
 

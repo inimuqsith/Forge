@@ -1,0 +1,58 @@
+[package]
+name = "pipewire"
+version = "1.4.11"
+release = 1
+slot = "0"
+description = "Low-latency audio/video routing daemon and multimedia processing graph"
+license = "MIT"
+upstream = "https://gitlab.freedesktop.org/pipewire/pipewire"
+
+[dependencies]
+runtime = ["glibc", "alsa-lib", "dbus", "elogind"]
+build = ["meson", "ninja", "pkgconf"]
+
+[sources]
+urls = [
+  "https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/1.4.11/pipewire-1.4.11.tar.gz"
+]
+sha256 = [
+  "a385ad74fe9c04523d65cac32b6a4429ee18a7ec8d96b424df5e284b0922c7f1"
+]
+
+[build]
+type = "meson"
+script = """
+meson setup build \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --buildtype=release \
+  -Ddocs=disabled \
+  -Dman=disabled \
+  -Dtests=disabled \
+  -Dsystemd=disabled \
+  -Dudev=disabled \
+  -Dpipewire-alsa=enabled \
+  -Dpipewire-v4l2=disabled \
+  -Dbluez5=disabled \
+  -Dffmpeg=disabled \
+  -Djack=disabled
+
+ninja -C build
+DESTDIR="${DESTDIR}" ninja -C build install
+
+# Create OpenRC Service script
+mkdir -p "${DESTDIR}/etc/init.d"
+cat << 'EOF' > "${DESTDIR}/etc/init.d/pipewire"
+#!/sbin/openrc-run
+description="PipeWire Audio and Multimedia Server"
+command="/usr/bin/pipewire"
+command_background="yes"
+pidfile="/run/pipewire.pid"
+
+depend() {
+    need dbus
+    after elogind
+}
+EOF
+chmod 755 "${DESTDIR}/etc/init.d/pipewire"
+"""

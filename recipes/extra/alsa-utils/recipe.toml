@@ -1,0 +1,37 @@
+[package]
+name = "alsa-utils"
+version = "1.2.16"
+release = 1
+slot = "0"
+description = "Advanced Linux Sound Architecture (ALSA) utilities (alsamixer, amixer, aplay)"
+license = "GPL-2.0-or-later"
+upstream = "https://github.com/alsa-project/alsa-utils"
+
+[dependencies]
+runtime = ["glibc", "alsa-lib", "ncurses"]
+build = ["autoconf", "automake", "libtool", "make", "pkgconf", "gettext"]
+
+[sources]
+urls = [
+  "https://github.com/alsa-project/alsa-utils/archive/refs/tags/v1.2.16.tar.gz"
+]
+sha256 = [
+  "4d613eac36b0b41eb11b7917f61f372cd0e56e30812319d8a8cca62a8249ea95"
+]
+
+[build]
+type = "autotools"
+script = """
+autoreconf -fiv
+./configure \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --sbindir=/usr/bin \
+  --disable-nls \
+  --disable-alsaconf \
+  --disable-bat \
+  --disable-xmlto
+
+make -j$(nproc)
+make DESTDIR="${DESTDIR}" install
+"""

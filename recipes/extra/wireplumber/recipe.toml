@@ -1,0 +1,50 @@
+[package]
+name = "wireplumber"
+version = "0.5.17"
+release = 1
+slot = "0"
+description = "Modular session manager daemon and policy router for PipeWire"
+license = "MIT"
+upstream = "https://gitlab.freedesktop.org/pipewire/wireplumber"
+
+[dependencies]
+runtime = ["glibc", "pipewire", "glib2"]
+build = ["meson", "ninja", "pkgconf", "glib2"]
+
+[sources]
+urls = [
+  "https://gitlab.freedesktop.org/pipewire/wireplumber/-/archive/0.5.17/wireplumber-0.5.17.tar.gz"
+]
+sha256 = [
+  "85d797ad6336a1be5f39f2059c7677b6f625fc8b07ece37cf50495f9412e0210"
+]
+
+[build]
+type = "meson"
+script = """
+meson setup build \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --buildtype=release \
+  -Ddoc=disabled \
+  -Dsystem-lua=false \
+  -Dsystemd=disabled
+
+ninja -C build
+DESTDIR="${DESTDIR}" ninja -C build install
+
+# Create OpenRC Service script
+mkdir -p "${DESTDIR}/etc/init.d"
+cat << 'EOF' > "${DESTDIR}/etc/init.d/wireplumber"
+#!/sbin/openrc-run
+description="WirePlumber PipeWire Session Manager"
+command="/usr/bin/wireplumber"
+command_background="yes"
+pidfile="/run/wireplumber.pid"
+
+depend() {
+    need pipewire
+}
+EOF
+chmod 755 "${DESTDIR}/etc/init.d/wireplumber"
+"""
