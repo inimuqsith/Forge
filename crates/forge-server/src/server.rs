@@ -1052,7 +1052,7 @@ fn render_dashboard_html(packages: &[PackageInfo]) -> String {
         <div class="binhost-card">
           <div class="binhost-card-title">🛠️ Source-First Engine</div>
           <div class="binhost-card-desc">Resep kompilasi modular dengan kustomisasi USE flags dan profil perangkat keras lokal.</div>
-          <div class="binhost-flags">105 Source Recipes • Bundled as recipes.tar.zst</div>
+          <div class="binhost-flags">{total_count} Source Recipes • Bundled as recipes.tar.zst</div>
           <a href="/v1/recipes/latest.tar.zst" class="api-link">Unduh Resep Tarball</a>
         </div>
       </div>
@@ -1671,11 +1671,42 @@ license = "GPL-3.0"
     }
 
     #[test]
-    fn test_scan_actual_105_workspace_recipes() {
-        let root_recipes = PathBuf::from("recipes");
-        if root_recipes.exists() {
-            let pkgs = ForgeServer::scan_packages(&root_recipes);
-            assert_eq!(pkgs.len(), 105, "Workspace harus memiliki tepat 105 resep paket");
+    fn test_scan_actual_workspace_recipes() {
+        let scanner_roots = [
+            Path::new("recipes"),
+            Path::new("../recipes"),
+            Path::new("../../recipes"),
+        ];
+
+        let found_root = scanner_roots.iter().find(|p| p.is_dir());
+        if let Some(root) = found_root {
+            let pkgs = ForgeServer::scan_packages(root);
+            assert!(!pkgs.is_empty(), "Katalog resep tidak boleh kosong");
+
+            // Hitung secara dinamis jumlah recipe.toml riil di filesystem
+            let mut recipe_file_count = 0;
+            for category in &["system", "core", "extra"] {
+                let cat_dir = root.join(category);
+                if cat_dir.is_dir() {
+                    for entry in std::fs::read_dir(&cat_dir).unwrap().flatten() {
+                        if entry.path().join("recipe.toml").is_file() {
+                            recipe_file_count += 1;
+                        }
+                    }
+                }
+            }
+
+            assert_eq!(
+                pkgs.len(),
+                recipe_file_count,
+                "Jumlah resep ter-scan ({}) harus cocok dengan jumlah file recipe.toml riil ({})",
+                pkgs.len(),
+                recipe_file_count
+            );
+            assert!(
+                pkgs.iter().all(|p| !p.name.is_empty() && !p.version.is_empty() && !p.category.is_empty()),
+                "Seluruh metadata paket harus valid dan ter-parse lengkap"
+            );
         }
     }
 

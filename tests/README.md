@@ -20,7 +20,7 @@ Total pengujian di Cargo Workspace terdiri dari **66 Unit & Integration Tests**:
 - **Toolchain Bundler & Stage Exporter:** `test_toolchain_status_detection_including_glibc`, `test_bundle_seed_toolchain_usrmerge_structure_and_config`, `test_bundle_seed_toolchain_fails_when_empty_stage`, `test_stage_exporter_validates_usrmerge`, `test_stage_exporter_validates_openrc`, `test_stage_exporter_sanitizes_temporary_files`, `test_stage_exporter_full_export_tarball_and_checksums`, `test_stage_exporter_xz_format`.
 
 ### 2. Crate `crates/forge-server` (24 Tests):
-- **Server State & Packaging:** `test_bundle_recipes_and_hash_generation`, `test_scan_packages_parses_all_fields`, `test_scan_actual_105_workspace_recipes`.
+- **Server State & Packaging:** `test_bundle_recipes_and_hash_generation`, `test_scan_packages_parses_all_fields`, `test_scan_actual_workspace_recipes`.
 - **REST Endpoints & Explorer:** `test_server_health_and_endpoints`, `test_api_v1_packages_json_endpoint`, `test_index_html_endpoint_returns_html_and_contains_packages`, `test_binhost_catalog_and_package_endpoints`.
 - **Client Sync Protocol:** `test_sync_recipes_client_full_cycle`, `test_sync_noop_when_up_to_date`.
 - **GitOps Webhook & Auto-Rebundle:** `test_github_webhook_endpoint_triggers_rebundle`, `test_recipes_refresh_endpoint`.
