@@ -1,0 +1,29 @@
+[package]
+name = "libxcursor"
+version = "1.2.3"
+release = 1
+slot = "0"
+description = "Cursor management library for X"
+license = "MIT"
+upstream = "https://xorg.freedesktop.org/"
+
+[dependencies]
+runtime = ["glibc", "libxcb"]
+build = ["make", "gcc", "pkgconf"]
+
+[sources]
+urls = [
+    "https://xorg.freedesktop.org/archive/individual/lib/libXcursor-1.2.3.tar.xz"
+]
+sha256 = [
+    "fde9402dd4cfe79da71e2d96bb980afc5e6ff4f8a7d74c159e1966afb2b2c2c0"
+]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/libXcursor-${pkgver}"
+./configure --prefix=/usr --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

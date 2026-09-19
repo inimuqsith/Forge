@@ -1,0 +1,29 @@
+[package]
+name = "xkeyboard-config"
+version = "2.44"
+release = 1
+slot = "0"
+description = "X Keyboard Extension configuration data"
+license = "MIT"
+upstream = "https://www.freedesktop.org/wiki/Software/XKeyboardConfig"
+
+[dependencies]
+runtime = []
+build = ["meson", "ninja", "gcc", "pkgconf", "python"]
+
+[sources]
+urls = [
+    "https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.44.tar.xz"
+]
+sha256 = [
+    "54d2c33eeebb031d48fa590c543e54c9bcbd0f00386ebc6489b2f47a0da4342a"
+]
+
+[build]
+type = "meson"
+script = """
+cd "${srcdir}/xkeyboard-config-${pkgver}"
+meson setup build --prefix=/usr --buildtype=release -Dnls=disabled
+ninja -C build -j${FORGE_JOBS:-$(nproc)}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

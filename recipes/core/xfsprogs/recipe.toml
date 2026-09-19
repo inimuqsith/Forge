@@ -8,7 +8,7 @@ license = "GPL-2.0-or-later"
 upstream = "https://xfs.wiki.kernel.org"
 
 [dependencies]
-runtime = ["glibc", "device-mapper", "libedit", "libinih", "liburcu", "util-linux"]
+runtime = ["glibc", "libedit", "libinih", "liburcu", "util-linux"]
 build = ["gcc", "git", "icu"]
 
 [sources]

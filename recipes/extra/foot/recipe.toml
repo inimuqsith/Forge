@@ -9,7 +9,7 @@ upstream = "https://codeberg.org/dnkl/$pkgbase"
 
 [dependencies]
 runtime = ["glibc", "fcft", "fontconfig", "libutf8proc", "libxkbcommon", "ncurses", "pixman", "wayland"]
-build = ["gcc", "git", "llvm", "meson", "ninja", "python", "scdoc", "sway", "tllist", "wayland-protocols"]
+build = ["gcc", "meson", "ninja", "pkgconf", "tllist", "wayland-protocols"]
 
 [sources]
 urls = [

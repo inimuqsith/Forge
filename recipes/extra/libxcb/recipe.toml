@@ -1,0 +1,29 @@
+[package]
+name = "libxcb"
+version = "1.17.0"
+release = 1
+slot = "0"
+description = "X11 C Bindings library"
+license = "MIT"
+upstream = "https://xcb.freedesktop.org/"
+
+[dependencies]
+runtime = ["glibc"]
+build = ["make", "gcc", "pkgconf", "python"]
+
+[sources]
+urls = [
+    "https://xorg.freedesktop.org/archive/individual/lib/libxcb-1.17.0.tar.xz"
+]
+sha256 = [
+    "599ebf9996710fea71622e6e184f3a8ad5b43d0e5fa8c4e407123c88a59a6d55"
+]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/libxcb-${pkgver}"
+./configure --prefix=/usr --enable-xinput --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

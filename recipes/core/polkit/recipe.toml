@@ -9,7 +9,7 @@ upstream = "https://github.com/polkit-org/polkit"
 
 [dependencies]
 runtime = ["glibc", "duktape", "expat", "glib2", "pam", "eudev"]
-build = ["gcc", "dbus", "git", "glib2-devel", "gobject-introspection", "gtk-doc", "meson", "ninja"]
+build = ["gcc", "dbus", "glib2", "gobject-introspection", "meson", "ninja", "pkgconf"]
 
 [sources]
 urls = [

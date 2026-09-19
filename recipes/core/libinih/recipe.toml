@@ -1,0 +1,29 @@
+[package]
+name = "libinih"
+version = "58"
+release = 1
+slot = "0"
+description = "Simple INI file parser written in C"
+license = "BSD-3-Clause"
+upstream = "https://github.com/benhoyt/inih"
+
+[dependencies]
+runtime = ["glibc"]
+build = ["meson", "ninja", "gcc", "pkgconf"]
+
+[sources]
+urls = [
+    "https://github.com/benhoyt/inih/archive/refs/tags/r58.tar.gz"
+]
+sha256 = [
+    "e79216260d5dffe809bda840be48ab0eec7737b2bb9f02d2275c1b46344ea7b7"
+]
+
+[build]
+type = "meson"
+script = """
+cd "${srcdir}/inih-r${pkgver}"
+meson setup build --prefix=/usr --buildtype=release -Ddistro_install=true
+ninja -C build -j${FORGE_JOBS:-$(nproc)}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

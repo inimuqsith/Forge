@@ -1,0 +1,29 @@
+[package]
+name = "libpciaccess"
+version = "0.18.1"
+release = 1
+slot = "0"
+description = "Generic PCI access library"
+license = "MIT"
+upstream = "https://xorg.freedesktop.org/"
+
+[dependencies]
+runtime = ["glibc", "zlib"]
+build = ["meson", "ninja", "gcc", "pkgconf"]
+
+[sources]
+urls = [
+    "https://www.x.org/releases/individual/lib/libpciaccess-0.18.1.tar.xz"
+]
+sha256 = [
+    "4af43444b38adb5545d0ed1c2ce46d9608cc47b31c2387fc5181656765a6fa76"
+]
+
+[build]
+type = "meson"
+script = """
+cd "${srcdir}/libpciaccess-${pkgver}"
+meson setup build --prefix=/usr --buildtype=release -Dzlib=enabled
+ninja -C build -j${FORGE_JOBS:-$(nproc)}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

@@ -8,8 +8,8 @@ license = "MIT"
 upstream = "https://www.nushell.sh"
 
 [dependencies]
-runtime = ["glibc", "curl", "gcc", "libgit2", "libssh2", "openssl", "sqlite3", "zstd"]
-build = ["gcc", "cargo", "git"]
+runtime = ["glibc", "curl", "gcc", "libgit2", "libssh2", "openssl", "sqlite", "zstd"]
+build = ["gcc", "rust", "mold", "clang", "llvm", "pkgconf", "git"]
 
 [sources]
 urls = [

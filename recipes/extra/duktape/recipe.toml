@@ -1,0 +1,28 @@
+[package]
+name = "duktape"
+version = "2.7.0"
+release = 1
+slot = "0"
+description = "Embeddable Javascript engine with a focus on portability and compact footprint"
+license = "MIT"
+upstream = "https://duktape.org/"
+
+[dependencies]
+runtime = ["glibc"]
+build = ["make", "gcc"]
+
+[sources]
+urls = [
+    "https://duktape.org/duktape-2.7.0.tar.xz"
+]
+sha256 = [
+    "90f8d2fa8b5567c6899830ddef2c03f3c27960b11aca222fa17aa7ac613c2890"
+]
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/duktape-${pkgver}"
+make -f Makefile.sharedlibrary ${MAKEFLAGS} INSTALL_PREFIX=/usr
+make -f Makefile.sharedlibrary DESTDIR="${DESTDIR}" INSTALL_PREFIX=/usr install
+"""

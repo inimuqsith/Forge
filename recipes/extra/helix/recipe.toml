@@ -8,8 +8,8 @@ license = "GPL-2.0-or-later"
 upstream = "https://helix-editor.com"
 
 [dependencies]
-runtime = ["glibc", "hicolor-icon-theme", "gcc", "libstdc++"]
-build = ["gcc", "cargo", "git"]
+runtime = ["glibc", "gcc"]
+build = ["gcc", "rust", "mold", "clang", "llvm", "pkgconf", "git"]
 
 [sources]
 urls = [

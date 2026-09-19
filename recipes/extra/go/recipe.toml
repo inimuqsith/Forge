@@ -1,0 +1,32 @@
+[package]
+name = "go"
+version = "1.24.1"
+release = 1
+slot = "0"
+description = "Open source programming language that makes it easy to build simple, fast, and reliable software"
+license = "BSD-3-Clause"
+upstream = "https://go.dev/"
+
+[dependencies]
+runtime = ["glibc", "ca-certificates"]
+build = ["make", "gcc", "bash"]
+
+[sources]
+urls = [
+    "https://go.dev/dl/go1.24.1.src.tar.gz"
+]
+sha256 = [
+    "8244ebf46c65607db10222b5806aeb31c1fcf8979c1b6b12f60c677e9a3c0656"
+]
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/go/src"
+./make.bash --no-banner
+mkdir -p "${DESTDIR}/usr/lib/go" "${DESTDIR}/usr/bin"
+cd "${srcdir}/go"
+cp -a bin doc lib misc pkg src test "${DESTDIR}/usr/lib/go/"
+ln -sf /usr/lib/go/bin/go "${DESTDIR}/usr/bin/go"
+ln -sf /usr/lib/go/bin/gofmt "${DESTDIR}/usr/bin/gofmt"
+"""

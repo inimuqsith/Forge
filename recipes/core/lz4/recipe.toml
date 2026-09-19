@@ -1,0 +1,28 @@
+[package]
+name = "lz4"
+version = "1.10.0"
+release = 1
+slot = "0"
+description = "Extremely fast compression algorithm"
+license = "BSD-2-Clause AND GPL-2.0-or-later"
+upstream = "https://lz4.github.io/lz4/"
+
+[dependencies]
+runtime = ["glibc"]
+build = ["make", "gcc", "pkgconf"]
+
+[sources]
+urls = [
+    "https://github.com/lz4/lz4/archive/refs/tags/v1.10.0.tar.gz"
+]
+sha256 = [
+    "537512904744b35e232912055ccf8ec66d768639ff3abe5788d90d792ec5f48b"
+]
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/lz4-${pkgver}"
+make ${MAKEFLAGS} PREFIX=/usr
+make DESTDIR="${DESTDIR}" PREFIX=/usr install
+"""

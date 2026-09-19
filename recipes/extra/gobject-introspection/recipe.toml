@@ -1,0 +1,29 @@
+[package]
+name = "gobject-introspection"
+version = "1.82.0"
+release = 1
+slot = "0"
+description = "Middleware layer for creating language bindings for C libraries"
+license = "LGPL-2.0-or-later AND GPL-2.0-or-later"
+upstream = "https://wiki.gnome.org/Projects/GObjectIntrospection"
+
+[dependencies]
+runtime = ["glibc", "glib2", "libffi"]
+build = ["meson", "ninja", "gcc", "pkgconf", "python", "bison", "flex"]
+
+[sources]
+urls = [
+    "https://download.gnome.org/sources/gobject-introspection/1.82/gobject-introspection-1.82.0.tar.xz"
+]
+sha256 = [
+    "0f5a4c1908424bf26bc41e9361168c363685080fbdb87a196c891c8401ca2f09"
+]
+
+[build]
+type = "meson"
+script = """
+cd "${srcdir}/gobject-introspection-${pkgver}"
+meson setup build --prefix=/usr --buildtype=release -Ddoctool=disabled -Dcairo=disabled
+ninja -C build -j${FORGE_JOBS:-$(nproc)}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

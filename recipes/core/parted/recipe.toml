@@ -8,8 +8,8 @@ license = "GPL-2.0-or-later"
 upstream = "https://www.gnu.org/software/parted/parted.html"
 
 [dependencies]
-runtime = ["glibc", "device-mapper", "util-linux"]
-build = ["gcc", "pkg-config"]
+runtime = ["glibc", "util-linux"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [

@@ -9,7 +9,7 @@ upstream = "https://fishshell.com/"
 
 [dependencies]
 runtime = ["glibc", "gcc", "pcre2"]
-build = ["gcc", "cmake", "git", "jq", "rust", "python-sphinx", "ninja"]
+build = ["gcc", "cmake", "ninja", "rust", "pkgconf"]
 
 [sources]
 urls = [

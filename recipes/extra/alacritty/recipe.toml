@@ -8,8 +8,8 @@ license = "GPL-2.0-or-later"
 upstream = "https://github.com/alacritty/alacritty"
 
 [dependencies]
-runtime = ["glibc", "freetype2", "fontconfig", "libxi", "libxcursor", "libxkbcommon", "libxkbcommon-x11", "libxrandr"]
-build = ["gcc", "git", "rust", "cargo", "cmake", "ncurses", "desktop-file-utils", "gdb", "libxcb", "scdoc"]
+runtime = ["glibc", "freetype", "fontconfig", "libxi", "libxcursor", "libxkbcommon", "libxrandr", "libxcb"]
+build = ["gcc", "rust", "mold", "clang", "llvm", "cmake", "ncurses", "pkgconf", "libxcb"]
 
 [sources]
 urls = [

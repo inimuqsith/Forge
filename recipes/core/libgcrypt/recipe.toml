@@ -1,0 +1,29 @@
+[package]
+name = "libgcrypt"
+version = "1.11.0"
+release = 1
+slot = "0"
+description = "General purpose cryptographic library based on the code from GnuPG"
+license = "LGPL-2.1-or-later AND GPL-2.0-or-later"
+upstream = "https://gnupg.org/software/libgcrypt/"
+
+[dependencies]
+runtime = ["glibc", "libgpg-error"]
+build = ["make", "gcc"]
+
+[sources]
+urls = [
+    "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.0.tar.bz2"
+]
+sha256 = [
+    "09120c9867ce7f2081d6aaa1775386b98c2f2f246135761aae47d81f58685b9c"
+]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/libgcrypt-${pkgver}"
+./configure --prefix=/usr
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

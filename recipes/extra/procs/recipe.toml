@@ -9,7 +9,7 @@ upstream = "https://github.com/dalance/$pkgname"
 
 [dependencies]
 runtime = ["glibc", "gcc"]
-build = ["gcc", "cargo", "asciidoctor"]
+build = ["rust", "mold", "clang", "llvm", "pkgconf"]
 
 [sources]
 urls = [

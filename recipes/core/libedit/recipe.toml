@@ -1,0 +1,29 @@
+[package]
+name = "libedit"
+version = "20240808-3.1"
+release = 1
+slot = "0"
+description = "NetBSD Editline library (BSD-licensed alternative to GNU readline)"
+license = "BSD-3-Clause"
+upstream = "https://www.thrysoee.dk/editline/"
+
+[dependencies]
+runtime = ["glibc", "ncurses"]
+build = ["make", "gcc"]
+
+[sources]
+urls = [
+    "https://www.thrysoee.dk/editline/libedit-20240808-3.1.tar.gz"
+]
+sha256 = [
+    "5f0573349d77c4a48967191cdd6634dd7aa5f6398c6a57fe037cc02696d6099f"
+]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/libedit-${pkgver}"
+./configure --prefix=/usr --enable-widec --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

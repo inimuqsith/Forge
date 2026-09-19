@@ -8,8 +8,8 @@ license = "GPL-2.0-or-later"
 upstream = "https://www.freedesktop.org/wiki/Software/dbus/"
 
 [dependencies]
-runtime = ["glibc", "audit", "expat", "libcap-ng", "eudev"]
-build = ["gcc", "docbook-xsl", "doxygen", "git", "glib2", "mallard-ducktype", "meson", "python", "qt5-tools", "xmlto", "yelp-tools", "ninja"]
+runtime = ["glibc", "expat", "libcap-ng", "eudev"]
+build = ["gcc", "meson", "ninja", "pkgconf", "glib2", "python"]
 
 [sources]
 urls = [

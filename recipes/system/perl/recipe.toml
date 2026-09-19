@@ -1,0 +1,29 @@
+[package]
+name = "perl"
+version = "5.40.1"
+release = 1
+slot = "0"
+description = "Highly capable, feature-rich programming language"
+license = "GPL-1.0-or-later OR Artistic-1.0-Perl"
+upstream = "https://www.perl.org/"
+
+[dependencies]
+runtime = ["glibc", "zlib", "bzip2"]
+build = ["make", "gcc"]
+
+[sources]
+urls = [
+    "https://www.cpan.org/src/5.0/perl-5.40.1.tar.gz"
+]
+sha256 = [
+    "02f8c45bb379ed0c3de7514fad48c714fd46be8f0b536bfd5320050165a1ee26"
+]
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/perl-${pkgver}"
+./Configure -des -Dprefix=/usr -Dvendorprefix=/usr -Duseithreads -Duseshrplib -Dman1dir=/usr/share/man/man1 -Dman3dir=/usr/share/man/man3
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

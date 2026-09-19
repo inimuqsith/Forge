@@ -1,0 +1,29 @@
+[package]
+name = "gperf"
+version = "3.1"
+release = 1
+slot = "0"
+description = "Perfect hash function generator"
+license = "GPL-3.0-or-later"
+upstream = "https://www.gnu.org/software/gperf/"
+
+[dependencies]
+runtime = ["glibc"]
+build = ["make", "gcc"]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/gperf/gperf-3.1.tar.gz"
+]
+sha256 = [
+    "588546b945bba4b70b6a3a616e80b4ab466e3f33024a352fc2198112cdbb3ae2"
+]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/gperf-${pkgver}"
+./configure --prefix=/usr --docdir=/usr/share/doc/gperf-3.1
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

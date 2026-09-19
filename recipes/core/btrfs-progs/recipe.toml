@@ -9,7 +9,7 @@ upstream = "https://btrfs.readthedocs.io"
 
 [dependencies]
 runtime = ["glibc", "libgcrypt", "lzo", "eudev", "util-linux", "zlib", "zstd"]
-build = ["gcc", "asciidoc", "e2fsprogs", "git", "python", "python-setuptools", "python-sphinx", "python-sphinx_rtd_theme", "xmlto"]
+build = ["gcc", "e2fsprogs", "pkgconf", "make"]
 
 [sources]
 urls = [

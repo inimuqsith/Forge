@@ -9,7 +9,7 @@ upstream = "https://github.com/eza-community/$pkgname"
 
 [dependencies]
 runtime = ["glibc", "gcc", "libgit2"]
-build = ["gcc", "cargo", "pandoc"]
+build = ["rust", "mold", "clang", "llvm", "pkgconf"]
 
 [sources]
 urls = [

@@ -1,0 +1,29 @@
+[package]
+name = "libxi"
+version = "1.8.2"
+release = 1
+slot = "0"
+description = "X11 Input extension library"
+license = "MIT"
+upstream = "https://xorg.freedesktop.org/"
+
+[dependencies]
+runtime = ["glibc", "libxcb"]
+build = ["make", "gcc", "pkgconf"]
+
+[sources]
+urls = [
+    "https://xorg.freedesktop.org/archive/individual/lib/libXi-1.8.2.tar.xz"
+]
+sha256 = [
+    "d0e0555e53d6e2114eabfa44226ba162d2708501a25e18d99cfb35c094c6c104"
+]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/libXi-${pkgver}"
+./configure --prefix=/usr --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

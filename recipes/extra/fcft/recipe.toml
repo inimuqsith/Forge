@@ -1,0 +1,29 @@
+[package]
+name = "fcft"
+version = "3.2.0"
+release = 1
+slot = "0"
+description = "Simple library for font loading and glyph rasterization"
+license = "MIT"
+upstream = "https://codeberg.org/dnkl/fcft"
+
+[dependencies]
+runtime = ["glibc", "fontconfig", "freetype", "pixman", "libutf8proc"]
+build = ["meson", "ninja", "gcc", "pkgconf", "tllist"]
+
+[sources]
+urls = [
+    "https://codeberg.org/dnkl/fcft/releases/download/3.2.0/fcft-3.2.0.tar.gz"
+]
+sha256 = [
+    "71f5f1b4a351dc281ea9f5acc86ebdeaa7221f0d93bd70090a134edab1760bfd"
+]
+
+[build]
+type = "meson"
+script = """
+cd "${srcdir}/fcft"
+meson setup build --prefix=/usr --buildtype=release -Ddocs=disabled
+ninja -C build -j${FORGE_JOBS:-$(nproc)}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

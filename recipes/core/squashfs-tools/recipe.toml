@@ -9,7 +9,7 @@ upstream = "https://github.com/plougher/squashfs-tools"
 
 [dependencies]
 runtime = ["glibc", "gcc", "lz4", "lzo", "xz", "zlib", "zstd"]
-build = ["gcc", "help2man"]
+build = ["gcc", "make", "pkgconf"]
 
 [sources]
 urls = [

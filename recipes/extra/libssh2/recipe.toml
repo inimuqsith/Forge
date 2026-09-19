@@ -1,0 +1,29 @@
+[package]
+name = "libssh2"
+version = "1.11.1"
+release = 1
+slot = "0"
+description = "Client-side C library implementing the SSH2 protocol"
+license = "BSD-3-Clause"
+upstream = "https://www.libssh2.org/"
+
+[dependencies]
+runtime = ["glibc", "openssl", "zlib"]
+build = ["make", "gcc", "pkgconf"]
+
+[sources]
+urls = [
+    "https://www.libssh2.org/download/libssh2-1.11.1.tar.xz"
+]
+sha256 = [
+    "9954cb54c4f548198a7cbebad248bdc87dd64bd26185708a294b2b50771e3769"
+]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/libssh2-${pkgver}"
+./configure --prefix=/usr --with-crypto=openssl --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

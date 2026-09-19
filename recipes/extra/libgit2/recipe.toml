@@ -1,0 +1,29 @@
+[package]
+name = "libgit2"
+version = "1.9.0"
+release = 1
+slot = "0"
+description = "Highly portable, pure C implementation of the Git core methods"
+license = "GPL-2.0-only WITH GCC-exception-2.0"
+upstream = "https://libgit2.org/"
+
+[dependencies]
+runtime = ["glibc", "openssl", "zlib", "pcre2"]
+build = ["cmake", "ninja", "gcc", "pkgconf", "python"]
+
+[sources]
+urls = [
+    "https://github.com/libgit2/libgit2/archive/refs/tags/v1.9.0.tar.gz"
+]
+sha256 = [
+    "75b27d4d6df44bd34e2f70663cfd998f5ec41e680e1e593238bbe517a84c7ed2"
+]
+
+[build]
+type = "cmake"
+script = """
+cd "${srcdir}/libgit2-${pkgver}"
+cmake -B build -G Ninja -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DUSE_SSH=OFF -DBUILD_TESTS=OFF
+ninja -C build -j${FORGE_JOBS:-$(nproc)}
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

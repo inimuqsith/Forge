@@ -8,8 +8,8 @@ license = "GPL-2.0-or-later"
 upstream = "https://github.com/elogind/elogind"
 
 [dependencies]
-runtime = ["glibc", "libelogind", "pam", "acl"]
-build = ["gcc", "intltool", "libtool", "gperf", "gtk-doc", "git", "libcap", "meson", "ninja"]
+runtime = ["glibc", "pam", "acl", "libcap"]
+build = ["gcc", "intltool", "libtool", "gperf", "libcap", "meson", "ninja", "pkgconf"]
 
 [sources]
 urls = [

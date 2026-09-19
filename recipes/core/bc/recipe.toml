@@ -1,0 +1,29 @@
+[package]
+name = "bc"
+version = "1.08.1"
+release = 1
+slot = "0"
+description = "Arbitrary precision numeric processing language"
+license = "GPL-3.0-or-later"
+upstream = "https://www.gnu.org/software/bc/"
+
+[dependencies]
+runtime = ["glibc", "readline"]
+build = ["make", "gcc", "flex", "bison"]
+
+[sources]
+urls = [
+    "https://ftp.gnu.org/gnu/bc/bc-1.08.1.tar.gz"
+]
+sha256 = [
+    "b71457ffeb210d7ea61825ff72b3e49dc8f2c1a04102bbe23591d783d1bfe996"
+]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/bc-${pkgver}"
+./configure --prefix=/usr --with-readline --mandir=/usr/share/man --infodir=/usr/share/info
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

@@ -8,8 +8,8 @@ license = "GPL-2.0-or-later"
 upstream = "https://wayland.freedesktop.org/"
 
 [dependencies]
-runtime = ["glibc", "libffi", "expat", "libxml2", "default-cursors"]
-build = ["gcc", "meson", "libxslt", "doxygen", "xmlto", "graphviz", "docbook-xsl", "mdbook", "ninja"]
+runtime = ["glibc", "libffi", "expat", "libxml2"]
+build = ["gcc", "meson", "ninja", "pkgconf", "libxslt"]
 
 [sources]
 urls = [
