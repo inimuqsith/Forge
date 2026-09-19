@@ -44,9 +44,9 @@ auto_match_cpu = true
 fallback_to_source = true
 
 [hybrid]
-# Fallback opsional ke repositori biner teroptimasi CachyOS (x86-64-v4 / v3)
+# Fallback opsional ke repositori biner teroptimasi CachyOS (x86-64-v4 / v3 / znver4)
 enable_cachyos_fallback = false
-cachyos_repo_url = "https://mirror.cachyos.org/repo/x86_64_v4/cachyos_v4"
+cachyos_repo_url = "https://cdn77.cachyos.org/repo/x86_64_v4/cachyos-v4"
 
 # Fallback opsional ke repositori biner standar Arch Linux
 enable_arch_fallback = false

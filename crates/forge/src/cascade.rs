@@ -156,6 +156,21 @@ impl PackageCascadeResolver {
                 "  [2/3] Biner belum ada di Forge Server. Memeriksa CachyOS Prebuilt ({:?})...",
                 cachyos.tier
             );
+            if let Some((download_url, meta)) = cachyos.query_package(pkg_name).await {
+                println!(
+                    "  [✓] Paket biner ditemukan di CachyOS: {} v{} ({:?})",
+                    meta.name.bold().green(),
+                    meta.version.cyan(),
+                    cachyos.tier
+                );
+                return Ok(CascadeResolution {
+                    provider: PackageProvider::CachyOsPrebuilt,
+                    package_name: pkg_name.to_string(),
+                    download_url: Some(download_url),
+                    target_march: cpu.target_march.clone(),
+                    reason: format!("CachyOS Prebuilt ({:?}) v{}", cachyos.tier, meta.version),
+                });
+            }
         }
 
         // 3. Tingkat 3: Fallback Source Code
@@ -170,7 +185,7 @@ impl PackageCascadeResolver {
             force_native,
             enable_binhost,
             None,
-            None,
+            Some(false),
         );
 
         Ok(resolution)
@@ -255,7 +270,7 @@ mod tests {
 
         assert_eq!(res.provider, PackageProvider::CachyOsPrebuilt);
         assert_eq!(res.package_name, "neovim");
-        assert!(res.download_url.unwrap().contains("mirror.cachyos.org"));
+        assert!(res.download_url.unwrap().contains("cachyos.org"));
         assert!(res.reason.contains("CachyOS Prebuilt"));
     }
 

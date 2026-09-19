@@ -227,6 +227,10 @@ impl MergeTransaction {
             || clean == "usr/share/glib-2.0/schemas/gschemas.compiled"
             || clean == "usr/share/applications/mimeinfo.cache"
             || clean.starts_with("usr/share/mime/")
+            || clean == ".PKGINFO"
+            || clean == ".BUILDINFO"
+            || clean == ".MTREE"
+            || clean == ".INSTALL"
     }
 
     /// Melakukan Pre-flight Collision Scan terhadap InstalledDatabase

@@ -137,23 +137,23 @@ impl CachyOsAdapter {
     /// dan pemuatan blacklist perlindungan anti-brick sistem inti.
     pub fn auto_detect(cpu: &CpuProfile) -> Self {
         let (tier, repo_name) = match cpu.target_march.as_str() {
-            "znver4" => (CachyOsTier::Znver4, "cachyos_znver4"),
-            "x86-64-v4" | "alderlake" | "sapphirerapids" => (CachyOsTier::X86_64_V4, "cachyos_v4"),
+            "znver4" => (CachyOsTier::Znver4, "cachyos-znver4"),
+            "x86-64-v4" | "alderlake" | "sapphirerapids" => (CachyOsTier::X86_64_V4, "cachyos-v4"),
             _ if cpu.isa_extensions.iter().any(|f| f.starts_with("avx512")) => {
-                (CachyOsTier::X86_64_V4, "cachyos_v4")
+                (CachyOsTier::X86_64_V4, "cachyos-v4")
             }
-            "x86-64-v3" | "znver3" => (CachyOsTier::X86_64_V3, "cachyos_v3"),
+            "x86-64-v3" | "znver3" => (CachyOsTier::X86_64_V3, "cachyos-v3"),
             _ if cpu.isa_extensions.iter().any(|f| f == "avx2") => {
-                (CachyOsTier::X86_64_V3, "cachyos_v3")
+                (CachyOsTier::X86_64_V3, "cachyos-v3")
             }
             _ => (CachyOsTier::Generic, "cachyos"),
         };
 
         let base_url = match tier {
-            CachyOsTier::Znver4 => format!("https://mirror.cachyos.org/repo/x86_64_v4/{}", repo_name),
-            CachyOsTier::X86_64_V4 => format!("https://mirror.cachyos.org/repo/x86_64_v4/{}", repo_name),
-            CachyOsTier::X86_64_V3 => format!("https://mirror.cachyos.org/repo/x86_64_v3/{}", repo_name),
-            CachyOsTier::Generic => format!("https://mirror.cachyos.org/repo/x86_64/{}", repo_name),
+            CachyOsTier::Znver4 => format!("https://cdn77.cachyos.org/repo/x86_64_v4/{}", repo_name),
+            CachyOsTier::X86_64_V4 => format!("https://cdn77.cachyos.org/repo/x86_64_v4/{}", repo_name),
+            CachyOsTier::X86_64_V3 => format!("https://cdn77.cachyos.org/repo/x86_64_v3/{}", repo_name),
+            CachyOsTier::Generic => format!("https://cdn77.cachyos.org/repo/x86_64/{}", repo_name),
         };
 
         // DAFTAR PAKET YANG HARAM DIAMBIL DARI CACHYOS DEMI MENCEGAH BRICK
@@ -172,6 +172,63 @@ impl CachyOsAdapter {
             base_url,
             protected_blacklist: blacklist,
         }
+    }
+
+    /// Daftar repositori aktif untuk tier arsitektur saat ini
+    pub fn get_repo_urls(&self) -> Vec<(String, String)> {
+        match self.tier {
+            CachyOsTier::Znver4 => vec![
+                ("https://cdn77.cachyos.org/repo/x86_64_v4/cachyos-extra-v4".to_string(), "cachyos-extra-v4".to_string()),
+                ("https://cdn77.cachyos.org/repo/x86_64_v4/cachyos-znver4".to_string(), "cachyos-znver4".to_string()),
+                ("https://cdn77.cachyos.org/repo/x86_64_v4/cachyos-v4".to_string(), "cachyos-v4".to_string()),
+                ("https://cdn77.cachyos.org/repo/x86_64_v4/cachyos-core-v4".to_string(), "cachyos-core-v4".to_string()),
+            ],
+            CachyOsTier::X86_64_V4 => vec![
+                ("https://cdn77.cachyos.org/repo/x86_64_v4/cachyos-extra-v4".to_string(), "cachyos-extra-v4".to_string()),
+                ("https://cdn77.cachyos.org/repo/x86_64_v4/cachyos-v4".to_string(), "cachyos-v4".to_string()),
+                ("https://cdn77.cachyos.org/repo/x86_64_v4/cachyos-core-v4".to_string(), "cachyos-core-v4".to_string()),
+            ],
+            CachyOsTier::X86_64_V3 => vec![
+                ("https://cdn77.cachyos.org/repo/x86_64_v3/cachyos-extra-v3".to_string(), "cachyos-extra-v3".to_string()),
+                ("https://cdn77.cachyos.org/repo/x86_64_v3/cachyos-v3".to_string(), "cachyos-v3".to_string()),
+                ("https://cdn77.cachyos.org/repo/x86_64_v3/cachyos-core-v3".to_string(), "cachyos-core-v3".to_string()),
+            ],
+            CachyOsTier::Generic => vec![
+                ("https://cdn77.cachyos.org/repo/x86_64/cachyos-extra".to_string(), "cachyos-extra".to_string()),
+                ("https://cdn77.cachyos.org/repo/x86_64/cachyos".to_string(), "cachyos".to_string()),
+                ("https://cdn77.cachyos.org/repo/x86_64/cachyos-core".to_string(), "cachyos-core".to_string()),
+            ],
+        }
+    }
+
+    /// Query repository databases secara asinkron untuk mencari URL biner dan metadata paket
+    pub async fn query_package(&self, pkg_name: &str) -> Option<(String, CachyOsPackageMeta)> {
+        let clean = clean_package_name(pkg_name);
+        if !self.is_allowed_package(clean) {
+            return None;
+        }
+
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(10))
+            .build()
+            .ok()?;
+
+        for (base_repo_url, repo_name) in self.get_repo_urls() {
+            let db_url = format!("{}/{}.db.tar.zst", base_repo_url, repo_name);
+            if let Ok(resp) = client.get(&db_url).send().await {
+                if resp.status().is_success() {
+                    if let Ok(bytes) = resp.bytes().await {
+                        if let Ok(db) = parse_repo_db_tar_zst(&bytes) {
+                            if let Some(meta) = db.get(clean) {
+                                let download_url = format!("{}/{}", base_repo_url, meta.filename);
+                                return Some((download_url, meta.clone()));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        None
     }
 
     /// Periksa apakah paket diizinkan diambil dari prebuilt CachyOS (Anti-Brick check)
@@ -267,22 +324,22 @@ pub mod tests {
         let zen4_cpu = CpuProfile::mock("znver4", &["avx512f", "avx512vl", "avx2"]);
         let adapter_zen4 = CachyOsAdapter::auto_detect(&zen4_cpu);
         assert_eq!(adapter_zen4.tier, CachyOsTier::Znver4);
-        assert_eq!(adapter_zen4.repo_name, "cachyos_znver4");
-        assert!(adapter_zen4.base_url.contains("cachyos_znver4"));
+        assert_eq!(adapter_zen4.repo_name, "cachyos-znver4");
+        assert!(adapter_zen4.base_url.contains("cachyos-znver4"));
 
         // 2. Intel / AVX-512 -> X86_64_V4
         let v4_cpu = CpuProfile::mock("alderlake", &["avx512f", "avx2"]);
         let adapter_v4 = CachyOsAdapter::auto_detect(&v4_cpu);
         assert_eq!(adapter_v4.tier, CachyOsTier::X86_64_V4);
-        assert_eq!(adapter_v4.repo_name, "cachyos_v4");
-        assert!(adapter_v4.base_url.contains("cachyos_v4"));
+        assert_eq!(adapter_v4.repo_name, "cachyos-v4");
+        assert!(adapter_v4.base_url.contains("cachyos-v4"));
 
         // 3. AVX2 -> X86_64_V3
         let v3_cpu = CpuProfile::mock("x86-64-v3", &["avx2", "sse4_2"]);
         let adapter_v3 = CachyOsAdapter::auto_detect(&v3_cpu);
         assert_eq!(adapter_v3.tier, CachyOsTier::X86_64_V3);
-        assert_eq!(adapter_v3.repo_name, "cachyos_v3");
-        assert!(adapter_v3.base_url.contains("cachyos_v3"));
+        assert_eq!(adapter_v3.repo_name, "cachyos-v3");
+        assert!(adapter_v3.base_url.contains("cachyos-v3"));
 
         // 4. Generic -> Generic
         let generic_cpu = CpuProfile::mock("x86-64", &["sse2"]);

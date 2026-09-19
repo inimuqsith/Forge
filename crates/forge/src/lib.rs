@@ -54,6 +54,7 @@ pub struct ForgeConfig {
     pub hybrid: HybridConfig,
     pub cpu: CpuConfig,
     pub build: BuildConfig,
+    #[serde(alias = "use")]
     pub use_flags: UseConfig,
     pub hooks: HooksConfig,
 }
@@ -201,8 +202,11 @@ impl ForgeConfig {
 
         for cand in candidates.into_iter().flatten() {
             if let Ok(content) = fs::read_to_string(cand) {
-                if let Ok(conf) = toml::from_str::<ForgeConfig>(&content) {
-                    return conf;
+                match toml::from_str::<ForgeConfig>(&content) {
+                    Ok(conf) => return conf,
+                    Err(e) => {
+                        eprintln!("[!] Peringatan: Gagal mem-parse konfigurasi di {:?}: {}", cand, e);
+                    }
                 }
             }
         }
