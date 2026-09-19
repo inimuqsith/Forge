@@ -46,66 +46,171 @@ pub use downloader::*;
 pub use menuconfig::*;
 
 /// Konfigurasi Global Forge (/etc/forge/forge.conf)
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ForgeConfig {
+    #[serde(default)]
     pub general: GeneralConfig,
+    #[serde(default)]
     pub server: ServerConfig,
+    #[serde(default)]
     pub binhost: BinhostConfig,
+    #[serde(default)]
     pub hybrid: HybridConfig,
+    #[serde(default)]
     pub cpu: CpuConfig,
+    #[serde(default)]
     pub build: BuildConfig,
-    #[serde(alias = "use")]
+    #[serde(default, alias = "use")]
     pub use_flags: UseConfig,
+    #[serde(default)]
     pub hooks: HooksConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GeneralConfig {
+    #[serde(default = "default_root")]
     pub root: String,
+    #[serde(default = "default_db_path")]
     pub db_path: String,
+    #[serde(default = "default_cache_path")]
     pub cache_path: String,
+    #[serde(default = "default_build_path")]
     pub build_path: String,
+    #[serde(default = "default_stage_path")]
     pub stage_path: String,
+    #[serde(default = "default_recipes_path")]
     pub recipes_path: String,
+    #[serde(default = "default_mode")]
     pub mode: String,
 }
 
+impl Default for GeneralConfig {
+    fn default() -> Self {
+        Self {
+            root: default_root(),
+            db_path: default_db_path(),
+            cache_path: default_cache_path(),
+            build_path: default_build_path(),
+            stage_path: default_stage_path(),
+            recipes_path: default_recipes_path(),
+            mode: default_mode(),
+        }
+    }
+}
+
+fn default_root() -> String { "/".to_string() }
+fn default_db_path() -> String { "/var/db/forge".to_string() }
+fn default_cache_path() -> String { "/var/cache/forge/distfiles".to_string() }
+fn default_build_path() -> String { "/tmp/forge/build".to_string() }
+fn default_stage_path() -> String { "/tmp/forge/stage".to_string() }
+fn default_recipes_path() -> String { "/var/db/forge/recipes".to_string() }
+fn default_mode() -> String { "source".to_string() }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServerConfig {
+    #[serde(default = "default_recipe_server")]
     pub recipe_server: String,
+    #[serde(default = "default_binhost_url")]
     pub binhost_url: String,
 }
 
+impl Default for ServerConfig {
+    fn default() -> Self {
+        Self {
+            recipe_server: default_recipe_server(),
+            binhost_url: default_binhost_url(),
+        }
+    }
+}
+
+fn default_recipe_server() -> String { "https://pkgkura.amqs.net/v1".to_string() }
+fn default_binhost_url() -> String { "https://pkgkura.amqs.net/v1".to_string() }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BinhostConfig {
+    #[serde(default)]
     pub enable_binhost: bool,
+    #[serde(default = "default_true")]
     pub auto_match_cpu: bool,
+    #[serde(default = "default_true")]
     pub fallback_to_source: bool,
+}
+
+impl Default for BinhostConfig {
+    fn default() -> Self {
+        Self {
+            enable_binhost: false,
+            auto_match_cpu: true,
+            fallback_to_source: true,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HybridConfig {
+    #[serde(default)]
     pub enable_cachyos_fallback: bool,
+    #[serde(default = "default_cachyos_repo_url")]
     pub cachyos_repo_url: String,
+    #[serde(default)]
     pub enable_arch_fallback: bool,
+    #[serde(default = "default_arch_repo_url")]
     pub arch_repo_url: String,
 }
 
+impl Default for HybridConfig {
+    fn default() -> Self {
+        Self {
+            enable_cachyos_fallback: false,
+            cachyos_repo_url: default_cachyos_repo_url(),
+            enable_arch_fallback: false,
+            arch_repo_url: default_arch_repo_url(),
+        }
+    }
+}
+
+fn default_cachyos_repo_url() -> String { "https://cdn77.cachyos.org/repo/x86_64_v4/cachyos-v4".to_string() }
+fn default_arch_repo_url() -> String { "https://geo.mirror.pkgbuild.com/core/os/x86_64".to_string() }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CpuConfig {
+    #[serde(default = "default_target_march")]
     pub target_march: String,
+    #[serde(default = "default_true")]
     pub enable_avx512: bool,
+    #[serde(default = "default_true")]
     pub enable_avx2: bool,
+    #[serde(default = "default_profile_file")]
     pub profile_file: String,
 }
 
+impl Default for CpuConfig {
+    fn default() -> Self {
+        Self {
+            target_march: default_target_march(),
+            enable_avx512: true,
+            enable_avx2: true,
+            profile_file: default_profile_file(),
+        }
+    }
+}
+
+fn default_target_march() -> String { "native".to_string() }
+fn default_profile_file() -> String { "/etc/forge/cpu-profile.json".to_string() }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BuildConfig {
+    #[serde(default = "default_cflags")]
     pub cflags: String,
+    #[serde(default = "default_cxxflags")]
     pub cxxflags: String,
+    #[serde(default = "default_ldflags")]
     pub ldflags: String,
+    #[serde(default = "default_makeflags")]
     pub makeflags: String,
+    #[serde(default = "default_jobs")]
     pub jobs: String,
+    #[serde(default = "default_prefix")]
     pub prefix: String,
     #[serde(default = "default_true")]
     pub enable_ccache: bool,
@@ -113,79 +218,65 @@ pub struct BuildConfig {
     pub ccache_dir: String,
 }
 
-fn default_true() -> bool {
-    true
+impl Default for BuildConfig {
+    fn default() -> Self {
+        Self {
+            cflags: default_cflags(),
+            cxxflags: default_cxxflags(),
+            ldflags: default_ldflags(),
+            makeflags: default_makeflags(),
+            jobs: default_jobs(),
+            prefix: default_prefix(),
+            enable_ccache: true,
+            ccache_dir: default_ccache_dir(),
+        }
+    }
 }
 
-fn default_ccache_dir() -> String {
-    "/var/cache/forge/ccache".to_string()
-}
+fn default_cflags() -> String { "-O3 -march=native -pipe -flto=thin -fno-plt -fno-math-errno -fno-trapping-math -ffunction-sections -fdata-sections -falign-functions=32 -fstack-protector-strong -D_FORTIFY_SOURCE=2".to_string() }
+fn default_cxxflags() -> String { "-O3 -march=native -pipe -flto=thin -fno-plt -fno-math-errno -fno-trapping-math -ffunction-sections -fdata-sections -falign-functions=32 -fstack-protector-strong -D_FORTIFY_SOURCE=2".to_string() }
+fn default_ldflags() -> String { "-Wl,-O3 -Wl,--as-needed -Wl,--gc-sections -Wl,--icf=all -Wl,-z,relro -Wl,-z,now".to_string() }
+fn default_makeflags() -> String { format!("-j{}", std::thread::available_parallelism().map(|n| n.get()).unwrap_or(16)) }
+fn default_jobs() -> String { "auto".to_string() }
+fn default_prefix() -> String { "/usr".to_string() }
+fn default_true() -> bool { true }
+fn default_ccache_dir() -> String { "/var/cache/forge/ccache".to_string() }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UseConfig {
+    #[serde(default = "default_use_flags")]
     pub flags: String,
 }
 
+impl Default for UseConfig {
+    fn default() -> Self {
+        Self {
+            flags: default_use_flags(),
+        }
+    }
+}
+
+fn default_use_flags() -> String { "ssl openrc alsa -systemd lto pgo".to_string() }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HooksConfig {
+    #[serde(default = "default_true")]
     pub enable_openrc_hooks: bool,
+    #[serde(default = "default_true")]
     pub enable_ldconfig_hooks: bool,
+    #[serde(default = "default_true")]
     pub enable_mandoc_hooks: bool,
+    #[serde(default = "default_true")]
     pub auto_prompt_services: bool,
 }
 
-impl Default for ForgeConfig {
+impl Default for HooksConfig {
     fn default() -> Self {
         Self {
-            general: GeneralConfig {
-                root: "/".to_string(),
-                db_path: "/var/db/forge".to_string(),
-                cache_path: "/var/cache/forge/distfiles".to_string(),
-                build_path: "/tmp/forge/build".to_string(),
-                stage_path: "/tmp/forge/stage".to_string(),
-                recipes_path: "/var/db/forge/recipes".to_string(),
-                mode: "source".to_string(),
-            },
-            server: ServerConfig {
-                recipe_server: "https://pkgkura.amqs.net/v1".to_string(),
-                binhost_url: "https://pkgkura.amqs.net/v1".to_string(),
-            },
-            binhost: BinhostConfig {
-                enable_binhost: false,
-                auto_match_cpu: true,
-                fallback_to_source: true,
-            },
-            hybrid: HybridConfig {
-                enable_cachyos_fallback: false,
-                cachyos_repo_url: "https://mirror.cachyos.org/repo/x86_64_v4/cachyos_v4".to_string(),
-                enable_arch_fallback: false,
-                arch_repo_url: "https://geo.mirror.pkgbuild.com/core/os/x86_64".to_string(),
-            },
-            cpu: CpuConfig {
-                target_march: "native".to_string(),
-                enable_avx512: true,
-                enable_avx2: true,
-                profile_file: "/etc/forge/cpu-profile.json".to_string(),
-            },
-            build: BuildConfig {
-                cflags: "-O3 -march=native -pipe -flto=thin -fno-plt -fno-math-errno -fno-trapping-math -ffunction-sections -fdata-sections -falign-functions=32 -fstack-protector-strong -D_FORTIFY_SOURCE=2".to_string(),
-                cxxflags: "-O3 -march=native -pipe -flto=thin -fno-plt -fno-math-errno -fno-trapping-math -ffunction-sections -fdata-sections -falign-functions=32 -fstack-protector-strong -D_FORTIFY_SOURCE=2".to_string(),
-                ldflags: "-Wl,-O3 -Wl,--as-needed -Wl,--gc-sections -Wl,--icf=all -Wl,-z,relro -Wl,-z,now".to_string(),
-                makeflags: format!("-j{}", std::thread::available_parallelism().map(|n| n.get()).unwrap_or(16)),
-                jobs: "auto".to_string(),
-                prefix: "/usr".to_string(),
-                enable_ccache: true,
-                ccache_dir: "/var/cache/forge/ccache".to_string(),
-            },
-            use_flags: UseConfig {
-                flags: "ssl openrc alsa -systemd lto pgo".to_string(),
-            },
-            hooks: HooksConfig {
-                enable_openrc_hooks: true,
-                enable_ldconfig_hooks: true,
-                enable_mandoc_hooks: true,
-                auto_prompt_services: true,
-            },
+            enable_openrc_hooks: true,
+            enable_ldconfig_hooks: true,
+            enable_mandoc_hooks: true,
+            auto_prompt_services: true,
         }
     }
 }
@@ -198,6 +289,7 @@ impl ForgeConfig {
             env_path.as_deref(),
             Some(Path::new("/etc/forge/forge.conf")),
             Some(Path::new("config/forge.conf")),
+            Some(Path::new("/usr/share/forge/forge.conf.default")),
         ];
 
         for cand in candidates.into_iter().flatten() {
@@ -326,6 +418,24 @@ mod tests {
         assert!(!engine.is_enabled("systemd"));
         assert!(!engine.is_enabled("lto"));
         assert!(engine.is_enabled("pam"));
+    }
+
+    #[test]
+    fn test_partial_config_layered_fallback_with_defaults() {
+        let partial_toml = r#"
+[general]
+root = "/tmp/custom_root"
+
+[use]
+flags = "ssl -systemd custom_flag"
+"#;
+        let config: ForgeConfig = toml::from_str(partial_toml).expect("Gagal mem-parse partial TOML");
+        assert_eq!(config.general.root, "/tmp/custom_root");
+        assert_eq!(config.general.db_path, "/var/db/forge");
+        assert_eq!(config.use_flags.flags, "ssl -systemd custom_flag");
+        assert_eq!(config.build.prefix, "/usr");
+        assert_eq!(config.cpu.target_march, "native");
+        assert!(config.hooks.enable_openrc_hooks);
     }
 }
 

@@ -93,8 +93,8 @@ Kompilasi engine `forge` dan `forge-server` dioptimalkan secara ekstrem untuk pe
 ├── scripts/                # Toolkit modular developer/maintainer
 │   ├── maintainer.py       # Entrypoint & CLI/TUI dispatcher maintainer suite
 │   └── maintainer/         # Modul Python (catalog, dag, tree, curated, inspector, linter, search, sources, matrix)
-├── config/                 # Template konfigurasi bawaan
-│   └── forge.conf.example  # Konfigurasi tunggal package manager
+├── config/                 # Konfigurasi paten bawaan (Canonical Distro Config)
+│   └── forge.conf.default  # Konfigurasi standar paten package manager
 ├── recipes/                # Pohon repositori resep resmi Kura Linux (lihat recipes/PACKAGE_STATUS.md)
 │   ├── PACKAGE_STATUS.md   # Matriks lengkap, dependensi, dan status kesiapan paket (SSOT)
 │   ├── system/             # Resep sistem inti & toolchain (base, base-devel, glibc, gcc, llvm, openrc, dll.)

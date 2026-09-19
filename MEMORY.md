@@ -13,7 +13,7 @@
 - [x] Pedoman AI mutlak Human-In-The-Loop (HITL) di [`AGENTS.md`](file:///home/admin/Development/Forge/AGENTS.md).
 - [x] Memori persisten & 26 ADR di [`MEMORY.md`](file:///home/admin/Development/Forge/MEMORY.md).
 - [x] Dokumentasi publik & panduan CLI di [`README.md`](file:///home/admin/Development/Forge/README.md).
-- [x] Template konfigurasi tunggal terpusat `config/forge.conf.example`.
+- [x] Konfigurasi standar paten tunggal terpusat `config/forge.conf.default` (ADR-060).
 - [x] Konsolidasi ke Clean 2-Crate Workspace Layout: [`crates/forge`](file:///home/admin/Development/Forge/crates/forge) dan [`crates/forge-server`](file:///home/admin/Development/Forge/crates/forge-server).
 
 ---
@@ -301,6 +301,7 @@
 | *2026-09-20* | *Shared Aggregate Index Sanitization & Collision Exemption* | *Berkas katalog/indeks bersama (`/usr/share/info/dir`, `ld.so.cache`, `gschemas.compiled`) dibuat oleh banyak paket GNU dan memicu tabrakan pra-instalasi* | *Menerapkan `sanitize_staging_dir` di `builder.rs` untuk menghapus berkas transien saat staging & `is_shared_system_file` di `merger.rs` untuk mengecualikan berkas sistem bersama dari deteksi tabrakan (ADR-057)* |
 | *2026-09-20* | *CachyOS CDN77 Query & Isolated Prebuilt Installation* | *Kegagalan parsing `[use]` pada konfigurasi kustom sysroot dan URL mirror CachyOS upstream usang* | *Menambahkan `#[serde(alias = "use")]` di `ForgeConfig`, mengintegrasikan mirror CDN77 resmi CachyOS (`cdn77.cachyos.org`), pencarian otomatis paket via query database repositori `.db.tar.zst`, dan isolasi metadata ALPM saat staging merge (ADR-058)* |
 | *2026-09-20* | *Automated Recursive Binhost Dependency Resolution* | *Mode binhost hanya mengunduh paket target tunggal tanpa menyelesaikan rantai dependensi runtime hulu secara otomatis* | *Menerapkan `fetch_package_db_pool` & `resolve_dependency_chain` di `cachyos.rs`, mengintegrasikan auto-download/merge topological sequence untuk seluruh dependensi belum terpasang di `main.rs` (ADR-059)* |
+| *2026-09-20* | *Canonical Distro Default Config & Layered Serde Overrides* | *Format `.example` redundan, konfigurasi user rentan usang/rusak saat ada opsi baru dari upstream* | *Menetapkan `/usr/share/forge/forge.conf.default` sebagai konfigurasi paten resmi yang selalu ter-update, mengeliminasi `.example`, dan menerapkan `#[serde(default)]` layered parsing di `ForgeConfig` (ADR-060)* |
 
 ---
 

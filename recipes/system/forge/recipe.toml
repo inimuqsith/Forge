@@ -36,11 +36,14 @@ cargo build --release -p forge
 install -d -m 0755 "${pkgdir}/usr/bin"
 install -m 0755 target/release/forge "${pkgdir}/usr/bin/forge"
 
-# Pasang konfigurasi template ke /etc/forge/forge.conf.example
+# Pasang konfigurasi paten default ke /usr/share/forge/forge.conf.default (Selalu ter-update)
+install -d -m 0755 "${pkgdir}/usr/share/forge"
+install -m 0644 config/forge.conf.default "${pkgdir}/usr/share/forge/forge.conf.default"
+
+# Pasang konfigurasi kustom awal ke /etc/forge/forge.conf jika belum ada
 install -d -m 0755 "${pkgdir}/etc/forge"
-install -m 0644 config/forge.conf.example "${pkgdir}/etc/forge/forge.conf.example"
 if [ ! -f "${pkgdir}/etc/forge/forge.conf" ]; then
-    install -m 0644 config/forge.conf.example "${pkgdir}/etc/forge/forge.conf"
+    install -m 0644 config/forge.conf.default "${pkgdir}/etc/forge/forge.conf"
 fi
 
 # Pasang direktori state sistem

@@ -1,5 +1,5 @@
-# /etc/forge/forge.conf
-# File Konfigurasi Bawaan Forge Package Manager untuk Kura Linux
+# /usr/share/forge/forge.conf.default & /etc/forge/forge.conf
+# Konfigurasi Standar Paten Forge Package Manager untuk Kura Linux (Canonical Distro Config)
 
 [general]
 # Target root filesystem (default: "/" untuk sistem hidup)
