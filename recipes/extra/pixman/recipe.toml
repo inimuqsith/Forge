@@ -1,0 +1,34 @@
+[package]
+name = "pixman"
+version = "0.46.4"
+release = 1
+slot = "0"
+description = "Low-level pixel manipulation and rasterization library"
+license = "MIT"
+upstream = "https://www.cairographics.org/"
+
+[dependencies]
+runtime = ["glibc"]
+build = ["meson", "ninja", "pkgconf"]
+
+[sources]
+urls = [
+  "https://www.cairographics.org/releases/pixman-0.46.4.tar.gz"
+]
+sha256 = [
+  "d09c44ebc3bd5bee7021c79f922fe8fb2fb57f7320f55e97ff9914d2346a591c"
+]
+
+[build]
+type = "meson"
+script = """
+meson setup build \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --buildtype=release \
+  -Ddemos=disabled \
+  -Dtests=disabled
+
+ninja -C build
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

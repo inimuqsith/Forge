@@ -1,0 +1,35 @@
+[package]
+name = "fontconfig"
+version = "2.18.3"
+release = 1
+slot = "0"
+description = "Library for configuring and customizing font access"
+license = "MIT"
+upstream = "https://www.freedesktop.org/wiki/Software/fontconfig/"
+
+[dependencies]
+runtime = ["glibc", "freetype", "expat"]
+build = ["meson", "ninja", "pkgconf", "gperf"]
+
+[sources]
+urls = [
+  "https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/2.18.3/fontconfig-2.18.3.tar.gz"
+]
+sha256 = [
+  "9ae01e1d53acdef56010c5451cd34aa41d325b2faccd8606448d8fa01b2496b3"
+]
+
+[build]
+type = "meson"
+script = """
+meson setup build \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --localstatedir=/var \
+  --buildtype=release \
+  -Ddoc=disabled \
+  -Dtests=disabled
+
+ninja -C build
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

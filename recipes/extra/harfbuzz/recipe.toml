@@ -1,0 +1,37 @@
+[package]
+name = "harfbuzz"
+version = "14.4.0"
+release = 1
+slot = "0"
+description = "OpenType text shaping engine"
+license = "MIT"
+upstream = "https://github.com/harfbuzz/harfbuzz"
+
+[dependencies]
+runtime = ["glibc", "freetype", "glib2", "icu"]
+build = ["meson", "ninja", "pkgconf"]
+
+[sources]
+urls = [
+  "https://github.com/harfbuzz/harfbuzz/releases/download/14.4.0/harfbuzz-14.4.0.tar.xz"
+]
+sha256 = [
+  "2357ed966c6ced7bfa720b0640c0231065af01158fbea215093ffa15aed44371"
+]
+
+[build]
+type = "meson"
+script = """
+meson setup build \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --buildtype=release \
+  -Dglib=enabled \
+  -Dfreetype=enabled \
+  -Dicu=enabled \
+  -Ddocs=disabled \
+  -Dtests=disabled
+
+ninja -C build
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

@@ -1,0 +1,36 @@
+[package]
+name = "cairo"
+version = "1.18.4"
+release = 1
+slot = "0"
+description = "2D graphics library with support for multiple output devices"
+license = "LGPL-2.1-or-later"
+upstream = "https://www.cairographics.org/"
+
+[dependencies]
+runtime = ["glibc", "pixman", "freetype", "fontconfig", "zlib", "libpng"]
+build = ["meson", "ninja", "pkgconf"]
+
+[sources]
+urls = [
+  "https://www.cairographics.org/releases/cairo-1.18.4.tar.xz"
+]
+sha256 = [
+  "445ed8208a6e4823de1226a74ca319d3600e83f6369f99b14265006599c32ccb"
+]
+
+[build]
+type = "meson"
+script = """
+meson setup build \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --buildtype=release \
+  -Dpng=disabled \
+  -Dfontconfig=enabled \
+  -Dfreetype=enabled \
+  -Dtests=disabled
+
+ninja -C build
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

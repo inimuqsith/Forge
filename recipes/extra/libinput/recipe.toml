@@ -1,0 +1,34 @@
+[package]
+name = "libinput"
+version = "1.32.0"
+release = 1
+slot = "0"
+description = "Input device management and event handling library"
+license = "MIT"
+upstream = "https://gitlab.freedesktop.org/libinput/libinput"
+
+[dependencies]
+runtime = ["glibc", "eudev", "libevdev", "mtdev"]
+build = ["meson", "ninja", "pkgconf"]
+
+[sources]
+urls = [
+  "https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.32.0/libinput-1.32.0.tar.gz"
+]
+sha256 = [
+  "913434a44fd1f8ea9cdd982a2ac3e9bf4f925a12399956b087a59d258c14ca8b"
+]
+
+[build]
+type = "meson"
+script = """
+meson setup build \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --buildtype=release \
+  -Ddocumentation=false \
+  -Dtests=false
+
+ninja -C build
+DESTDIR="${DESTDIR}" ninja -C build install
+"""

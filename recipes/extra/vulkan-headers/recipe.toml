@@ -1,0 +1,32 @@
+[package]
+name = "vulkan-headers"
+version = "1.4.363"
+release = 1
+slot = "0"
+description = "Vulkan Header files and API registry"
+license = "Apache-2.0"
+upstream = "https://github.com/KhronosGroup/Vulkan-Headers"
+
+[dependencies]
+runtime = []
+build = ["cmake", "ninja"]
+
+[sources]
+urls = [
+  "https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/v1.4.363.tar.gz"
+]
+sha256 = [
+  "cbaf687d3c59b9666fe080e7f8396b6b4f4d344a768ee6b337c59852f4526b68"
+]
+
+[build]
+type = "cmake"
+script = """
+cmake -B build -G Ninja \
+  -DCMAKE_INSTALL_PREFIX=/usr \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DVULKAN_HEADERS_ENABLE_TESTS=OFF
+
+ninja -C build
+DESTDIR="${DESTDIR}" ninja -C build install
+"""
