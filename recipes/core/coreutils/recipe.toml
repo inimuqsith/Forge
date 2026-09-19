@@ -1,6 +1,6 @@
 [package]
 name = "coreutils"
-version = "9.6"
+version = "9.12"
 release = 1
 slot = "0"
 description = "The basic file, shell and text manipulation utilities of the GNU operating system"
@@ -13,9 +13,11 @@ build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://ftp.gnu.org/gnu/coreutils/coreutils-9.6.tar.xz"
+    "https://ftp.gnu.org/gnu/coreutils/coreutils-9.12.tar.xz"
 ]
-sha256 = ["7a0124327b398fd9eb1a6abde583389821422c744ffa10734b24f557610d3283"]
+sha256 = [
+    "a480198559733e9b3da999e90543ac6f888a2caa544d8d664c5a1f17e528e210"
+]
 
 [build]
 type = "autotools"

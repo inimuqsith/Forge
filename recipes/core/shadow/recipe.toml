@@ -1,6 +1,6 @@
 [package]
 name = "shadow"
-version = "4.17.3"
+version = "4.20.2"
 release = 1
 slot = "0"
 description = "Password and account management utilities"
@@ -13,10 +13,10 @@ build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/shadow-maint/shadow/releases/download/4.17.3/shadow-4.17.3.tar.xz"
+    "https://github.com/shadow-maint/shadow/releases/download/4.20.2/shadow-4.20.2.tar.xz"
 ]
 sha256 = [
-    "09e896c7b01c97ba4be2d6be332c55a3e478b4893cd3c3466d8224e622bd4943"
+    "b89f432b75ae55a2d852b446d0365484795fdf533ab97d550e325fa15594a224"
 ]
 
 [build]

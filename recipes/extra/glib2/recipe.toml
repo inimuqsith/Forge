@@ -1,11 +1,11 @@
 [package]
 name = "glib2"
-version = "2.82.5"
+version = "2.90.0"
 release = 1
 slot = "0"
 description = "Core low-level data structure and utility library from GNOME"
 license = "LGPL-2.1-or-later"
-upstream = "https://gitlab.gnome.org/GNOME/glib"
+upstream = "https://github.com/GNOME/glib"
 
 [dependencies]
 runtime = ["glibc", "libffi", "pcre2", "zlib"]
@@ -13,10 +13,10 @@ build = ["meson", "ninja", "pkgconf", "gcc"]
 
 [sources]
 urls = [
-    "https://download.gnome.org/sources/glib/2.82/glib-2.82.5.tar.xz"
+    "https://github.com/GNOME/glib/archive/refs/tags/2.90.0.tar.gz"
 ]
 sha256 = [
-    "05c2031f9bdf6b5aba7a06ca84f0b4aced28b19bf1b50c6ab25cc675277cbc3f"
+    "b67a1cf3630088638ac8d3d9f0129625e3df2eae7600181c45629d7c9b2d43b6"
 ]
 
 [build]

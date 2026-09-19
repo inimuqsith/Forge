@@ -53,12 +53,12 @@
 | **`cmake`** | 3.31.5 | ✅ Verified | `glibc`, `openssl`, `zlib` | `gcc`, `make` | Cross-platform build automation |
 | **`meson`** | 1.12.0 | ✅ Verified | `python`, `ninja` | `python` | Fast build system |
 | **`pkgconf`** | 3.0.7 | ✅ Verified | `glibc` | `gcc`, `make` | Package compiler metadata toolkit |
-| **`linux-headers`**| 6.13.6 | ✅ Verified | - | `make`, `rsync` | Kernel userspace API headers |
+| **`linux-headers`**| 7.2 | ✅ Verified | - | `make`, `rsync` | Kernel userspace API headers |
 | **`m4`** | 1.4.21 | ✅ Verified | `glibc` | `gcc`, `make` | Macro processor |
 | **`autoconf`** | 2.73 | ✅ Verified | `m4`, `perl` | `make` | Extensible package of M4 macros |
 | **`automake`** | 1.18 | ✅ Verified | `autoconf` | `make` | Tool for generating GNU Makefiles |
 | **`libtool`** | 2.6.2 | ✅ Verified | `m4` | `gcc`, `make` | Generic library support script |
-| **`patch`** | 2.7.6 | ✅ Verified | `glibc` | `gcc`, `make` | Tool for patching source trees |
+| **`patch`** | 2.8 | ✅ Verified | `glibc` | `gcc`, `make` | Tool for patching source trees |
 | **`bison`** | 3.8.2 | ✅ Verified | `glibc`, `m4` | `gcc`, `make` | Parser generator |
 | **`flex`** | 2.6.4 | ✅ Verified | `glibc`, `m4` | `gcc`, `make`, `bison` | Fast lexical analyzer generator |
 
@@ -71,9 +71,9 @@
 | Paket | Versi | Status | Kategori Peran | Catatan Kura Linux |
 | :--- | :---: | :---: | :--- | :--- |
 | **`bash`** | 5.3.3 | ✅ Verified | Shell Inti | Default interactive shell |
-| **`coreutils`** | 9.7 | ✅ Verified | Utilitas Dasar | GNU core utilities (ls, cp, rm, mv) |
+| **`coreutils`** | 9.12 | ✅ Verified | Utilitas Dasar | GNU core utilities (ls, cp, rm, mv) |
 | **`util-linux`** | 2.42.3 | ✅ Verified | Utilitas Sistem | mount, blkid, fdisk, lsblk, dmesg |
-| **`shadow`** | 4.17.3 | ✅ Verified | Akun & Autentikasi | passwd, useradd, groupadd, su |
+| **`shadow`** | 4.20.2 | ✅ Verified | Akun & Autentikasi | passwd, useradd, groupadd, su |
 | **`eudev`** | 3.2.14 | ✅ Verified | Device Manager | OpenRC device daemon (pengganti systemd-udevd) |
 | **`kmod`** | 34.2 | ✅ Verified | Kernel Modules | modprobe, insmod, lsmod, rmmod |
 | **`e2fsprogs`** | 1.47.2 | ✅ Verified | Filesystem ext4 | Format & perbaikan ext4/ext3 |
@@ -88,7 +88,7 @@
 | **`dbus`** | 1.16.2 | 🟡 Scaffolded | IPC Daemon | D-Bus Message Bus System (OpenRC service) |
 | **`polkit`** | 127 | 🟡 Scaffolded | Kebijakan Akses | Application privilege control (non-systemd) |
 | **`elogind`** | 246.10 | 🟡 Scaffolded | User Session | Logind standalone untuk OpenRC (Wayland helper) |
-| **`curl`** | 8.13.0 | ✅ Verified | Jaringan & Unduhan | HTTP/HTTPS client engine |
+| **`curl`** | 8.22.0 | ✅ Verified | Jaringan & Unduhan | HTTP/HTTPS client engine |
 | **`openssl`** | 4.1.0-alpha1 | ✅ Verified | Kriptografi | SSL/TLS toolkit |
 | **`dhcpcd`** | 10.2.2 | ✅ Verified | Jaringan | DHCP client daemon untuk OpenRC |
 | **`iproute2`** | 7.2.0 | ✅ Verified | Jaringan | IP routing & interface control (ip link) |
@@ -97,7 +97,7 @@
 | **`wpa_supplicant`**| 2.12 | ✅ Verified | Wi-Fi | WPA/WPA2/WPA3 wireless daemon |
 | **`cronie`** | 1.7.2 | ✅ Verified | Task Scheduler | Cron daemon untuk OpenRC |
 | **`sysklogd`** | 2.7.2 | ✅ Verified | System Logger | Syslog & klog daemon untuk OpenRC |
-| **`zstd`** | 1.5.7 | ✅ Verified | Kompresi | Default fast compression (`.forge.tar.zst`) |
+| **`zstd`** | 1.5.7-kernel | ✅ Verified | Kompresi | Default fast compression (`.forge.tar.zst`) |
 | **`xz`** | 5.8.4 | ✅ Verified | Kompresi | Ultra-high compression (`.tar.xz`) |
 | **`gzip`**, **`bzip2`**, **`tar`**, **`unzip`**, **`zip`** | - | ✅ Verified | Kompresi | Arsip standar UNIX |
 

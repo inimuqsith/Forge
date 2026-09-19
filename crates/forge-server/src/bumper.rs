@@ -51,7 +51,7 @@ impl RecipeBumper {
 
         // 2. Fallback: Coba periksa database terbuka Anitya / Release-Monitoring.org
         if latest_version.is_none() {
-            if let Ok(Some(ver)) = check_anitya_latest(&client, &recipe.package.name).await {
+            if let Ok(Some(ver)) = check_anitya_latest(&client, &recipe.package.name, Some(&recipe.package.upstream)).await {
                 latest_version = Some(ver);
                 provider = "Anitya (Release-Monitoring.org)".to_string();
             }
@@ -470,7 +470,11 @@ async fn check_github_latest(
 }
 
 /// Cek versi terbaru dari Anitya API (release-monitoring.org v2 Projects API)
-async fn check_anitya_latest(client: &reqwest::Client, pkg_name: &str) -> Result<Option<String>> {
+async fn check_anitya_latest(
+    client: &reqwest::Client,
+    pkg_name: &str,
+    upstream_url: Option<&str>,
+) -> Result<Option<String>> {
     let lookup_name = match pkg_name {
         "linux-headers" => "linux",
         other => other,
@@ -481,34 +485,64 @@ async fn check_anitya_latest(client: &reqwest::Client, pkg_name: &str) -> Result
             if let Ok(text) = resp.text().await {
                 if let Ok(val) = serde_json::from_str::<serde_json::Value>(&text) {
                     if let Some(items) = val.get("items").and_then(|i| i.as_array()) {
-                        // Cari item yang namanya paling cocok
-                        for item in items {
-                            let item_name = item.get("name").and_then(|n| n.as_str()).unwrap_or_default();
-                            if item_name.eq_ignore_ascii_case(pkg_name) {
-                                if let Some(ver) = item.get("version").and_then(|v| v.as_str()) {
-                                    let cleaned = clean_version_tag(ver, pkg_name);
-                                    if !cleaned.is_empty() {
-                                        return Ok(Some(cleaned));
+                        let extract_item_version = |item: &serde_json::Value, pkg: &str| -> Option<String> {
+                            if let Some(stables) = item.get("stable_versions").and_then(|s| s.as_array()) {
+                                for s in stables {
+                                    if let Some(s_str) = s.as_str() {
+                                        let cleaned = clean_version_tag(s_str, pkg);
+                                        if !cleaned.is_empty() && !cleaned.contains("-rc") && !cleaned.contains("-beta") && !cleaned.contains("-alpha") {
+                                            // Pengecualian MPC jika rilis 1.4.x belum tersedia di GNU FTP
+                                            if pkg == "mpc" && cleaned.starts_with("1.4") {
+                                                continue;
+                                            }
+                                            return Some(cleaned);
+                                        }
                                     }
                                 }
-                                if let Some(stables) = item.get("stable_versions").and_then(|s| s.as_array()) {
-                                    if let Some(first_stable) = stables.first().and_then(|v| v.as_str()) {
-                                        let cleaned = clean_version_tag(first_stable, pkg_name);
-                                        if !cleaned.is_empty() {
-                                            return Ok(Some(cleaned));
-                                        }
+                            }
+                            if let Some(ver) = item.get("version").and_then(|v| v.as_str()) {
+                                let cleaned = clean_version_tag(ver, pkg);
+                                if !cleaned.is_empty() {
+                                    return Some(cleaned);
+                                }
+                            }
+                            None
+                        };
+
+                        // 1. Prioritas tertinggi: Cari item yang homepage atau ecosystem-nya cocok dengan upstream_url
+                        if let Some(up_url) = upstream_url {
+                            let up_clean = up_url.trim_end_matches('/').to_lowercase();
+                            for item in items {
+                                let hp = item.get("homepage").and_then(|h| h.as_str()).unwrap_or_default().to_lowercase();
+                                let eco = item.get("ecosystem").and_then(|e| e.as_str()).unwrap_or_default().to_lowercase();
+                                let be = item.get("backend").and_then(|b| b.as_str()).unwrap_or_default().to_lowercase();
+                                
+                                if (!hp.is_empty() && (up_clean.contains(&hp) || hp.contains(&up_clean)))
+                                    || (!eco.is_empty() && (up_clean.contains(&eco) || eco.contains(&up_clean)))
+                                    || (up_clean.contains("gnu.org") && (be.contains("gnu") || be.contains("cgit") || hp.contains("gnu.org") || eco.contains("gnu.org")))
+                                    || (up_clean.contains("kernel.org") && (be.contains("cgit") || hp.contains("kernel.org")))
+                                {
+                                    if let Some(cleaned) = extract_item_version(item, pkg_name) {
+                                        return Ok(Some(cleaned));
                                     }
                                 }
                             }
                         }
 
-                        // Fallback ke item pertama jika ada
-                        if let Some(first) = items.first() {
-                            if let Some(ver) = first.get("version").and_then(|v| v.as_str()) {
-                                let cleaned = clean_version_tag(ver, pkg_name);
-                                if !cleaned.is_empty() {
+                        // 2. Cari item yang namanya paling cocok
+                        for item in items {
+                            let item_name = item.get("name").and_then(|n| n.as_str()).unwrap_or_default();
+                            if item_name.eq_ignore_ascii_case(pkg_name) {
+                                if let Some(cleaned) = extract_item_version(item, pkg_name) {
                                     return Ok(Some(cleaned));
                                 }
+                            }
+                        }
+
+                        // 3. Fallback ke item pertama jika ada
+                        if let Some(first) = items.first() {
+                            if let Some(cleaned) = extract_item_version(first, pkg_name) {
+                                return Ok(Some(cleaned));
                             }
                         }
                     }

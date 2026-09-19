@@ -1,6 +1,6 @@
 [package]
 name = "linux-headers"
-version = "6.13.6"
+version = "7.2"
 release = 1
 slot = "0"
 description = "Linux kernel API headers for userspace"
@@ -13,10 +13,10 @@ build = ["make", "rsync"]
 
 [sources]
 urls = [
-    "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.13.6.tar.xz"
+    "https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.2.tar.xz"
 ]
 sha256 = [
-    "de0053cb413d408f20fd1d5788219951b8a4403e5dac1b1d9032090938acd199"
+    "f9fef3d14c0df53819026f4be74459835c2a0b0dcbf5b5bbd9ea19f0829402b3"
 ]
 
 [build]

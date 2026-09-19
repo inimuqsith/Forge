@@ -1,11 +1,11 @@
 [package]
 name = "libxml2"
-version = "2.13.6"
+version = "2.15.4"
 release = 1
 slot = "0"
 description = "XML parsing library and utility toolkit"
 license = "MIT"
-upstream = "https://gitlab.gnome.org/GNOME/libxml2"
+upstream = "https://github.com/GNOME/libxml2"
 
 [dependencies]
 runtime = ["glibc", "zlib", "xz", "icu"]
@@ -13,10 +13,10 @@ build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://download.gnome.org/sources/libxml2/2.13/libxml2-2.13.6.tar.xz"
+    "https://github.com/GNOME/libxml2/archive/refs/tags/v2.15.4.tar.gz"
 ]
 sha256 = [
-    "f453480307524968f7a04ec65e64f2a83a825973bcd260a2e7691be82ae70c96"
+    "bb01bd9ac9a7403f9706816fd6d3e7888041d32b0211075feb20e755d2a9f29d"
 ]
 
 [build]
