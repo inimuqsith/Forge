@@ -9,7 +9,7 @@ upstream = "https://www.gnu.org/software/binutils/"
 
 [dependencies]
 runtime = ["glibc", "zlib", "zstd"]
-build = ["gcc", "make", "bison", "flex"]
+build = ["bison", "flex"]
 
 [sources]
 urls = [

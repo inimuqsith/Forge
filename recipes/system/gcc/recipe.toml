@@ -9,7 +9,7 @@ upstream = "https://gcc.gnu.org/"
 
 [dependencies]
 runtime = ["glibc", "gmp", "mpfr", "mpc", "zstd"]
-build = ["binutils", "make", "bison", "flex"]
+build = ["bison", "flex"]
 
 [sources]
 urls = [

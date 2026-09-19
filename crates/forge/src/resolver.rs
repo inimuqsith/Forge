@@ -739,6 +739,12 @@ impl DependencyResolver {
                 if let Some(target_dep) = DependencyGraph::parse_conditional_dependency(dep_raw, use_engine) {
                     let dep_id = PackageId::parse(&target_dep);
 
+                    // Sesuai standar Arch Linux base-devel & Gentoo Portage, abaikan compiler & build tools implisit
+                    // (gcc, make, binutils) dalam ekspansi makedepends untuk mencegah circular dependency deadlock.
+                    if dep_id.name == "gcc" || dep_id.name == "make" || dep_id.name == "binutils" {
+                        continue;
+                    }
+
                     graph.add_edge(DependencyEdge {
                         from: pkg_id.clone(),
                         to: dep_id.clone(),

@@ -9,7 +9,7 @@ upstream = "https://kuralinux.org"
 
 [dependencies]
 runtime = ["glibc", "llvm", "mold", "make", "ninja", "gcc", "binutils", "pkgconf", "linux-headers", "patch", "bubblewrap"]
-build = ["gcc"]
+build = []
 
 [sources]
 urls = [

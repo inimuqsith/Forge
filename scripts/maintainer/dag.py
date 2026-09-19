@@ -66,7 +66,7 @@ class DagSolver:
                 # In build mode for non-bootstrap packages, pull build deps
                 # For bootstrap packages, isolate self-toolchain loop (ADR-019)
                 if curr not in BOOTSTRAP_TOOLCHAIN:
-                    deps.extend(rec.build_deps)
+                    deps.extend([d for d in rec.build_deps if d not in ("gcc", "make", "binutils")])
                 else:
                     # For bootstrap packages, only depend on non-cycle toolchain primitives
                     deps.extend([d for d in rec.build_deps if d not in BOOTSTRAP_TOOLCHAIN or d == "linux-headers"])

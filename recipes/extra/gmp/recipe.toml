@@ -9,7 +9,7 @@ upstream = "https://gmplib.org/"
 
 [dependencies]
 runtime = ["glibc"]
-build = ["make", "gcc", "m4"]
+build = ["m4"]
 
 [sources]
 urls = [

@@ -21,15 +21,15 @@
 | :--- | :---: | :---: | :--- | :--- | :--- |
 | **`autoconf`** | `2.73` | ✅ Verified | `m4`, `glibc` | `make`, `m4`, `gcc` | Extensible package of M4 macros to produce configuration scripts |
 | **`automake`** | `1.19` | ✅ Verified | `autoconf`, `glibc` | `make`, `autoconf`, `gcc` | Tool for automatically generating Makefile.in files |
-| **`base`** | `1.0.0` | ✅ Verified | `glibc`, `coreutils`, `sed`, `grep`, `gawk`, `tar`, `xz`, `zstd`, `findutils`, `diffutils`, `file`, `which`, `util-linux`, `shadow`, `openrc`, `eudev`, `kmod`, `ca-certificates` | `gcc` | Kura Linux Minimal Base System (Meta-Package) |
-| **`base-devel`** | `1.0.0` | ✅ Verified | `glibc`, `llvm`, `mold`, `make`, `ninja`, `gcc`, `binutils`, `pkgconf`, `linux-headers`, `patch`, `bubblewrap` | `gcc` | Kura Linux Base Development Toolchain (Meta-Package) |
-| **`binutils`** | `2.47` | ✅ Verified | `glibc`, `zlib`, `zstd` | `gcc`, `make`, `bison`, `flex` | GNU binary utilities (as, ld, readelf, objdump, strip, ar) |
+| **`base`** | `1.0.0` | ✅ Verified | `glibc`, `coreutils`, `sed`, `grep`, `gawk`, `tar`, `xz`, `zstd`, `findutils`, `diffutils`, `file`, `which`, `util-linux`, `shadow`, `openrc`, `eudev`, `kmod`, `ca-certificates` | - | Kura Linux Minimal Base System (Meta-Package) |
+| **`base-devel`** | `1.0.0` | ✅ Verified | `glibc`, `llvm`, `mold`, `make`, `ninja`, `gcc`, `binutils`, `pkgconf`, `linux-headers`, `patch`, `bubblewrap` | - | Kura Linux Base Development Toolchain (Meta-Package) |
+| **`binutils`** | `2.47` | ✅ Verified | `glibc`, `zlib`, `zstd` | `bison`, `flex` | GNU binary utilities (as, ld, readelf, objdump, strip, ar) |
 | **`bison`** | `3.8.2` | ✅ Verified | `glibc`, `m4` | `make`, `m4`, `gcc` | General-purpose parser generator |
 | **`clang`** | `23.1.1` | ✅ Verified | `llvm`, `glibc` | `cmake`, `ninja`, `pkgconf`, `make`, `python` | C, C++, and Objective-C front-end for LLVM (v22) |
 | **`cmake`** | `4.3.5` | ✅ Verified | `glibc`, `openssl`, `zlib`, `libarchive` | `make`, `gcc`, `binutils`, `pkgconf` | Cross-platform open-source build system generator |
 | **`flex`** | `2.6.4` | ✅ Verified | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
 | **`forge`** | `git` | ✅ Verified | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `clang`, `llvm`, `git`, `ca-certificates`, `tar`, `xz` | `rust`, `mold`, `clang`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
-| **`gcc`** | `16.2.0` | ✅ Verified | `glibc`, `gmp`, `mpfr`, `mpc`, `zstd` | `binutils`, `make`, `bison`, `flex` | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
+| **`gcc`** | `16.2.0` | ✅ Verified | `glibc`, `gmp`, `mpfr`, `mpc`, `zstd` | `bison`, `flex` | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
 | **`gettext`** | `1.0` | ✅ Verified | `glibc`, `acl`, `ncurses` | `make`, `gcc` | GNU internationalization and localization utilities |
 | **`glibc`** | `2.44` | ✅ Verified | - | `linux-headers` | GNU C Library (Standard Core System C Library - Latest 2.44) |
 | **`gperf`** | `3.3` | ✅ Verified | `glibc` | `make`, `gcc` | Perfect hash function generator |
@@ -38,7 +38,7 @@
 | **`linux-headers`** | `7.2` | ✅ Verified | - | - | Linux kernel API headers for userspace |
 | **`llvm`** | `23.1.1` | ✅ Verified | `glibc`, `zlib`, `zstd`, `libxml2` | `cmake`, `ninja`, `pkgconf`, `make`, `python` | LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22) |
 | **`m4`** | `1.4.21` | ✅ Verified | `glibc` | `make`, `gcc` | GNU Macro Processor |
-| **`make`** | `4.4.1` | ✅ Verified | `glibc` | `gcc` | GNU Make utility to maintain groups of programs |
+| **`make`** | `4.4.1` | ✅ Verified | `glibc` | - | GNU Make utility to maintain groups of programs |
 | **`meson`** | `1.12.0` | ✅ Verified | `glibc`, `python`, `ninja` | `python` | Fast and user friendly build system |
 | **`mold`** | `2.42.1` | ✅ Verified | `glibc`, `zlib`, `openssl` | `gcc`, `cmake`, `make` | High-performance modern linker (Latest 2.42.1) |
 | **`ninja`** | `1.13.2` | ✅ Verified | `glibc`, `gcc` | `gcc`, `python` | Small build system with a focus on speed (Latest 1.13.2) |
@@ -178,7 +178,7 @@
 | **`gh`** | `2.101.0` | ✅ Verified | `glibc`, `git` | `gcc`, `make`, `go` | The GitHub CLI |
 | **`git`** | `2.55.0` | ✅ Verified | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
 | **`glib2`** | `2.90.0` | ✅ Verified | `glibc`, `libffi`, `pcre2`, `zlib` | `meson`, `ninja`, `pkgconf`, `gcc` | Core low-level data structure and utility library from GNOME |
-| **`gmp`** | `6.3.0` | ✅ Verified | `glibc` | `make`, `gcc`, `m4` | GNU Multiple Precision Arithmetic Library |
+| **`gmp`** | `6.3.0` | ✅ Verified | `glibc` | `m4` | GNU Multiple Precision Arithmetic Library |
 | **`go`** | `1.27.1` | ✅ Verified | `glibc`, `ca-certificates` | `make`, `gcc`, `bash` | Open source programming language that makes it easy to build simple, fast, and reliable software |
 | **`gobject-introspection`** | `1.86.0` | ✅ Verified | `glibc`, `glib2`, `libffi` | `meson`, `ninja`, `gcc`, `pkgconf`, `python`, `bison`, `flex` | Middleware layer for creating language bindings for C libraries |
 | **`grex`** | `1.4.6` | ✅ Verified | `glibc`, `gcc` | `gcc`, `cargo` | A command-line tool for generating regular expressions from user-provided input strings |
@@ -221,8 +221,8 @@
 | **`libxslt`** | `1.1.45` | ✅ Verified | `glibc`, `libxml2` | `make`, `gcc`, `pkgconf` | XML stylesheet transformation library (XSLT) |
 | **`lsof`** | `4.99.7` | ✅ Verified | `glibc` | `make`, `gcc` | Lists information about files opened by processes |
 | **`mesa`** | `26.2.3` | ✅ Verified | `glibc`, `libdrm`, `expat`, `zstd`, `zlib`, `libxkbcommon`, `wayland` | `meson`, `ninja`, `pkgconf`, `python`, `bison`, `flex`, `llvm`, `clang`, `wayland-protocols`, `vulkan-headers` | Open-source OpenGL and Vulkan 3D graphics drivers |
-| **`mpc`** | `1.3.1` | ✅ Verified | `glibc`, `gmp`, `mpfr` | `make`, `gcc` | Library for the arithmetic of complex numbers with arbitrarily high precision |
-| **`mpfr`** | `4.2.2` | ✅ Verified | `glibc`, `gmp` | `make`, `gcc` | Multiple-precision floating-point arithmetic library |
+| **`mpc`** | `1.3.1` | ✅ Verified | `glibc`, `gmp`, `mpfr` | - | Library for the arithmetic of complex numbers with arbitrarily high precision |
+| **`mpfr`** | `4.2.2` | ✅ Verified | `glibc`, `gmp` | - | Multiple-precision floating-point arithmetic library |
 | **`neovim`** | `0.12.5` | ✅ Verified | `glibc` | `cmake`, `ninja`, `gcc`, `pkgconf` | Vim-fork focused on extensibility and usability |
 | **`nushell`** | `0.115.1` | ✅ Verified | `glibc`, `curl`, `gcc`, `libgit2`, `libssh2`, `openssl`, `sqlite`, `zstd` | `gcc`, `rust`, `mold`, `clang`, `llvm`, `pkgconf`, `git` | A new type of shell |
 | **`openssh`** | `10.5p1` | ✅ Verified | `glibc`, `openssl`, `zlib`, `libcap` | `make`, `gcc`, `pkgconf` | Premier connectivity tool for remote login with the SSH protocol |
@@ -258,7 +258,7 @@
 | **`wayland-protocols`** | `1.49` | ✅ Verified | `glibc` | `gcc`, `wayland`, `meson`, `ninja` | Specifications of extended Wayland protocols |
 | **`wireplumber`** | `0.5.17` | ✅ Verified | `glibc`, `pipewire`, `glib2` | `meson`, `ninja`, `pkgconf`, `glib2` | Modular session manager daemon and policy router for PipeWire |
 | **`zellij`** | `0.45.1` | ✅ Verified | `glibc`, `curl`, `gcc`, `zlib` | `rust`, `mold`, `clang`, `llvm`, `pkgconf` | A terminal multiplexer |
-| **`zlib`** | `1.3.2` | ✅ Verified | `glibc` | `make`, `gcc` | Standard compression library implementing DEFLATE algorithm |
+| **`zlib`** | `1.3.2` | ✅ Verified | `glibc` | - | Standard compression library implementing DEFLATE algorithm |
 | **`zoxide`** | `0.10.0` | ✅ Verified | `glibc` | `gcc`, `git`, `rust` | A smarter cd command for your terminal |
 
 ---

@@ -9,7 +9,7 @@ upstream = "https://www.gnu.org/software/make/"
 
 [dependencies]
 runtime = ["glibc"]
-build = ["gcc"]
+build = []
 
 [sources]
 urls = [

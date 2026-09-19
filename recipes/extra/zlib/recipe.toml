@@ -9,7 +9,7 @@ upstream = "https://github.com/madler/zlib"
 
 [dependencies]
 runtime = ["glibc"]
-build = ["make", "gcc"]
+build = []
 
 [sources]
 urls = [

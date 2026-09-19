@@ -9,7 +9,7 @@ upstream = "https://www.mpfr.org/"
 
 [dependencies]
 runtime = ["glibc", "gmp"]
-build = ["make", "gcc"]
+build = []
 
 [sources]
 urls = [

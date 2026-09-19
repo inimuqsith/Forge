@@ -9,7 +9,7 @@ upstream = "https://www.multiprecision.org/mpc/"
 
 [dependencies]
 runtime = ["glibc", "gmp", "mpfr"]
-build = ["make", "gcc"]
+build = []
 
 [sources]
 urls = [
