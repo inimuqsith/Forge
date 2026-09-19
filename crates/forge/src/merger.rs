@@ -6,6 +6,7 @@ use std::os::unix::fs::{symlink, PermissionsExt};
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 use rayon::prelude::*;
+use colored::*;
 
 use crate::db::{
     InstalledDatabase, ManifestEntry, ManifestEntryType, PackageManifest, PackageMetadata,
@@ -462,24 +463,9 @@ impl MergeTransaction {
     }
 
     fn run_post_merge_hooks(&self) {
-        // 1. Deteksi service OpenRC (/etc/init.d/)
-        let has_openrc_service = self.entries.iter().any(|e| {
-            let p_str = e.relative_path.to_string_lossy();
-            p_str.starts_with("/etc/init.d/") || p_str.starts_with("etc/init.d/")
-        });
-
-        if has_openrc_service {
-            println!("  [OpenRC Hook] Layanan OpenRC terdeteksi di /etc/init.d/.");
-        }
-
-        // 2. Deteksi pustaka dinamis shared library (/usr/lib/, /lib/)
-        let has_libraries = self.entries.iter().any(|e| {
-            let p_str = e.relative_path.to_string_lossy();
-            p_str.contains(".so") || p_str.starts_with("/usr/lib") || p_str.starts_with("/lib")
-        });
-
-        if has_libraries {
-            println!("  [Hook] Shared libraries terdeteksi (ldconfig trigger).");
+        let executed = crate::hooks::HookEngine::run_post_merge_hooks(&self.entries, &self.target_root);
+        for msg in executed {
+            println!("  [{}] {}", "Hook".bold().cyan(), msg);
         }
     }
 }

@@ -250,6 +250,7 @@
 45. **ADR-045 (Low-Level Linux Syscall Resource Governance & PID Liveness Detection):** Menggunakan `nix` untuk binding kernel aman: deteksi liveness PID lock melalui sinyal 0 (`kill(0)`) untuk mencegah *stale locks* dan penegakan limit proses build (`RLIMIT_NOFILE`, `RLIMIT_CORE` via `setrlimit`).
 46. **ADR-046 (Asynchronous Non-Blocking Streaming Decompression):** Mengintegrasikan `async-compression` dan `tokio-util` pada pipeline streaming download biner untuk dekompresi *on-the-fly* non-blocking langsung dari byte stream jaringan.
 47. **ADR-047 (Pre-Flight Root Privilege Enforcement & Transparent Sudo/Doas Auto-Escalation):** Menegakkan pengecekan awal hak akses root (`geteuid().is_root()`) pada seluruh perintah mutatif (`install`, `remove`, `update`, `setup`, `sync`) sebelum I/O dimulai. Jika dijalankan oleh non-root di terminal interaktif, Forge secara transparan mengeskalasi eksekusi dengan `sudo`/`doas` memunculkan prompt password secara otomatis; jika non-interaktif, Forge langsung berhenti dengan pesan instruksi yang jelas.
+48. **ADR-048 (Generic Post-Merge File Triggers & Hooks Engine):** Menerapkan `HookEngine` terpusat yang memindai berkas-berkas hasil merge untuk menjalankan pemicu sistem otomatis: `ldconfig` untuk shared libraries (`/lib*`, `/usr/lib*`, `*.so*`), `update-desktop-database` untuk file `.desktop`, `gtk-update-icon-cache` untuk direktori icon tema, `glib-compile-schemas` untuk skema GSettings/GLib, `update-mime-database` untuk MIME info packages, `depmod` untuk modul kernel (`/lib/modules`), dan notifikasi OpenRC services (`/etc/init.d/`). Eksekusi hook dilengkapi deteksi keberadaan binary secara anggun (*graceful fallback* jika binary utilitas belum terpasang di root target).
 
 ---
 
@@ -280,13 +281,14 @@
 | *2026-09-19* | *Streaming & DAG Install* | *Kebutuhan eksekusi end-to-end instalasi biner streaming dan kompilasi transaksional DAG pada `forge install`* | *Mengimplementasikan `BinhostClient::download_and_extract_stream` dan menghubungkan `MergeTransaction` penuh ke CLI `forge install` (ADR-041)* |
 | *2026-09-19* | *Security & Parallelism* | *Kebutuhan tanda tangan digital biner murni Rust, evaluasi batasan versi semantik, paralelisasi I/O RAM tmpfs, dan safe low-level Linux syscalls* | *Mengintegrasikan `ed25519-dalek` (`crypto.rs`), `version-compare` (`resolver.rs`), `rayon` (`RecipeScanner` & `scan_staging`), `nix` (`lock.rs` & `sandbox.rs`), serta `async-compression` (ADR-042, ADR-043, ADR-044, ADR-045, ADR-046)* |
 | *2026-09-19* | *UX & Privilege* | *User non-root menjalankan `forge install` baru gagal di tengah jalan saat merge; butuh pre-flight root check dan auto-escalation prompt* | *Mengimplementasikan `PrivilegeManager` (`privilege.rs`) dengan deteksi UID 0 awal via `nix::unistd::geteuid()`, auto-escalation transparan via `sudo`/`doas` di TTY interaktif, dan pesan error jelas (ADR-047)* |
+| *2026-09-19* | *Hooks & Triggers* | *Paket baru terpasang (shared lib, icon, schema, desktop entry, service) membutuhkan update cache/database sistem otomatis* | *Menerapkan `HookEngine` (`hooks.rs`) generic post-merge triggers untuk `ldconfig`, `update-desktop-database`, `gtk-update-icon-cache`, `glib-compile-schemas`, `update-mime-database`, `depmod`, dan OpenRC (ADR-048)* |
 
 ---
 
 ## 4. Panduan Serah Terima AI Agent (Incoming AI Agent Handover Guide)
 
 > **Catatan Penting untuk AI Agent Penerus:**
-> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")**, optimasi compiler **Mentok Ekstrem (Zen 4 AVX-512 / Thin LTO / Mold ICF)**, repositori resep terstandarisasi **`/var/db/forge/recipes/` (ADR-028)**, Client Sync Engine (`sync.rs`), Forge Server HTTP Daemon (`server.rs`), DAG Dependency Resolver (`resolver.rs`), Transactional Merger (`merger.rs`), Manifest Database Engine (`db.rs`), Strict Sandbox Enforcement (`sandbox.rs`), Live Streaming Downloader (`binhost.rs`), Distro Stage Exporter (`stage.rs`), Digital Signing Engine (`crypto.rs`), Root Privilege Manager (`privilege.rs`), dan 5 Crate High-Performance/Security dengan tingkat kesiapan **100%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan 47 ADR telah didokumentasikan secara lengkap.
+> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")**, optimasi compiler **Mentok Ekstrem (Zen 4 AVX-512 / Thin LTO / Mold ICF)**, repositori resep terstandarisasi **`/var/db/forge/recipes/` (ADR-028)**, Client Sync Engine (`sync.rs`), Forge Server HTTP Daemon (`server.rs`), DAG Dependency Resolver (`resolver.rs`), Transactional Merger (`merger.rs`), Manifest Database Engine (`db.rs`), Strict Sandbox Enforcement (`sandbox.rs`), Live Streaming Downloader (`binhost.rs`), Distro Stage Exporter (`stage.rs`), Digital Signing Engine (`crypto.rs`), Root Privilege Manager (`privilege.rs`), Generic Post-Merge Hooks Engine (`hooks.rs`), dan 5 Crate High-Performance/Security dengan tingkat kesiapan **100%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan 48 ADR telah didokumentasikan secara lengkap.
 
 ### 📌 Ringkasan Status & State Workspace:
 - **Workspace:** 2 Crate murni: [`crates/forge`](file:///home/admin/Development/Forge/crates/forge) (Klien & Engine Library) dan [`crates/forge-server`](file:///home/admin/Development/Forge/crates/forge-server) (Server & CI/CD Builder).
@@ -294,7 +296,8 @@
 - **Seed Toolchain:** Staged murni di `/tmp/forge/stage/`, membundel `/var/db/forge/recipes/`, `/etc/forge/forge.conf`, dan `/usr/bin/forge` ke `dist/kura-toolchain.tar.xz` (ADR-019, ADR-028).
 - **Distro Stage Exporter:** Modul `crates/forge/src/stage.rs` dan CLI `forge stage-export` mengemas staging/rootfs Kura Linux menjadi `dist/kura-stage.tar.xz` / `dist/kura-stage.tar.zst` lengkap dengan validasi FHS/UsrMerge/OpenRC, sanitasi cache, dan hash SHA256 (`.sha256`) & BLAKE3 (`.b3sum`).
 - **Meta-Paket Distro:** `recipes/system/base/recipe.toml` (Base OS) dan `recipes/system/base-devel/recipe.toml` (Toolchain).
-- **Test Suite:** 78 unit & integration tests lulus 100% (`cargo test --workspace`).
+- **Test Suite:** 80 unit & integration tests lulus 100% (`cargo test --workspace`).
+
 
 ### 🛑 6 Aturan Mutlak yang Wajib Diikuti:
 1. **HITL (Human-In-The-Loop):** Wajib ikuti siklus 5-langkah (*Plan $\rightarrow$ Chat $\rightarrow$ ACC $\rightarrow$ Eksekusi $\rightarrow$ Uji*). Jangan edit/buat file tanpa ACC di chat.
