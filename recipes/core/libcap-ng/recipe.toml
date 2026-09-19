@@ -9,21 +9,23 @@ upstream = "https://people.redhat.com/sgrubb/libcap-ng/"
 
 [dependencies]
 runtime = ["glibc"]
-build = ["make", "gcc"]
+build = ["make", "gcc", "autoconf", "automake", "libtool"]
 
 [sources]
 urls = [
-    "https://people.redhat.com/sgrubb/libcap-ng/libcap-ng-0.9.6.tar.gz"
+    "https://github.com/stevegrubb/libcap-ng/archive/refs/tags/v0.9.6.tar.gz"
 ]
 sha256 = [
-    "3ba5294d1cbdfa98afaacfbc00b6af9ed2b83e8a21817185dfd844cc8c7ac6ff"
+    "399040138e0ca62fa2bcabd63da9af4431a246ef7a654561a0ca3cb00010a539"
 ]
 
 [build]
 type = "autotools"
 script = """
 cd "${srcdir}/libcap-ng-${pkgver}"
-./configure --prefix=/usr --without-python --without-python3
+touch NEWS
+autoreconf -fiv
+./configure --prefix=/usr --sysconfdir=/etc --without-python --without-python3
 make ${MAKEFLAGS}
 make DESTDIR="${DESTDIR}" install
 """

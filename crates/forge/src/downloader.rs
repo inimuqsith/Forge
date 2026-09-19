@@ -145,7 +145,7 @@ impl SourceDownloader {
 
         let client = reqwest::Client::builder()
             .user_agent("Forge-Client/0.1.0 (KuraLinux Distro Engine)")
-            .timeout(Duration::from_secs(options.timeout_secs))
+            .connect_timeout(Duration::from_secs(options.timeout_secs.max(15)))
             .build()?;
 
         // 3. Iterasi setiap kandidat mirror
@@ -223,14 +223,33 @@ impl SourceDownloader {
                         let mut bytes_downloaded_this_session = 0u64;
                         let mut stream_err = false;
                         let mut response = response;
+                        let chunk_idle_timeout = Duration::from_secs(options.timeout_secs.max(30));
 
-                        while let Ok(Some(chunk)) = response.chunk().await {
-                            if let Err(e) = file.write_all(&chunk).await {
-                                last_error = Some(format!("Gagal menulis chunk ke part file: {:#}", e));
-                                stream_err = true;
-                                break;
+                        loop {
+                            match tokio::time::timeout(chunk_idle_timeout, response.chunk()).await {
+                                Ok(Ok(Some(chunk))) => {
+                                    if let Err(e) = file.write_all(&chunk).await {
+                                        last_error = Some(format!("Gagal menulis chunk ke part file: {:#}", e));
+                                        stream_err = true;
+                                        break;
+                                    }
+                                    bytes_downloaded_this_session += chunk.len() as u64;
+                                }
+                                Ok(Ok(None)) => {
+                                    // Selesai membaca seluruh stream secara utuh
+                                    break;
+                                }
+                                Ok(Err(e)) => {
+                                    last_error = Some(format!("Error membaca chunk dari stream: {:#}", e));
+                                    stream_err = true;
+                                    break;
+                                }
+                                Err(_) => {
+                                    last_error = Some(format!("Timeout: tidak ada data diterima selama {} detik", chunk_idle_timeout.as_secs()));
+                                    stream_err = true;
+                                    break;
+                                }
                             }
-                            bytes_downloaded_this_session += chunk.len() as u64;
                         }
 
                         if stream_err {
