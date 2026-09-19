@@ -287,6 +287,7 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-051** | TUI Menuconfig & Dynamic Recipe USE Flags Selector (`UseFlagsTui`) | ✅ Diterapkan |
 | **ADR-052** | Seccomp BPF Syscall Filtering & Build Hardening Engine (`SeccompFilterBuilder`) | ✅ Diterapkan |
 | **ADR-053** | Automated Server Source Code Rebuild & Seamless Self-Restart on Git Webhook | ✅ Diterapkan |
+| **ADR-054** | Pure Self-Updating Package Philosophy & Live Git VCS Head Probe Update Engine | ✅ Diterapkan |
 
 
 

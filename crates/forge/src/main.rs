@@ -490,7 +490,222 @@ fn main() -> Result<()> {
             forge::PrivilegeManager::ensure_root_or_escalate(&target_root, "update")?;
 
             let _lock = ForgeLockGuard::acquire("forge", true)?;
-            println!(">>> Memeriksa pembaruan untuk target: {}", target.bold().yellow());
+            let db = InstalledDatabase::new(PathBuf::from(&config.general.db_path));
+            let recipes_base = PathBuf::from(&config.general.recipes_path);
+
+            println!("{}", "=== Forge System & Package Update Engine ===".bold().cyan());
+
+            if target == "@world" {
+                println!(">>> Memindai seluruh paket terpasang di sistem (@world)...");
+                let installed_list = db.list_installed()?;
+                if installed_list.is_empty() {
+                    println!("{} Tidak ada paket yang terpasang di database sistem.", "[i]".yellow());
+                    return Ok(());
+                }
+
+                println!("  [i] Ditemukan {} paket terpasang di sistem.", installed_list.len().to_string().bold().yellow());
+                let mut updates_to_apply = Vec::new();
+
+                for inst in &installed_list {
+                    let found_recipe = RecipeBuilder::find_recipe(&inst.package_name, Some(&recipes_base));
+                    let recipe_path = match found_recipe {
+                        Some(p) => p,
+                        None => continue,
+                    };
+
+                    let recipe = match RecipeBuilder::load_recipe(&recipe_path) {
+                        Ok(r) => r,
+                        Err(_) => continue,
+                    };
+
+                    let is_git_vcs = recipe.package.version == "git"
+                        || recipe
+                            .sources
+                            .as_ref()
+                            .map(|s| s.urls.iter().any(|u| u.contains(".git") || u.starts_with("git://")))
+                            .unwrap_or(false);
+
+                    if is_git_vcs {
+                        // Periksa hash commit hulu
+                        if let Some(ref sources) = recipe.sources {
+                            if let Some(first_url) = sources.urls.first() {
+                                print!("  [🔍] Memeriksa upstream VCS untuk {}... ", inst.package_name.bold());
+                                match RecipeBuilder::probe_git_remote_commit(first_url, None) {
+                                    Ok(remote_commit) => {
+                                        let installed_commit = inst.metadata.as_ref().and_then(|m| m.git_commit.clone());
+                                        let short_remote = &remote_commit[..8.min(remote_commit.len())];
+                                        let short_inst = installed_commit
+                                            .as_ref()
+                                            .map(|c| &c[..8.min(c.len())])
+                                            .unwrap_or("none");
+
+                                        if installed_commit.as_deref() != Some(&remote_commit) {
+                                            println!(
+                                                "{}",
+                                                format!("[PEMBARUAN] {} -> {}", short_inst.yellow(), short_remote.bold().green()).cyan()
+                                            );
+                                            updates_to_apply.push((inst.package_name.clone(), format!("git:{}", short_remote)));
+                                        } else {
+                                            println!("{}", format!("[TERKINI] ({})", short_inst).dimmed());
+                                        }
+                                    }
+                                    Err(e) => {
+                                        println!("{}", format!("[GAGAL CEK: {}]", e).red());
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        // Perbandingan versi rilis semver
+                        let is_newer_ver = version_compare::compare_to(&recipe.package.version, &inst.package_version, version_compare::Cmp::Gt).unwrap_or(false);
+                        let is_same_ver = version_compare::compare_to(&recipe.package.version, &inst.package_version, version_compare::Cmp::Eq).unwrap_or(false);
+                        let is_newer_rel = is_same_ver && recipe.package.release > inst.release;
+
+                        if is_newer_ver || is_newer_rel {
+                            println!(
+                                "  [↑] Pembaruan terdeteksi untuk {}: v{}-r{} -> v{}-r{}",
+                                inst.package_name.bold().green(),
+                                inst.package_version.yellow(),
+                                inst.release,
+                                recipe.package.version.bold().green(),
+                                recipe.package.release
+                            );
+                            updates_to_apply.push((inst.package_name.clone(), recipe.package.version.clone()));
+                        }
+                    }
+                }
+
+                if updates_to_apply.is_empty() {
+                    println!("\n{} Seluruh paket sistem sudah dalam versi terkini! (@world is up to date)", "✓".green().bold());
+                    return Ok(());
+                }
+
+                println!(
+                    "\n{} Ditemukan {} paket yang memerlukan pembaruan.",
+                    "⚡".cyan(),
+                    updates_to_apply.len().to_string().bold().yellow()
+                );
+
+                for (pkg_name, _new_ver) in updates_to_apply {
+                    println!("\n>>> Memperbarui paket: {}", pkg_name.bold().green());
+                    let graph = match DependencyResolver::build_graph(&pkg_name, &config, None, None) {
+                        Ok(g) => g,
+                        Err(e) => {
+                            println!("{} Gagal memetakan graf dependensi {}: {:#}", "✗".red(), pkg_name.bold(), e);
+                            continue;
+                        }
+                    };
+
+                    let plan = match graph.topological_sort(&pkg_name) {
+                        Ok(p) => p,
+                        Err(e) => {
+                            println!("{} Gagal menyelesaikan urutan topologis {}: {:#}", "✗".red(), pkg_name.bold(), e);
+                            continue;
+                        }
+                    };
+
+                    let scheduler = WavefrontScheduler::new(config.clone(), None);
+                    if let Err(e) = scheduler.execute(&graph, &plan, &target_root, &db) {
+                        println!("{} Eksekusi pembaruan paket {} gagal: {:#}", "✗".red(), pkg_name.bold(), e);
+                    } else {
+                        println!("{} Paket '{}' berhasil diperbarui ke versi terbaru!", "✓".green(), pkg_name.bold());
+                    }
+                }
+
+                println!("\n{} Proses pembaruan @world selesai!", "✨".green().bold());
+            } else {
+                // Target spesifik (misal: forge update forge atau forge update bash)
+                println!(">>> Memproses pembaruan paket spesifik: {}", target.bold().green());
+                let found_recipe = RecipeBuilder::find_recipe(&target, Some(&recipes_base));
+                let recipe_path = match found_recipe {
+                    Some(p) => p,
+                    None => {
+                        println!("{} Resep tidak ditemukan untuk paket: {}", "✗".red(), target.bold());
+                        return Ok(());
+                    }
+                };
+
+                let recipe = RecipeBuilder::load_recipe(&recipe_path)?;
+                let installed_pkg = db.get_package(&target)?;
+
+                let is_git_vcs = recipe.package.version == "git"
+                    || recipe
+                        .sources
+                        .as_ref()
+                        .map(|s| s.urls.iter().any(|u| u.contains(".git") || u.starts_with("git://")))
+                        .unwrap_or(false);
+
+                if let Some(ref inst) = installed_pkg {
+                    if is_git_vcs {
+                        if let Some(ref sources) = recipe.sources {
+                            if let Some(first_url) = sources.urls.first() {
+                                print!("  [🔍] Memeriksa upstream VCS untuk {}... ", target.bold());
+                                match RecipeBuilder::probe_git_remote_commit(first_url, None) {
+                                    Ok(remote_commit) => {
+                                        let installed_commit = inst.metadata.as_ref().and_then(|m| m.git_commit.clone());
+                                        let short_remote = &remote_commit[..8.min(remote_commit.len())];
+                                        let short_inst = installed_commit
+                                            .as_ref()
+                                            .map(|c| &c[..8.min(c.len())])
+                                            .unwrap_or("none");
+
+                                        if installed_commit.as_deref() != Some(&remote_commit) {
+                                            println!(
+                                                "{}",
+                                                format!("[PEMBARUAN] {} -> {}", short_inst.yellow(), short_remote.bold().green()).cyan()
+                                            );
+                                        } else {
+                                            println!("{}", format!("[TERKINI] ({}) -> Memaksa re-kompilasi...", short_inst).dimmed());
+                                        }
+                                    }
+                                    Err(e) => {
+                                        println!("{}", format!("[GAGAL CEK: {}] -> Melanjutkan kompilasi...", e).yellow());
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        println!(
+                            "  [i] Paket terpasang: v{}-r{}, Versi resep: v{}-r{}",
+                            inst.package_version.yellow(),
+                            inst.release,
+                            recipe.package.version.green(),
+                            recipe.package.release
+                        );
+                    }
+                } else {
+                    println!("  [i] Paket '{}' belum terpasang. Memulai instalasi pertama kali...", target.cyan());
+                }
+
+                println!("  [🔍] Menghitung graf dependensi (DAG) & USE flags untuk '{}'...", target.bold().yellow());
+                let graph = match DependencyResolver::build_graph(&target, &config, None, None) {
+                    Ok(g) => g,
+                    Err(e) => {
+                        println!("{} Gagal memetakan graf dependensi target {}: {:#}", "✗".red(), target.bold(), e);
+                        return Ok(());
+                    }
+                };
+
+                let plan = match graph.topological_sort(&target) {
+                    Ok(p) => p,
+                    Err(e) => {
+                        println!("{} Gagal menyelesaikan urutan topologis target {}: {:#}", "✗".red(), target.bold(), e);
+                        return Ok(());
+                    }
+                };
+
+                let scheduler = WavefrontScheduler::new(config.clone(), None);
+                if let Err(e) = scheduler.execute(&graph, &plan, &target_root, &db) {
+                    println!("{} Pembaruan paket {} gagal: {:#}", "✗".red(), target.bold(), e);
+                    std::process::exit(1);
+                }
+
+                println!(
+                    "\n{} Paket '{}' berhasil diperbarui & dipasang dengan sukses!",
+                    "✨".green(),
+                    target.bold().green()
+                );
+            }
         }
 
         Commands::CpuDump { export_cflags, output } => {

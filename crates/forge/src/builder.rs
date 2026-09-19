@@ -1,4 +1,5 @@
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
+use colored::Colorize;
 use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -31,6 +32,50 @@ pub const SENSITIVE_BAREMETAL_PACKAGES: &[&str] = &[
 pub struct RecipeBuilder;
 
 impl RecipeBuilder {
+    /// Parse URL git menjadi (clean_url, Option<branch>)
+    pub fn parse_git_url(raw: &str) -> (String, Option<String>) {
+        if let Some((url_part, frag)) = raw.split_once('#') {
+            let branch = if let Some(b) = frag.strip_prefix("branch=") {
+                Some(b.to_string())
+            } else if let Some(t) = frag.strip_prefix("tag=") {
+                Some(t.to_string())
+            } else if let Some(c) = frag.strip_prefix("commit=") {
+                Some(c.to_string())
+            } else {
+                Some(frag.to_string())
+            };
+            (url_part.to_string(), branch)
+        } else {
+            (raw.to_string(), None)
+        }
+    }
+
+    /// Melakukan probe commit HEAD git remote secara instan via `git ls-remote`
+    pub fn probe_git_remote_commit(raw_url: &str, branch_override: Option<&str>) -> Result<String> {
+        let (clean_url, branch) = Self::parse_git_url(raw_url);
+        let target_branch = branch_override.or(branch.as_deref()).unwrap_or("HEAD");
+
+        let output = Command::new("git")
+            .arg("ls-remote")
+            .arg(&clean_url)
+            .arg(target_branch)
+            .output()
+            .with_context(|| format!("Gagal menjalankan git ls-remote pada {}", clean_url))?;
+
+        if !output.status.success() {
+            let err = String::from_utf8_lossy(&output.stderr);
+            bail!("git ls-remote gagal untuk {}: {}", clean_url, err.trim());
+        }
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let commit = stdout
+            .lines()
+            .next()
+            .and_then(|line| line.split_whitespace().next())
+            .ok_or_else(|| anyhow::anyhow!("Tidak ada commit yang dikembalikan oleh git ls-remote dari {}", clean_url))?;
+
+        Ok(commit.to_string())
+    }
     /// Cek apakah paket wajib menggunakan compiler & flag aman (GCC + BFD ld + -O2)
     pub fn is_compiler_exempt(pkg_name: &str, build_meta: &BuildMeta) -> bool {
         SENSITIVE_BAREMETAL_PACKAGES.contains(&pkg_name)
@@ -134,6 +179,17 @@ impl RecipeBuilder {
             }
         }
 
+        let git_commit = {
+            let commit_file = staging_dir.join(".forge_git_commit");
+            if commit_file.exists() {
+                let s = fs::read_to_string(&commit_file).ok().map(|s| s.trim().to_string());
+                let _ = fs::remove_file(&commit_file);
+                s
+            } else {
+                None
+            }
+        };
+
         // Tulis metadata.json ke staging sebelum kompresi
         let metadata = PackageMetadata {
             name: recipe.package.name.clone(),
@@ -153,6 +209,7 @@ impl RecipeBuilder {
             use_flags: use_flags.to_string(),
             files_count,
             installed_size,
+            git_commit,
         };
 
         let meta_path = staging_dir.join("metadata.json");
@@ -193,10 +250,7 @@ impl RecipeBuilder {
             &config.cpu.target_march
         };
 
-        let staging_dir = std::env::temp_dir()
-            .join("forge")
-            .join("stage")
-            .join(format!("{}-{}", pkg_name, pkg_ver));
+        let staging_dir = PathBuf::from(format!("/tmp/forge/stage/{}-{}-{}", pkg_name, pkg_ver, target_march));
         if staging_dir.exists() {
             let _ = fs::remove_dir_all(&staging_dir);
         }
@@ -259,35 +313,88 @@ impl RecipeBuilder {
         // 2. Unduh dan verifikasi sumber jika ada entri sources
         if let Some(ref sources) = recipe.sources {
             for (i, url) in sources.urls.iter().enumerate() {
-                let filename = url.split('/').last().unwrap_or("source.tar.gz");
-                let target_file = distfiles_dir.join(filename);
+                let is_git = url.ends_with(".git")
+                    || url.contains(".git#")
+                    || url.starts_with("git://")
+                    || url.starts_with("git+")
+                    || recipe.package.version == "git";
 
-                let expected_sha = sources.sha256.get(i).cloned();
-                let dl_options = crate::downloader::DownloadOptions {
-                    expected_sha256: expected_sha.clone(),
-                    expected_blake3: None,
-                    fallback_mirrors: Vec::new(),
-                    retries: 3,
-                    timeout_secs: 30,
-                    show_progress: true,
-                };
+                if is_git {
+                    let (clean_url, branch) = Self::parse_git_url(url);
+                    let raw_repo = clean_url
+                        .trim_end_matches(".git")
+                        .split('/')
+                        .last()
+                        .unwrap_or(pkg_name.as_str());
+                    let target_dir = build_root.join(raw_repo);
 
-                let dl_res = crate::downloader::SourceDownloader::download(url, &target_file, &dl_options);
-                if dl_res.is_err() && !target_file.exists() {
-                    if custom_src_dir.is_none() {
-                        anyhow::bail!("Gagal mengunduh sumber dari {}: {:#}", url, dl_res.unwrap_err());
+                    println!(
+                        "  [📦] Mengkloning repositori Git: {} (Branch: {:?})",
+                        clean_url.cyan(),
+                        branch.as_deref().unwrap_or("default")
+                    );
+
+                    if target_dir.exists() {
+                        let _ = fs::remove_dir_all(&target_dir);
                     }
-                }
 
-                // Ekstrak ke build directory jika arsip ada
-                if target_file.exists() {
-                    println!("  [📦] Mengekstrak sumber ke {:?}", build_root);
-                    let _ = Command::new("tar")
-                        .arg("-xf")
-                        .arg(&target_file)
-                        .arg("-C")
-                        .arg(&build_root)
-                        .status();
+                    let mut cmd = Command::new("git");
+                    cmd.arg("clone").arg("--depth").arg("1");
+                    if let Some(ref b) = branch {
+                        cmd.arg("--branch").arg(b);
+                    }
+                    cmd.arg(&clean_url).arg(&target_dir);
+
+                    let status = cmd.status().context("Gagal mengeksekusi git clone")?;
+                    if !status.success() {
+                        if custom_src_dir.is_none() {
+                            bail!("git clone gagal untuk {}", clean_url);
+                        }
+                    }
+
+                    // Ambil commit hash HEAD
+                    if let Ok(rev_out) = Command::new("git")
+                        .current_dir(&target_dir)
+                        .args(["rev-parse", "HEAD"])
+                        .output()
+                    {
+                        if rev_out.status.success() {
+                            let head_commit = String::from_utf8_lossy(&rev_out.stdout).trim().to_string();
+                            println!("  [✓] Git HEAD Commit: {}", head_commit.bold().cyan());
+                            let _ = fs::write(destdir.join(".forge_git_commit"), &head_commit);
+                        }
+                    }
+                } else {
+                    let filename = url.split('/').last().unwrap_or("source.tar.gz");
+                    let target_file = distfiles_dir.join(filename);
+
+                    let expected_sha = sources.sha256.get(i).cloned();
+                    let dl_options = crate::downloader::DownloadOptions {
+                        expected_sha256: expected_sha.clone(),
+                        expected_blake3: None,
+                        fallback_mirrors: Vec::new(),
+                        retries: 3,
+                        timeout_secs: 30,
+                        show_progress: true,
+                    };
+
+                    let dl_res = crate::downloader::SourceDownloader::download(url, &target_file, &dl_options);
+                    if dl_res.is_err() && !target_file.exists() {
+                        if custom_src_dir.is_none() {
+                            anyhow::bail!("Gagal mengunduh sumber dari {}: {:#}", url, dl_res.unwrap_err());
+                        }
+                    }
+
+                    // Ekstrak ke build directory jika arsip ada
+                    if target_file.exists() {
+                        println!("  [📦] Mengekstrak sumber ke {:?}", build_root);
+                        let _ = Command::new("tar")
+                            .arg("-xf")
+                            .arg(&target_file)
+                            .arg("-C")
+                            .arg(&build_root)
+                            .status();
+                    }
                 }
             }
         }
@@ -357,6 +464,7 @@ impl RecipeBuilder {
             env_vars.insert("LDFLAGS".to_string(), ldflags.clone());
             env_vars.insert("MAKEFLAGS".to_string(), config.build.makeflags.clone());
             env_vars.insert("DESTDIR".to_string(), destdir.display().to_string());
+            env_vars.insert("pkgdir".to_string(), destdir.display().to_string());
             env_vars.insert("PREFIX".to_string(), config.build.prefix.clone());
             env_vars.insert("srcdir".to_string(), build_root.display().to_string());
             env_vars.insert("pkgname".to_string(), pkg_name.clone());
@@ -478,5 +586,20 @@ chmod +x "$DESTDIR/usr/bin/client-test-bin"
         let mut march_meta = BuildMeta::default();
         march_meta.disable_custom_march = true;
         assert!(RecipeBuilder::is_compiler_exempt("my-custom-pkg2", &march_meta));
+    }
+
+    #[test]
+    fn test_git_url_parsing() {
+        let (url1, branch1) = RecipeBuilder::parse_git_url("https://github.com/inimuqsith/Forge.git#branch=main");
+        assert_eq!(url1, "https://github.com/inimuqsith/Forge.git");
+        assert_eq!(branch1, Some("main".to_string()));
+
+        let (url2, tag2) = RecipeBuilder::parse_git_url("https://github.com/CachyOS/linux-cachyos.git#tag=v6.13");
+        assert_eq!(url2, "https://github.com/CachyOS/linux-cachyos.git");
+        assert_eq!(tag2, Some("v6.13".to_string()));
+
+        let (url3, branch3) = RecipeBuilder::parse_git_url("https://github.com/foo/bar.git");
+        assert_eq!(url3, "https://github.com/foo/bar.git");
+        assert_eq!(branch3, None);
     }
 }

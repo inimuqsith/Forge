@@ -1,0 +1,51 @@
+[package]
+name = "forge"
+version = "git"
+release = 1
+slot = "0"
+description = "High-Performance Source-First & Hybrid Package Manager for Kura Linux"
+license = "GPL-3.0-or-later"
+upstream = "https://github.com/inimuqsith/Forge"
+
+[dependencies]
+runtime = [
+    "glibc", "zlib", "zstd", "bubblewrap", "mold", "clang", "llvm",
+    "git", "ca-certificates", "tar", "xz"
+]
+build = [
+    "rust", "mold", "clang", "llvm", "pkgconf", "git"
+]
+
+[sources]
+urls = [
+    "https://github.com/inimuqsith/Forge.git#branch=main"
+]
+sha256 = [
+    "SKIP"
+]
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/Forge" || cd "${srcdir}"
+
+# Kompilasi rilis forge CLI dengan Mold linker dan LTO
+cargo build --release -p forge
+
+# Pasang biner forge ke /usr/bin
+install -d -m 0755 "${pkgdir}/usr/bin"
+install -m 0755 target/release/forge "${pkgdir}/usr/bin/forge"
+
+# Pasang konfigurasi template ke /etc/forge/forge.conf.example
+install -d -m 0755 "${pkgdir}/etc/forge"
+install -m 0644 config/forge.conf.example "${pkgdir}/etc/forge/forge.conf.example"
+if [ ! -f "${pkgdir}/etc/forge/forge.conf" ]; then
+    install -m 0644 config/forge.conf.example "${pkgdir}/etc/forge/forge.conf"
+fi
+
+# Pasang direktori state sistem
+install -d -m 0755 "${pkgdir}/var/db/forge/installed"
+install -d -m 0755 "${pkgdir}/var/db/forge/recipes"
+install -d -m 0755 "${pkgdir}/var/cache/forge"
+install -d -m 0755 "${pkgdir}/tmp/forge/stage"
+"""

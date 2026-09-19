@@ -172,6 +172,8 @@ pub struct PackageMetadata {
     pub files_count: usize,
     #[serde(default)]
     pub installed_size: u64,
+    #[serde(default)]
+    pub git_commit: Option<String>,
 }
 
 fn default_release() -> u32 {
@@ -418,6 +420,7 @@ impl InstalledDatabase {
                 use_flags: manifest.use_flags.clone().unwrap_or_default(),
                 files_count: manifest.entries.len(),
                 installed_size: total_size,
+                git_commit: None,
             };
             let meta_json = serde_json::to_string_pretty(&fallback_meta)?;
             fs::write(pkg_entry_dir.join("metadata.json"), meta_json)?;
@@ -438,6 +441,22 @@ impl InstalledDatabase {
         let mut contents_file = File::create(contents_path)?;
         for entry in &manifest.entries {
             writeln!(contents_file, "{}", entry.path.display())?;
+        }
+
+        // 6. Hapus entri versi lama untuk paket dan slot yang sama jika ada (Upgrade cleaner)
+        if let Ok(entries) = fs::read_dir(&base_installed) {
+            let prefix = format!("{}-", manifest.package_name);
+            let slot_suffix = format!(":{}", manifest.slot);
+            for entry in entries.flatten() {
+                let p = entry.path();
+                if p.is_dir() && p != pkg_entry_dir {
+                    if let Some(file_name) = p.file_name().and_then(|n| n.to_str()) {
+                        if file_name.starts_with(&prefix) && file_name.ends_with(&slot_suffix) {
+                            let _ = fs::remove_dir_all(&p);
+                        }
+                    }
+                }
+            }
         }
 
         Ok(pkg_entry_dir)

@@ -433,6 +433,7 @@ impl WavefrontScheduler {
                         use_flags: self.config.use_flags.flags.clone(),
                         files_count: 0,
                         installed_size: 0,
+                        git_commit: None,
                     }),
                     use_flags: Some(self.config.use_flags.flags.clone()),
                     cflags: Some(self.config.build.cflags.clone()),

@@ -409,18 +409,60 @@ impl MergeTransaction {
             })
             .collect();
 
+        let mut final_metadata = self.metadata.clone();
+        if final_metadata.is_none() {
+            let meta_path = self.staging_dir.join("metadata.json");
+            if meta_path.exists() {
+                final_metadata = fs::read_to_string(&meta_path)
+                    .ok()
+                    .and_then(|s| serde_json::from_str(&s).ok());
+            }
+        }
+        if final_metadata.is_none() {
+            let commit_file = self.staging_dir.join(".forge_git_commit");
+            let git_commit = if commit_file.exists() {
+                fs::read_to_string(&commit_file).ok().map(|s| s.trim().to_string())
+            } else {
+                None
+            };
+            let total_size: u64 = manifest_entries.iter().map(|e| e.size).sum();
+            final_metadata = Some(PackageMetadata {
+                name: self.package_name.clone(),
+                version: self.package_version.clone(),
+                release: self.release,
+                slot: self.slot.clone(),
+                description: String::new(),
+                url: String::new(),
+                license: String::new(),
+                upstream: String::new(),
+                build_time: SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_secs(),
+                target_march: "native".to_string(),
+                cflags: self.cflags.clone().unwrap_or_default(),
+                use_flags: self.use_flags.clone().unwrap_or_default(),
+                files_count: manifest_entries.len(),
+                installed_size: total_size,
+                git_commit,
+            });
+        }
+
         let manifest = PackageManifest {
             package_name: self.package_name.clone(),
             package_version: self.package_version.clone(),
             release: self.release,
             slot: self.slot.clone(),
             entries: manifest_entries,
-            metadata: self.metadata.clone(),
+            metadata: final_metadata,
             use_flags: self.use_flags.clone(),
             cflags: self.cflags.clone(),
         };
 
         db.record_package(&manifest, &self.target_root)?;
+
+        let _ = fs::remove_file(self.target_root.join(".forge_git_commit"));
+        let _ = fs::remove_file(self.staging_dir.join(".forge_git_commit"));
 
         // 5. Eksekusi Post-Merge Hooks (OpenRC, ldconfig)
         self.run_post_merge_hooks();

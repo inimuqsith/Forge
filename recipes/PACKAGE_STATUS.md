@@ -8,14 +8,14 @@
 
 | Kategori | Total Paket | Status Kesiapan | Deskripsi Ruang Lingkup |
 | :--- | :---: | :---: | :--- |
-| **`recipes/system/`** | 23 | ✅ 100% Verified | Fondasi OS, Kernel & Toolchain Kompilasi |
+| **`recipes/system/`** | 24 | ✅ 100% Verified | Fondasi OS, Kernel & Toolchain Kompilasi |
 | **`recipes/core/`** | 72 | ✅ 100% Verified | Sistem Inti, Storage, Filesystem, Networking, Security & Bootloader |
 | **`recipes/extra/`** | 100 | ✅ 100% Verified | Development Tools, CLI Modern, Desktop Apps, Audio, Qt6 & KDE Plasma 6 Desktop |
-| **TOTAL RESEP RESMI** | **195** | **✅ 100% Audited** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Hardware, Firmware, Audio, Qt6 & KDE Plasma 6)** |
+| **TOTAL RESEP RESMI** | **196** | **✅ 100% Audited** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Hardware, Firmware, Audio, Qt6 & KDE Plasma 6)** |
 
 ---
 
-## 1. Kategori `recipes/system/` (23 Paket — Fondasi OS & Toolchain Kompilasi)
+## 1. Kategori `recipes/system/` (24 Paket — Fondasi OS & Toolchain Kompilasi)
 
 | Paket | Versi Hulu | Status | Runtime Dependencies | Build Dependencies | Deskripsi |
 | :--- | :---: | :---: | :--- | :--- | :--- |
@@ -28,6 +28,7 @@
 | **`clang`** | `23.1.1` | ✅ Verified | - | - | C, C++, and Objective-C front-end for LLVM (v22) |
 | **`cmake`** | `4.3.5` | ✅ Verified | - | - | Cross-platform open-source build system generator |
 | **`flex`** | `2.6.4` | ✅ Verified | - | - | Fast lexical analyzer generator |
+| **`forge`** | `git` | ✅ Verified | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `clang`, `llvm`, `git`, `ca-certificates`, `tar`, `xz` | `rust`, `mold`, `clang`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
 | **`gcc`** | `16.2.0` | ✅ Verified | - | - | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
 | **`glibc`** | `2.44` | ✅ Verified | - | - | GNU C Library (Standard Core System C Library - Latest 2.44) |
 | **`libtool`** | `2.6.2` | ✅ Verified | - | - | Generic library support script |
