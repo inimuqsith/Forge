@@ -283,4 +283,6 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-047** | Pre-Flight Root Privilege Enforcement & Sudo/Doas Transparent Auto-Escalation | ✅ Diterapkan |
 | **ADR-048** | Generic Post-Merge File Triggers & Hooks Engine (`HookEngine`) | ✅ Diterapkan |
 | **ADR-049** | Wavefront Parallel DAG Scheduler & Multi-Worker Build Pool (`WavefrontScheduler`) | ✅ Diterapkan |
+| **ADR-050** | Resumable HTTP Source Downloader with Multi-Mirror Fallback & Integrity Engine (`SourceDownloader`) | ✅ Diterapkan |
+
 

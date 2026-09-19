@@ -21,6 +21,7 @@ pub mod crypto;
 pub mod privilege;
 pub mod hooks;
 pub mod scheduler;
+pub mod downloader;
 
 pub use builder::RecipeBuilder;
 pub use toolchain::{ToolchainComponent, ToolchainManager, ToolchainStatus};
@@ -40,6 +41,7 @@ pub use crypto::*;
 pub use privilege::*;
 pub use hooks::*;
 pub use scheduler::*;
+pub use downloader::*;
 
 /// Konfigurasi Global Forge (/etc/forge/forge.conf)
 #[derive(Debug, Clone, Serialize, Deserialize)]

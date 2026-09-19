@@ -262,46 +262,24 @@ impl RecipeBuilder {
                 let filename = url.split('/').last().unwrap_or("source.tar.gz");
                 let target_file = distfiles_dir.join(filename);
 
-                if !target_file.exists() {
-                    println!("  [↓] Mengunduh sumber: {}", url);
-                    let curl_status = Command::new("curl")
-                        .arg("-sSL")
-                        .arg("-o")
-                        .arg(&target_file)
-                        .arg(url)
-                        .status();
+                let expected_sha = sources.sha256.get(i).cloned();
+                let dl_options = crate::downloader::DownloadOptions {
+                    expected_sha256: expected_sha.clone(),
+                    expected_blake3: None,
+                    fallback_mirrors: Vec::new(),
+                    retries: 3,
+                    timeout_secs: 30,
+                    show_progress: true,
+                };
 
-                    if curl_status.is_err() || !curl_status.unwrap().success() {
-                        // Fallback jika tidak ada akses internet saat test, buat dummy file jika custom_src_dir tidak ada
-                        if custom_src_dir.is_none() {
-                            anyhow::bail!("Gagal mengunduh sumber dari {}", url);
-                        }
+                let dl_res = crate::downloader::SourceDownloader::download(url, &target_file, &dl_options);
+                if dl_res.is_err() && !target_file.exists() {
+                    if custom_src_dir.is_none() {
+                        anyhow::bail!("Gagal mengunduh sumber dari {}: {:#}", url, dl_res.unwrap_err());
                     }
                 }
 
-                // Verifikasi SHA256 jika checksum tersedia
-                if let Some(expected_sha) = sources.sha256.get(i) {
-                    if target_file.exists() {
-                        println!("  [✓] Memvalidasi hash SHA256 untuk {}...", filename);
-                        let sha_out = Command::new("sha256sum").arg(&target_file).output();
-                        if let Ok(out) = sha_out {
-                            let calculated = String::from_utf8_lossy(&out.stdout)
-                                .split_whitespace()
-                                .next()
-                                .unwrap_or_default()
-                                .to_string();
-                            if !expected_sha.is_empty() && calculated != *expected_sha {
-                                anyhow::bail!(
-                                    "Mismatch checksum SHA256! Expected: {}, Found: {}",
-                                    expected_sha,
-                                    calculated
-                                );
-                            }
-                        }
-                    }
-                }
-
-                // Ekstrak ke build directory
+                // Ekstrak ke build directory jika arsip ada
                 if target_file.exists() {
                     println!("  [📦] Mengekstrak sumber ke {:?}", build_root);
                     let _ = Command::new("tar")
