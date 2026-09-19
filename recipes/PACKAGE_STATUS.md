@@ -9,9 +9,9 @@
 | Kategori | Total Paket | Status Kesiapan | Deskripsi Ruang Lingkup |
 | :--- | :---: | :---: | :--- |
 | **`recipes/system/`** | 22 | ✅ 100% Verified | Fondasi OS & Toolchain Kompilasi |
-| **`recipes/core/`** | 62 | ✅ 100% Verified | Sistem Inti, Storage, Filesystem, Networking & Daemons |
+| **`recipes/core/`** | 63 | ✅ 100% Verified | Sistem Inti, Storage, Filesystem, Networking & Daemons |
 | **`recipes/extra/`** | 100 | ✅ 100% Verified | Development Tools, CLI Modern, Desktop Apps, Audio, Qt6 & KDE Plasma 6 Desktop |
-| **TOTAL RESEP RESMI** | **184** | **✅ 100% Audited** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Audio, Qt6 & KDE Plasma 6)** |
+| **TOTAL RESEP RESMI** | **185** | **✅ 100% Audited** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Audio, Qt6 & KDE Plasma 6)** |
 
 ---
 
@@ -44,7 +44,7 @@
 
 ---
 
-## 2. Kategori `recipes/core/` (62 Paket — Sistem Inti, Storage, Filesystem, Networking & Daemons)
+## 2. Kategori `recipes/core/` (63 Paket — Sistem Inti, Storage, Filesystem, Networking & Daemons)
 
 | Paket | Versi Hulu | Status | Runtime Dependencies | Build Dependencies | Deskripsi |
 | :--- | :---: | :---: | :--- | :--- | :--- |
@@ -88,6 +88,7 @@
 | **`ncurses`** | `6.5` | ✅ Verified | - | - | System V Release 4.0 curses emulation library |
 | **`nftables`** | `1.1.1` | ✅ Verified | - | - | Netfilter userspace packet filtering framework |
 | **`openssl`** | `4.1.0-alpha1` | ✅ Verified | - | - | Robust, commercial-grade TLS/SSL cryptography toolkit |
+| **`pam`** | `1.7.1` | ✅ Verified | `glibc` | `gcc`, `make`, `flex`... | Pluggable Authentication Modules for Linux |
 | **`parted`** | `3.7` | ✅ Verified | - | - | A program for creating, destroying, resizing, checking and copying partitions |
 | **`pciutils`** | `3.15.0` | ✅ Verified | - | - | PCI bus configuration and diagnostic tools (lspci, setpci) |
 | **`polkit`** | `127` | ✅ Verified | - | - | Application development toolkit for controlling system-wide privileges |
@@ -199,7 +200,7 @@
 | **`rsync`** | `3.5.0` | ✅ Verified | - | - | Fast and versatile remote file copying tool |
 | **`rust`** | `1.98.1` | ✅ Verified | - | - | Empowering everyone to build reliable and efficient systems programming language |
 | **`sddm`** | `0.21.0` | ✅ Verified | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `pam`... | `cmake`, `ninja`, `extra-cmake-modules`... | QML and Wayland based modern display manager |
-| **`seatd`** | `0.9.3` | ✅ Verified | - | - | A minimal seat management daemon, and a universal seat management library |
+| **`seatd`** | `0.9.3` | ✅ Verified | `glibc`, `eudev` | `meson`, `ninja`, `pkgconf` | A minimal seat management daemon, and a universal seat management library |
 | **`sqlite`** | `3.53.4` | ✅ Verified | - | - | Self-contained serverless SQL database engine |
 | **`starship`** | `1.26.0` | ✅ Verified | - | - | The cross-shell prompt for astronauts |
 | **`strace`** | `7.2` | ✅ Verified | - | - | Diagnostic, debugging and instructional userspace utility for Linux syscall tracing |
