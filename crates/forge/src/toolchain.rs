@@ -88,12 +88,6 @@ impl ToolchainManager {
             fs::create_dir_all(stage_root.join(dir))?;
         }
 
-        // Set izin direktori tmp (1777 / sticky)
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            let _ = fs::set_permissions(stage_root.join("tmp"), fs::Permissions::from_mode(0o1777));
-        }
 
         // 2. Buat symlink UsrMerge di root level
         let _ = make_symlink("usr/bin", &stage_root.join("bin"));

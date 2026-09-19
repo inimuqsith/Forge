@@ -16,16 +16,16 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Setup Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@4dd527f00d81cb40e6ae5d105260170a4421b585 # stable
 
       - name: Cache Cargo Dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: |
             ~/.cargo/bin/
@@ -38,7 +38,7 @@ jobs:
             ${{ runner.os }}-cargo-forge-server-
 
       - name: Build forge-server Tool
-        run: cargo build --release -p forge-server
+        run: cargo build --release -p forge-server --locked
 
       - name: Audit Upstream Recipes Status
         run: ./target/release/forge-server audit --recipes-path recipes

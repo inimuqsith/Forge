@@ -152,13 +152,17 @@ async fn index_html_handler(State(state): State<Arc<ServerState>>) -> Html<Strin
 async fn packages_json_handler(
     State(state): State<Arc<ServerState>>,
 ) -> Json<Vec<PackageInfo>> {
-    let packages = ForgeServer::scan_packages(&state.recipes_dir);
+    let recipes_dir = state.recipes_dir.clone();
+    let packages = tokio::task::spawn_blocking(move || ForgeServer::scan_packages(&recipes_dir))
+        .await
+        .unwrap_or_default();
     Json(packages)
 }
 
 async fn recipes_hash_handler(State(state): State<Arc<ServerState>>) -> Result<String, StatusCode> {
     let hash_file = state.cache_dir.join("recipes.tar.zst.sha256");
-    std::fs::read_to_string(hash_file)
+    tokio::fs::read_to_string(hash_file)
+        .await
         .map(|s| s.trim().to_string())
         .map_err(|_| StatusCode::NOT_FOUND)
 }
@@ -167,7 +171,7 @@ async fn recipes_tarball_handler(
     State(state): State<Arc<ServerState>>,
 ) -> Result<Vec<u8>, StatusCode> {
     let tar_file = state.cache_dir.join("recipes.tar.zst");
-    std::fs::read(tar_file).map_err(|_| StatusCode::NOT_FOUND)
+    tokio::fs::read(tar_file).await.map_err(|_| StatusCode::NOT_FOUND)
 }
 
 async fn binhost_catalog_handler(
@@ -178,7 +182,9 @@ async fn binhost_catalog_handler(
         return Err(StatusCode::BAD_REQUEST);
     }
     let catalog_file = state.binhost_dir.join(&march).join("catalog.json");
-    std::fs::read_to_string(catalog_file).map_err(|_| StatusCode::NOT_FOUND)
+    tokio::fs::read_to_string(catalog_file)
+        .await
+        .map_err(|_| StatusCode::NOT_FOUND)
 }
 
 async fn binhost_package_handler(
@@ -195,7 +201,9 @@ async fn binhost_package_handler(
         return Err(StatusCode::BAD_REQUEST);
     }
     let package_file = state.binhost_dir.join(&march).join(&package);
-    std::fs::read(package_file).map_err(|_| StatusCode::NOT_FOUND)
+    tokio::fs::read(package_file)
+        .await
+        .map_err(|_| StatusCode::NOT_FOUND)
 }
 
 /// Sinkronisasi resep dari Git repo jika tersedia dan bungkus ulang ke recipes.tar.zst
@@ -234,8 +242,15 @@ pub fn sync_and_rebundle_recipes(recipes_dir: &Path, cache_dir: &Path) -> anyhow
 async fn github_webhook_handler(
     State(state): State<Arc<ServerState>>,
 ) -> (StatusCode, Json<SyncWebhookResponse>) {
-    match sync_and_rebundle_recipes(&state.recipes_dir, &state.cache_dir) {
-        Ok((count, hash, git_updated)) => (
+    let recipes_dir = state.recipes_dir.clone();
+    let cache_dir = state.cache_dir.clone();
+    let result = tokio::task::spawn_blocking(move || {
+        sync_and_rebundle_recipes(&recipes_dir, &cache_dir)
+    })
+    .await;
+
+    match result {
+        Ok(Ok((count, hash, git_updated))) => (
             StatusCode::OK,
             Json(SyncWebhookResponse {
                 status: "ok".to_string(),
@@ -245,11 +260,21 @@ async fn github_webhook_handler(
                 git_updated,
             }),
         ),
-        Err(e) => (
+        Ok(Err(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(SyncWebhookResponse {
                 status: "error".to_string(),
                 message: format!("Failed to synchronize recipes: {:#}", e),
+                package_count: 0,
+                sha256: None,
+                git_updated: false,
+            }),
+        ),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(SyncWebhookResponse {
+                status: "error".to_string(),
+                message: format!("Task execution error: {:#}", e),
                 package_count: 0,
                 sha256: None,
                 git_updated: false,
@@ -261,9 +286,15 @@ async fn github_webhook_handler(
 async fn github_webhook_info_handler(
     State(state): State<Arc<ServerState>>,
 ) -> Json<SyncWebhookResponse> {
-    let packages = ForgeServer::scan_packages(&state.recipes_dir);
+    let recipes_dir = state.recipes_dir.clone();
+    let packages = tokio::task::spawn_blocking(move || ForgeServer::scan_packages(&recipes_dir))
+        .await
+        .unwrap_or_default();
     let hash_file = state.cache_dir.join("recipes.tar.zst.sha256");
-    let sha256 = std::fs::read_to_string(hash_file).ok().map(|s| s.trim().to_string());
+    let sha256 = tokio::fs::read_to_string(hash_file)
+        .await
+        .ok()
+        .map(|s| s.trim().to_string());
     Json(SyncWebhookResponse {
         status: "ready".to_string(),
         message: "Forge GitHub Webhook Receiver is active. Send POST requests from GitHub Webhooks (push event) to trigger automatic recipe rebundle.".to_string(),
@@ -276,8 +307,15 @@ async fn github_webhook_info_handler(
 async fn recipes_refresh_handler(
     State(state): State<Arc<ServerState>>,
 ) -> (StatusCode, Json<SyncWebhookResponse>) {
-    match sync_and_rebundle_recipes(&state.recipes_dir, &state.cache_dir) {
-        Ok((count, hash, git_updated)) => (
+    let recipes_dir = state.recipes_dir.clone();
+    let cache_dir = state.cache_dir.clone();
+    let result = tokio::task::spawn_blocking(move || {
+        sync_and_rebundle_recipes(&recipes_dir, &cache_dir)
+    })
+    .await;
+
+    match result {
+        Ok(Ok((count, hash, git_updated))) => (
             StatusCode::OK,
             Json(SyncWebhookResponse {
                 status: "ok".to_string(),
@@ -287,11 +325,21 @@ async fn recipes_refresh_handler(
                 git_updated,
             }),
         ),
-        Err(e) => (
+        Ok(Err(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(SyncWebhookResponse {
                 status: "error".to_string(),
                 message: format!("Failed to refresh recipes: {:#}", e),
+                package_count: 0,
+                sha256: None,
+                git_updated: false,
+            }),
+        ),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(SyncWebhookResponse {
+                status: "error".to_string(),
+                message: format!("Task execution error: {:#}", e),
                 package_count: 0,
                 sha256: None,
                 git_updated: false,

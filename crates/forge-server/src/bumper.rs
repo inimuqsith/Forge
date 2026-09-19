@@ -77,43 +77,53 @@ impl RecipeBumper {
 
     /// Audit seluruh resep di direktori recipes/ secara paralel (ultra-fast)
     pub async fn audit_all(recipes_dir: &Path) -> Result<Vec<UpstreamVersionCheck>> {
-        let mut tasks = Vec::new();
-        let categories = ["system", "core", "extra"];
+        let recipes_dir_buf = recipes_dir.to_path_buf();
+        let loaded_recipes = tokio::task::spawn_blocking(move || {
+            let mut list = Vec::new();
+            let categories = ["system", "core", "extra"];
 
-        for cat in &categories {
-            let cat_dir = recipes_dir.join(cat);
-            if !cat_dir.exists() {
-                continue;
-            }
+            for cat in &categories {
+                let cat_dir = recipes_dir_buf.join(cat);
+                if !cat_dir.exists() {
+                    continue;
+                }
 
-            if let Ok(entries) = std::fs::read_dir(&cat_dir) {
-                for entry in entries.flatten() {
-                    let pkg_dir = entry.path();
-                    let recipe_file = pkg_dir.join("recipe.toml");
-                    if recipe_file.is_file() {
-                        if let Ok(content) = std::fs::read_to_string(&recipe_file) {
-                            if let Ok(recipe) = toml::from_str::<forge::Recipe>(&content) {
-                                let cat_str = cat.to_string();
-                                tasks.push(tokio::spawn(async move {
-                                    match Self::check_upstream(&recipe, &cat_str).await {
-                                        Ok(check) => check,
-                                        Err(_) => UpstreamVersionCheck {
-                                            name: recipe.package.name,
-                                            category: cat_str,
-                                            current_version: recipe.package.version,
-                                            latest_version: None,
-                                            has_update: false,
-                                            source_url: None,
-                                            new_sha256: None,
-                                            provider: "Unreachable".to_string(),
-                                        },
-                                    }
-                                }));
+                if let Ok(entries) = std::fs::read_dir(&cat_dir) {
+                    for entry in entries.flatten() {
+                        let pkg_dir = entry.path();
+                        let recipe_file = pkg_dir.join("recipe.toml");
+                        if recipe_file.is_file() {
+                            if let Ok(content) = std::fs::read_to_string(&recipe_file) {
+                                if let Ok(recipe) = toml::from_str::<forge::Recipe>(&content) {
+                                    list.push((recipe, cat.to_string()));
+                                }
                             }
                         }
                     }
                 }
             }
+            list
+        })
+        .await
+        .context("Gagal membaca daftar resep dari disk")?;
+
+        let mut tasks = Vec::new();
+        for (recipe, cat_str) in loaded_recipes {
+            tasks.push(tokio::spawn(async move {
+                match Self::check_upstream(&recipe, &cat_str).await {
+                    Ok(check) => check,
+                    Err(_) => UpstreamVersionCheck {
+                        name: recipe.package.name,
+                        category: cat_str,
+                        current_version: recipe.package.version,
+                        latest_version: None,
+                        has_update: false,
+                        source_url: None,
+                        new_sha256: None,
+                        provider: "Unreachable".to_string(),
+                    },
+                }
+            }));
         }
 
         let mut results = Vec::new();
@@ -133,7 +143,8 @@ impl RecipeBumper {
         new_version: &str,
         fetch_sha: bool,
     ) -> Result<(String, Option<String>)> {
-        let content = std::fs::read_to_string(recipe_path)
+        let content = tokio::fs::read_to_string(recipe_path)
+            .await
             .with_context(|| format!("Gagal membaca recipe di {:?}", recipe_path))?;
 
         let recipe: forge::Recipe = toml::from_str(&content)
@@ -220,7 +231,7 @@ impl RecipeBumper {
         }
 
         let new_content = modified_lines.join("\n") + "\n";
-        std::fs::write(recipe_path, new_content)?;
+        tokio::fs::write(recipe_path, new_content).await?;
 
         Ok((old_version, new_sha256))
     }
@@ -235,7 +246,7 @@ impl RecipeBumper {
         let recipe_path = find_recipe_file(recipes_dir, pkg_name)
             .with_context(|| format!("Resep paket '{}' tidak ditemukan di {:?}", pkg_name, recipes_dir))?;
 
-        let content = std::fs::read_to_string(&recipe_path)?;
+        let content = tokio::fs::read_to_string(&recipe_path).await?;
         let recipe: forge::Recipe = toml::from_str(&content)?;
 
         let version_to_set = if let Some(ver) = target_version {

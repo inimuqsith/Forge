@@ -383,9 +383,9 @@ fn main() -> Result<()> {
 
                     if auto_push && bumped_count > 0 {
                         println!("{} Mem-push perubahan langsung ke GitHub (Single Source of Truth)...", "[*]".blue());
-                        let _ = std::process::Command::new("git").args(["add", "recipes"]).status();
-                        let _ = std::process::Command::new("git").args(["commit", "-m", "chore(recipes): automated upstream recipe version bump"]).status();
-                        let push_status = std::process::Command::new("git").args(["push", "origin", "main"]).status();
+                        let _ = tokio::process::Command::new("git").args(["add", "recipes"]).status().await;
+                        let _ = tokio::process::Command::new("git").args(["commit", "-m", "chore(recipes): automated upstream recipe version bump"]).status().await;
+                        let push_status = tokio::process::Command::new("git").args(["push", "origin", "main"]).status().await;
                         if let Ok(st) = push_status {
                             if st.success() {
                                 println!("{} Berhasil di-push ke GitHub!", "✓".green());
@@ -401,10 +401,10 @@ fn main() -> Result<()> {
 
                     if auto_push {
                         println!("{} Mem-push perubahan langsung ke GitHub (Single Source of Truth)...", "[*]".blue());
-                        let _ = std::process::Command::new("git").args(["add", "recipes"]).status();
+                        let _ = tokio::process::Command::new("git").args(["add", "recipes"]).status().await;
                         let commit_msg = format!("chore(recipes): bump {} to latest version", pkg);
-                        let _ = std::process::Command::new("git").args(["commit", "-m", &commit_msg]).status();
-                        let push_status = std::process::Command::new("git").args(["push", "origin", "main"]).status();
+                        let _ = tokio::process::Command::new("git").args(["commit", "-m", &commit_msg]).status().await;
+                        let push_status = tokio::process::Command::new("git").args(["push", "origin", "main"]).status().await;
                         if let Ok(st) = push_status {
                             if st.success() {
                                 println!("{} Berhasil di-push ke GitHub!", "✓".green());

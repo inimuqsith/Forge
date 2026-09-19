@@ -201,11 +201,6 @@ impl StageExporter {
         } else {
             let _ = fs::create_dir_all(&tmp_dir);
         }
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            let _ = fs::set_permissions(&tmp_dir, fs::Permissions::from_mode(0o1777));
-        }
 
         // Bersihkan isi /var/cache/* (misal /var/cache/forge/sync/*)
         let var_cache = staging_copy.join("var/cache");
