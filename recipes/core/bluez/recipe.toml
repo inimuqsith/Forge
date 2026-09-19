@@ -1,0 +1,53 @@
+[package]
+name = "bluez"
+version = "5.87"
+release = 1
+slot = "0"
+description = "Official Linux Bluetooth protocol stack with OpenRC service"
+license = "GPL-2.0-or-later"
+upstream = "http://www.bluez.org"
+
+[dependencies]
+runtime = ["glibc", "dbus", "glib2", "eudev", "readline"]
+build = ["gcc", "make", "pkgconf", "libtool"]
+
+[sources]
+urls = [
+    "https://mirrors.edge.kernel.org/pub/linux/bluetooth/bluez-5.87.tar.xz"
+]
+sha256 = [
+    "26bdcf2cebd7310c6f598850606b037ef0c515fe6608ebc54d22c50c4c32b35f"
+]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/bluez-${pkgver}"
+./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --enable-library \
+    --enable-tools \
+    --enable-cups=no \
+    --enable-systemd=no \
+    --disable-systemd
+make ${MAKEFLAGS}
+DESTDIR="${DESTDIR}" make install
+
+# Pasang OpenRC init script
+mkdir -p "${DESTDIR}/etc/init.d"
+cat << 'EOF' > "${DESTDIR}/etc/init.d/bluetooth"
+#!/sbin/openrc-run
+description="Bluetooth Subsystem Daemon"
+command="/usr/libexec/bluetooth/bluetoothd"
+command_background="yes"
+pidfile="/run/bluetoothd.pid"
+
+depend() {
+    need dbus
+    after udev
+}
+EOF
+chmod 755 "${DESTDIR}/etc/init.d/bluetooth"
+"""

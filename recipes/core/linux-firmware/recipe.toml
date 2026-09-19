@@ -1,0 +1,28 @@
+[package]
+name = "linux-firmware"
+version = "20260916"
+release = 1
+slot = "0"
+description = "Firmware files for Linux kernel drivers (Wi-Fi, GPU, Bluetooth, Audio SOF)"
+license = "Custom"
+upstream = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git"
+
+[dependencies]
+runtime = []
+build = ["make"]
+
+[sources]
+urls = [
+    "https://mirrors.edge.kernel.org/pub/linux/kernel/firmware/linux-firmware-20260916.tar.xz"
+]
+sha256 = [
+    "f80dcb757a623deda62200c08e0e1a88c76fb6b54964f31b35fa74da1c90ccc5"
+]
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/linux-firmware-${pkgver}"
+mkdir -p "${DESTDIR}/usr/lib/firmware"
+make DESTDIR="${DESTDIR}" FIRMWAREDIR="/usr/lib/firmware" install
+"""

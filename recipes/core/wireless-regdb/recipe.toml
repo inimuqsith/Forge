@@ -1,0 +1,30 @@
+[package]
+name = "wireless-regdb"
+version = "2026.09.03"
+release = 1
+slot = "0"
+description = "Wireless regulatory database for Linux kernel and CRDA"
+license = "ISC"
+upstream = "https://wireless.docs.kernel.org/en/latest/en/developers/regulatory/wireless-regdb.html"
+
+[dependencies]
+runtime = []
+build = []
+
+[sources]
+urls = [
+    "https://mirrors.edge.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-2026.09.03.tar.xz"
+]
+sha256 = [
+    "b22e0901227b820cd1c280abe681a15b773a5103a5e10dc442e94ebb34cbf58d"
+]
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/wireless-regdb-${pkgver}"
+mkdir -p "${DESTDIR}/usr/lib/firmware"
+mkdir -p "${DESTDIR}/usr/share/man/man5"
+install -m 644 regulatory.db regulatory.db.p7s "${DESTDIR}/usr/lib/firmware/"
+install -m 644 regulatory.db.5 "${DESTDIR}/usr/share/man/man5/" 2>/dev/null || true
+"""

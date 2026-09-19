@@ -9,9 +9,9 @@
 | Kategori | Total Paket | Status Kesiapan | Deskripsi Ruang Lingkup |
 | :--- | :---: | :---: | :--- |
 | **`recipes/system/`** | 23 | ✅ 100% Verified | Fondasi OS, Kernel & Toolchain Kompilasi |
-| **`recipes/core/`** | 66 | ✅ 100% Verified | Sistem Inti, Storage, Filesystem, Networking, Security & Bootloader |
+| **`recipes/core/`** | 72 | ✅ 100% Verified | Sistem Inti, Storage, Filesystem, Networking, Security & Bootloader |
 | **`recipes/extra/`** | 100 | ✅ 100% Verified | Development Tools, CLI Modern, Desktop Apps, Audio, Qt6 & KDE Plasma 6 Desktop |
-| **TOTAL RESEP RESMI** | **189** | **✅ 100% Audited** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Audio, Qt6 & KDE Plasma 6)** |
+| **TOTAL RESEP RESMI** | **195** | **✅ 100% Audited** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Hardware, Firmware, Audio, Qt6 & KDE Plasma 6)** |
 
 ---
 
@@ -31,7 +31,7 @@
 | **`gcc`** | `16.2.0` | ✅ Verified | - | - | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
 | **`glibc`** | `2.44` | ✅ Verified | - | - | GNU C Library (Standard Core System C Library - Latest 2.44) |
 | **`libtool`** | `2.6.2` | ✅ Verified | - | - | Generic library support script |
-| **`linux-cachyos-bore`** | `6.14.0_git` | ✅ Verified | `kmod`, `eudev` | `clang`, `llvm`, `mold`, `make`, `bc`, `bison`, `flex`, `zstd` | Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO |
+| **`linux-cachyos-bore`** | `6.17.9` | ✅ Verified | `kmod`, `eudev` | `clang`, `llvm`, `mold`, `make`, `bc`, `bison`, `flex`, `zstd` | Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO |
 | **`linux-headers`** | `7.2` | ✅ Verified | - | - | Linux kernel API headers for userspace |
 | **`llvm`** | `23.1.1` | ✅ Verified | - | - | LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22) |
 | **`m4`** | `1.4.21` | ✅ Verified | - | - | GNU Macro Processor |
@@ -45,15 +45,17 @@
 
 ---
 
-## 2. Kategori `recipes/core/` (65 Paket — Sistem Inti, Storage, Filesystem, Networking, Security & Bootloader)
+## 2. Kategori `recipes/core/` (72 Paket — Sistem Inti, Storage, Filesystem, Networking, Security & Bootloader)
 
 | Paket | Versi Hulu | Status | Runtime Dependencies | Build Dependencies | Deskripsi |
 | :--- | :---: | :---: | :--- | :--- | :--- |
 | **`acl`** | `2.4.0` | ✅ Verified | - | - | Access control list utilities and library |
 | **`acpid`** | `2.0.34` | ✅ Verified | - | - | Flexible and extensible ACPI event daemon |
+| **`amd-ucode`** | `20260916` | ✅ Verified | - | - | Microcode update image and firmware for AMD CPUs |
 | **`bash`** | `5.3` | ✅ Verified | - | - | GNU Bourne Again SHell |
 | **`btrfs-progs`** | `7.1` | ✅ Verified | - | - | Btrfs filesystem utilities |
 | **`bubblewrap`** | `0.12.0` | ✅ Verified | `glibc`, `libcap` | `gcc`, `meson`, `ninja`, `pkgconf` | Unprivileged sandboxing tool based on Linux user namespaces |
+| **`bluez`** | `5.87` | ✅ Verified | `glibc`, `dbus`, `glib2`, `eudev`, `readline` | `gcc`, `make`, `pkgconf`... | Official Linux Bluetooth protocol stack with OpenRC service |
 | **`bzip2`** | `1.0.8` | ✅ Verified | - | - | A high-quality data compression program |
 | **`ca-certificates`** | `20260909` | ✅ Verified | - | - | Common CA root certificates bundle from Mozilla |
 | **`coreutils`** | `9.12` | ✅ Verified | - | - | The basic file, shell and text manipulation utilities of the GNU operating system |
@@ -80,13 +82,16 @@
 | **`hwdata`** | `0.411` | ✅ Verified | - | - | Hardware identification databases (pci.ids, usb.ids, oui.txt) |
 | **`iproute2`** | `7.2.0` | ✅ Verified | - | - | IP routing and network device configuration suite (ip, ss, tc) |
 | **`iptables`** | `1.8.11` | ✅ Verified | - | - | Linux kernel packet filtering and NAT control utility |
+| **`intel-ucode`** | `20260812` | ✅ Verified | - | - | Microcode update files and early-initramfs image for Intel CPUs |
 | **`kbd`** | `2.10.0` | ✅ Verified | - | - | Keytable files and keyboard utilities (loadkeys, setfont) |
 | **`kmod`** | `34.2` | ✅ Verified | - | - | Linux kernel module management tools and library (lsmod, modprobe, insmod) |
 | **`less`** | `710` | ✅ Verified | - | - | A terminal based program for viewing text files |
 | **`libarchive`** | `3.8.9` | ✅ Verified | - | - | Multi-format archive and compression library (bsdtar, bsdcpio) |
 | **`libcap`** | `2.78` | ✅ Verified | - | - | POSIX 1003.1e capabilities library and tools (setcap, getcap) |
 | **`libseccomp`** | `2.6.1` | ✅ Verified | - | - | Enhanced Seccomp library and kernel syscall filtering interface |
+| **`linux-firmware`** | `20260916` | ✅ Verified | - | `make` | Firmware files for Linux kernel drivers (Wi-Fi, GPU, Bluetooth, Audio SOF) |
 | **`man-pages`** | `6.19` | ✅ Verified | - | - | Linux system documentation manual pages |
+| **`mkinitcpio`** | `42` | ✅ Verified | `bash`, `kmod`, `coreutils`, `util-linux` | `make` | Modular and fast initramfs creation utility for Linux |
 | **`nano`** | `9.2` | ✅ Verified | - | - | Pico editor clone with enhancements |
 | **`ncurses`** | `6.5` | ✅ Verified | - | - | System V Release 4.0 curses emulation library |
 | **`nftables`** | `1.1.1` | ✅ Verified | - | - | Netfilter userspace packet filtering framework |
@@ -109,6 +114,7 @@
 | **`util-linux`** | `2.42.3` | ✅ Verified | - | - | Miscellaneous system utilities for Linux |
 | **`wget`** | `1.25.0` | ✅ Verified | - | - | Network utility to retrieve files from the Web using HTTP, HTTPS and FTP |
 | **`which`** | `2.25` | ✅ Verified | - | - | Displays where a particular program is found in the path |
+| **`wireless-regdb`** | `2026.09.03` | ✅ Verified | - | - | Wireless regulatory database for Linux kernel and CRDA |
 | **`wpa_supplicant`** | `2.12` | ✅ Verified | - | - | WPA/WPA2/WPA3 and IEEE 802.1X wireless client daemon |
 | **`xfsprogs`** | `7.2.0` | ✅ Verified | - | - | XFS filesystem utilities |
 | **`xz`** | `5.8.4` | ✅ Verified | - | - | Free general-purpose data compression software with high compression ratio (LZMA2) |

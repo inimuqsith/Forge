@@ -1,0 +1,27 @@
+[package]
+name = "mkinitcpio"
+version = "42"
+release = 1
+slot = "0"
+description = "Modular and fast initramfs creation utility for Linux"
+license = "GPL-2.0-only"
+upstream = "https://wiki.archlinux.org/title/Mkinitcpio"
+
+[dependencies]
+runtime = ["bash", "kmod", "coreutils", "util-linux", "zstd", "findutils"]
+build = ["make"]
+
+[sources]
+urls = [
+    "https://github.com/archlinux/mkinitcpio/archive/refs/tags/v42.tar.gz"
+]
+sha256 = [
+    "b61c0361d4ae125e429bee419064ad2c6a8d3e6da1882fc8f20002947f840528"
+]
+
+[build]
+type = "custom"
+script = """
+cd "${srcdir}/mkinitcpio-${pkgver}"
+make DESTDIR="${DESTDIR}" PREFIX=/usr install
+"""

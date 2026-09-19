@@ -1,6 +1,6 @@
 [package]
 name = "linux-cachyos-bore"
-version = "6.14.0_git"
+version = "6.17.9"
 release = 1
 slot = "cachyos-bore"
 description = "Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO"
