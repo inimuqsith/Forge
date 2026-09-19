@@ -21,6 +21,35 @@ pub struct RecipeBumper;
 impl RecipeBumper {
     /// Periksa versi hulu (upstream) untuk satu resep paket
     pub async fn check_upstream(recipe: &forge::Recipe, category: &str) -> Result<UpstreamVersionCheck> {
+        // 0. Deteksi dan kecualikan paket Git VCS (Live / Rolling Git repository)
+        let is_git_vcs = recipe.package.version == "git"
+            || recipe.package.version.ends_with("_git")
+            || recipe.package.version.ends_with("-git")
+            || recipe.sources.as_ref().map_or(false, |s| s.urls.iter().any(|u| u.ends_with(".git") || u.contains(".git#")));
+
+        if is_git_vcs {
+            let branch = recipe.sources.as_ref().and_then(|s| {
+                s.urls.iter().find_map(|u| {
+                    if let Some(pos) = u.find("#branch=") {
+                        Some(u[pos + 8..].to_string())
+                    } else {
+                        None
+                    }
+                })
+            }).unwrap_or_else(|| "master".to_string());
+
+            return Ok(UpstreamVersionCheck {
+                name: recipe.package.name.clone(),
+                category: category.to_string(),
+                current_version: recipe.package.version.clone(),
+                latest_version: Some(recipe.package.version.clone()),
+                has_update: false,
+                source_url: None,
+                new_sha256: None,
+                provider: format!("Git VCS (Live Branch: {})", branch),
+            });
+        }
+
         let client = reqwest::Client::builder()
             .timeout(std::time::Duration::from_secs(10))
             .user_agent("Forge-Server-Bumper/0.1.0 (KuraLinux Distro Engine)")
@@ -701,6 +730,34 @@ script = "ninja"
         let parsed: forge::Recipe = toml::from_str(&updated_content)?;
         assert_eq!(parsed.package.version, "0.12.0");
         assert_eq!(parsed.sources.unwrap().sha256.len(), 1);
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_git_vcs_package_exemption_in_audit() -> Result<()> {
+        let recipe_toml = r#"[package]
+name = "linux-cachyos-bore"
+version = "git"
+release = 1
+slot = "cachyos-bore"
+description = "Linux CachyOS Kernel"
+
+[sources]
+urls = [
+    "https://github.com/CachyOS/linux-cachyos.git#branch=master"
+]
+sha256 = [
+    "SKIP"
+]
+"#;
+        let recipe: forge::Recipe = toml::from_str(recipe_toml)?;
+        let check = RecipeBumper::check_upstream(&recipe, "system").await?;
+        assert_eq!(check.current_version, "git");
+        assert_eq!(check.latest_version, Some("git".to_string()));
+        assert!(!check.has_update);
+        assert!(check.provider.contains("Git VCS"));
+        assert!(check.provider.contains("master"));
 
         Ok(())
     }

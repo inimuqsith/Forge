@@ -1,6 +1,6 @@
 [package]
 name = "linux-cachyos-bore"
-version = "6.17.9"
+version = "git"
 release = 1
 slot = "cachyos-bore"
 description = "Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO"
@@ -16,7 +16,7 @@ build = [
 
 [sources]
 urls = [
-    "https://github.com/CachyOS/linux-cachyos.git"
+    "https://github.com/CachyOS/linux-cachyos.git#branch=master"
 ]
 sha256 = [
     "SKIP"

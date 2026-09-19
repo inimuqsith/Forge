@@ -31,7 +31,7 @@
 | **`gcc`** | `16.2.0` | ✅ Verified | - | - | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
 | **`glibc`** | `2.44` | ✅ Verified | - | - | GNU C Library (Standard Core System C Library - Latest 2.44) |
 | **`libtool`** | `2.6.2` | ✅ Verified | - | - | Generic library support script |
-| **`linux-cachyos-bore`** | `6.17.9` | ✅ Verified | `kmod`, `eudev` | `clang`, `llvm`, `mold`, `make`, `bc`, `bison`, `flex`, `zstd` | Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO |
+| **`linux-cachyos-bore`** | `git` | ✅ Verified | `kmod`, `eudev` | `clang`, `llvm`, `mold`, `make`, `bc`, `bison`, `flex`, `zstd` | Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO |
 | **`linux-headers`** | `7.2` | ✅ Verified | - | - | Linux kernel API headers for userspace |
 | **`llvm`** | `23.1.1` | ✅ Verified | - | - | LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22) |
 | **`m4`** | `1.4.21` | ✅ Verified | - | - | GNU Macro Processor |
