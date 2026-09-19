@@ -9,13 +9,23 @@ use crate::{BuildMeta, ForgeConfig, PackageMetadata, Recipe};
 /// Daftar paket tingkat rendah / bare-metal / bootloader yang wajib otomatis
 /// dikecualikan dari optimasi agresif (-march=native / SIMD / mold) demi mencegah triple-fault dan kegagalan boot.
 pub const SENSITIVE_BAREMETAL_PACKAGES: &[&str] = &[
-    "glibc",
+    // Tier 1: Bootloader & Bare-Metal
     "grub",
     "efibootmgr",
+    "efivar",
     "syslinux",
     "memtest86+",
+    "edk2",
+    "ovmf",
+    // Tier 2: C Library & Dynamic Linker
+    "glibc",
+    "musl",
+    // Tier 3: Ring-0 Kernel & Module Loader
+    "linux",
+    "kmod",
+    // Tier 4: Emulators, JIT & Low-Level Debuggers
     "valgrind",
-    "efivar",
+    "gdb",
 ];
 
 pub struct RecipeBuilder;
@@ -462,14 +472,20 @@ chmod +x "$DESTDIR/usr/bin/client-test-bin"
     fn test_sensitive_baremetal_packages_are_auto_exempted() {
         let empty_meta = BuildMeta::default();
 
-        // 1. Paket dalam daftar bawaan SENSITIVE_BAREMETAL_PACKAGES harus otomatis exempt
+        // 1. Paket dalam daftar bawaan SENSITIVE_BAREMETAL_PACKAGES (4 Tier) harus otomatis exempt
         assert!(RecipeBuilder::is_compiler_exempt("glibc", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("musl", &empty_meta));
         assert!(RecipeBuilder::is_compiler_exempt("grub", &empty_meta));
         assert!(RecipeBuilder::is_compiler_exempt("efibootmgr", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("efivar", &empty_meta));
         assert!(RecipeBuilder::is_compiler_exempt("syslinux", &empty_meta));
         assert!(RecipeBuilder::is_compiler_exempt("memtest86+", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("edk2", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("ovmf", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("linux", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("kmod", &empty_meta));
         assert!(RecipeBuilder::is_compiler_exempt("valgrind", &empty_meta));
-        assert!(RecipeBuilder::is_compiler_exempt("efivar", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("gdb", &empty_meta));
 
         // 2. Paket aplikasi biasa tanpa override TIDAK BOLEH exempt (wajib Clang + mold + -march=native)
         assert!(!RecipeBuilder::is_compiler_exempt("fastfetch", &empty_meta));
