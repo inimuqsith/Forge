@@ -632,13 +632,13 @@ impl DependencyGraph {
 pub struct DependencyResolver;
 
 impl DependencyResolver {
-    /// Selesaikan seluruh pohon dependensi untuk target yang diminta
-    pub fn resolve(
+    /// Bangun graf dependensi lengkap tanpa melakukan pengurutan topologis
+    pub fn build_graph(
         target: &str,
         config: &ForgeConfig,
         custom_use_engine: Option<&UseFlagsEngine>,
         custom_scanner: Option<&RecipeScanner>,
-    ) -> Result<ResolutionPlan> {
+    ) -> Result<DependencyGraph> {
         let default_scanner = RecipeScanner::new(Some(vec![PathBuf::from(&config.general.recipes_path)]));
         let scanner = custom_scanner.unwrap_or(&default_scanner);
 
@@ -659,7 +659,17 @@ impl DependencyResolver {
             &mut visited_packages,
         )?;
 
-        // Lakukan pengurutan topologis
+        Ok(graph)
+    }
+
+    /// Selesaikan seluruh pohon dependensi untuk target yang diminta
+    pub fn resolve(
+        target: &str,
+        config: &ForgeConfig,
+        custom_use_engine: Option<&UseFlagsEngine>,
+        custom_scanner: Option<&RecipeScanner>,
+    ) -> Result<ResolutionPlan> {
+        let graph = Self::build_graph(target, config, custom_use_engine, custom_scanner)?;
         graph.topological_sort(target)
     }
 

@@ -282,3 +282,5 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-046** | Asynchronous Non-Blocking Streaming Decompression (`async-compression`) | ✅ Diterapkan |
 | **ADR-047** | Pre-Flight Root Privilege Enforcement & Sudo/Doas Transparent Auto-Escalation | ✅ Diterapkan |
 | **ADR-048** | Generic Post-Merge File Triggers & Hooks Engine (`HookEngine`) | ✅ Diterapkan |
+| **ADR-049** | Wavefront Parallel DAG Scheduler & Multi-Worker Build Pool (`WavefrontScheduler`) | ✅ Diterapkan |
+

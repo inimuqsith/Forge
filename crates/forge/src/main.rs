@@ -3,9 +3,9 @@ use clap::{Parser, Subcommand};
 use colored::*;
 use forge::{
     BinhostClient, CpuProfile, DependencyResolver, ForgeConfig, ForgeLockGuard, InstalledDatabase,
-    MergeTransaction, PackageCascadeResolver, PackageManifest, PackageMetadata, PackageProvider,
-    RecipeBuilder, RecipeImporter, StageExportOptions, StageExporter, StageFormat, SyncClient,
-    ToolchainComponent, ToolchainManager,
+    MergeTransaction, PackageCascadeResolver, PackageProvider, RecipeBuilder, RecipeImporter,
+    StageExportOptions, StageExporter, StageFormat, SyncClient, ToolchainComponent,
+    ToolchainManager, WavefrontScheduler,
 };
 use std::path::{Path, PathBuf};
 
@@ -47,6 +47,10 @@ enum Commands {
         /// Paksa kompilasi lokal dari source code (alias untuk --native)
         #[arg(long, hide = true)]
         build_source: bool,
+
+        /// Jumlah worker kompilasi paralel (misal: -j8 atau --jobs 8)
+        #[arg(short = 'j', long)]
+        jobs: Option<usize>,
     },
 
     /// Hapus paket secara bersih berdasarkan manifest
@@ -176,6 +180,7 @@ fn main() -> Result<()> {
             native,
             interactive,
             build_source,
+            jobs,
         } => {
             let config = ForgeConfig::load_or_default(None);
             let target_root = PathBuf::from(&config.general.root);
@@ -279,10 +284,18 @@ fn main() -> Result<()> {
                     );
 
                     println!("  [🔍] Menghitung graf dependensi (DAG) & USE flags untuk '{}'...", target.bold().yellow());
-                    let plan = match DependencyResolver::resolve(&target, &config, None, None) {
+                    let graph = match DependencyResolver::build_graph(&target, &config, None, None) {
+                        Ok(g) => g,
+                        Err(e) => {
+                            println!("{} Gagal memetakan graf dependensi target {}: {:#}", "✗".red(), target.bold(), e);
+                            return Ok(());
+                        }
+                    };
+
+                    let plan = match graph.topological_sort(&target) {
                         Ok(p) => p,
                         Err(e) => {
-                            println!("{} Gagal menyelesaikan dependensi target {}: {:#}", "✗".red(), target.bold(), e);
+                            println!("{} Gagal menyelesaikan urutan topologis target {}: {:#}", "✗".red(), target.bold(), e);
                             return Ok(());
                         }
                     };
@@ -308,94 +321,11 @@ fn main() -> Result<()> {
                             step.recipe_path.display().to_string().dimmed()
                         );
                     }
-                    println!("\n{} Memulai proses kompilasi & instalasi secara bertahap...", "✓".green());
 
-                    for step in &plan.steps {
-                        let pkg_name = &step.package_id.name;
-                        let pkg_slot = &step.package_id.slot;
-                        let pkg_ver = &step.version;
-
-                        if step.is_meta {
-                            println!("\n>>> Memproses meta-paket: {}", pkg_name.bold().magenta());
-                            let dummy_manifest = PackageManifest {
-                                package_name: pkg_name.clone(),
-                                package_version: pkg_ver.clone(),
-                                release: 1,
-                                slot: pkg_slot.clone(),
-                                entries: Vec::new(),
-                                metadata: Some(PackageMetadata {
-                                    name: pkg_name.clone(),
-                                    version: pkg_ver.clone(),
-                                    release: 1,
-                                    slot: pkg_slot.clone(),
-                                    description: format!("Kura Linux Meta Package: {}", pkg_name),
-                                    url: "".to_string(),
-                                    license: "GPL-3.0".to_string(),
-                                    upstream: "".to_string(),
-                                    build_time: std::time::SystemTime::now()
-                                        .duration_since(std::time::UNIX_EPOCH)
-                                        .unwrap_or_default()
-                                        .as_secs(),
-                                    target_march: config.cpu.target_march.clone(),
-                                    cflags: config.build.cflags.clone(),
-                                    use_flags: config.use_flags.flags.clone(),
-                                    files_count: 0,
-                                    installed_size: 0,
-                                }),
-                                use_flags: Some(config.use_flags.flags.clone()),
-                                cflags: Some(config.build.cflags.clone()),
-                            };
-                            if let Err(e) = db.record_package(&dummy_manifest, &target_root) {
-                                eprintln!("  [!] Gagal mencatat manifest meta-paket: {:#}", e);
-                            } else {
-                                println!("  [✓] Meta-paket '{}' berhasil dicatat.", pkg_name.green());
-                            }
-                            continue;
-                        }
-
-                        println!(
-                            "\n>>> Mengompilasi [{}/{}]: {} v{}",
-                            step.step_number, plan.total_packages, pkg_name.bold().green(), pkg_ver
-                        );
-                        let staging_dir = std::env::temp_dir()
-                            .join("forge")
-                            .join("stage")
-                            .join(format!("{}-{}", pkg_name, pkg_ver));
-                        if staging_dir.exists() {
-                            let _ = std::fs::remove_dir_all(&staging_dir);
-                        }
-                        std::fs::create_dir_all(&staging_dir)?;
-
-                        if let Err(e) = RecipeBuilder::build(&step.recipe_path, &config, &staging_dir, None) {
-                            println!("{} Gagal mengompilasi resep {}: {:#}", "✗".red(), pkg_name.bold(), e);
-                            std::process::exit(1);
-                        }
-
-                        let mut tx = MergeTransaction::new(
-                            pkg_name,
-                            pkg_ver,
-                            pkg_slot,
-                            &staging_dir,
-                            &target_root,
-                            PathBuf::from(&config.general.db_path),
-                        );
-                        tx.cflags = Some(config.build.cflags.clone());
-                        tx.use_flags = Some(config.use_flags.flags.clone());
-
-                        match tx.execute_merge(&db) {
-                            Ok(manifest) => {
-                                println!(
-                                    "  [✓] Paket '{}' v{} sukses digabungkan ({} berkas)",
-                                    pkg_name.bold().green(),
-                                    pkg_ver,
-                                    manifest.entries.len()
-                                );
-                            }
-                            Err(e) => {
-                                println!("{} Gagal menggabungkan paket {} ke sistem: {:#}", "✗".red(), pkg_name.bold(), e);
-                                std::process::exit(1);
-                            }
-                        }
+                    let scheduler = WavefrontScheduler::new(config.clone(), jobs);
+                    if let Err(e) = scheduler.execute(&graph, &plan, &target_root, &db) {
+                        println!("{} Eksekusi kompilasi paralel DAG gagal: {:#}", "✗".red(), e);
+                        std::process::exit(1);
                     }
 
                     println!(
