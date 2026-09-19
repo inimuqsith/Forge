@@ -21,6 +21,7 @@ pub struct BuildSummary {
     pub total_packages: usize,
     pub compiled_packages: usize,
     pub meta_packages: usize,
+    pub skipped_packages: usize,
     pub total_files_installed: usize,
     pub elapsed_seconds: f64,
     pub failed_packages: Vec<String>,
@@ -32,6 +33,8 @@ pub struct SchedulerConfig {
     pub jobs: usize,
     pub clean_staging: bool,
     pub dry_run: bool,
+    pub rebuild_deps: bool,
+    pub reinstall: bool,
 }
 
 impl Default for SchedulerConfig {
@@ -40,6 +43,8 @@ impl Default for SchedulerConfig {
             jobs: Self::detect_default_jobs(None),
             clean_staging: true,
             dry_run: false,
+            rebuild_deps: false,
+            reinstall: false,
         }
     }
 }
@@ -50,6 +55,8 @@ impl SchedulerConfig {
             jobs: Self::detect_default_jobs(jobs),
             clean_staging: true,
             dry_run: false,
+            rebuild_deps: false,
+            reinstall: false,
         }
     }
 
@@ -84,6 +91,11 @@ enum TaskEvent {
         version: String,
         is_meta: bool,
     },
+    Skipped {
+        worker_id: usize,
+        package_id: PackageId,
+        version: String,
+    },
     Success {
         worker_id: usize,
         package_id: PackageId,
@@ -108,6 +120,15 @@ pub struct WavefrontScheduler {
 
 impl WavefrontScheduler {
     pub fn new(config: ForgeConfig, jobs: Option<usize>) -> Self {
+        Self::with_options(config, jobs, false, false)
+    }
+
+    pub fn with_options(
+        config: ForgeConfig,
+        jobs: Option<usize>,
+        rebuild_deps: bool,
+        reinstall: bool,
+    ) -> Self {
         let effective_jobs = if let Some(j) = jobs {
             j
         } else if !config.build.jobs.is_empty() {
@@ -122,6 +143,8 @@ impl WavefrontScheduler {
                 jobs: effective_jobs.max(1),
                 clean_staging: true,
                 dry_run: false,
+                rebuild_deps,
+                reinstall,
             },
         }
     }
@@ -150,6 +173,7 @@ impl WavefrontScheduler {
                 total_packages: 0,
                 compiled_packages: 0,
                 meta_packages: 0,
+                skipped_packages: 0,
                 total_files_installed: 0,
                 elapsed_seconds: 0.0,
                 failed_packages: Vec::new(),
@@ -186,6 +210,7 @@ impl WavefrontScheduler {
         let mut worker_counter = 0usize;
         let mut compiled_count = 0usize;
         let mut meta_count = 0usize;
+        let mut skipped_count = 0usize;
 
         // 3. Loop Dispatcher & Event Processor
         while completed.len() < total_packages {
@@ -226,61 +251,80 @@ impl WavefrontScheduler {
                         });
                     });
                 } else {
-                    // Source package: eksekusi di worker thread
-                    compiled_count += 1;
-                    let tx_clone = tx.clone();
-                    let config_clone = self.config.clone();
-                    let node_clone = node.clone();
+                    let is_target = node.id.name == plan.target;
+                    let already_installed = is_installed_and_matches(&node, db);
+                    let should_skip = if is_target {
+                        already_installed && !self.scheduler_cfg.reinstall && !self.scheduler_cfg.rebuild_deps
+                    } else {
+                        already_installed && !self.scheduler_cfg.rebuild_deps
+                    };
 
-                    thread::spawn(move || {
-                        let task_start = Instant::now();
-                        let _ = tx_clone.send(TaskEvent::Started {
-                            worker_id,
-                            package_id: node_clone.id.clone(),
-                            version: node_clone.version.clone(),
-                            is_meta: false,
+                    if should_skip {
+                        let tx_clone = tx.clone();
+                        thread::spawn(move || {
+                            let _ = tx_clone.send(TaskEvent::Skipped {
+                                worker_id,
+                                package_id: node.id.clone(),
+                                version: node.version.clone(),
+                            });
                         });
+                    } else {
+                        // Source package: eksekusi di worker thread
+                        compiled_count += 1;
+                        let tx_clone = tx.clone();
+                        let config_clone = self.config.clone();
+                        let node_clone = node.clone();
 
-                        let staging_dir = std::env::temp_dir()
-                            .join("forge")
-                            .join("stage")
-                            .join(format!("{}-{}", node_clone.id.name, node_clone.version));
-
-                        if staging_dir.exists() {
-                            let _ = std::fs::remove_dir_all(&staging_dir);
-                        }
-                        if let Err(e) = std::fs::create_dir_all(&staging_dir) {
-                            let _ = tx_clone.send(TaskEvent::Failed {
+                        thread::spawn(move || {
+                            let task_start = Instant::now();
+                            let _ = tx_clone.send(TaskEvent::Started {
                                 worker_id,
                                 package_id: node_clone.id.clone(),
                                 version: node_clone.version.clone(),
-                                error: format!("Gagal membuat direktori staging: {:#}", e),
+                                is_meta: false,
                             });
-                            return;
-                        }
 
-                        match RecipeBuilder::build(&node_clone.recipe_path, &config_clone, &staging_dir, None) {
-                            Ok(_) => {
-                                let elapsed = task_start.elapsed().as_millis();
-                                let _ = tx_clone.send(TaskEvent::Success {
-                                    worker_id,
-                                    package_id: node_clone.id.clone(),
-                                    version: node_clone.version.clone(),
-                                    is_meta: false,
-                                    staging_dir: Some(staging_dir),
-                                    duration_ms: elapsed,
-                                });
+                            let staging_dir = std::env::temp_dir()
+                                .join("forge")
+                                .join("stage")
+                                .join(format!("{}-{}", node_clone.id.name, node_clone.version));
+
+                            if staging_dir.exists() {
+                                let _ = std::fs::remove_dir_all(&staging_dir);
                             }
-                            Err(e) => {
+                            if let Err(e) = std::fs::create_dir_all(&staging_dir) {
                                 let _ = tx_clone.send(TaskEvent::Failed {
                                     worker_id,
                                     package_id: node_clone.id.clone(),
                                     version: node_clone.version.clone(),
-                                    error: format!("{:#}", e),
+                                    error: format!("Gagal membuat direktori staging: {:#}", e),
                                 });
+                                return;
                             }
-                        }
-                    });
+
+                            match RecipeBuilder::build(&node_clone.recipe_path, &config_clone, &staging_dir, None) {
+                                Ok(_) => {
+                                    let elapsed = task_start.elapsed().as_millis();
+                                    let _ = tx_clone.send(TaskEvent::Success {
+                                        worker_id,
+                                        package_id: node_clone.id.clone(),
+                                        version: node_clone.version.clone(),
+                                        is_meta: false,
+                                        staging_dir: Some(staging_dir),
+                                        duration_ms: elapsed,
+                                    });
+                                }
+                                Err(e) => {
+                                    let _ = tx_clone.send(TaskEvent::Failed {
+                                        worker_id,
+                                        package_id: node_clone.id.clone(),
+                                        version: node_clone.version.clone(),
+                                        error: format!("{:#}", e),
+                                    });
+                                }
+                            }
+                        });
+                    }
                 }
             }
 
@@ -317,6 +361,42 @@ impl WavefrontScheduler {
                         package_id.to_string().bold(),
                         version
                     );
+                }
+                TaskEvent::Skipped {
+                    worker_id,
+                    package_id,
+                    version,
+                } => {
+                    in_flight.remove(&package_id);
+                    completed.insert(package_id.clone());
+                    skipped_count += 1;
+
+                    println!(
+                        "  [Worker {:02}] {} {} v{} sudah terpasang (Dilewati)",
+                        worker_id,
+                        "[SKIP]".cyan(),
+                        package_id.to_string().bold(),
+                        version
+                    );
+
+                    // Perambatan Wavefront: kurangi in-degree semua dependent
+                    if let Some(dependents) = graph.dependents_of.get(&package_id) {
+                        let mut newly_ready = Vec::new();
+                        for dep in dependents {
+                            if let Some(deg) = in_degrees.get_mut(dep) {
+                                if *deg > 0 {
+                                    *deg -= 1;
+                                    if *deg == 0 && !completed.contains(dep) && !in_flight.contains(dep) {
+                                        newly_ready.push(dep.clone());
+                                    }
+                                }
+                            }
+                        }
+                        newly_ready.sort();
+                        for dep in newly_ready {
+                            ready_queue.push_back(dep);
+                        }
+                    }
                 }
                 TaskEvent::Failed {
                     worker_id,
@@ -477,22 +557,47 @@ impl WavefrontScheduler {
         }
 
         let elapsed = start_time.elapsed().as_secs_f64();
-        println!(
-            "\n{} Seluruh {} paket berhasil dikompilasi & dipasang dalam {:.2} detik!",
-            "✓".green().bold(),
-            total_packages.to_string().bold().yellow(),
-            elapsed
-        );
+        if skipped_count > 0 {
+            println!(
+                "\n{} Selesai! (Dipasang: {}, Dilewati: {}, Total: {}) dalam {:.2} detik!",
+                "✓".green().bold(),
+                (compiled_count + meta_count).to_string().bold().green(),
+                skipped_count.to_string().bold().cyan(),
+                total_packages.to_string().bold().yellow(),
+                elapsed
+            );
+        } else {
+            println!(
+                "\n{} Seluruh {} paket berhasil dikompilasi & dipasang dalam {:.2} detik!",
+                "✓".green().bold(),
+                total_packages.to_string().bold().yellow(),
+                elapsed
+            );
+        }
 
         Ok(BuildSummary {
             total_packages,
             compiled_packages: compiled_count,
             meta_packages: meta_count,
+            skipped_packages: skipped_count,
             total_files_installed,
             elapsed_seconds: elapsed,
             failed_packages: Vec::new(),
         })
     }
+}
+
+/// Helper untuk memeriksa apakah paket sudah terpasang dan versinya cocok di InstalledDatabase
+fn is_installed_and_matches(node: &PackageNode, db: &InstalledDatabase) -> bool {
+    if let Ok(Some(installed)) = db.get_package(&node.id.name) {
+        if installed.package_version == node.version
+            && installed.release == node.release
+            && (node.id.slot.is_empty() || installed.slot == node.id.slot)
+        {
+            return true;
+        }
+    }
+    false
 }
 
 #[cfg(test)]
@@ -765,6 +870,127 @@ exit 42
         assert!(result.is_err());
         let err_msg = result.unwrap_err().to_string();
         assert!(err_msg.contains("bad-pkg"));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_wavefront_skip_already_installed_dependency() -> Result<()> {
+        let temp = tempdir()?;
+        let recipes_root = temp.path().join("recipes");
+        let target_root = temp.path().join("target_root");
+        let db_root = temp.path().join("db");
+        fs::create_dir_all(&recipes_root)?;
+        fs::create_dir_all(&target_root)?;
+        fs::create_dir_all(&db_root)?;
+
+        let mut config = ForgeConfig::default();
+        config.general.recipes_path = recipes_root.display().to_string();
+        config.general.db_path = db_root.display().to_string();
+        config.general.root = target_root.display().to_string();
+
+        let db = InstalledDatabase::new(db_root);
+
+        // Pasang dep-pkg di database dummy
+        let dep_manifest = PackageManifest {
+            package_name: "dep-pkg".to_string(),
+            package_version: "1.0.0".to_string(),
+            release: 1,
+            slot: "0".to_string(),
+            entries: Vec::new(),
+            metadata: None,
+            use_flags: None,
+            cflags: None,
+        };
+        db.record_package(&dep_manifest, &target_root)?;
+
+        // Buat resep untuk app-pkg (bergantung pada dep-pkg)
+        let app_recipe = temp.path().join("app_pkg.toml");
+        fs::write(
+            &app_recipe,
+            r#"
+[package]
+name = "app-pkg"
+version = "1.0.0"
+
+[build]
+type = "shell"
+script = """
+mkdir -p "${DESTDIR}/usr/bin"
+echo '#!/bin/sh\necho app' > "${DESTDIR}/usr/bin/app-pkg"
+chmod +x "${DESTDIR}/usr/bin/app-pkg"
+"""
+"#,
+        )?;
+
+        let dep_recipe = temp.path().join("dep_pkg.toml");
+        fs::write(
+            &dep_recipe,
+            r#"
+[package]
+name = "dep-pkg"
+version = "1.0.0"
+
+[build]
+type = "shell"
+script = """
+mkdir -p "${DESTDIR}/usr/lib"
+touch "${DESTDIR}/usr/lib/libdep.so"
+"""
+"#,
+        )?;
+
+        let mut graph = DependencyGraph::new();
+        let dep_node = PackageNode {
+            id: PackageId::new("dep-pkg", "0"),
+            version: "1.0.0".to_string(),
+            release: 1,
+            description: "Dep pkg".to_string(),
+            recipe_path: dep_recipe,
+            is_meta: false,
+            active_use_flags: HashSet::new(),
+            is_installed: false,
+            installed_version: None,
+        };
+        let app_node = PackageNode {
+            id: PackageId::new("app-pkg", "0"),
+            version: "1.0.0".to_string(),
+            release: 1,
+            description: "App pkg".to_string(),
+            recipe_path: app_recipe,
+            is_meta: false,
+            active_use_flags: HashSet::new(),
+            is_installed: false,
+            installed_version: None,
+        };
+
+        graph.add_node(dep_node);
+        graph.add_node(app_node);
+        graph.add_edge(DependencyEdge {
+            from: PackageId::new("app-pkg", "0"),
+            to: PackageId::new("dep-pkg", "0"),
+            kind: DependencyKind::Runtime,
+            condition_flag: None,
+        });
+
+        let plan = graph.topological_sort("app-pkg")?;
+
+        // 1. Eksekusi default: dep-pkg harus di-skip karena sudah terpasang
+        let scheduler = WavefrontScheduler::new(config.clone(), Some(2));
+        let summary = scheduler.execute(&graph, &plan, &target_root, &db)?;
+
+        assert_eq!(summary.total_packages, 2);
+        assert_eq!(summary.compiled_packages, 1);
+        assert_eq!(summary.skipped_packages, 1);
+        assert!(target_root.join("usr/bin/app-pkg").exists());
+
+        // 2. Eksekusi dengan rebuild_deps = true: dep-pkg harus ikut dikompilasi ulang
+        let scheduler_rebuild = WavefrontScheduler::with_options(config, Some(2), true, false);
+        let summary_rebuild = scheduler_rebuild.execute(&graph, &plan, &target_root, &db)?;
+
+        assert_eq!(summary_rebuild.total_packages, 2);
+        assert_eq!(summary_rebuild.compiled_packages, 2);
+        assert_eq!(summary_rebuild.skipped_packages, 0);
 
         Ok(())
     }

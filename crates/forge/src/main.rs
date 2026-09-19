@@ -55,6 +55,14 @@ enum Commands {
         /// Tampilkan dialog interaktif TUI untuk memilih USE flags sebelum kompilasi
         #[arg(long)]
         interactive_use: bool,
+
+        /// Evaluasi dan kompilasi ulang seluruh rantai dependensi tanpa memedulikan paket yang sudah terpasang
+        #[arg(short = 'D', long = "deep", alias = "rebuild-deps")]
+        deep: bool,
+
+        /// Paksa kompilasi/instalasi ulang paket target utama meskipun sudah terpasang dengan versi yang sama
+        #[arg(long = "reinstall")]
+        reinstall: bool,
     },
 
     /// Konfigurasi visual interaktif USE Flags sistem atau per-paket (TUI Menuconfig)
@@ -90,6 +98,18 @@ enum Commands {
     Update {
         #[arg(default_value = "@world")]
         target: String,
+
+        /// Jumlah worker kompilasi paralel (misal: -j8 atau --jobs 8)
+        #[arg(short = 'j', long)]
+        jobs: Option<usize>,
+
+        /// Evaluasi dan kompilasi ulang seluruh rantai dependensi tanpa memedulikan paket yang sudah terpasang
+        #[arg(short = 'D', long = "deep", alias = "rebuild-deps")]
+        deep: bool,
+
+        /// Paksa kompilasi/instalasi ulang target meskipun versinya sudah terpasang
+        #[arg(long = "reinstall")]
+        reinstall: bool,
     },
 
     /// Introspeksi mikroarsitektur CPU hardware dan ekspor cpu-profile.json
@@ -228,6 +248,8 @@ fn main() -> Result<()> {
             build_source,
             jobs,
             interactive_use,
+            deep,
+            reinstall,
         } => {
             let mut config = ForgeConfig::load_or_default(None);
             let target_root = PathBuf::from(&config.general.root);
@@ -415,8 +437,16 @@ fn main() -> Result<()> {
                     println!("  Runtime Depends  : {}", plan.runtime_only_count.to_string().cyan());
                     println!("\n{}", "Urutan Kompilasi & Staging:".bold());
                     for step in &plan.steps {
+                        let is_installed = if let Ok(Some(inst)) = db.get_package(&step.package_id.name) {
+                            inst.package_version == step.version
+                        } else {
+                            false
+                        };
+
                         let kind_badge = if step.is_meta {
                             "[META]".magenta()
+                        } else if is_installed && !deep && (step.package_id.name != target || !reinstall) {
+                            "[SKIP]".cyan()
                         } else {
                             "[SRC] ".green()
                         };
@@ -430,7 +460,7 @@ fn main() -> Result<()> {
                         );
                     }
 
-                    let scheduler = WavefrontScheduler::new(config.clone(), jobs);
+                    let scheduler = WavefrontScheduler::with_options(config.clone(), jobs, deep, reinstall);
                     if let Err(e) = scheduler.execute(&graph, &plan, &target_root, &db) {
                         println!("{} Eksekusi kompilasi paralel DAG gagal: {:#}", "✗".red(), e);
                         std::process::exit(1);
@@ -527,7 +557,12 @@ fn main() -> Result<()> {
             }
         }
 
-        Commands::Update { target } => {
+        Commands::Update {
+            target,
+            jobs,
+            deep,
+            reinstall,
+        } => {
             let config = ForgeConfig::load_or_default(None);
             let target_root = PathBuf::from(&config.general.root);
             forge::PrivilegeManager::ensure_root_or_escalate(&target_root, "update")?;
@@ -647,7 +682,7 @@ fn main() -> Result<()> {
                         }
                     };
 
-                    let scheduler = WavefrontScheduler::new(config.clone(), None);
+                    let scheduler = WavefrontScheduler::with_options(config.clone(), jobs, deep, true);
                     if let Err(e) = scheduler.execute(&graph, &plan, &target_root, &db) {
                         println!("{} Eksekusi pembaruan paket {} gagal: {:#}", "✗".red(), pkg_name.bold(), e);
                     } else {
@@ -737,7 +772,7 @@ fn main() -> Result<()> {
                     }
                 };
 
-                let scheduler = WavefrontScheduler::new(config.clone(), None);
+                let scheduler = WavefrontScheduler::with_options(config.clone(), jobs, deep, reinstall || true);
                 if let Err(e) = scheduler.execute(&graph, &plan, &target_root, &db) {
                     println!("{} Pembaruan paket {} gagal: {:#}", "✗".red(), target.bold(), e);
                     std::process::exit(1);
