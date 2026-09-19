@@ -23,141 +23,38 @@ pub struct UseFlagsTui;
 impl UseFlagsTui {
     /// Katalog standar USE flags resmi distribusi Kura Linux
     pub fn standard_catalog() -> Vec<FlagDefinition> {
-        vec![
-            // Toolchain & Compiler Optimizations
-            FlagDefinition {
-                name: "lto".to_string(),
-                description: "Link-Time Optimization (Thin/Full LTO) untuk inlining cross-crate".to_string(),
-                category: "Toolchain".to_string(),
-                default_enabled: true,
-            },
-            FlagDefinition {
-                name: "pgo".to_string(),
-                description: "Profile-Guided Optimization untuk eksekusi branch prediction maksimal".to_string(),
-                category: "Toolchain".to_string(),
-                default_enabled: true,
-            },
-            FlagDefinition {
-                name: "hardened".to_string(),
-                description: "Keamanan ekstra compiler (-fstack-protector-strong, -D_FORTIFY_SOURCE=2)".to_string(),
-                category: "Toolchain".to_string(),
-                default_enabled: true,
-            },
+        const FLAGS: &[(&str, &str, &str, bool)] = &[
+            ("lto", "Link-Time Optimization (Thin/Full LTO) untuk inlining cross-crate", "Toolchain", true),
+            ("pgo", "Profile-Guided Optimization untuk eksekusi branch prediction maksimal", "Toolchain", true),
+            ("hardened", "Keamanan ekstra compiler (-fstack-protector-strong, -D_FORTIFY_SOURCE=2)", "Toolchain", true),
+            ("wayland", "Dukungan modern Wayland display protocol & compositor", "Graphics", true),
+            ("x11", "Dukungan legacy X11 / Xorg display server protocol", "Graphics", false),
+            ("vulkan", "Dukungan low-overhead 3D graphics & compute Vulkan API", "Graphics", true),
+            ("opengl", "Dukungan standar OpenGL/EGL accelerated rendering", "Graphics", true),
+            ("alsa", "Advanced Linux Sound Architecture kernel sound API", "Audio", true),
+            ("pipewire", "Next-generation multimedia server & audio graph", "Audio", true),
+            ("pulseaudio", "PulseAudio client library compatibility layer", "Audio", false),
+            ("openrc", "Integrasi native OpenRC init system scripts (/etc/init.d/)", "System", true),
+            ("systemd", "Dukungan unit file systemd (Haram/Dinonaktifkan di Kura Linux)", "System", false),
+            ("dbus", "D-Bus inter-process communication message bus system", "System", true),
+            ("pam", "Pluggable Authentication Modules untuk otentikasi login", "System", true),
+            ("ssl", "Enkripsi TLS/SSL standar (OpenSSL / Rustls backend)", "Security", true),
+            ("curl", "Dukungan transfer jaringan via libcurl", "Network", true),
+            ("zstd", "Kompresi ultra-cepat Zstandard realtime", "Compression", true),
+            ("brotli", "Kompresi web modern Google Brotli", "Compression", false),
+            ("qt6", "Dukungan antarmuka Qt6 / KDE Frameworks 6", "GUI Toolkits", true),
+            ("gtk4", "Dukungan antarmuka GTK 4 / GNOME toolkit", "GUI Toolkits", false),
+        ];
 
-            // Display & Graphics
-            FlagDefinition {
-                name: "wayland".to_string(),
-                description: "Dukungan modern Wayland display protocol & compositor".to_string(),
-                category: "Graphics".to_string(),
-                default_enabled: true,
-            },
-            FlagDefinition {
-                name: "x11".to_string(),
-                description: "Dukungan legacy X11 / Xorg display server protocol".to_string(),
-                category: "Graphics".to_string(),
-                default_enabled: false,
-            },
-            FlagDefinition {
-                name: "vulkan".to_string(),
-                description: "Dukungan low-overhead 3D graphics & compute Vulkan API".to_string(),
-                category: "Graphics".to_string(),
-                default_enabled: true,
-            },
-            FlagDefinition {
-                name: "opengl".to_string(),
-                description: "Dukungan standar OpenGL/EGL accelerated rendering".to_string(),
-                category: "Graphics".to_string(),
-                default_enabled: true,
-            },
-
-            // Audio & Media
-            FlagDefinition {
-                name: "alsa".to_string(),
-                description: "Advanced Linux Sound Architecture kernel sound API".to_string(),
-                category: "Audio".to_string(),
-                default_enabled: true,
-            },
-            FlagDefinition {
-                name: "pipewire".to_string(),
-                description: "Next-generation multimedia server & audio graph".to_string(),
-                category: "Audio".to_string(),
-                default_enabled: true,
-            },
-            FlagDefinition {
-                name: "pulseaudio".to_string(),
-                description: "PulseAudio client library compatibility layer".to_string(),
-                category: "Audio".to_string(),
-                default_enabled: false,
-            },
-
-            // Init & System Daemons
-            FlagDefinition {
-                name: "openrc".to_string(),
-                description: "Integrasi native OpenRC init system scripts (/etc/init.d/)".to_string(),
-                category: "System".to_string(),
-                default_enabled: true,
-            },
-            FlagDefinition {
-                name: "systemd".to_string(),
-                description: "Dukungan unit file systemd (Haram/Dinonaktifkan di Kura Linux)".to_string(),
-                category: "System".to_string(),
-                default_enabled: false,
-            },
-            FlagDefinition {
-                name: "dbus".to_string(),
-                description: "D-Bus inter-process communication message bus system".to_string(),
-                category: "System".to_string(),
-                default_enabled: true,
-            },
-            FlagDefinition {
-                name: "pam".to_string(),
-                description: "Pluggable Authentication Modules untuk otentikasi login".to_string(),
-                category: "System".to_string(),
-                default_enabled: true,
-            },
-
-            // Cryptography & Network
-            FlagDefinition {
-                name: "ssl".to_string(),
-                description: "Enkripsi TLS/SSL standar (OpenSSL / Rustls backend)".to_string(),
-                category: "Security".to_string(),
-                default_enabled: true,
-            },
-            FlagDefinition {
-                name: "curl".to_string(),
-                description: "Dukungan transfer jaringan via libcurl".to_string(),
-                category: "Network".to_string(),
-                default_enabled: true,
-            },
-
-            // Compression & Formats
-            FlagDefinition {
-                name: "zstd".to_string(),
-                description: "Kompresi ultra-cepat Zstandard realtime".to_string(),
-                category: "Compression".to_string(),
-                default_enabled: true,
-            },
-            FlagDefinition {
-                name: "brotli".to_string(),
-                description: "Kompresi web modern Google Brotli".to_string(),
-                category: "Compression".to_string(),
-                default_enabled: false,
-            },
-
-            // UI Toolkits
-            FlagDefinition {
-                name: "qt6".to_string(),
-                description: "Dukungan antarmuka Qt6 / KDE Frameworks 6".to_string(),
-                category: "GUI Toolkits".to_string(),
-                default_enabled: true,
-            },
-            FlagDefinition {
-                name: "gtk4".to_string(),
-                description: "Dukungan antarmuka GTK 4 / GNOME toolkit".to_string(),
-                category: "GUI Toolkits".to_string(),
-                default_enabled: false,
-            },
-        ]
+        FLAGS
+            .iter()
+            .map(|&(name, desc, cat, def)| FlagDefinition {
+                name: name.to_string(),
+                description: desc.to_string(),
+                category: cat.to_string(),
+                default_enabled: def,
+            })
+            .collect()
     }
 
     /// Ekstraksi seluruh flag bersyarat dari sebuah berkas resep (misal: "wayland? ( dep )")
