@@ -30,9 +30,9 @@
 | **`flex`** | `2.6.4` | ✅ Verified | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
 | **`forge`** | `git` | ✅ Verified | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `clang`, `llvm`, `git`, `ca-certificates`, `tar`, `xz` | `rust`, `mold`, `clang`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
 | **`gcc`** | `16.2.0` | ✅ Verified | `glibc`, `gmp`, `mpfr`, `mpc`, `zstd` | `binutils`, `make`, `bison`, `flex` | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
-| **`gettext`** | `0.24` | ✅ Verified | `glibc`, `acl`, `ncurses` | `make`, `gcc` | GNU internationalization and localization utilities |
+| **`gettext`** | `1.0` | ✅ Verified | `glibc`, `acl`, `ncurses` | `make`, `gcc` | GNU internationalization and localization utilities |
 | **`glibc`** | `2.44` | ✅ Verified | `linux-headers` | `gcc`, `binutils`, `make`, `bison`, `gawk`, `sed` | GNU C Library (Standard Core System C Library - Latest 2.44) |
-| **`gperf`** | `3.1` | ✅ Verified | `glibc` | `make`, `gcc` | Perfect hash function generator |
+| **`gperf`** | `3.3` | ✅ Verified | `glibc` | `make`, `gcc` | Perfect hash function generator |
 | **`libtool`** | `2.6.2` | ✅ Verified | `glibc`, `m4` | `make`, `m4`, `autoconf`, `automake`, `gcc` | Generic library support script |
 | **`linux-cachyos-bore`** | `git` | ✅ Verified | `kmod`, `eudev` | `clang`, `llvm`, `mold`, `make`, `bc`, `bison`, `flex`, `elfutils`, `openssl`, `rsync`, `kmod`, `zstd`, `diffutils` | Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO |
 | **`linux-headers`** | `7.2` | ✅ Verified | - | `make`, `rsync` | Linux kernel API headers for userspace |
@@ -44,7 +44,7 @@
 | **`ninja`** | `1.13.2` | ✅ Verified | `glibc`, `gcc` | `gcc`, `python` | Small build system with a focus on speed (Latest 1.13.2) |
 | **`openrc`** | `0.64` | ✅ Verified | `glibc`, `ncurses` | `meson`, `ninja`, `pkgconf`, `make` | Service and init manager for Kura Linux |
 | **`patch`** | `2.8` | ✅ Verified | `glibc` | `make`, `gcc` | Utility to apply diffs to files |
-| **`perl`** | `5.40.1` | ✅ Verified | `glibc`, `zlib`, `bzip2` | `make`, `gcc` | Highly capable, feature-rich programming language |
+| **`perl`** | `5.44.0` | ✅ Verified | `glibc`, `zlib`, `bzip2` | `make`, `gcc` | Highly capable, feature-rich programming language |
 | **`pkgconf`** | `3.0.7` | ✅ Verified | `glibc` | `gcc`, `make` | Package compiler and linker metadata toolkit (Latest 3.0.7) |
 
 ---
@@ -57,7 +57,7 @@
 | **`acpid`** | `2.0.34` | ✅ Verified | `glibc` | `make`, `gcc` | Flexible and extensible ACPI event daemon |
 | **`amd-ucode`** | `20260916` | ✅ Verified | - | - | Microcode update image and firmware for AMD CPUs |
 | **`bash`** | `5.3` | ✅ Verified | `glibc`, `readline`, `ncurses` | `make`, `gcc`, `bison`, `pkgconf` | GNU Bourne Again SHell |
-| **`bc`** | `1.08.1` | ✅ Verified | `glibc`, `readline` | `make`, `gcc`, `flex`, `bison` | Arbitrary precision numeric processing language |
+| **`bc`** | `1.08.2` | ✅ Verified | `glibc`, `readline` | `make`, `gcc`, `flex`, `bison` | Arbitrary precision numeric processing language |
 | **`bluez`** | `5.87` | ✅ Verified | `glibc`, `dbus`, `glib2`, `eudev`, `readline` | `gcc`, `make`, `pkgconf`, `libtool` | Official Linux Bluetooth protocol stack with OpenRC service |
 | **`btrfs-progs`** | `7.1` | ✅ Verified | `glibc`, `libgcrypt`, `lzo`, `eudev`, `util-linux`, `zlib`, `zstd` | `gcc`, `e2fsprogs`, `pkgconf`, `make` | Btrfs filesystem utilities |
 | **`bubblewrap`** | `0.12.0` | ✅ Verified | `glibc`, `libcap` | `meson`, `ninja`, `pkgconf`, `gcc` | Unprivileged sandboxing tool based on Linux user namespaces |
@@ -73,7 +73,7 @@
 | **`e2fsprogs`** | `1.47.4` | ✅ Verified | `glibc`, `util-linux` | `make`, `gcc`, `pkgconf` | Ext2/3/4 filesystem management utilities (mke2fs, fsck.ext4) |
 | **`efibootmgr`** | `18` | ✅ Verified | - | - | Linux user-space application to modify the EFI Boot Manager |
 | **`efivar`** | `39` | ✅ Verified | - | - | Tools and library to manipulate EFI variables |
-| **`elfutils`** | `0.192` | ✅ Verified | `glibc`, `zlib`, `bzip2`, `xz`, `zstd` | `make`, `gcc`, `pkgconf`, `m4`, `flex`, `bison` | Libraries and tools for handling ELF files and DWARF data |
+| **`elfutils`** | `0.196` | ✅ Verified | `glibc`, `zlib`, `bzip2`, `xz`, `zstd` | `make`, `gcc`, `pkgconf`, `m4`, `flex`, `bison` | Libraries and tools for handling ELF files and DWARF data |
 | **`elogind`** | `257.16` | ✅ Verified | `glibc`, `pam`, `acl`, `libcap` | `gcc`, `intltool`, `libtool`, `gperf`, `libcap`, `meson`, `ninja`, `pkgconf` | The systemd project |
 | **`ethtool`** | `7.1` | ✅ Verified | `glibc` | `make`, `gcc`, `pkgconf` | Utility for examining and tuning network interfaces and drivers |
 | **`eudev`** | `3.2.14` | ✅ Verified | `glibc`, `kmod`, `hwdata` | `make`, `gcc`, `pkgconf`, `gperf` | Standalone device manager fork of systemd-udev for OpenRC |
@@ -95,13 +95,13 @@
 | **`less`** | `710` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | A terminal based program for viewing text files |
 | **`libarchive`** | `3.8.9` | ✅ Verified | `glibc`, `zlib`, `bzip2`, `xz`, `zstd`, `openssl`, `expat` | `make`, `gcc`, `pkgconf` | Multi-format archive and compression library (bsdtar, bsdcpio) |
 | **`libcap`** | `2.78` | ✅ Verified | `glibc` | `make`, `gcc` | POSIX 1003.1e capabilities library and tools (setcap, getcap) |
-| **`libcap-ng`** | `0.8.5` | ✅ Verified | `glibc` | `make`, `gcc` | Alternate POSIX capabilities library |
-| **`libedit`** | `20240808-3.1` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | NetBSD Editline library (BSD-licensed alternative to GNU readline) |
-| **`libevdev`** | `1.13.3` | ✅ Verified | `glibc` | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | Wrapper library for evdev devices |
-| **`libgcrypt`** | `1.11.0` | ✅ Verified | `glibc`, `libgpg-error` | `make`, `gcc` | General purpose cryptographic library based on the code from GnuPG |
-| **`libgpg-error`** | `1.51` | ✅ Verified | `glibc` | `make`, `gcc` | Small library with error codes and strings based on libgcrypt |
+| **`libcap-ng`** | `0.9.6` | ✅ Verified | `glibc` | `make`, `gcc` | Alternate POSIX capabilities library |
+| **`libedit`** | `20260512-3.1` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | NetBSD Editline library (BSD-licensed alternative to GNU readline) |
+| **`libevdev`** | `1.13.7` | ✅ Verified | `glibc` | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | Wrapper library for evdev devices |
+| **`libgcrypt`** | `1.12.4` | ✅ Verified | `glibc`, `libgpg-error` | `make`, `gcc` | General purpose cryptographic library based on the code from GnuPG |
+| **`libgpg-error`** | `1.61` | ✅ Verified | `glibc` | `make`, `gcc` | Small library with error codes and strings based on libgcrypt |
 | **`libinih`** | `58` | ✅ Verified | `glibc` | `meson`, `ninja`, `gcc`, `pkgconf` | Simple INI file parser written in C |
-| **`libpciaccess`** | `0.18.1` | ✅ Verified | `glibc`, `zlib` | `meson`, `ninja`, `gcc`, `pkgconf` | Generic PCI access library |
+| **`libpciaccess`** | `0.19` | ✅ Verified | `glibc`, `zlib` | `meson`, `ninja`, `gcc`, `pkgconf` | Generic PCI access library |
 | **`libseccomp`** | `2.6.1` | ✅ Verified | `glibc` | `make`, `gcc` | Enhanced Seccomp library and kernel syscall filtering interface |
 | **`liburcu`** | `0.15.0` | ✅ Verified | `glibc` | `make`, `gcc` | Userspace RCU (read-copy-update) library |
 | **`linux-firmware`** | `20260916` | ✅ Verified | - | `make` | Firmware files for Linux kernel drivers (Wi-Fi, GPU, Bluetooth, Audio SOF) |
@@ -135,7 +135,7 @@
 | **`wireless-regdb`** | `2026.09.03` | ✅ Verified | - | - | Wireless regulatory database for Linux kernel and CRDA |
 | **`wpa_supplicant`** | `2.12` | ✅ Verified | `glibc`, `openssl`, `readline` | `make`, `gcc`, `pkgconf` | WPA/WPA2/WPA3 and IEEE 802.1X wireless client daemon |
 | **`xfsprogs`** | `7.2.0` | ✅ Verified | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
-| **`xkeyboard-config`** | `2.44` | ✅ Verified | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
+| **`xkeyboard-config`** | `2.48` | ✅ Verified | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
 | **`xz`** | `5.8.4` | ✅ Verified | `glibc` | `make`, `gcc` | Free general-purpose data compression software with high compression ratio (LZMA2) |
 | **`zip`** | `8.6.0` | ✅ Verified | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
 | **`zsh`** | `5.9.2` | ✅ Verified | `glibc`, `ncurses`, `pcre2` | `make`, `gcc`, `pkgconf` | Advanced programmable command interpreter |
@@ -168,7 +168,7 @@
 | **`extra-cmake-modules`** | `6.30.0` | ✅ Verified | - | - | Extra modules and scripts for CMake used by KDE Frameworks |
 | **`eza`** | `0.23.5` | ✅ Verified | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `clang`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
 | **`fastfetch`** | `2.68.1` | ✅ Verified | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
-| **`fcft`** | `3.2.0` | ✅ Verified | `glibc`, `fontconfig`, `freetype`, `pixman`, `libutf8proc` | `meson`, `ninja`, `gcc`, `pkgconf`, `tllist` | Simple library for font loading and glyph rasterization |
+| **`fcft`** | `3.3.3` | ✅ Verified | `glibc`, `fontconfig`, `freetype`, `pixman`, `libutf8proc` | `meson`, `ninja`, `gcc`, `pkgconf`, `tllist` | Simple library for font loading and glyph rasterization |
 | **`fd`** | `10.5.0` | ✅ Verified | `glibc` | `cargo`, `rust` | Simple, fast and user-friendly alternative to find |
 | **`fish`** | `4.9.3` | ✅ Verified | `glibc`, `gcc`, `pcre2` | `gcc`, `cmake`, `ninja`, `rust`, `pkgconf` | Smart and user friendly shell intended mostly for interactive use |
 | **`fontconfig`** | `2.18.3` | ✅ Verified | `glibc`, `freetype`, `expat` | `meson`, `ninja`, `pkgconf`, `gperf` | Library for configuring and customizing font access |
@@ -179,8 +179,8 @@
 | **`git`** | `2.55.0` | ✅ Verified | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
 | **`glib2`** | `2.90.0` | ✅ Verified | `glibc`, `libffi`, `pcre2`, `zlib` | `meson`, `ninja`, `pkgconf`, `gcc` | Core low-level data structure and utility library from GNOME |
 | **`gmp`** | `6.3.0` | ✅ Verified | `glibc` | `make`, `gcc`, `m4` | GNU Multiple Precision Arithmetic Library |
-| **`go`** | `1.24.1` | ✅ Verified | `glibc`, `ca-certificates` | `make`, `gcc`, `bash` | Open source programming language that makes it easy to build simple, fast, and reliable software |
-| **`gobject-introspection`** | `1.82.0` | ✅ Verified | `glibc`, `glib2`, `libffi` | `meson`, `ninja`, `gcc`, `pkgconf`, `python`, `bison`, `flex` | Middleware layer for creating language bindings for C libraries |
+| **`go`** | `1.27.1` | ✅ Verified | `glibc`, `ca-certificates` | `make`, `gcc`, `bash` | Open source programming language that makes it easy to build simple, fast, and reliable software |
+| **`gobject-introspection`** | `1.86.0` | ✅ Verified | `glibc`, `glib2`, `libffi` | `meson`, `ninja`, `gcc`, `pkgconf`, `python`, `bison`, `flex` | Middleware layer for creating language bindings for C libraries |
 | **`grex`** | `1.4.6` | ✅ Verified | `glibc`, `gcc` | `gcc`, `cargo` | A command-line tool for generating regular expressions from user-provided input strings |
 | **`harfbuzz`** | `14.4.0` | ✅ Verified | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |
 | **`helium-browser`** | `0.17.2.1` | ✅ Verified | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
@@ -206,18 +206,18 @@
 | **`lazygit`** | `0.65.1` | ✅ Verified | `glibc`, `git` | `gcc`, `go` | Simple terminal UI for git commands |
 | **`libdrm`** | `2.4.134` | ✅ Verified | `glibc`, `libpciaccess` | `meson`, `ninja`, `pkgconf` | Userspace interface to kernel DRM services |
 | **`libffi`** | `3.8.0` | ✅ Verified | `glibc` | `make`, `gcc` | Portable foreign function interface library |
-| **`libgit2`** | `1.9.0` | ✅ Verified | `glibc`, `openssl`, `zlib`, `pcre2` | `cmake`, `ninja`, `gcc`, `pkgconf`, `python` | Highly portable, pure C implementation of the Git core methods |
+| **`libgit2`** | `1.9.7` | ✅ Verified | `glibc`, `openssl`, `zlib`, `pcre2` | `cmake`, `ninja`, `gcc`, `pkgconf`, `python` | Highly portable, pure C implementation of the Git core methods |
 | **`libinput`** | `1.32.0` | ✅ Verified | `glibc`, `eudev`, `libevdev`, `mtdev` | `meson`, `ninja`, `pkgconf` | Input device management and event handling library |
 | **`libksysguard`** | `6.7.5` | ✅ Verified | - | - | Task management and system monitoring library for KDE Plasma |
 | **`libpng`** | `1.6.47` | ✅ Verified | `glibc`, `zlib` | `make`, `gcc` | Official PNG reference library |
 | **`libssh2`** | `1.11.1` | ✅ Verified | `glibc`, `openssl`, `zlib` | `make`, `gcc`, `pkgconf` | Client-side C library implementing the SSH2 protocol |
-| **`libutf8proc`** | `2.10.0` | ✅ Verified | `glibc` | `make`, `gcc` | Clean C library for processing UTF-8 Unicode data |
+| **`libutf8proc`** | `2.11.3` | ✅ Verified | `glibc` | `make`, `gcc` | Clean C library for processing UTF-8 Unicode data |
 | **`libxcb`** | `1.17.0` | ✅ Verified | `glibc` | `make`, `gcc`, `pkgconf`, `python` | X11 C Bindings library |
 | **`libxcursor`** | `1.2.3` | ✅ Verified | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | Cursor management library for X |
-| **`libxi`** | `1.8.2` | ✅ Verified | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | X11 Input extension library |
+| **`libxi`** | `1.8.3` | ✅ Verified | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | X11 Input extension library |
 | **`libxkbcommon`** | `1.13.2` | ✅ Verified | `glibc`, `xkeyboard-config` | `meson`, `ninja`, `pkgconf`, `bison`, `wayland`, `wayland-protocols` | Keyboard description compilation and handling library |
 | **`libxml2`** | `2.15.4` | ✅ Verified | `glibc`, `zlib`, `xz`, `icu` | `make`, `gcc`, `pkgconf` | XML parsing library and utility toolkit |
-| **`libxrandr`** | `1.5.4` | ✅ Verified | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | X11 RandR extension library |
+| **`libxrandr`** | `1.5.5` | ✅ Verified | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | X11 RandR extension library |
 | **`libxslt`** | `1.1.45` | ✅ Verified | `glibc`, `libxml2` | `make`, `gcc`, `pkgconf` | XML stylesheet transformation library (XSLT) |
 | **`lsof`** | `4.99.7` | ✅ Verified | `glibc` | `make`, `gcc` | Lists information about files opened by processes |
 | **`mesa`** | `26.2.3` | ✅ Verified | `glibc`, `libdrm`, `expat`, `zstd`, `zlib`, `libxkbcommon`, `wayland` | `meson`, `ninja`, `pkgconf`, `python`, `bison`, `flex`, `llvm`, `clang`, `wayland-protocols`, `vulkan-headers` | Open-source OpenGL and Vulkan 3D graphics drivers |

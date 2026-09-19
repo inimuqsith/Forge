@@ -1,6 +1,6 @@
 [package]
 name = "xkeyboard-config"
-version = "2.44"
+version = "2.48"
 release = 1
 slot = "0"
 description = "X Keyboard Extension configuration data"
@@ -13,10 +13,10 @@ build = ["meson", "ninja", "gcc", "pkgconf", "python"]
 
 [sources]
 urls = [
-    "https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.44.tar.xz"
+    "https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.48.tar.xz"
 ]
 sha256 = [
-    "54d2c33eeebb031d48fa590c543e54c9bcbd0f00386ebc6489b2f47a0da4342a"
+    "b77041324f0109f77161ee43743fe04baa485866af8460d31e476ad3f7648fd5"
 ]
 
 [build]

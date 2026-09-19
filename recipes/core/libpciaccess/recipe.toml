@@ -1,6 +1,6 @@
 [package]
 name = "libpciaccess"
-version = "0.18.1"
+version = "0.19"
 release = 1
 slot = "0"
 description = "Generic PCI access library"
@@ -13,10 +13,10 @@ build = ["meson", "ninja", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://www.x.org/releases/individual/lib/libpciaccess-0.18.1.tar.xz"
+    "https://www.x.org/releases/individual/lib/libpciaccess-0.19.tar.xz"
 ]
 sha256 = [
-    "4af43444b38adb5545d0ed1c2ce46d9608cc47b31c2387fc5181656765a6fa76"
+    "3c55aa86c82e54a4e3109786f0463530d53b36b6d1cfd14616454f985dd2aa43"
 ]
 
 [build]

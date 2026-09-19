@@ -1,6 +1,6 @@
 [package]
 name = "libgpg-error"
-version = "1.51"
+version = "1.61"
 release = 1
 slot = "0"
 description = "Small library with error codes and strings based on libgcrypt"
@@ -13,10 +13,10 @@ build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.51.tar.bz2"
+    "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.61.tar.bz2"
 ]
 sha256 = [
-    "be0f1b2db6b93eed55369cdf79f19f72750c8c7c39fc20b577e724545427e6b2"
+    "7a85413f2bc354f4f8aa832b718af122e48965e9e0eb9012ee659c13c6385c93"
 ]
 
 [build]

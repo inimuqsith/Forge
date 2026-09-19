@@ -1,6 +1,6 @@
 [package]
 name = "libedit"
-version = "20240808-3.1"
+version = "20260512-3.1"
 release = 1
 slot = "0"
 description = "NetBSD Editline library (BSD-licensed alternative to GNU readline)"
@@ -13,10 +13,10 @@ build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://www.thrysoee.dk/editline/libedit-20240808-3.1.tar.gz"
+    "https://www.thrysoee.dk/editline/libedit-20260512-3.1.tar.gz"
 ]
 sha256 = [
-    "5f0573349d77c4a48967191cdd6634dd7aa5f6398c6a57fe037cc02696d6099f"
+    "432d5e7ea8b0116dd39f2eca7bc11d0eed77faa6b77ea526ace89907c23ea4a0"
 ]
 
 [build]

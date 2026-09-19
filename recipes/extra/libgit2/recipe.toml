@@ -1,6 +1,6 @@
 [package]
 name = "libgit2"
-version = "1.9.0"
+version = "1.9.7"
 release = 1
 slot = "0"
 description = "Highly portable, pure C implementation of the Git core methods"
@@ -13,10 +13,10 @@ build = ["cmake", "ninja", "gcc", "pkgconf", "python"]
 
 [sources]
 urls = [
-    "https://github.com/libgit2/libgit2/archive/refs/tags/v1.9.0.tar.gz"
+    "https://github.com/libgit2/libgit2/archive/refs/tags/v1.9.7.tar.gz"
 ]
 sha256 = [
-    "75b27d4d6df44bd34e2f70663cfd998f5ec41e680e1e593238bbe517a84c7ed2"
+    "1a4fbe7589e814777ae76b64734ad80f4ecad22cd33a22682a2aaea4ae5375e7"
 ]
 
 [build]

@@ -1,6 +1,6 @@
 [package]
 name = "libevdev"
-version = "1.13.3"
+version = "1.13.7"
 release = 1
 slot = "0"
 description = "Wrapper library for evdev devices"
@@ -13,10 +13,10 @@ build = ["meson", "ninja", "gcc", "pkgconf", "python"]
 
 [sources]
 urls = [
-    "https://www.freedesktop.org/software/libevdev/libevdev-1.13.3.tar.xz"
+    "https://www.freedesktop.org/software/libevdev/libevdev-1.13.7.tar.xz"
 ]
 sha256 = [
-    "abf1aace86208eebdd5d3550ffded4c8d73bb405b796d51c389c9d0604cbcfbf"
+    "0caf824971108f15bb2ad356433bae198d7d3bf1e82d43f63626e069e060bfa6"
 ]
 
 [build]

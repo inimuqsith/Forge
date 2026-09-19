@@ -1,6 +1,6 @@
 [package]
 name = "libgcrypt"
-version = "1.11.0"
+version = "1.12.4"
 release = 1
 slot = "0"
 description = "General purpose cryptographic library based on the code from GnuPG"
@@ -13,10 +13,10 @@ build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.0.tar.bz2"
+    "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.12.4.tar.bz2"
 ]
 sha256 = [
-    "09120c9867ce7f2081d6aaa1775386b98c2f2f246135761aae47d81f58685b9c"
+    "d77f68f48879510e79a2f65977ccc68981781ea0923e5bdffac2a193ea3d660e"
 ]
 
 [build]

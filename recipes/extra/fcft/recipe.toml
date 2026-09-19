@@ -1,6 +1,6 @@
 [package]
 name = "fcft"
-version = "3.2.0"
+version = "3.3.3"
 release = 1
 slot = "0"
 description = "Simple library for font loading and glyph rasterization"
@@ -13,10 +13,10 @@ build = ["meson", "ninja", "gcc", "pkgconf", "tllist"]
 
 [sources]
 urls = [
-    "https://codeberg.org/dnkl/fcft/releases/download/3.2.0/fcft-3.2.0.tar.gz"
+    "https://codeberg.org/dnkl/fcft/releases/download/3.3.3/fcft-3.3.3.tar.gz"
 ]
 sha256 = [
-    "71f5f1b4a351dc281ea9f5acc86ebdeaa7221f0d93bd70090a134edab1760bfd"
+    "bb298772d625e7d917373d541456f34f1957a9e22b16f17f64158b2c3816563c"
 ]
 
 [build]
