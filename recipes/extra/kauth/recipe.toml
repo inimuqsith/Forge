@@ -4,12 +4,12 @@ version = "6.30.0"
 release = 1
 description = "Execute actions as privileged user through authentication backends"
 license = "LGPL-2.0-or-later"
-homepage = "https://invent.kde.org/frameworks/kauth"
+upstream = "https://invent.kde.org/frameworks/kauth"
 slot = "6"
 
 [dependencies]
-depends = ["kcoreaddons", "polkit"]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+runtime = ["kcoreaddons", "polkit"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
 
 [sources]
 urls = ["https://download.kde.org/stable/frameworks/6.30/kauth-6.30.0.tar.xz"]

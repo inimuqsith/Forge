@@ -4,12 +4,12 @@ version = "18"
 release = 1
 description = "Linux user-space application to modify the EFI Boot Manager"
 license = "GPL-2.0-or-later"
-homepage = "https://github.com/rhboot/efibootmgr"
+upstream = "https://github.com/rhboot/efibootmgr"
 slot = "0"
 
 [dependencies]
-depends = ["glibc", "efivar", "popt"]
-makedepends = ["gcc", "make", "pkgconf", "linux-headers"]
+runtime = ["glibc", "efivar", "popt"]
+build = ["gcc", "make", "pkgconf", "linux-headers"]
 
 [sources]
 urls = ["https://github.com/rhboot/efibootmgr/archive/refs/tags/18.tar.gz"]

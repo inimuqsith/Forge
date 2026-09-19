@@ -4,12 +4,12 @@ version = "6.7.5"
 release = 1
 description = "Qt component for Wayland wl-layer-shell protocol integration"
 license = "LGPL-2.1-or-later OR LGPL-3.0-only"
-homepage = "https://invent.kde.org/plasma/layer-shell-qt"
+upstream = "https://invent.kde.org/plasma/layer-shell-qt"
 slot = "6"
 
 [dependencies]
-depends = ["qt6-base", "qt6-declarative", "qt6-wayland", "wayland"]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols"]
+runtime = ["qt6-base", "qt6-declarative", "qt6-wayland", "wayland"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols"]
 
 [sources]
 urls = ["https://download.kde.org/stable/plasma/6.7.5/layer-shell-qt-6.7.5.tar.xz"]

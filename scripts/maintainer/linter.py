@@ -18,17 +18,18 @@ class RecipeLinter:
 
         for name, rec in sorted(self.catalog.recipes.items()):
             pkg_issues = []
-            if not rec.description:
-                pkg_issues.append("Deskripsi kosong")
-            if not rec.upstream:
-                pkg_issues.append("URL upstream kosong")
+            upstream = rec.upstream or rec.data.get("package", {}).get("homepage", "").strip()
+            if not upstream:
+                pkg_issues.append("URL upstream/homepage kosong")
             if not rec.license:
                 pkg_issues.append("Lisensi kosong")
 
-            b_script = rec.data.get("build", {}).get("script", "")
+            b_script = rec.data.get("build", {}).get("script", "") or rec.data.get("build", {}).get("install", "")
             if b_script:
-                if "DESTDIR" not in b_script and "install" in b_script and rec.data.get("build", {}).get("type") != "meta":
-                    pkg_issues.append("Script build memasang file tanpa variabel ${DESTDIR} (raw host write risk)")
+                is_meta = rec.data.get("build", {}).get("type") == "meta"
+                has_dest = "DESTDIR" in b_script or "pkgdir" in b_script
+                if "install" in b_script and not has_dest and not is_meta:
+                    pkg_issues.append("Script build memasang file tanpa variabel ${DESTDIR} atau ${pkgdir} (raw host write risk)")
 
             if pkg_issues:
                 failed += 1

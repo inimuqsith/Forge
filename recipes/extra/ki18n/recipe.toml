@@ -4,12 +4,12 @@ version = "6.30.0"
 release = 1
 description = "Advanced internationalization framework for KDE applications"
 license = "LGPL-2.0-or-later"
-homepage = "https://invent.kde.org/frameworks/ki18n"
+upstream = "https://invent.kde.org/frameworks/ki18n"
 slot = "6"
 
 [dependencies]
-depends = ["qt6-base", "qt6-declarative"]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "python"]
+runtime = ["qt6-base", "qt6-declarative"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "python"]
 
 [sources]
 urls = ["https://download.kde.org/stable/frameworks/6.30/ki18n-6.30.0.tar.xz"]

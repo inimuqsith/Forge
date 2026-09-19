@@ -4,12 +4,12 @@ version = "1.7.2"
 release = 1
 description = "Pluggable Authentication Modules for Linux"
 license = "BSD-3-Clause OR GPL-2.0-or-later"
-homepage = "https://github.com/linux-pam/linux-pam"
+upstream = "https://github.com/linux-pam/linux-pam"
 slot = "0"
 
 [dependencies]
-depends = ["glibc"]
-makedepends = ["gcc", "make", "flex", "bison", "linux-headers", "pkgconf"]
+runtime = ["glibc"]
+build = ["gcc", "make", "flex", "bison", "linux-headers", "pkgconf"]
 
 [sources]
 urls = ["https://github.com/linux-pam/linux-pam/releases/download/v1.7.2/Linux-PAM-1.7.2.tar.xz"]

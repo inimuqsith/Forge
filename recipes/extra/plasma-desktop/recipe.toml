@@ -4,11 +4,11 @@ version = "6.7.5"
 release = 1
 description = "KDE Plasma Desktop user interface, panels, widgets and settings"
 license = "GPL-2.0-or-later"
-homepage = "https://invent.kde.org/plasma/plasma-desktop"
+upstream = "https://invent.kde.org/plasma/plasma-desktop"
 slot = "6"
 
 [dependencies]
-depends = [
+runtime = [
     "qt6-base",
     "qt6-declarative",
     "qt6-wayland",
@@ -27,7 +27,7 @@ depends = [
     "libksysguard",
     "breeze"
 ]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols"]
 
 [sources]
 urls = ["https://download.kde.org/stable/plasma/6.7.5/plasma-desktop-6.7.5.tar.xz"]

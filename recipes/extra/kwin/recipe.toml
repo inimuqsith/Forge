@@ -4,11 +4,11 @@ version = "6.7.5"
 release = 1
 description = "Flexible, high-performance, and feature-rich Wayland window manager"
 license = "GPL-2.0-or-later"
-homepage = "https://invent.kde.org/plasma/kwin"
+upstream = "https://invent.kde.org/plasma/kwin"
 slot = "6"
 
 [dependencies]
-depends = [
+runtime = [
     "qt6-base",
     "qt6-declarative",
     "qt6-wayland",
@@ -27,7 +27,7 @@ depends = [
     "mesa",
     "wayland"
 ]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols", "vulkan-headers"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols", "vulkan-headers"]
 
 [sources]
 urls = ["https://download.kde.org/stable/plasma/6.7.5/kwin-6.7.5.tar.xz"]

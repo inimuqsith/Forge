@@ -4,12 +4,12 @@ version = "6.30.0"
 release = 1
 description = "Global desktop keyboard shortcuts management engine"
 license = "LGPL-2.0-or-later"
-homepage = "https://invent.kde.org/frameworks/kglobalaccel"
+upstream = "https://invent.kde.org/frameworks/kglobalaccel"
 slot = "6"
 
 [dependencies]
-depends = ["kconfig", "kcoreaddons", "kcrash", "kdbusaddons", "kwindowsystem"]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+runtime = ["kconfig", "kcoreaddons", "kcrash", "kdbusaddons", "kwindowsystem"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
 
 [sources]
 urls = ["https://download.kde.org/stable/frameworks/6.30/kglobalaccel-6.30.0.tar.xz"]

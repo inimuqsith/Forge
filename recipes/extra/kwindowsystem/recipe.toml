@@ -4,12 +4,12 @@ version = "6.30.0"
 release = 1
 description = "Access to the windowing system for KDE frameworks (Wayland and X11)"
 license = "LGPL-2.0-or-later"
-homepage = "https://invent.kde.org/frameworks/kwindowsystem"
+upstream = "https://invent.kde.org/frameworks/kwindowsystem"
 slot = "6"
 
 [dependencies]
-depends = ["qt6-base", "qt6-wayland", "libxkbcommon", "wayland"]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols"]
+runtime = ["qt6-base", "qt6-wayland", "libxkbcommon", "wayland"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols"]
 
 [sources]
 urls = ["https://download.kde.org/stable/frameworks/6.30/kwindowsystem-6.30.0.tar.xz"]

@@ -4,12 +4,12 @@ version = "6.30.0"
 release = 1
 description = "Plugin framework for desktop services and applications"
 license = "LGPL-2.0-or-later"
-homepage = "https://invent.kde.org/frameworks/kservice"
+upstream = "https://invent.kde.org/frameworks/kservice"
 slot = "6"
 
 [dependencies]
-depends = ["kcoreaddons", "kconfig", "ki18n"]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "flex", "bison"]
+runtime = ["kcoreaddons", "kconfig", "ki18n"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "flex", "bison"]
 
 [sources]
 urls = ["https://download.kde.org/stable/frameworks/6.30/kservice-6.30.0.tar.xz"]

@@ -59,12 +59,12 @@ class RecipeRecord:
         self.path = path
         self.data = data
         self.description = data.get("package", {}).get("description", "").strip()
-        self.upstream = data.get("package", {}).get("upstream", "").strip()
+        self.upstream = (data.get("package", {}).get("upstream", "") or data.get("package", {}).get("homepage", "")).strip()
         self.license = data.get("package", {}).get("license", "").strip()
 
         deps = data.get("dependencies", {})
-        self.raw_runtime_deps = deps.get("runtime", [])
-        self.raw_build_deps = deps.get("build", [])
+        self.raw_runtime_deps = deps.get("runtime", []) if "runtime" in deps else deps.get("depends", [])
+        self.raw_build_deps = deps.get("build", []) if "build" in deps else deps.get("makedepends", [])
 
         self.runtime_deps = [parse_clean_dep_name(d) for d in self.raw_runtime_deps if parse_clean_dep_name(d)]
         self.build_deps = [parse_clean_dep_name(d) for d in self.raw_build_deps if parse_clean_dep_name(d)]

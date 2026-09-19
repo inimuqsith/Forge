@@ -4,12 +4,12 @@ version = "2.14"
 release = 1
 description = "GNU GRand Unified Bootloader (2)"
 license = "GPL-3.0-or-later"
-homepage = "https://www.gnu.org/software/grub/"
+upstream = "https://www.gnu.org/software/grub/"
 slot = "0"
 
 [dependencies]
-depends = ["glibc", "xz"]
-makedepends = ["gcc", "make", "pkgconf", "flex", "bison", "python"]
+runtime = ["glibc", "xz"]
+build = ["gcc", "make", "pkgconf", "flex", "bison", "python"]
 
 [sources]
 urls = ["https://ftp.gnu.org/gnu/grub/grub-2.14.tar.xz"]

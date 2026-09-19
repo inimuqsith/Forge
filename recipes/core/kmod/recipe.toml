@@ -4,12 +4,12 @@ version = "34.2"
 release = 1
 description = "Linux kernel module management tools and library (lsmod, modprobe, insmod)"
 license = "GPL-2.0-or-later AND LGPL-2.1-or-later"
-homepage = "https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git"
+upstream = "https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git"
 slot = "0"
 
 [dependencies]
-depends = ["glibc", "zlib", "xz", "zstd", "openssl"]
-makedepends = ["gcc", "make", "pkgconf"]
+runtime = ["glibc", "zlib", "xz", "zstd", "openssl"]
+build = ["gcc", "make", "pkgconf"]
 
 [sources]
 urls = ["https://kernel.org/pub/linux/utils/kernel/kmod/kmod-34.2.tar.xz"]

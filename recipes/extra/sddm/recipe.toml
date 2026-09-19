@@ -4,11 +4,11 @@ version = "0.21.0"
 release = 1
 description = "QML and Wayland based modern display manager"
 license = "GPL-2.0-or-later"
-homepage = "https://github.com/sddm/sddm"
+upstream = "https://github.com/sddm/sddm"
 
 [dependencies]
-depends = ["qt6-base", "qt6-declarative", "libxkbcommon", "pam", "shadow"]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+runtime = ["qt6-base", "qt6-declarative", "libxkbcommon", "pam", "shadow"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
 
 [sources]
 urls = ["https://github.com/sddm/sddm/archive/refs/tags/v0.21.0.tar.gz"]

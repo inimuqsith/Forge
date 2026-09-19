@@ -71,8 +71,8 @@
 | **`diffutils`** | `3.12` | ✅ Verified | `glibc` | `make`, `gcc` | GNU diff, cmp, diff3 and sdiff programs |
 | **`dosfstools`** | `4.2` | ✅ Verified | `glibc` | `gcc` | DOS filesystem utilities |
 | **`e2fsprogs`** | `1.47.4` | ✅ Verified | `glibc`, `util-linux` | `make`, `gcc`, `pkgconf` | Ext2/3/4 filesystem management utilities (mke2fs, fsck.ext4) |
-| **`efibootmgr`** | `18` | ✅ Verified | - | - | Linux user-space application to modify the EFI Boot Manager |
-| **`efivar`** | `39` | ✅ Verified | - | - | Tools and library to manipulate EFI variables |
+| **`efibootmgr`** | `18` | ✅ Verified | `glibc`, `efivar`, `popt` | `gcc`, `make`, `pkgconf`, `linux-headers` | Linux user-space application to modify the EFI Boot Manager |
+| **`efivar`** | `39` | ✅ Verified | `glibc`, `popt` | `gcc`, `make`, `pkgconf`, `linux-headers` | Tools and library to manipulate EFI variables |
 | **`elfutils`** | `0.196` | ✅ Verified | `glibc`, `zlib`, `bzip2`, `xz`, `zstd` | `make`, `gcc`, `pkgconf`, `m4`, `flex`, `bison` | Libraries and tools for handling ELF files and DWARF data |
 | **`elogind`** | `257.16` | ✅ Verified | `glibc`, `pam`, `acl`, `libcap` | `gcc`, `intltool`, `libtool`, `gperf`, `libcap`, `meson`, `ninja`, `pkgconf` | The systemd project |
 | **`ethtool`** | `7.1` | ✅ Verified | `glibc` | `make`, `gcc`, `pkgconf` | Utility for examining and tuning network interfaces and drivers |
@@ -83,7 +83,7 @@
 | **`gawk`** | `5.4.1` | ✅ Verified | `glibc`, `readline`, `gmp`, `mpfr` | `make`, `gcc` | GNU awk pattern scanning and processing language |
 | **`grep`** | `3.12` | ✅ Verified | `glibc`, `pcre2` | `make`, `gcc`, `pkgconf` | GNU grep, egrep and fgrep |
 | **`groff`** | `1.24.1` | ✅ Verified | `glibc` | `make`, `gcc`, `bison`, `pkgconf` | GNU troff text-formatting system |
-| **`grub`** | `2.14` | ✅ Verified | - | - | GNU GRand Unified Bootloader (2) |
+| **`grub`** | `2.14` | ✅ Verified | `glibc`, `xz` | `gcc`, `make`, `pkgconf`, `flex`, `bison`, `python` | GNU GRand Unified Bootloader (2) |
 | **`gzip`** | `1.14` | ✅ Verified | `glibc` | `make`, `gcc` | Popular data compression program |
 | **`hwdata`** | `0.411` | ✅ Verified | `glibc` | `make` | Hardware identification databases (pci.ids, usb.ids, oui.txt) |
 | **`intel-ucode`** | `20260812` | ✅ Verified | - | - | Microcode update files and early-initramfs image for Intel CPUs |
@@ -91,7 +91,7 @@
 | **`iproute2`** | `7.2.0` | ✅ Verified | `glibc`, `libcap`, `libseccomp` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | IP routing and network device configuration suite (ip, ss, tc) |
 | **`iptables`** | `1.8.11` | ✅ Verified | `glibc` | `make`, `gcc`, `pkgconf` | Linux kernel packet filtering and NAT control utility |
 | **`kbd`** | `2.10.0` | ✅ Verified | `glibc` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | Keytable files and keyboard utilities (loadkeys, setfont) |
-| **`kmod`** | `34.2` | ✅ Verified | - | - | Linux kernel module management tools and library (lsmod, modprobe, insmod) |
+| **`kmod`** | `34.2` | ✅ Verified | `glibc`, `zlib`, `xz`, `zstd`, `openssl` | `gcc`, `make`, `pkgconf` | Linux kernel module management tools and library (lsmod, modprobe, insmod) |
 | **`less`** | `710` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | A terminal based program for viewing text files |
 | **`libarchive`** | `3.8.9` | ✅ Verified | `glibc`, `zlib`, `bzip2`, `xz`, `zstd`, `openssl`, `expat` | `make`, `gcc`, `pkgconf` | Multi-format archive and compression library (bsdtar, bsdcpio) |
 | **`libcap`** | `2.78` | ✅ Verified | `glibc` | `make`, `gcc` | POSIX 1003.1e capabilities library and tools (setcap, getcap) |
@@ -114,11 +114,11 @@
 | **`ncurses`** | `6.5` | ✅ Verified | `glibc` | `make`, `gcc`, `pkgconf` | System V Release 4.0 curses emulation library |
 | **`nftables`** | `1.1.1` | ✅ Verified | `glibc`, `gmp`, `readline` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | Netfilter userspace packet filtering framework |
 | **`openssl`** | `4.1.0-alpha1` | ✅ Verified | `glibc` | `make`, `gcc`, `perl` | Robust, commercial-grade TLS/SSL cryptography toolkit |
-| **`pam`** | `1.7.2` | ✅ Verified | - | - | Pluggable Authentication Modules for Linux |
+| **`pam`** | `1.7.2` | ✅ Verified | `glibc` | `gcc`, `make`, `flex`, `bison`, `linux-headers`, `pkgconf` | Pluggable Authentication Modules for Linux |
 | **`parted`** | `3.7` | ✅ Verified | `glibc`, `util-linux` | `make`, `gcc`, `pkgconf` | A program for creating, destroying, resizing, checking and copying partitions |
 | **`pciutils`** | `3.15.0` | ✅ Verified | `glibc`, `hwdata`, `kmod` | `make`, `gcc`, `pkgconf` | PCI bus configuration and diagnostic tools (lspci, setpci) |
 | **`polkit`** | `127` | ✅ Verified | `glibc`, `duktape`, `expat`, `glib2`, `pam`, `eudev` | `gcc`, `dbus`, `glib2`, `gobject-introspection`, `meson`, `ninja`, `pkgconf` | Application development toolkit for controlling system-wide privileges |
-| **`popt`** | `1.19` | ✅ Verified | - | - | Command line option parsing library |
+| **`popt`** | `1.19` | ✅ Verified | `glibc` | `gcc`, `make`, `autoconf`, `automake`, `libtool`, `pkgconf` | Command line option parsing library |
 | **`procps-ng`** | `4.0.7` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Utilities for monitoring your system and its processes (ps, top, free) |
 | **`psmisc`** | `23.7` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | Miscellaneous proc-based tools (killall, fuser, pstree) |
 | **`readline`** | `8.2.13` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | GNU Readline command line editing library |
@@ -154,7 +154,7 @@
 | **`bandwhich`** | `0.23.1` | ✅ Verified | `glibc`, `gcc` | `gcc`, `cargo` | Terminal bandwidth utilization tool |
 | **`bat`** | `0.26.1` | ✅ Verified | `glibc`, `zlib` | `cargo`, `rust` | A cat clone with syntax highlighting and Git integration |
 | **`bottom`** | `0.14.9` | ✅ Verified | `glibc`, `gcc` | `gcc`, `git`, `rust` | A graphical process/system monitor |
-| **`breeze`** | `6.7.5` | ✅ Verified | - | - | Artwork, styles and assets for the Breeze visual theme |
+| **`breeze`** | `6.7.5` | ✅ Verified | `qt6-base`, `qt6-declarative`, `kcoreaddons`, `kconfig`, `kwidgetsaddons`, `kwindowsystem` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Artwork, styles and assets for the Breeze visual theme |
 | **`btop`** | `1.4.7` | ✅ Verified | `glibc` | `make`, `gcc` | Modern and beautiful resource monitor that shows usage and stats for processor, memory, disks, network and processes |
 | **`cairo`** | `1.18.4` | ✅ Verified | `glibc`, `pixman`, `freetype`, `fontconfig`, `zlib`, `libpng` | `meson`, `ninja`, `pkgconf` | 2D graphics library with support for multiple output devices |
 | **`cargo`** | `1.85.0` | ✅ Verified | `glibc`, `rust`, `openssl`, `curl`, `zlib` | `rust` | Rust Package Manager and Build Tool |
@@ -165,7 +165,7 @@
 | **`duktape`** | `2.7.0` | ✅ Verified | `glibc` | `make`, `gcc` | Embeddable Javascript engine with a focus on portability and compact footprint |
 | **`dust`** | `1.2.6` | ✅ Verified | `glibc`, `gcc` | `gcc`, `git`, `rust` | A more intuitive version of du in rust |
 | **`expat`** | `2.8.4` | ✅ Verified | `glibc` | `make`, `gcc` | XML parser library written in C |
-| **`extra-cmake-modules`** | `6.30.0` | ✅ Verified | - | - | Extra modules and scripts for CMake used by KDE Frameworks |
+| **`extra-cmake-modules`** | `6.30.0` | ✅ Verified | - | `cmake` | Extra modules and scripts for CMake used by KDE Frameworks |
 | **`eza`** | `0.23.5` | ✅ Verified | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `clang`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
 | **`fastfetch`** | `2.68.1` | ✅ Verified | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
 | **`fcft`** | `3.3.3` | ✅ Verified | `glibc`, `fontconfig`, `freetype`, `pixman`, `libutf8proc` | `meson`, `ninja`, `gcc`, `pkgconf`, `tllist` | Simple library for font loading and glyph rasterization |
@@ -190,25 +190,25 @@
 | **`icu`** | `78.3` | ✅ Verified | `glibc` | `make`, `gcc`, `pkgconf` | International Components for Unicode library |
 | **`intellij-idea`** | `2025.2.5` | ✅ Verified | `glibc`, `ca-certificates`, `tar` | `tar`, `gzip` | Capable and Ergonomic IDE for JVM, Java, Kotlin, and Polyglot Development by JetBrains |
 | **`jq`** | `1.8.2` | ✅ Verified | `glibc` | `make`, `gcc`, `bison`, `pkgconf` | Command-line JSON processor |
-| **`kauth`** | `6.30.0` | ✅ Verified | - | - | Execute actions as privileged user through authentication backends |
-| **`kconfig`** | `6.30.0` | ✅ Verified | - | - | Configuration system for KDE applications and frameworks |
-| **`kcoreaddons`** | `6.30.0` | ✅ Verified | - | - | Addons to QtCore offering various utilities and classes |
-| **`kcrash`** | `6.30.0` | ✅ Verified | - | - | Graceful handling of application crashes and signal handlers |
-| **`kdbusaddons`** | `6.30.0` | ✅ Verified | - | - | Addons to QtDBus offering DBus application management |
-| **`kglobalaccel`** | `6.30.0` | ✅ Verified | - | - | Global desktop keyboard shortcuts management engine |
-| **`ki18n`** | `6.30.0` | ✅ Verified | - | - | Advanced internationalization framework for KDE applications |
-| **`kpipewire`** | `6.7.5` | ✅ Verified | - | - | Components for Flatpak and PipeWire integration in KDE Plasma |
-| **`kservice`** | `6.30.0` | ✅ Verified | - | - | Plugin framework for desktop services and applications |
-| **`kwidgetsaddons`** | `6.30.0` | ✅ Verified | - | - | Addons to QtWidgets providing diverse GUI widgets |
-| **`kwin`** | `6.7.5` | ✅ Verified | - | - | Flexible, high-performance, and feature-rich Wayland window manager |
-| **`kwindowsystem`** | `6.30.0` | ✅ Verified | - | - | Access to the windowing system for KDE frameworks (Wayland and X11) |
-| **`layer-shell-qt`** | `6.7.5` | ✅ Verified | - | - | Qt component for Wayland wl-layer-shell protocol integration |
+| **`kauth`** | `6.30.0` | ✅ Verified | `kcoreaddons`, `polkit` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Execute actions as privileged user through authentication backends |
+| **`kconfig`** | `6.30.0` | ✅ Verified | `qt6-base`, `qt6-declarative` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Configuration system for KDE applications and frameworks |
+| **`kcoreaddons`** | `6.30.0` | ✅ Verified | `qt6-base` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Addons to QtCore offering various utilities and classes |
+| **`kcrash`** | `6.30.0` | ✅ Verified | `kcoreaddons`, `kwindowsystem` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Graceful handling of application crashes and signal handlers |
+| **`kdbusaddons`** | `6.30.0` | ✅ Verified | `qt6-base`, `dbus` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Addons to QtDBus offering DBus application management |
+| **`kglobalaccel`** | `6.30.0` | ✅ Verified | `kconfig`, `kcoreaddons`, `kcrash`, `kdbusaddons`, `kwindowsystem` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Global desktop keyboard shortcuts management engine |
+| **`ki18n`** | `6.30.0` | ✅ Verified | `qt6-base`, `qt6-declarative` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `python` | Advanced internationalization framework for KDE applications |
+| **`kpipewire`** | `6.7.5` | ✅ Verified | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `kcoreaddons`, `ki18n`, `pipewire`, `libdrm`, `mesa` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | Components for Flatpak and PipeWire integration in KDE Plasma |
+| **`kservice`** | `6.30.0` | ✅ Verified | `kcoreaddons`, `kconfig`, `ki18n` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `flex`, `bison` | Plugin framework for desktop services and applications |
+| **`kwidgetsaddons`** | `6.30.0` | ✅ Verified | `qt6-base` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Addons to QtWidgets providing diverse GUI widgets |
+| **`kwin`** | `6.7.5` | ✅ Verified | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `kcoreaddons`, `kconfig`, `kwindowsystem`, `kcrash`, `kdbusaddons`, `kglobalaccel`, `kpipewire`, `layer-shell-qt`, `breeze`, `libdrm`, `libinput`, `libxkbcommon`, `mesa`, `wayland` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols`, `vulkan-headers` | Flexible, high-performance, and feature-rich Wayland window manager |
+| **`kwindowsystem`** | `6.30.0` | ✅ Verified | `qt6-base`, `qt6-wayland`, `libxkbcommon`, `wayland` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | Access to the windowing system for KDE frameworks (Wayland and X11) |
+| **`layer-shell-qt`** | `6.7.5` | ✅ Verified | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `wayland` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | Qt component for Wayland wl-layer-shell protocol integration |
 | **`lazygit`** | `0.65.1` | ✅ Verified | `glibc`, `git` | `gcc`, `go` | Simple terminal UI for git commands |
 | **`libdrm`** | `2.4.134` | ✅ Verified | `glibc`, `libpciaccess` | `meson`, `ninja`, `pkgconf` | Userspace interface to kernel DRM services |
 | **`libffi`** | `3.8.0` | ✅ Verified | `glibc` | `make`, `gcc` | Portable foreign function interface library |
 | **`libgit2`** | `1.9.7` | ✅ Verified | `glibc`, `openssl`, `zlib`, `pcre2` | `cmake`, `ninja`, `gcc`, `pkgconf`, `python` | Highly portable, pure C implementation of the Git core methods |
 | **`libinput`** | `1.32.0` | ✅ Verified | `glibc`, `eudev`, `libevdev`, `mtdev` | `meson`, `ninja`, `pkgconf` | Input device management and event handling library |
-| **`libksysguard`** | `6.7.5` | ✅ Verified | - | - | Task management and system monitoring library for KDE Plasma |
+| **`libksysguard`** | `6.7.5` | ✅ Verified | `qt6-base`, `qt6-declarative`, `kcoreaddons`, `kconfig`, `ki18n`, `kauth`, `zlib` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Task management and system monitoring library for KDE Plasma |
 | **`libpng`** | `1.6.47` | ✅ Verified | `glibc`, `zlib` | `make`, `gcc` | Official PNG reference library |
 | **`libssh2`** | `1.11.1` | ✅ Verified | `glibc`, `openssl`, `zlib` | `make`, `gcc`, `pkgconf` | Client-side C library implementing the SSH2 protocol |
 | **`libutf8proc`** | `2.11.3` | ✅ Verified | `glibc` | `make`, `gcc` | Clean C library for processing UTF-8 Unicode data |
@@ -229,19 +229,19 @@
 | **`pcre2`** | `10.48` | ✅ Verified | `glibc`, `zlib`, `bzip2`, `readline` | `make`, `gcc`, `pkgconf` | Perl Compatible Regular Expressions 2 (PCRE2) |
 | **`pipewire`** | `1.4.11` | ✅ Verified | `glibc`, `alsa-lib`, `dbus`, `elogind` | `meson`, `ninja`, `pkgconf` | Low-latency audio/video routing daemon and multimedia processing graph |
 | **`pixman`** | `0.46.4` | ✅ Verified | `glibc` | `meson`, `ninja`, `pkgconf` | Low-level pixel manipulation and rasterization library |
-| **`plasma-desktop`** | `6.7.5` | ✅ Verified | - | - | KDE Plasma Desktop user interface, panels, widgets and settings |
-| **`plasma-workspace`** | `6.7.5` | ✅ Verified | - | - | KDE Plasma Workspace components and session management |
+| **`plasma-desktop`** | `6.7.5` | ✅ Verified | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `qt6-svg`, `kcoreaddons`, `kconfig`, `kwindowsystem`, `ki18n`, `kauth`, `kwidgetsaddons`, `kservice`, `kcrash`, `kdbusaddons`, `kglobalaccel`, `plasma-workspace`, `libksysguard`, `breeze` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | KDE Plasma Desktop user interface, panels, widgets and settings |
+| **`plasma-workspace`** | `6.7.5` | ✅ Verified | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `qt6-svg`, `kcoreaddons`, `kconfig`, `kwindowsystem`, `ki18n`, `kauth`, `kservice`, `kcrash`, `kdbusaddons`, `kglobalaccel`, `kpipewire`, `layer-shell-qt`, `libksysguard`, `breeze`, `kwin`, `pam`, `shadow` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | KDE Plasma Workspace components and session management |
 | **`procs`** | `0.14.12` | ✅ Verified | `glibc`, `gcc` | `rust`, `mold`, `clang`, `llvm`, `pkgconf` | A modern replacement for ps written in Rust |
 | **`python`** | `3.14.7` | ✅ Verified | `glibc`, `openssl`, `zlib`, `bzip2`, `xz`, `sqlite`, `libffi`, `expat`, `ncurses`, `readline` | `make`, `gcc`, `pkgconf` | Next generation of the high-level scripting language Python |
-| **`qt6-base`** | `6.8.2` | ✅ Verified | - | - | Cross-platform application and UI framework (Core, Gui, Widgets, Network, DBus) |
-| **`qt6-declarative`** | `6.8.2` | ✅ Verified | - | - | Classes for QML and JavaScript languages for Qt6 |
-| **`qt6-svg`** | `6.8.2` | ✅ Verified | - | - | Classes for displaying the contents of SVG files in Qt6 |
-| **`qt6-wayland`** | `6.8.2` | ✅ Verified | - | - | Provides APIs for Wayland client and compositor support in Qt6 |
+| **`qt6-base`** | `6.8.2` | ✅ Verified | `glibc`, `openssl`, `zlib`, `zstd`, `dbus`, `libxkbcommon`, `fontconfig`, `freetype`, `harfbuzz`, `mesa`, `libdrm` | `cmake`, `ninja`, `pkgconf`, `vulkan-headers` | Cross-platform application and UI framework (Core, Gui, Widgets, Network, DBus) |
+| **`qt6-declarative`** | `6.8.2` | ✅ Verified | `qt6-base` | `cmake`, `ninja`, `pkgconf`, `python` | Classes for QML and JavaScript languages for Qt6 |
+| **`qt6-svg`** | `6.8.2` | ✅ Verified | `qt6-base`, `zlib` | `cmake`, `ninja`, `pkgconf` | Classes for displaying the contents of SVG files in Qt6 |
+| **`qt6-wayland`** | `6.8.2` | ✅ Verified | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `libdrm`, `wayland` | `cmake`, `ninja`, `pkgconf`, `wayland-protocols`, `vulkan-headers` | Provides APIs for Wayland client and compositor support in Qt6 |
 | **`ripgrep`** | `15.2.0` | ✅ Verified | `glibc`, `pcre2` | `cargo`, `rust`, `pkgconf` | Ultra-fast line-oriented search tool combining grep with find |
 | **`rsync`** | `3.5.0` | ✅ Verified | `glibc`, `zstd`, `openssl`, `acl` | `make`, `gcc`, `pkgconf` | Fast and versatile remote file copying tool |
 | **`rust`** | `1.98.1` | ✅ Verified | `glibc`, `llvm`, `zlib`, `openssl`, `curl` | `python`, `cmake`, `ninja`, `gcc`, `make` | Empowering everyone to build reliable and efficient systems programming language |
-| **`sddm`** | `0.21.0` | ✅ Verified | - | - | QML and Wayland based modern display manager |
-| **`seatd`** | `0.9.3` | ✅ Verified | - | - | A minimal seat management daemon, and a universal seat management library |
+| **`sddm`** | `0.21.0` | ✅ Verified | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `pam`, `shadow` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | QML and Wayland based modern display manager |
+| **`seatd`** | `0.9.3` | ✅ Verified | `glibc`, `eudev` | `meson`, `ninja`, `pkgconf` | A minimal seat management daemon, and a universal seat management library |
 | **`sqlite`** | `3.53.4` | ✅ Verified | `glibc`, `readline`, `zlib` | `make`, `gcc`, `pkgconf` | Self-contained serverless SQL database engine |
 | **`starship`** | `1.26.0` | ✅ Verified | `glibc`, `gcc` | `gcc`, `cmake`, `git`, `rust` | The cross-shell prompt for astronauts |
 | **`strace`** | `7.2` | ✅ Verified | `glibc` | `make`, `gcc` | Diagnostic, debugging and instructional userspace utility for Linux syscall tracing |

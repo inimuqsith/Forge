@@ -4,12 +4,12 @@ version = "6.30.0"
 release = 1
 description = "Extra modules and scripts for CMake used by KDE Frameworks"
 license = "BSD-2-Clause"
-homepage = "https://invent.kde.org/frameworks/extra-cmake-modules"
+upstream = "https://invent.kde.org/frameworks/extra-cmake-modules"
 slot = "6"
 
 [dependencies]
-depends = []
-makedepends = ["cmake"]
+runtime = []
+build = ["cmake"]
 
 [sources]
 urls = ["https://download.kde.org/stable/frameworks/6.30/extra-cmake-modules-6.30.0.tar.xz"]

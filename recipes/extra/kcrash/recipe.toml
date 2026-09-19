@@ -4,12 +4,12 @@ version = "6.30.0"
 release = 1
 description = "Graceful handling of application crashes and signal handlers"
 license = "LGPL-2.0-or-later"
-homepage = "https://invent.kde.org/frameworks/kcrash"
+upstream = "https://invent.kde.org/frameworks/kcrash"
 slot = "6"
 
 [dependencies]
-depends = ["kcoreaddons", "kwindowsystem"]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+runtime = ["kcoreaddons", "kwindowsystem"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
 
 [sources]
 urls = ["https://download.kde.org/stable/frameworks/6.30/kcrash-6.30.0.tar.xz"]

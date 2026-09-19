@@ -4,12 +4,12 @@ version = "39"
 release = 1
 description = "Tools and library to manipulate EFI variables"
 license = "LGPL-2.1-or-later"
-homepage = "https://github.com/rhboot/efivar"
+upstream = "https://github.com/rhboot/efivar"
 slot = "0"
 
 [dependencies]
-depends = ["glibc", "popt"]
-makedepends = ["gcc", "make", "pkgconf", "linux-headers"]
+runtime = ["glibc", "popt"]
+build = ["gcc", "make", "pkgconf", "linux-headers"]
 
 [sources]
 urls = ["https://github.com/rhboot/efivar/archive/refs/tags/39.tar.gz"]

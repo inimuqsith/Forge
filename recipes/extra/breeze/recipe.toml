@@ -4,12 +4,12 @@ version = "6.7.5"
 release = 1
 description = "Artwork, styles and assets for the Breeze visual theme"
 license = "GPL-2.0-or-later"
-homepage = "https://invent.kde.org/plasma/breeze"
+upstream = "https://invent.kde.org/plasma/breeze"
 slot = "6"
 
 [dependencies]
-depends = ["qt6-base", "qt6-declarative", "kcoreaddons", "kconfig", "kwidgetsaddons", "kwindowsystem"]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+runtime = ["qt6-base", "qt6-declarative", "kcoreaddons", "kconfig", "kwidgetsaddons", "kwindowsystem"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
 
 [sources]
 urls = ["https://download.kde.org/stable/plasma/6.7.5/breeze-6.7.5.tar.xz"]

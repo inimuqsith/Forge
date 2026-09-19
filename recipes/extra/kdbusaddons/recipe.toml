@@ -4,12 +4,12 @@ version = "6.30.0"
 release = 1
 description = "Addons to QtDBus offering DBus application management"
 license = "LGPL-2.0-or-later"
-homepage = "https://invent.kde.org/frameworks/kdbusaddons"
+upstream = "https://invent.kde.org/frameworks/kdbusaddons"
 slot = "6"
 
 [dependencies]
-depends = ["qt6-base", "dbus"]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+runtime = ["qt6-base", "dbus"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
 
 [sources]
 urls = ["https://download.kde.org/stable/frameworks/6.30/kdbusaddons-6.30.0.tar.xz"]

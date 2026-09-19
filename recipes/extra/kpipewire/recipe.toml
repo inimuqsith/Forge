@@ -4,12 +4,12 @@ version = "6.7.5"
 release = 1
 description = "Components for Flatpak and PipeWire integration in KDE Plasma"
 license = "LGPL-2.1-or-later OR LGPL-3.0-only"
-homepage = "https://invent.kde.org/plasma/kpipewire"
+upstream = "https://invent.kde.org/plasma/kpipewire"
 slot = "6"
 
 [dependencies]
-depends = ["qt6-base", "qt6-declarative", "qt6-wayland", "kcoreaddons", "ki18n", "pipewire", "libdrm", "mesa"]
-makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols"]
+runtime = ["qt6-base", "qt6-declarative", "qt6-wayland", "kcoreaddons", "ki18n", "pipewire", "libdrm", "mesa"]
+build = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols"]
 
 [sources]
 urls = ["https://download.kde.org/stable/plasma/6.7.5/kpipewire-6.7.5.tar.xz"]
