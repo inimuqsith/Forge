@@ -125,6 +125,35 @@ enum Commands {
         #[arg(long, default_value = "/var/db/forge/binhost")]
         storage_path: PathBuf,
     },
+
+    /// Generate pasangan kunci kriptografis Ed25519 untuk digital signing
+    Keygen {
+        /// Direktori penyimpanan kunci
+        #[arg(long, default_value = "/etc/forge/keys")]
+        output_dir: PathBuf,
+
+        /// Nama file kunci privat
+        #[arg(long, default_value = "kura_builder.priv")]
+        priv_name: String,
+
+        /// Nama file kunci publik
+        #[arg(long, default_value = "kura.pub")]
+        pub_name: String,
+    },
+
+    /// Tandatangani paket biner .forge.tar.zst dengan kunci Ed25519
+    Sign {
+        /// File paket biner .forge.tar.zst yang akan ditandatangani
+        package_file: PathBuf,
+
+        /// Path ke berkas private key
+        #[arg(long, default_value = "/etc/forge/keys/kura_builder.priv")]
+        key: PathBuf,
+
+        /// Path file output signature (opsional, default: <package_file>.sig)
+        #[arg(long)]
+        sig_output: Option<PathBuf>,
+    },
 }
 
 fn main() -> Result<()> {
@@ -423,6 +452,53 @@ fn main() -> Result<()> {
 
         Commands::Index { storage_path } => {
             ServerIndexer::regenerate_index(&storage_path)?;
+        }
+
+        Commands::Keygen {
+            output_dir,
+            priv_name,
+            pub_name,
+        } => {
+            println!("{}", "=== Forge Key Generator (Ed25519) ===".bold().cyan());
+            let priv_path = output_dir.join(&priv_name);
+            let pub_path = output_dir.join(&pub_name);
+
+            let keypair = forge::SigningKeyPair::generate();
+            keypair.save_to_files(&priv_path, Some(&pub_path))?;
+
+            println!("{} Berhasil membuat pasangan kunci digital signing!", "✓".green());
+            println!("  - Secret Key (Private) : {}", priv_path.display().to_string().bold().yellow());
+            println!("  - Public Key (Distro)  : {}", pub_path.display().to_string().bold().green());
+            println!("  - Public Key Hex       : {}", keypair.public_key_hex().bold().cyan());
+        }
+
+        Commands::Sign {
+            package_file,
+            key,
+            sig_output,
+        } => {
+            println!("{}", "=== Forge Package Signer ===".bold().cyan());
+            if !package_file.exists() {
+                anyhow::bail!("Berkas paket biner {:?} tidak ditemukan!", package_file);
+            }
+            if !key.exists() {
+                anyhow::bail!(
+                    "Berkas private key {:?} tidak ditemukan! Buat kunci dengan 'forge-server keygen'.",
+                    key
+                );
+            }
+
+            let keypair = forge::SigningKeyPair::load_from_file(&key)?;
+            let target_sig = sig_output.unwrap_or_else(|| {
+                let mut p = package_file.clone().into_os_string();
+                p.push(".sig");
+                PathBuf::from(p)
+            });
+
+            keypair.sign_file_to_sig_file(&package_file, &target_sig)?;
+            println!("{} Paket biner berhasil ditandatangani!", "✓".green());
+            println!("  - Package   : {}", package_file.display());
+            println!("  - Signature : {}", target_sig.display().to_string().bold().yellow());
         }
     }
 

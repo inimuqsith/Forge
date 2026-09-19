@@ -34,3 +34,11 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 fs2 = { workspace = true }
+ed25519-dalek = { workspace = true }
+rand = { workspace = true }
+version-compare = { workspace = true }
+rayon = { workspace = true }
+nix = { workspace = true }
+async-compression = { workspace = true }
+tokio-util = { workspace = true }
+hex = { workspace = true }

@@ -4,8 +4,77 @@ use std::fs;
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use anyhow::{bail, Context, Result};
+use rayon::prelude::*;
+use version_compare::Cmp;
 
 use crate::{ForgeConfig, Recipe, UseFlagsEngine};
+
+/// Batasan versi dependensi paket (misal: ">=2.3.0", "<=5.0", "=1.0", "~1.2")
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct VersionConstraint {
+    pub raw: String,
+    pub op: String,
+    pub target_version: String,
+}
+
+impl VersionConstraint {
+    /// Parsing string dependensi menjadi (PackageId, Option<VersionConstraint>)
+    pub fn parse(raw: &str) -> (PackageId, Option<Self>) {
+        let trimmed = raw.trim();
+        let ops = [">=", "<=", "==", "!=", ">", "<", "=", "~"];
+
+        // Cek operator infix seperti "openssl>=3.0.0"
+        for op in ops {
+            if let Some(pos) = trimmed.find(op) {
+                let pkg_part = trimmed[..pos].trim();
+                let ver_part = trimmed[pos + op.len()..].trim();
+                if !pkg_part.is_empty() && !ver_part.is_empty() {
+                    let pkg_id = PackageId::parse(pkg_part);
+                    return (
+                        pkg_id,
+                        Some(Self {
+                            raw: trimmed.to_string(),
+                            op: op.to_string(),
+                            target_version: ver_part.to_string(),
+                        }),
+                    );
+                }
+            }
+        }
+
+        // Cek jika diawali operator prefix seperti ">=gcc-15"
+        for op in ops {
+            if trimmed.starts_with(op) {
+                let rest = trimmed[op.len()..].trim();
+                let pkg_id = PackageId::parse(rest);
+                return (
+                    pkg_id,
+                    Some(Self {
+                        raw: trimmed.to_string(),
+                        op: op.to_string(),
+                        target_version: rest.to_string(),
+                    }),
+                );
+            }
+        }
+
+        (PackageId::parse(trimmed), None)
+    }
+
+    /// Evaluasi apakah sebuah versi kandidat memenuhi batasan versi ini
+    pub fn is_satisfied_by(&self, candidate_version: &str) -> bool {
+        match self.op.as_str() {
+            ">=" => version_compare::compare_to(candidate_version, &self.target_version, Cmp::Ge).unwrap_or(false),
+            "<=" => version_compare::compare_to(candidate_version, &self.target_version, Cmp::Le).unwrap_or(false),
+            ">" => version_compare::compare_to(candidate_version, &self.target_version, Cmp::Gt).unwrap_or(false),
+            "<" => version_compare::compare_to(candidate_version, &self.target_version, Cmp::Lt).unwrap_or(false),
+            "=" | "==" => version_compare::compare_to(candidate_version, &self.target_version, Cmp::Eq).unwrap_or(false),
+            "!=" => version_compare::compare_to(candidate_version, &self.target_version, Cmp::Ne).unwrap_or(false),
+            "~" => version_compare::compare_to(candidate_version, &self.target_version, Cmp::Ge).unwrap_or(false),
+            _ => true,
+        }
+    }
+}
 
 /// Tipe relasi dependensi antar paket
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
@@ -170,9 +239,10 @@ impl RecipeScanner {
         scanner
     }
 
-    /// Pindai seluruh subfolder (system, core, extra) dan indeks file recipe.toml
+    /// Pindai seluruh subfolder (system, core, extra) dan indeks file recipe.toml secara paralel dengan Rayon
     pub fn scan_all(&mut self) -> Result<()> {
         let categories = ["system", "core", "extra"];
+        let mut candidate_files = Vec::new();
 
         for root in &self.search_roots {
             if !root.exists() {
@@ -188,19 +258,7 @@ impl RecipeScanner {
                             if pkg_dir.is_dir() {
                                 let recipe_file = pkg_dir.join("recipe.toml");
                                 if recipe_file.is_file() {
-                                    if let Ok(content) = fs::read_to_string(&recipe_file) {
-                                        if let Ok(parsed) = toml::from_str::<Recipe>(&content) {
-                                            let pkg_id = PackageId::new(
-                                                &parsed.package.name,
-                                                &parsed.package.slot,
-                                            );
-                                            self.recipes_cache.insert(pkg_id.clone(), recipe_file.clone());
-                                            self.name_index
-                                                .entry(parsed.package.name.clone())
-                                                .or_default()
-                                                .push(recipe_file.clone());
-                                        }
-                                    }
+                                    candidate_files.push(recipe_file);
                                 }
                             }
                         }
@@ -208,6 +266,26 @@ impl RecipeScanner {
                 }
             }
         }
+
+        // Parsing resep secara paralel di CPU RAM tmpfs menggunakan Rayon
+        let parsed_entries: Vec<(PackageId, String, PathBuf)> = candidate_files
+            .par_iter()
+            .filter_map(|recipe_file| {
+                let content = fs::read_to_string(recipe_file).ok()?;
+                let parsed = toml::from_str::<Recipe>(&content).ok()?;
+                let pkg_id = PackageId::new(&parsed.package.name, &parsed.package.slot);
+                Some((pkg_id, parsed.package.name, recipe_file.clone()))
+            })
+            .collect();
+
+        for (pkg_id, name, recipe_file) in parsed_entries {
+            self.recipes_cache.insert(pkg_id, recipe_file.clone());
+            self.name_index
+                .entry(name)
+                .or_default()
+                .push(recipe_file);
+        }
+
         Ok(())
     }
 
@@ -974,5 +1052,34 @@ mod tests {
         assert!(idx_binutils < idx_gcc);
         assert!(idx_glibc < idx_gcc);
         assert!(idx_gcc < idx_mold);
+    }
+
+    #[test]
+    fn test_version_constraint_evaluation() {
+        let (id1, c1) = VersionConstraint::parse("openssl>=3.0.0");
+        assert_eq!(id1.name, "openssl");
+        let constraint1 = c1.expect("Harus menghasilkan VersionConstraint");
+        assert_eq!(constraint1.op, ">=");
+        assert_eq!(constraint1.target_version, "3.0.0");
+        assert!(constraint1.is_satisfied_by("3.0.0"));
+        assert!(constraint1.is_satisfied_by("3.4.1"));
+        assert!(!constraint1.is_satisfied_by("1.1.1u"));
+
+        let (id2, c2) = VersionConstraint::parse("gcc<=15.0.0");
+        assert_eq!(id2.name, "gcc");
+        let constraint2 = c2.expect("Harus menghasilkan VersionConstraint");
+        assert!(constraint2.is_satisfied_by("14.2.0"));
+        assert!(constraint2.is_satisfied_by("15.0.0"));
+        assert!(!constraint2.is_satisfied_by("16.0.0"));
+
+        let (id3, c3) = VersionConstraint::parse("zlib!=1.2.11");
+        assert_eq!(id3.name, "zlib");
+        let constraint3 = c3.expect("Harus menghasilkan VersionConstraint");
+        assert!(constraint3.is_satisfied_by("1.3.1"));
+        assert!(!constraint3.is_satisfied_by("1.2.11"));
+
+        let (id4, c4) = VersionConstraint::parse("curl");
+        assert_eq!(id4.name, "curl");
+        assert!(c4.is_none());
     }
 }

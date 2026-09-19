@@ -5,6 +5,7 @@ use std::io::Write;
 use std::os::unix::fs::{symlink, PermissionsExt};
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
+use rayon::prelude::*;
 
 use crate::db::{
     InstalledDatabase, ManifestEntry, ManifestEntryType, PackageManifest, PackageMetadata,
@@ -121,18 +122,34 @@ impl MergeTransaction {
         }
     }
 
-    /// Memindai seluruh berkas dan symlink yang berada di direktori staging
+    /// Memindai seluruh berkas dan symlink yang berada di direktori staging secara paralel dengan Rayon
     pub fn scan_staging(&mut self) -> Result<&[StagedEntry]> {
         self.entries.clear();
         if !self.staging_dir.exists() {
             bail!("Direktori staging {:?} tidak ditemukan!", self.staging_dir);
         }
 
-        self.scan_dir_recursive(&self.staging_dir.clone())?;
+        let mut regular_files = Vec::new();
+        self.scan_dir_recursive(&self.staging_dir.clone(), &mut regular_files)?;
+
+        // Hitung hash SHA256 seluruh regular file secara paralel menggunakan thread pool Rayon
+        let hashes: Vec<(usize, Option<String>)> = regular_files
+            .par_iter()
+            .map(|(idx, disk_path)| (*idx, InstalledDatabase::calculate_sha256(disk_path).ok()))
+            .collect();
+
+        for (idx, sha) in hashes {
+            self.entries[idx].sha256 = sha;
+        }
+
         Ok(&self.entries)
     }
 
-    fn scan_dir_recursive(&mut self, current_dir: &Path) -> Result<()> {
+    fn scan_dir_recursive(
+        &mut self,
+        current_dir: &Path,
+        regular_files: &mut Vec<(usize, PathBuf)>,
+    ) -> Result<()> {
         for entry in fs::read_dir(current_dir)? {
             let entry = entry?;
             let path = entry.path();
@@ -175,9 +192,10 @@ impl MergeTransaction {
                     sha256: None,
                     symlink_target: None,
                 });
-                self.scan_dir_recursive(&path)?;
+                self.scan_dir_recursive(&path, regular_files)?;
             } else {
-                let sha256 = InstalledDatabase::calculate_sha256(&path).ok();
+                let entry_idx = self.entries.len();
+                regular_files.push((entry_idx, path.clone()));
                 self.entries.push(StagedEntry {
                     relative_path: normalized_rel,
                     file_type: FileType::Regular,
@@ -185,7 +203,7 @@ impl MergeTransaction {
                     mode,
                     uid: 0,
                     gid: 0,
-                    sha256,
+                    sha256: None,
                     symlink_target: None,
                 });
             }

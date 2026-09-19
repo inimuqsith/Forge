@@ -146,6 +146,28 @@ impl SandboxRunner {
         cmd.status()
             .with_context(|| "Gagal mengeksekusi bash script dalam mode fallback")
     }
+
+    /// Konfigurasi batas alokasi resource proses Linux (nix syscalls setrlimit)
+    pub fn configure_process_limits(
+        max_open_files: Option<u64>,
+        max_core_dump: Option<u64>,
+    ) -> Result<()> {
+        if let Some(nofile) = max_open_files {
+            let _ = nix::sys::resource::setrlimit(
+                nix::sys::resource::Resource::RLIMIT_NOFILE,
+                nofile,
+                nofile,
+            );
+        }
+        if let Some(core) = max_core_dump {
+            let _ = nix::sys::resource::setrlimit(
+                nix::sys::resource::Resource::RLIMIT_CORE,
+                core,
+                core,
+            );
+        }
+        Ok(())
+    }
 }
 
 impl Default for SandboxRunner {
@@ -253,5 +275,11 @@ echo "var=$MY_TEST_VAR" >> "$DESTDIR/output.txt"
         );
 
         assert!(res.is_ok(), "Harus diizinkan untuk paket 'bubblewrap' agar self-bootstrap berhasil");
+    }
+
+    #[test]
+    fn test_configure_process_limits() {
+        let res = SandboxRunner::configure_process_limits(Some(1024), Some(0));
+        assert!(res.is_ok(), "Konfigurasi limits via nix harus berhasil");
     }
 }

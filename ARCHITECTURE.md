@@ -275,3 +275,8 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-039** | Server-Side Multi-Tier Upstream Probing & GitHub SSOT Automated Bumping | ✅ Diterapkan |
 | **ADR-040** | Penegakan Wajib Sandbox Bubblewrap & Pengecualian Self-Bootstrap `bubblewrap` | ✅ Diterapkan |
 | **ADR-041** | Live Network Streaming Downloader & End-to-End Transactional Installation Pipeline | ✅ Diterapkan |
+| **ADR-042** | Pure Rust Ed25519 Digital Package Signing & Supply-Chain Verification (`ed25519-dalek`) | ✅ Diterapkan |
+| **ADR-043** | Dynamic Version Constraint Engine (`version-compare`) | ✅ Diterapkan |
+| **ADR-044** | Multi-Core Data Parallelism on RAM tmpfs (`rayon`) | ✅ Diterapkan |
+| **ADR-045** | Low-Level Linux Syscall Resource Governance & PID Liveness Detection (`nix`) | ✅ Diterapkan |
+| **ADR-046** | Asynchronous Non-Blocking Streaming Decompression (`async-compression`) | ✅ Diterapkan |

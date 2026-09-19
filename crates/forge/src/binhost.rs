@@ -178,4 +178,43 @@ impl BinhostClient {
             staging_dir: staging_dir.to_path_buf(),
         })
     }
+
+    /// Verifikasi digital signature Ed25519 untuk file arsip biner
+    pub fn verify_archive_signature(
+        archive_path: &Path,
+        sig_path: &Path,
+        verifier: &crate::crypto::PackageVerifier,
+    ) -> Result<()> {
+        verifier.verify_file_sig_file(archive_path, sig_path)
+    }
+}
+
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+    use crate::crypto::SigningKeyPair;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_binhost_signature_verification() -> Result<()> {
+        let temp = tempdir()?;
+        let pkg_tar = temp.path().join("ripgrep-14.1.0-1.forge.tar.zst");
+        let sig_file = temp.path().join("ripgrep-14.1.0-1.forge.tar.zst.sig");
+
+        fs::write(&pkg_tar, b"Binary payload for ripgrep")?;
+
+        let keypair = SigningKeyPair::generate();
+        keypair.sign_file_to_sig_file(&pkg_tar, &sig_file)?;
+
+        let verifier = crate::crypto::PackageVerifier::from_verifying_key(keypair.verifying_key());
+        let verify_result = BinhostClient::verify_archive_signature(&pkg_tar, &sig_file, &verifier);
+        assert!(verify_result.is_ok(), "Verifikasi signature sah harus berhasil");
+
+        // Modifikasi isi paket untuk memastikan tamper detection
+        fs::write(&pkg_tar, b"Tampered binary payload")?;
+        let tampered_result = BinhostClient::verify_archive_signature(&pkg_tar, &sig_file, &verifier);
+        assert!(tampered_result.is_err(), "Verifikasi signature paket termodifikasi harus gagal");
+
+        Ok(())
+    }
 }

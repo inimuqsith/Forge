@@ -61,7 +61,14 @@ impl ForgeLockGuard {
                 }
                 Err(_e) => {
                     let existing_pid = fs::read_to_string(path).unwrap_or_default();
-                    let pid_info = if !existing_pid.trim().is_empty() {
+                    let pid_info = if let Ok(pid_num) = existing_pid.trim().parse::<i32>() {
+                        let alive = Self::is_pid_alive(pid_num);
+                        format!(
+                            " (PID: {}, status: {})",
+                            pid_num,
+                            if alive { "active" } else { "stale/dead" }
+                        )
+                    } else if !existing_pid.trim().is_empty() {
                         format!(" (PID: {})", existing_pid.trim())
                     } else {
                         String::new()
@@ -80,6 +87,19 @@ impl ForgeLockGuard {
                 file,
                 lock_path: path.to_path_buf(),
             })
+        }
+    }
+
+    /// Periksa apakah proses dengan PID tertentu masih hidup menggunakan sinyal kernel 0 (nix)
+    pub fn is_pid_alive(pid: i32) -> bool {
+        if pid <= 0 {
+            return false;
+        }
+        match nix::sys::signal::kill(nix::unistd::Pid::from_raw(pid), None) {
+            Ok(()) => true,
+            Err(nix::errno::Errno::EPERM) => true,
+            Err(nix::errno::Errno::ESRCH) => false,
+            Err(_) => false,
         }
     }
 
@@ -154,5 +174,14 @@ pub mod tests {
             "Pesan error harus mencantumkan PID aktif: {}",
             err_msg
         );
+    }
+
+    #[test]
+    fn test_is_pid_alive_detection() {
+        let current_pid = std::process::id() as i32;
+        assert!(ForgeLockGuard::is_pid_alive(current_pid));
+        // PID 99999999 kemungkinan besar tidak ada di Linux
+        assert!(!ForgeLockGuard::is_pid_alive(99_999_999));
+        assert!(!ForgeLockGuard::is_pid_alive(-1));
     }
 }
