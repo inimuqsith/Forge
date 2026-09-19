@@ -356,6 +356,11 @@ impl InstalledDatabase {
         Ok(None)
     }
 
+    /// Cek apakah paket telah terpasang di database
+    pub fn is_installed(&self, pkg_name: &str) -> bool {
+        self.get_package(pkg_name).map(|opt| opt.is_some()).unwrap_or(false)
+    }
+
     /// Mencari paket pemilik file tertentu di rootfs
     pub fn find_owner(&self, relative_path: &Path) -> Result<Option<(String, String)>> {
         let clean_path = if relative_path.starts_with("/") {

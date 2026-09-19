@@ -282,12 +282,48 @@ fn main() -> Result<()> {
                         provider_name.bold().green()
                     );
 
-                    if let Some(ref download_url) = resolution.download_url {
+                    let items_to_install: Vec<(String, String, Option<String>)> = if resolution.provider == PackageProvider::CachyOsPrebuilt {
+                        let cpu = forge::CpuProfile::detect().unwrap_or_else(|_| forge::CpuProfile::mock("native", &[]));
+                        let cachyos = forge::CachyOsAdapter::auto_detect(&cpu);
+                        if let Ok(chain) = rt.block_on(cachyos.resolve_dependency_chain(&target)) {
+                            // Filter dependensi yang belum terpasang di database
+                            chain.into_iter()
+                                .filter(|(pkg, _, _)| !db.is_installed(pkg))
+                                .map(|(pkg, url, meta)| (pkg, url, Some(meta.version)))
+                                .collect()
+                        } else if let Some(ref dl_url) = resolution.download_url {
+                            vec![(target.clone(), dl_url.clone(), None)]
+                        } else {
+                            vec![]
+                        }
+                    } else if let Some(ref dl_url) = resolution.download_url {
+                        vec![(target.clone(), dl_url.clone(), None)]
+                    } else {
+                        vec![]
+                    };
+
+                    if items_to_install.is_empty() {
+                        println!("{} Seluruh paket dan dependensi untuk '{}' sudah terpasang!", "✓".green(), target.bold());
+                        return Ok(());
+                    }
+
+                    println!("\n{}", "=== Rencana Eksekusi Instalasi Biner (Recursive Topological Order) ===".bold().cyan());
+                    println!("  Total Paket yang Akan Dipasang: {}", items_to_install.len().to_string().bold().yellow());
+                    for (idx, (pkg, _, ver_opt)) in items_to_install.iter().enumerate() {
+                        let ver_str = ver_opt.as_deref().unwrap_or("latest");
+                        let role = if pkg == &target { "[TARGET]".green() } else { "[DEPEND]".cyan() };
+                        println!("  {:>2}. {} {:<20} v{}", idx + 1, role, pkg.bold(), ver_str);
+                    }
+                    println!();
+
+                    for (pkg, download_url, ver_opt) in items_to_install {
+                        let ver_str = ver_opt.as_deref().unwrap_or("latest");
+                        println!("\n>>> Memasang paket biner: {} v{}", pkg.bold().green(), ver_str);
                         println!("  [↓] URL: {}", download_url.dimmed());
                         let stream_staging = std::env::temp_dir()
                             .join("forge")
                             .join("stage")
-                            .join(format!("stream-{}", target));
+                            .join(format!("stream-{}", pkg));
 
                         if stream_staging.exists() {
                             let _ = std::fs::remove_dir_all(&stream_staging);
@@ -295,7 +331,7 @@ fn main() -> Result<()> {
                         std::fs::create_dir_all(&stream_staging)?;
 
                         match rt.block_on(BinhostClient::download_and_extract_stream(
-                            download_url,
+                            &download_url,
                             &stream_staging,
                             None,
                             true,
@@ -309,8 +345,8 @@ fn main() -> Result<()> {
                                 println!("  [📦] Memulai transaksi merger ke target rootfs '{}'...", target_root.display());
 
                                 let mut tx = MergeTransaction::new(
-                                    &target,
-                                    "latest",
+                                    &pkg,
+                                    ver_str,
                                     "0",
                                     &stream_staging,
                                     &target_root,
@@ -322,25 +358,32 @@ fn main() -> Result<()> {
                                 match tx.execute_merge(&db) {
                                     Ok(manifest) => {
                                         println!(
-                                            "\n{} Paket '{}' v{} berhasil dipasang ke sistem!",
+                                            "{} Paket '{}' v{} berhasil dipasang ke sistem! ({} berkas)",
                                             "✓".green(),
                                             manifest.package_name.bold().green(),
-                                            manifest.package_version
+                                            manifest.package_version,
+                                            manifest.entries.len()
                                         );
-                                        println!("  - Total berkas terpasang: {}", manifest.entries.len());
                                     }
                                     Err(e) => {
                                         println!("{} Gagal menggabungkan paket ke sistem: {:#}", "✗".red(), e);
                                         std::process::exit(1);
                                     }
                                 }
+                                let _ = std::fs::remove_dir_all(&stream_staging);
                             }
                             Err(e) => {
                                 println!("{} Gagal mengunduh paket biner: {:#}", "✗".red(), e);
-                                println!("  [!] Beralih ke kompilasi lokal dari kode sumber...");
+                                std::process::exit(1);
                             }
                         }
                     }
+
+                    println!(
+                        "\n{} Seluruh target paket '{}' dan dependensinya berhasil dipasang!",
+                        "✨".green(),
+                        target.bold().green()
+                    );
                 }
                 PackageProvider::ForgeSource => {
                     println!(

@@ -201,6 +201,58 @@ impl CachyOsAdapter {
         }
     }
 
+    /// Mengunduh seluruh database repositori tier aktif dan menggabungkannya ke dalam map metadata
+    pub async fn fetch_package_db_pool(&self) -> Result<HashMap<String, (String, CachyOsPackageMeta)>> {
+        let mut pool = HashMap::new();
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(15))
+            .build()
+            .context("Gagal membuat HTTP client untuk CachyOS DB pool")?;
+
+        for (base_repo_url, repo_name) in self.get_repo_urls() {
+            let db_url = format!("{}/{}.db.tar.zst", base_repo_url, repo_name);
+            if let Ok(resp) = client.get(&db_url).send().await {
+                if resp.status().is_success() {
+                    if let Ok(bytes) = resp.bytes().await {
+                        if let Ok(db) = parse_repo_db_tar_zst(&bytes) {
+                            for (pkg_name, meta) in db {
+                                pool.entry(pkg_name).or_insert_with(|| (base_repo_url.clone(), meta));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Ok(pool)
+    }
+
+    /// Menelusuri seluruh rantai dependensi paket dan mengembalikan urutan build/install topologis
+    /// beserta URL download dan metadata masing-masing paket.
+    pub async fn resolve_dependency_chain(
+        &self,
+        target_pkg: &str,
+    ) -> Result<Vec<(String, String, CachyOsPackageMeta)>> {
+        let pool = self.fetch_package_db_pool().await?;
+        let clean = clean_package_name(target_pkg);
+
+        let meta_map: HashMap<String, CachyOsPackageMeta> = pool
+            .iter()
+            .map(|(k, (_, meta))| (k.clone(), meta.clone()))
+            .collect();
+
+        let ordered_names = self.resolve_dependencies_recursive(&[clean], &meta_map)?;
+        let mut chain = Vec::new();
+
+        for name in ordered_names {
+            if let Some((base_url, meta)) = pool.get(&name) {
+                let download_url = format!("{}/{}", base_url, meta.filename);
+                chain.push((name, download_url, meta.clone()));
+            }
+        }
+
+        Ok(chain)
+    }
+
     /// Query repository databases secara asinkron untuk mencari URL biner dan metadata paket
     pub async fn query_package(&self, pkg_name: &str) -> Option<(String, CachyOsPackageMeta)> {
         let clean = clean_package_name(pkg_name);
