@@ -1,9 +1,8 @@
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::fs;
-use std::io::Write;
 use std::path::{Path, PathBuf};
+use tokio::io::AsyncWriteExt;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BinhostPackageEntry {
@@ -115,7 +114,8 @@ impl BinhostClient {
             None
         };
 
-        fs::create_dir_all(staging_dir)
+        tokio::fs::create_dir_all(staging_dir)
+            .await
             .with_context(|| format!("Gagal membuat direktori staging {:?}", staging_dir))?;
 
         // Streaming ke file sementara terisolasi
@@ -125,7 +125,7 @@ impl BinhostClient {
             .tempfile()?;
         let temp_archive_path = temp_archive.path().to_path_buf();
 
-        let mut file = fs::File::create(&temp_archive_path)?;
+        let mut file = tokio::fs::File::create(&temp_archive_path).await?;
         let mut sha256_hasher = Sha256::new();
         let mut blake3_hasher = blake3::Hasher::new();
         let mut bytes_downloaded = 0u64;
@@ -135,11 +135,14 @@ impl BinhostClient {
             sha256_hasher.update(&chunk);
             blake3_hasher.update(&chunk);
             bytes_downloaded += chunk.len() as u64;
-            file.write_all(&chunk)?;
+            file.write_all(&chunk).await?;
             if let Some(ref p) = pb {
                 p.set_position(bytes_downloaded);
             }
         }
+
+        file.flush().await?;
+        drop(file);
 
         if let Some(ref p) = pb {
             p.finish_with_message("Unduhan biner selesai!");
@@ -158,15 +161,23 @@ impl BinhostClient {
             }
         }
 
-        // Dekompresi Zstd dan ekstrak Tar ke direktori staging
-        let tar_file = fs::File::open(&temp_archive_path)?;
-        let decoder = zstd::Decoder::new(tar_file)
-            .context("Gagal menginisialisasi dekompresor Zstd")?;
-        let mut archive = tar::Archive::new(decoder);
-        archive.set_preserve_permissions(true);
-        archive.set_unpack_xattrs(true);
-        archive.unpack(staging_dir)
-            .with_context(|| format!("Gagal mengekstrak arsip tarball ke {:?}", staging_dir))?;
+        // Dekompresi Zstd dan ekstrak Tar ke direktori staging (spawn_blocking)
+        let staging_dir_buf = staging_dir.to_path_buf();
+        let temp_archive_path_buf = temp_archive_path.clone();
+        tokio::task::spawn_blocking(move || -> Result<()> {
+            let tar_file = std::fs::File::open(&temp_archive_path_buf)
+                .with_context(|| format!("Gagal membuka file arsip sementara {:?}", temp_archive_path_buf))?;
+            let decoder = zstd::Decoder::new(tar_file)
+                .context("Gagal menginisialisasi dekompresor Zstd")?;
+            let mut archive = tar::Archive::new(decoder);
+            archive.set_preserve_permissions(true);
+            archive.set_unpack_xattrs(true);
+            archive.unpack(&staging_dir_buf)
+                .with_context(|| format!("Gagal mengekstrak arsip tarball ke {:?}", staging_dir_buf))?;
+            Ok(())
+        })
+        .await
+        .context("Gagal mengeksekusi worker thread ekstraksi tarball")??;
 
         let package_name = url.split('/').last().unwrap_or("package").to_string();
 
@@ -193,6 +204,7 @@ impl BinhostClient {
 pub mod tests {
     use super::*;
     use crate::crypto::SigningKeyPair;
+    use std::fs;
     use tempfile::tempdir;
 
     #[test]

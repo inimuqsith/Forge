@@ -3,10 +3,11 @@ use blake3::Hasher as Blake3Hasher;
 use colored::Colorize;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::fs::{self, File, OpenOptions};
-use std::io::{Read, Write};
+use std::fs::File;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
+use tokio::io::AsyncWriteExt;
 
 /// Opsi konfigurasi untuk proses pengunduhan kode sumber
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -84,19 +85,20 @@ impl SourceDownloader {
         rt.block_on(Self::download_async(primary_url, target_path, options))
     }
 
-    /// Unduh berkas sumber secara asinkron dengan fitur Resumption & Multi-Mirror Failover
+    /// Unduh berkas sumber secara asinkron dengan fitur Resumption & Multi-Mirror Failover (Non-Blocking Async I/O)
     pub async fn download_async(
         primary_url: &str,
         target_path: &Path,
         options: &DownloadOptions,
     ) -> Result<DownloadResult> {
         if let Some(parent) = target_path.parent() {
-            fs::create_dir_all(parent)?;
+            tokio::fs::create_dir_all(parent).await?;
         }
 
         // 1. Cek apakah berkas final sudah ada di disk dan hash-nya valid
         if target_path.exists() {
-            if let Ok((sha, b3)) = Self::calculate_hashes(target_path) {
+            let target_path_clone = target_path.to_path_buf();
+            if let Ok(Ok((sha, b3))) = tokio::task::spawn_blocking(move || Self::calculate_hashes(&target_path_clone)).await {
                 let sha_valid = match &options.expected_sha256 {
                     Some(expected) => !expected.is_empty() && &sha == expected,
                     None => true,
@@ -107,7 +109,7 @@ impl SourceDownloader {
                 };
 
                 if sha_valid && b3_valid {
-                    let metadata = fs::metadata(target_path)?;
+                    let metadata = tokio::fs::metadata(target_path).await?;
                     let total_size = metadata.len();
                     if options.show_progress {
                         println!(
@@ -162,7 +164,7 @@ impl SourceDownloader {
             // Retry loop per mirror dengan exponential backoff
             for attempt in 1..=options.retries {
                 let existing_len = if part_file.exists() {
-                    fs::metadata(&part_file).map(|m| m.len()).unwrap_or(0)
+                    tokio::fs::metadata(&part_file).await.map(|m| m.len()).unwrap_or(0)
                 } else {
                     0
                 };
@@ -186,7 +188,7 @@ impl SourceDownloader {
 
                         if status == reqwest::StatusCode::RANGE_NOT_SATISFIABLE {
                             // File part mungkin corrupt atau server file berubah, hapus part dan ulangi dari 0
-                            let _ = fs::remove_file(&part_file);
+                            let _ = tokio::fs::remove_file(&part_file).await;
                             continue;
                         }
 
@@ -203,16 +205,18 @@ impl SourceDownloader {
 
                         let is_partial = status == reqwest::StatusCode::PARTIAL_CONTENT;
                         let mut file = if is_partial && existing_len > 0 {
-                            OpenOptions::new()
+                            tokio::fs::OpenOptions::new()
                                 .create(true)
                                 .append(true)
-                                .open(&part_file)?
+                                .open(&part_file)
+                                .await?
                         } else {
-                            OpenOptions::new()
+                            tokio::fs::OpenOptions::new()
                                 .create(true)
                                 .write(true)
                                 .truncate(true)
-                                .open(&part_file)?
+                                .open(&part_file)
+                                .await?
                         };
 
                         let resumed_offset = if is_partial { existing_len } else { 0 };
@@ -221,7 +225,7 @@ impl SourceDownloader {
                         let mut response = response;
 
                         while let Ok(Some(chunk)) = response.chunk().await {
-                            if let Err(e) = file.write_all(&chunk) {
+                            if let Err(e) = file.write_all(&chunk).await {
                                 last_error = Some(format!("Gagal menulis chunk ke part file: {:#}", e));
                                 stream_err = true;
                                 break;
@@ -238,15 +242,20 @@ impl SourceDownloader {
                             }
                         }
 
-                        file.flush()?;
+                        file.flush().await?;
                         drop(file);
 
-                        // 4. Validasi Checksum Integritas
-                        let (calc_sha, calc_b3) = Self::calculate_hashes(&part_file)?;
+                        // 4. Validasi Checksum Integritas (Offload ke worker thread)
+                        let part_file_clone = part_file.clone();
+                        let (calc_sha, calc_b3) = tokio::task::spawn_blocking(move || {
+                            Self::calculate_hashes(&part_file_clone)
+                        })
+                        .await
+                        .context("Gagal menjalankan hashing task")??;
 
                         if let Some(ref expected_sha) = options.expected_sha256 {
                             if !expected_sha.is_empty() && &calc_sha != expected_sha {
-                                let _ = fs::remove_file(&part_file);
+                                let _ = tokio::fs::remove_file(&part_file).await;
                                 last_error = Some(format!(
                                     "Mismatch checksum SHA256! Expected: {}, Found: {}",
                                     expected_sha, calc_sha
@@ -257,7 +266,7 @@ impl SourceDownloader {
 
                         if let Some(ref expected_b3) = options.expected_blake3 {
                             if !expected_b3.is_empty() && &calc_b3 != expected_b3 {
-                                let _ = fs::remove_file(&part_file);
+                                let _ = tokio::fs::remove_file(&part_file).await;
                                 last_error = Some(format!(
                                     "Mismatch checksum BLAKE3! Expected: {}, Found: {}",
                                     expected_b3, calc_b3
@@ -267,9 +276,9 @@ impl SourceDownloader {
                         }
 
                         // Promosikan .part secara atomik ke nama file target final
-                        fs::rename(&part_file, target_path)?;
+                        tokio::fs::rename(&part_file, target_path).await?;
 
-                        let final_size = fs::metadata(target_path)?.len();
+                        let final_size = tokio::fs::metadata(target_path).await?.len();
                         if options.show_progress {
                             println!(
                                 "  [✓] Unduhan selesai ({:.2} MB, SHA256: {})",
@@ -308,6 +317,7 @@ impl SourceDownloader {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
     use tempfile::tempdir;
 
     #[test]
