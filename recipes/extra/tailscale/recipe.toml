@@ -1,0 +1,67 @@
+[package]
+name = "tailscale"
+version = "1.102.4"
+release = 1
+slot = "0"
+description = "Zero config VPN daemon and CLI for secure mesh networks"
+license = "BSD-3-Clause"
+upstream = "https://github.com/tailscale/tailscale"
+
+[dependencies]
+runtime = ["glibc", "ca-certificates", "iptables"]
+build = ["tar", "gzip"]
+
+[sources]
+urls = [
+  "https://pkgs.tailscale.com/stable/tailscale_1.102.4_amd64.tgz"
+]
+sha256 = [
+  "50748df1045e60b5b695f19f4c56b0da36c019948b440fb456b6584a50f0d8b9"
+]
+
+[build]
+type = "binary"
+script = """
+mkdir -p "${DESTDIR}/usr/bin"
+mkdir -p "${DESTDIR}/etc/init.d"
+mkdir -p "${DESTDIR}/etc/conf.d"
+mkdir -p "${DESTDIR}/var/lib/tailscale"
+
+# Install binaries
+if [ -f "tailscale" ]; then
+  install -Dm755 tailscale "${DESTDIR}/usr/bin/tailscale"
+  install -Dm755 tailscaled "${DESTDIR}/usr/bin/tailscaled"
+elif [ -d "tailscale_${pkgver}_amd64" ]; then
+  install -Dm755 "tailscale_${pkgver}_amd64/tailscale" "${DESTDIR}/usr/bin/tailscale"
+  install -Dm755 "tailscale_${pkgver}_amd64/tailscaled" "${DESTDIR}/usr/bin/tailscaled"
+fi
+
+# OpenRC init.d service script
+cat << 'EOF' > "${DESTDIR}/etc/init.d/tailscale"
+#!/sbin/openrc-run
+description="Tailscale Mesh VPN Daemon"
+supervisor="supervise-daemon"
+command="/usr/bin/tailscaled"
+command_args="${TAILSCALED_OPTS:---state=/var/lib/tailscale/tailscaled.state --socket=/run/tailscale/tailscaled.sock}"
+command_background="yes"
+pidfile="/run/tailscaled.pid"
+
+depend() {
+    need net
+    after firewall
+    use logger
+}
+
+start_pre() {
+    checkpath -d -m 0755 /var/lib/tailscale
+    checkpath -d -m 0755 /run/tailscale
+}
+EOF
+chmod 755 "${DESTDIR}/etc/init.d/tailscale"
+
+# OpenRC conf.d configuration
+cat << 'EOF' > "${DESTDIR}/etc/conf.d/tailscale"
+# Tailscaled daemon options
+TAILSCALED_OPTS="--state=/var/lib/tailscale/tailscaled.state --socket=/run/tailscale/tailscaled.sock"
+EOF
+"""

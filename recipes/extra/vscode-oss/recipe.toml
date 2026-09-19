@@ -1,0 +1,64 @@
+[package]
+name = "vscode-oss"
+version = "1.135.06055"
+release = 1
+slot = "0"
+description = "Free/Libre Open Source Software Binaries of Visual Studio Code (VSCodium)"
+license = "MIT"
+upstream = "https://vscodium.com"
+
+[dependencies]
+runtime = ["glibc", "ca-certificates", "dbus", "ncurses"]
+build = ["tar", "gzip"]
+
+[sources]
+urls = [
+  "https://github.com/VSCodium/vscodium/releases/download/1.135.06055/VSCodium-linux-x64-1.135.06055.tar.gz"
+]
+sha256 = [
+  "c09d8ac8dd7f52b09ee159ee24b440541dfd8f937a0f6f88cc428c78e48ee1f2"
+]
+
+[build]
+type = "binary"
+script = """
+mkdir -p "${DESTDIR}/opt/vscode-oss"
+mkdir -p "${DESTDIR}/usr/bin"
+mkdir -p "${DESTDIR}/usr/share/applications"
+mkdir -p "${DESTDIR}/usr/share/pixmaps"
+
+# Extract / copy application payload into /opt/vscode-oss
+cp -a . "${DESTDIR}/opt/vscode-oss/"
+chmod +x "${DESTDIR}/opt/vscode-oss/codium" 2>/dev/null || chmod +x "${DESTDIR}/opt/vscode-oss/bin/codium" 2>/dev/null || true
+
+# Symlinks for code, code-oss, and vscodium
+ln -sf /opt/vscode-oss/bin/codium "${DESTDIR}/usr/bin/codium"
+ln -sf /opt/vscode-oss/bin/codium "${DESTDIR}/usr/bin/code-oss"
+ln -sf /opt/vscode-oss/bin/codium "${DESTDIR}/usr/bin/code"
+
+# Create Desktop Entry
+cat << 'EOF' > "${DESTDIR}/usr/share/applications/vscode-oss.desktop"
+[Desktop Entry]
+Name=Code - OSS
+Comment=Code Editing. Redefined.
+GenericName=Text Editor
+Exec=/usr/bin/code-oss --no-sandbox %F
+Icon=vscodium
+Type=Application
+StartupNotify=false
+StartupWMClass=VSCodium
+Categories=TextEditor;Development;IDE;
+MimeType=text/plain;inode/directory;
+Actions=new-empty-window;
+Keywords=vscode;codium;editor;
+
+[Desktop Action new-empty-window]
+Name=New Empty Window
+Exec=/usr/bin/code-oss --no-sandbox --new-window %F
+Icon=vscodium
+EOF
+
+if [ -f "${DESTDIR}/opt/vscode-oss/resources/app/resources/linux/code.png" ]; then
+  cp "${DESTDIR}/opt/vscode-oss/resources/app/resources/linux/code.png" "${DESTDIR}/usr/share/pixmaps/vscodium.png"
+fi
+"""

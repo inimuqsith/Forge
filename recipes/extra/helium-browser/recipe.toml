@@ -1,0 +1,58 @@
+[package]
+name = "helium-browser"
+version = "0.17.2.1"
+release = 1
+slot = "0"
+description = "Lightweight, privacy-focused, bloat-free Chromium-based web browser"
+license = "GPL-3.0-or-later"
+upstream = "https://github.com/imputnet/helium-linux"
+
+[dependencies]
+runtime = ["glibc", "dbus", "ncurses"]
+build = ["tar", "xz"]
+
+[sources]
+urls = [
+  "https://github.com/imputnet/helium-linux/releases/download/0.17.2.1/helium-0.17.2.1-x86_64_linux.tar.xz"
+]
+sha256 = [
+  "2a639df54e3d05f413cfbb4622a4d1a68584b31da5a7aaf58ee3cd83c7c3e299"
+]
+
+[build]
+type = "binary"
+script = """
+mkdir -p "${DESTDIR}/opt/helium"
+mkdir -p "${DESTDIR}/usr/bin"
+mkdir -p "${DESTDIR}/usr/share/applications"
+mkdir -p "${DESTDIR}/usr/share/pixmaps"
+
+# Extract / copy application payload into /opt/helium
+cp -a . "${DESTDIR}/opt/helium/"
+chmod +x "${DESTDIR}/opt/helium/helium" 2>/dev/null || true
+
+# Create symlinks in /usr/bin
+ln -sf /opt/helium/helium "${DESTDIR}/usr/bin/helium-browser"
+ln -sf /opt/helium/helium "${DESTDIR}/usr/bin/helium"
+
+# Create Desktop Entry
+cat << 'EOF' > "${DESTDIR}/usr/share/applications/helium-browser.desktop"
+[Desktop Entry]
+Version=1.0
+Name=Helium
+Comment=Lightweight and Private Chromium Web Browser
+GenericName=Web Browser
+Exec=/usr/bin/helium-browser %U
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+Icon=helium-browser
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/vnd.mozilla.xul+xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;
+StartupNotify=true
+EOF
+
+if [ -f "${DESTDIR}/opt/helium/product_logo_128.png" ]; then
+  cp "${DESTDIR}/opt/helium/product_logo_128.png" "${DESTDIR}/usr/share/pixmaps/helium-browser.png"
+fi
+"""

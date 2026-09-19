@@ -1,0 +1,56 @@
+[package]
+name = "intellij-idea"
+version = "2025.2.5"
+release = 1
+slot = "0"
+description = "Capable and Ergonomic IDE for JVM, Java, Kotlin, and Polyglot Development by JetBrains"
+license = "Apache-2.0"
+upstream = "https://www.jetbrains.com/idea/"
+
+[dependencies]
+runtime = ["glibc", "ca-certificates", "tar"]
+build = ["tar", "gzip"]
+
+[sources]
+urls = [
+  "https://download.jetbrains.com/idea/ideaIC-2025.2.5.tar.gz"
+]
+sha256 = [
+  "995c334cc3e143f13467abafef07a1ccf7d06275512bb6f4c91123948786ab7c"
+]
+
+[build]
+type = "binary"
+script = """
+mkdir -p "${DESTDIR}/opt/intellij-idea"
+mkdir -p "${DESTDIR}/usr/bin"
+mkdir -p "${DESTDIR}/usr/share/applications"
+mkdir -p "${DESTDIR}/usr/share/pixmaps"
+
+# Copy IDE distribution into /opt/intellij-idea
+cp -a . "${DESTDIR}/opt/intellij-idea/"
+chmod +x "${DESTDIR}/opt/intellij-idea/bin/idea.sh" 2>/dev/null || true
+
+# Symlink launcher
+ln -sf /opt/intellij-idea/bin/idea.sh "${DESTDIR}/usr/bin/idea"
+
+# Create Desktop Entry
+cat << 'EOF' > "${DESTDIR}/usr/share/applications/intellij-idea.desktop"
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=IntelliJ IDEA
+Comment=Capable and Ergonomic IDE for Java and JVM Development
+Exec=/usr/bin/idea %f
+Icon=intellij-idea
+Terminal=false
+Categories=Development;IDE;Java;
+StartupWMClass=jetbrains-idea
+EOF
+
+if [ -f "${DESTDIR}/opt/intellij-idea/bin/idea.png" ]; then
+  cp "${DESTDIR}/opt/intellij-idea/bin/idea.png" "${DESTDIR}/usr/share/pixmaps/intellij-idea.png"
+elif [ -f "${DESTDIR}/opt/intellij-idea/bin/idea.svg" ]; then
+  cp "${DESTDIR}/opt/intellij-idea/bin/idea.svg" "${DESTDIR}/usr/share/pixmaps/intellij-idea.svg"
+fi
+"""
