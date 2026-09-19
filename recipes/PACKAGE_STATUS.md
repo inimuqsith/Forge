@@ -95,7 +95,7 @@
 | **`less`** | `710` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | A terminal based program for viewing text files |
 | **`libarchive`** | `3.8.9` | ✅ Verified | `glibc`, `zlib`, `bzip2`, `xz`, `zstd`, `openssl`, `expat` | `make`, `gcc`, `pkgconf` | Multi-format archive and compression library (bsdtar, bsdcpio) |
 | **`libcap`** | `2.78` | ✅ Verified | `glibc` | - | POSIX 1003.1e capabilities library and tools (setcap, getcap) |
-| **`libcap-ng`** | `0.9.6` | ✅ Verified | `glibc` | `make`, `gcc` | Alternate POSIX capabilities library |
+| **`libcap-ng`** | `0.9.6` | ✅ Verified | `glibc` | `make`, `gcc`, `autoconf`, `automake`, `libtool` | Alternate POSIX capabilities library |
 | **`libedit`** | `20260512-3.1` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | NetBSD Editline library (BSD-licensed alternative to GNU readline) |
 | **`libevdev`** | `1.13.7` | ✅ Verified | `glibc` | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | Wrapper library for evdev devices |
 | **`libgcrypt`** | `1.12.4` | ✅ Verified | `glibc`, `libgpg-error` | `make`, `gcc` | General purpose cryptographic library based on the code from GnuPG |
@@ -221,7 +221,7 @@
 | **`libxslt`** | `1.1.45` | ✅ Verified | `glibc`, `libxml2` | `make`, `gcc`, `pkgconf` | XML stylesheet transformation library (XSLT) |
 | **`lsof`** | `4.99.7` | ✅ Verified | `glibc` | `make`, `gcc` | Lists information about files opened by processes |
 | **`mesa`** | `26.2.3` | ✅ Verified | `glibc`, `libdrm`, `expat`, `zstd`, `zlib`, `libxkbcommon`, `wayland` | `meson`, `ninja`, `pkgconf`, `python`, `bison`, `flex`, `llvm`, `clang`, `wayland-protocols`, `vulkan-headers` | Open-source OpenGL and Vulkan 3D graphics drivers |
-| **`mpc`** | `1.3.1` | ✅ Verified | `glibc`, `gmp`, `mpfr` | - | Library for the arithmetic of complex numbers with arbitrarily high precision |
+| **`mpc`** | `1.4.1` | ✅ Verified | `glibc`, `gmp`, `mpfr` | - | Library for the arithmetic of complex numbers with arbitrarily high precision |
 | **`mpfr`** | `4.2.2` | ✅ Verified | `glibc`, `gmp` | - | Multiple-precision floating-point arithmetic library |
 | **`neovim`** | `0.12.5` | ✅ Verified | `glibc` | `cmake`, `ninja`, `gcc`, `pkgconf` | Vim-fork focused on extensibility and usability |
 | **`nushell`** | `0.115.1` | ✅ Verified | `glibc`, `curl`, `gcc`, `libgit2`, `libssh2`, `openssl`, `sqlite`, `zstd` | `gcc`, `rust`, `mold`, `clang`, `llvm`, `pkgconf`, `git` | A new type of shell |
