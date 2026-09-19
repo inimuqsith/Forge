@@ -1,0 +1,59 @@
+[package]
+name = "sddm"
+version = "0.21.0"
+release = 1
+description = "QML and Wayland based modern display manager"
+license = "GPL-2.0-or-later"
+homepage = "https://github.com/sddm/sddm"
+
+[dependencies]
+depends = ["qt6-base", "qt6-declarative", "libxkbcommon", "pam", "shadow"]
+makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+
+[sources]
+urls = ["https://github.com/sddm/sddm/archive/refs/tags/v0.21.0.tar.gz"]
+sha256 = ["f895de2683627e969e4849dbfbbb2b500787481ca5ba0de6d6dfdae5f1549abf"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_SYSCONFDIR=/etc \
+    -DCMAKE_INSTALL_LOCALSTATEDIR=/var \
+    -DBUILD_WITH_QT6=ON \
+    -DENABLE_JOURNALD=OFF \
+    -DENABLE_PAM=ON \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+
+# OpenRC Service Script
+mkdir -p "${DESTDIR}/etc/init.d"
+cat << 'EOF' > "${DESTDIR}/etc/init.d/sddm"
+#!/sbin/openrc-run
+
+name="SDDM Display Manager"
+description="QML and Wayland based modern display manager"
+command="/usr/bin/sddm"
+command_background="yes"
+pidfile="/run/sddm.pid"
+
+depend() {
+    need localmount dbus
+    after bootmisc consolefont keymaps
+}
+EOF
+chmod 755 "${DESTDIR}/etc/init.d/sddm"
+
+# OpenRC Conf
+mkdir -p "${DESTDIR}/etc/conf.d"
+cat << 'EOF' > "${DESTDIR}/etc/conf.d/sddm"
+# Configuration for /etc/init.d/sddm
+CHECKPATH="/var/lib/sddm"
+EOF
+"""

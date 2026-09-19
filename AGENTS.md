@@ -43,7 +43,7 @@
    - Menyajikan katalog resep terpusat dan melayani sinkronisasi klien (`forge sync`).
    - Endpoint `POST /v1/webhook/github` yang mendeteksi perubahan commit dari GitHub SSOT (`inimuqsith/Forge`), melakukan `git pull --rebase`, dan auto-rebundle `recipes.tar.zst` secara instan.
 2. **Upstream Recipe Bumper & Audit Engine (Bebas Rate-Limit):**
-   - Perintah `forge-server audit`: Memindai seluruh 107 resep paket secara paralel dalam hitungan detik.
+   - Perintah `forge-server audit`: Memindai seluruh 184 resep paket secara paralel dalam hitungan detik.
    - Perintah `forge-server bump <pkg|--all>`: Mengunduh tarball baru, menghitung SHA256 baru secara atomik, dan melakukan auto-push langsung ke GitHub SSOT (`origin main`).
 3. **CI/CD Build Farm (Lock-CPU):**
    - Perintah `forge-server import <cpu-profile.json>`: Menyimpan profil silikon CPU target pengguna ke `/var/db/forge/profiles/<march>.json` dan mengesetnya sebagai profil aktif (`active.json`).
@@ -92,10 +92,10 @@ Kompilasi engine `forge` dan `forge-server` dioptimalkan secara ekstrem untuk pe
 │   └── forge-server/       # Binary daemon 'forge-server' (serve, import, profiles, index, bumper, webhook, CI/CD build farm)
 ├── config/                 # Template konfigurasi bawaan
 │   └── forge.conf.example  # Konfigurasi tunggal package manager
-├── recipes/                # Pohon 107 resep paket resmi Kura Linux (di-sync dari server)
+├── recipes/                # Pohon 184 resep paket resmi Kura Linux (di-sync dari server)
 │   ├── system/             # 22 Resep sistem inti & toolchain (base, base-devel, glibc, gcc, llvm, openrc, dll.)
-│   ├── core/               # 51 Resep utilitas & daemons inti sistem
-│   └── extra/              # 34 Resep aplikasi dev, CLI modern & layanan tambahan
+│   ├── core/               # 62 Resep utilitas & daemons inti sistem
+│   └── extra/              # 100 Resep aplikasi dev, CLI modern, desktop, audio & Qt6/KF6/Plasma 6
 ├── tests/                  # Test suite integrasi & sandbox testing
 └── docs/                   # Spesifikasi teknis resep, manual GitOps & panduan API
     ├── GITOPS_AND_BUMPER_MANUAL.md # Panduan lengkap GitOps & Upstream Bumper
@@ -138,7 +138,7 @@ forge stage-export --output kura-stage.tar.xz  # Kemas rootfs menjadi stage tarb
 forge-server serve              # Jalankan service API resep, Web Explorer & Webhook receiver
 
 # --- 2. Upstream Recipe Bumper & Audit Engine ---
-forge-server audit              # Audit 107 resep paket vs rilis hulu terbaru
+forge-server audit              # Audit 184 resep paket vs rilis hulu terbaru
 forge-server bump <pkg>         # Perbarui resep spesifik ke versi hulu & auto-push ke GitHub SSOT
 forge-server bump --all         # Perbarui SEMUA resep yang outdated & auto-push ke GitHub SSOT
 

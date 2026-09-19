@@ -1,0 +1,52 @@
+[package]
+name = "plasma-workspace"
+version = "6.7.5"
+release = 1
+description = "KDE Plasma Workspace components and session management"
+license = "GPL-2.0-or-later"
+homepage = "https://invent.kde.org/plasma/plasma-workspace"
+slot = "6"
+
+[dependencies]
+depends = [
+    "qt6-base",
+    "qt6-declarative",
+    "qt6-wayland",
+    "qt6-svg",
+    "kcoreaddons",
+    "kconfig",
+    "kwindowsystem",
+    "ki18n",
+    "kauth",
+    "kservice",
+    "kcrash",
+    "kdbusaddons",
+    "kglobalaccel",
+    "kpipewire",
+    "layer-shell-qt",
+    "libksysguard",
+    "breeze",
+    "kwin",
+    "pam",
+    "shadow"
+]
+makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols"]
+
+[sources]
+urls = ["https://download.kde.org/stable/plasma/6.7.5/plasma-workspace-6.7.5.tar.xz"]
+sha256 = ["94ab21e2243b7876f65c315f1e545081c6437f5bd0a041ca4fb6c2533ae874c9"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DENABLE_X11=OFF \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+"""

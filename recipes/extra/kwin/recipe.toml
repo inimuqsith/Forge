@@ -1,0 +1,49 @@
+[package]
+name = "kwin"
+version = "6.7.5"
+release = 1
+description = "Flexible, high-performance, and feature-rich Wayland window manager"
+license = "GPL-2.0-or-later"
+homepage = "https://invent.kde.org/plasma/kwin"
+slot = "6"
+
+[dependencies]
+depends = [
+    "qt6-base",
+    "qt6-declarative",
+    "qt6-wayland",
+    "kcoreaddons",
+    "kconfig",
+    "kwindowsystem",
+    "kcrash",
+    "kdbusaddons",
+    "kglobalaccel",
+    "kpipewire",
+    "layer-shell-qt",
+    "breeze",
+    "libdrm",
+    "libinput",
+    "libxkbcommon",
+    "mesa",
+    "wayland"
+]
+makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols", "vulkan-headers"]
+
+[sources]
+urls = ["https://download.kde.org/stable/plasma/6.7.5/kwin-6.7.5.tar.xz"]
+sha256 = ["6baa910b732d93c48c90f9c1cc685cc93d0b8de0cdf138c24192c045bc3a48e2"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DKWIN_BUILD_X11=OFF \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+"""

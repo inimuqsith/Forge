@@ -150,7 +150,7 @@
 
 ---
 
-### Fase 12: Upstream Recipe Importer & Katalog 100+ Resep Paket Esensial
+### Fase 12: Upstream Recipe Importer & Katalog 184 Resep Paket Esensial & KDE Plasma 6
 **Status:** ✅ **SELESAI & TERUJI (100% IMPLEMENTED)**
 - [x] **Recipe Importer Engine (`crates/forge/src/importer.rs`):**
   - Parsing PKGBUILD dan APKBUILD cerdas: ekstraksi metadata (`pkgname`, `pkgver`, `pkgrel`, `pkgdesc`, `url`, `license`, `depends`, `makedepends`, `source`, `sha256sums`).
@@ -160,11 +160,11 @@
 - [x] **CLI Sub-perintah `forge recipe-import`:**
   - Mendukung file lokal maupun unduhan langsung dari URL hulu (`http://`, `https://`).
   - Opsi penyimpanan `--output <PATH>`.
-- [x] **Katalog 161 Resep Esensial Kura Linux (`recipes/`):**
+- [x] **Katalog 184 Resep Esensial Kura Linux (`recipes/`):**
   - `recipes/system/` (22 paket fondasi & toolchain: `glibc`, `gcc`, `llvm`, `clang`, `mold`, `binutils`, `make`, `ninja`, `cmake`, `meson`, `m4`, `autoconf`, `automake`, `libtool`, `patch`, `bison`, `flex`, `linux-headers`, `openrc`, `pkgconf`, `base`, `base-devel`).
   - `recipes/core/` (62 paket utilitas inti, daemons & library).
-  - `recipes/extra/` (77 paket dev tools, CLI modern, desktop apps, fondasi grafis, font, serta audio stack: `alsa-lib`, `alsa-utils`, `pipewire`, `wireplumber`, `libdrm`, `libinput`, `libxkbcommon`, `pixman`, `freetype`, `fontconfig`, `harfbuzz`, `cairo`, `vulkan-headers`, `vulkan-loader`, `mesa`, `helium-browser`, `antigravity-cli`, `intellij-idea`, `vscode-oss`, `tailscale`, dll.).
-- [x] **Unit & Integration Tests:** `test_parse_pkgbuild_metadata`, `test_transpile_build_package_steps`, `test_dependency_normalization`, `test_validate_all_recipes_in_repo_are_valid_toml`, `test_scan_actual_workspace_recipes` (100% lulus pada 161 resep riil).
+  - `recipes/extra/` (100 paket: dev tools, CLI modern, desktop apps `helium-browser`, `antigravity-cli`, `intellij-idea`, `vscode-oss`, `tailscale`; fondasi grafis & font `libdrm`, `libinput`, `libxkbcommon`, `pixman`, `freetype`, `fontconfig`, `harfbuzz`, `cairo`, `vulkan-headers`, `vulkan-loader`, `mesa`; audio `alsa-lib`, `alsa-utils`, `pipewire`, `wireplumber`; Qt6 & SDDM `extra-cmake-modules`, `qt6-base`, `qt6-declarative`, `qt6-wayland`, `qt6-svg`, `sddm`; serta KDE Frameworks 6 & Plasma 6 `kcoreaddons`, `kconfig`, `kwindowsystem`, `ki18n`, `kauth`, `kwidgetsaddons`, `kservice`, `kcrash`, `kdbusaddons`, `kglobalaccel`, `layer-shell-qt`, `libksysguard`, `kpipewire`, `breeze`, `kwin`, `plasma-workspace`, `plasma-desktop`).
+- [x] **Unit & Integration Tests:** `test_parse_pkgbuild_metadata`, `test_transpile_build_package_steps`, `test_dependency_normalization`, `test_validate_all_recipes_in_repo_are_valid_toml`, `test_scan_actual_workspace_recipes` (100% lulus pada seluruh 184 resep riil).
 
 ---
 
@@ -189,7 +189,7 @@
     * Tier 1: GitHub REST API dengan injeksi header `Authorization: Bearer <GITHUB_TOKEN>` jika tersedia.
     * Tier 2: GitHub Atom Feed (`https://github.com/{owner}/{repo}/releases.atom`) untuk parsing rilis terbaru bebas rate-limit (zero quota).
     * Tier 3: Anitya / Release-Monitoring.org v2 Projects API (`https://release-monitoring.org/api/v2/projects/?name={pkg}`) untuk repositori non-GitHub (GNU, kernel.org, Sourceforge, dll.).
-  - `RecipeBumper::audit_all`: Pemindaian paralel asinkron (Tokio tasks) mengaudit 107 resep paket dalam ~3 detik dengan format status tabel CLI (`[LATEST]`, `[UPDATE]`, `[UNK]`).
+  - `RecipeBumper::audit_all`: Pemindaian paralel asinkron (Tokio tasks) mengaudit seluruh 184 resep paket dalam ~3 detik dengan format status tabel CLI (`[LATEST]`, `[UPDATE]`, `[UNK]`).
   - `RecipeBumper::bump_recipe_file`: Manipulasi atomik berkas `recipe.toml` (update `version`, reset `release = 1`, unduh tarball & hitung hash SHA256 baru secara otomatis).
   - `RecipeBumper::bump_package_by_name`: Targeted bumping per-paket atau `--all`.
 - [x] **GitHub Single Source of Truth (SSOT) Auto-Push:**

@@ -1,0 +1,53 @@
+[package]
+name = "qt6-base"
+version = "6.8.2"
+release = 1
+description = "Cross-platform application and UI framework (Core, Gui, Widgets, Network, DBus)"
+license = "LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only"
+homepage = "https://www.qt.io/"
+slot = "6"
+
+[dependencies]
+depends = ["glibc", "openssl", "zlib", "zstd", "dbus", "libxkbcommon", "fontconfig", "freetype", "harfbuzz", "mesa", "libdrm", "double-conversion"]
+makedepends = ["cmake", "ninja", "pkgconf", "vulkan-headers"]
+
+[sources]
+urls = ["https://download.qt.io/official_releases/qt/6.8/6.8.2/submodules/qtbase-everywhere-src-6.8.2.tar.xz"]
+sha256 = ["012043ce6d411e6e8a91fdc4e05e6bedcfa10fcb1347d3c33908f7fdd10dfe05"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DINSTALL_BINDIR=lib/qt6/bin \
+    -DINSTALL_INCLUDEDIR=include/qt6 \
+    -DINSTALL_LIBDIR=lib \
+    -DINSTALL_ARCHDATADIR=lib/qt6 \
+    -DINSTALL_PLUGINSDIR=lib/qt6/plugins \
+    -DINSTALL_MKSPECSDIR=lib/qt6/mkspecs \
+    -DFEATURE_journald=OFF \
+    -DFEATURE_system_zlib=ON \
+    -DFEATURE_system_doubleconversion=OFF \
+    -DFEATURE_system_harfbuzz=ON \
+    -DFEATURE_system_freetype=ON \
+    -DFEATURE_system_fontconfig=ON \
+    -DFEATURE_system_pcre2=ON \
+    -DFEATURE_vulkan=ON \
+    -DFEATURE_openssl=ON \
+    -DFEATURE_dbus=ON \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+mkdir -p "${DESTDIR}/usr/bin"
+for bin in "${DESTDIR}/usr/lib/qt6/bin/"*; do
+    if [ -f "$bin" ]; then
+        name=$(basename "$bin")
+        ln -sf "../lib/qt6/bin/${name}" "${DESTDIR}/usr/bin/${name}6"
+    fi
+done
+"""

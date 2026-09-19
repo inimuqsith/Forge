@@ -1,0 +1,30 @@
+[package]
+name = "kcoreaddons"
+version = "6.30.0"
+release = 1
+description = "Addons to QtCore offering various utilities and classes"
+license = "LGPL-2.0-or-later"
+homepage = "https://invent.kde.org/frameworks/kcoreaddons"
+slot = "6"
+
+[dependencies]
+depends = ["qt6-base"]
+makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+
+[sources]
+urls = ["https://download.kde.org/stable/frameworks/6.30/kcoreaddons-6.30.0.tar.xz"]
+sha256 = ["cc68fe15beb0fca2036cff8742f468c1345406bf99793fffacbf8f2a3f89bc4b"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+"""

@@ -1,0 +1,30 @@
+[package]
+name = "kauth"
+version = "6.30.0"
+release = 1
+description = "Execute actions as privileged user through authentication backends"
+license = "LGPL-2.0-or-later"
+homepage = "https://invent.kde.org/frameworks/kauth"
+slot = "6"
+
+[dependencies]
+depends = ["kcoreaddons", "polkit"]
+makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+
+[sources]
+urls = ["https://download.kde.org/stable/frameworks/6.30/kauth-6.30.0.tar.xz"]
+sha256 = ["60b75e02abc2bfbb247c586e3ab94def7ecd7b4e1ddb8260358951d84d9ea8c9"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+"""

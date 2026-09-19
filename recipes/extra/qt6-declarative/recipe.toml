@@ -1,0 +1,36 @@
+[package]
+name = "qt6-declarative"
+version = "6.8.2"
+release = 1
+description = "Classes for QML and JavaScript languages for Qt6"
+license = "LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only"
+homepage = "https://www.qt.io/"
+slot = "6"
+
+[dependencies]
+depends = ["qt6-base"]
+makedepends = ["cmake", "ninja", "pkgconf", "python"]
+
+[sources]
+urls = ["https://download.qt.io/official_releases/qt/6.8/6.8.2/submodules/qtdeclarative-everywhere-src-6.8.2.tar.xz"]
+sha256 = ["144d876adc8bb55909735143e678d1e24eadcd0a380a0186792d88b731346d56"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DINSTALL_BINDIR=lib/qt6/bin \
+    -DINSTALL_INCLUDEDIR=include/qt6 \
+    -DINSTALL_LIBDIR=lib \
+    -DINSTALL_ARCHDATADIR=lib/qt6 \
+    -DINSTALL_PLUGINSDIR=lib/qt6/plugins \
+    -DINSTALL_QMLDIR=lib/qt6/qml \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+"""

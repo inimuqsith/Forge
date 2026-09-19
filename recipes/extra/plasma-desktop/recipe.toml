@@ -1,0 +1,48 @@
+[package]
+name = "plasma-desktop"
+version = "6.7.5"
+release = 1
+description = "KDE Plasma Desktop user interface, panels, widgets and settings"
+license = "GPL-2.0-or-later"
+homepage = "https://invent.kde.org/plasma/plasma-desktop"
+slot = "6"
+
+[dependencies]
+depends = [
+    "qt6-base",
+    "qt6-declarative",
+    "qt6-wayland",
+    "qt6-svg",
+    "kcoreaddons",
+    "kconfig",
+    "kwindowsystem",
+    "ki18n",
+    "kauth",
+    "kwidgetsaddons",
+    "kservice",
+    "kcrash",
+    "kdbusaddons",
+    "kglobalaccel",
+    "plasma-workspace",
+    "libksysguard",
+    "breeze"
+]
+makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "wayland-protocols"]
+
+[sources]
+urls = ["https://download.kde.org/stable/plasma/6.7.5/plasma-desktop-6.7.5.tar.xz"]
+sha256 = ["079fcf6b87d7bf65e3f2a4670d605fac9469344c279a285a98ad549332d7b53e"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+"""

@@ -1,0 +1,30 @@
+[package]
+name = "kservice"
+version = "6.30.0"
+release = 1
+description = "Plugin framework for desktop services and applications"
+license = "LGPL-2.0-or-later"
+homepage = "https://invent.kde.org/frameworks/kservice"
+slot = "6"
+
+[dependencies]
+depends = ["kcoreaddons", "kconfig", "ki18n"]
+makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf", "flex", "bison"]
+
+[sources]
+urls = ["https://download.kde.org/stable/frameworks/6.30/kservice-6.30.0.tar.xz"]
+sha256 = ["e63062504ede4ebfda4c93e3484a63817731e1157cdcac6e33fb47fe6abc1657"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+"""

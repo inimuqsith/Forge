@@ -1,0 +1,30 @@
+[package]
+name = "libksysguard"
+version = "6.7.5"
+release = 1
+description = "Task management and system monitoring library for KDE Plasma"
+license = "LGPL-2.1-or-later OR GPL-2.0-or-later"
+homepage = "https://invent.kde.org/plasma/libksysguard"
+slot = "6"
+
+[dependencies]
+depends = ["qt6-base", "qt6-declarative", "kcoreaddons", "kconfig", "ki18n", "kauth", "zlib"]
+makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+
+[sources]
+urls = ["https://download.kde.org/stable/plasma/6.7.5/libksysguard-6.7.5.tar.xz"]
+sha256 = ["9069bcf3fe4e491ea774d0d70eb17f99b567299871045a38543fcabcdb56dfc4"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+"""

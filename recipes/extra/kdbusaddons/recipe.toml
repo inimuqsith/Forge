@@ -1,0 +1,30 @@
+[package]
+name = "kdbusaddons"
+version = "6.30.0"
+release = 1
+description = "Addons to QtDBus offering DBus application management"
+license = "LGPL-2.0-or-later"
+homepage = "https://invent.kde.org/frameworks/kdbusaddons"
+slot = "6"
+
+[dependencies]
+depends = ["qt6-base", "dbus"]
+makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+
+[sources]
+urls = ["https://download.kde.org/stable/frameworks/6.30/kdbusaddons-6.30.0.tar.xz"]
+sha256 = ["063ef80460f76d86dc4b033ef04b65b69ba82ee0de410440fe609465e7f5a997"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+"""

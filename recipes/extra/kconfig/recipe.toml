@@ -1,0 +1,30 @@
+[package]
+name = "kconfig"
+version = "6.30.0"
+release = 1
+description = "Configuration system for KDE applications and frameworks"
+license = "LGPL-2.0-or-later"
+homepage = "https://invent.kde.org/frameworks/kconfig"
+slot = "6"
+
+[dependencies]
+depends = ["qt6-base", "qt6-declarative"]
+makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+
+[sources]
+urls = ["https://download.kde.org/stable/frameworks/6.30/kconfig-6.30.0.tar.xz"]
+sha256 = ["0e98bac324cd716849202d4b246a948e363d6792a8eb09c78417cdde9559f56e"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+"""

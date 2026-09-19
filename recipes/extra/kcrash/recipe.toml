@@ -1,0 +1,30 @@
+[package]
+name = "kcrash"
+version = "6.30.0"
+release = 1
+description = "Graceful handling of application crashes and signal handlers"
+license = "LGPL-2.0-or-later"
+homepage = "https://invent.kde.org/frameworks/kcrash"
+slot = "6"
+
+[dependencies]
+depends = ["kcoreaddons", "kwindowsystem"]
+makedepends = ["cmake", "ninja", "extra-cmake-modules", "pkgconf"]
+
+[sources]
+urls = ["https://download.kde.org/stable/frameworks/6.30/kcrash-6.30.0.tar.xz"]
+sha256 = ["b17f8242309e1502119c48b1ef5059a396a3068596a84fb79fdef6d9e2cd4f49"]
+
+[build]
+configure = """
+cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTING=OFF
+"""
+compile = """
+cmake --build build -j$(nproc)
+"""
+install = """
+DESTDIR="${DESTDIR}" cmake --install build
+"""
