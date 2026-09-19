@@ -41,7 +41,7 @@ flowchart TD
 - **🚀 Source-First Native Compilation (Gentoo Mode):** Secara default mengompilasi paket langsung dari kode sumber upstream dengan flag native target mentok ekstrem (`-O3 -march=native -pipe -flto=thin -fno-math-errno -falign-functions=32`) di RAM `tmpfs`.
 - **⚡ Ccache 4.13.5 Acceleration:** Integrasi otomatis compiler cache untuk memangkas waktu kompilasi ulang hingga 80-90%.
 - **🐙 GitHub Single Source of Truth (SSOT) & GitOps Automation:** Seluruh resep dikelola di repository GitHub `inimuqsith/Forge`. Webhook real-time secara instan memicu pembaruan dan rebundling tarball di server VPS `https://pkgkura.amqs.net`.
-- **🤖 Zero-Quota Upstream Recipe Bumper & Audit Engine:** Memindai seluruh 184 paket dalam ~3 detik melalui Multi-Tier Probing (GitHub REST API dengan Token, GitHub Atom Feed `/releases.atom` bebas kuota, dan Anitya v2 Projects API) serta memperbarui versi & SHA256 secara atomik (`forge-server bump`).
+- **🤖 Zero-Quota Upstream Recipe Bumper & Audit Engine:** Memindai seluruh katalog paket dalam ~3 detik melalui Multi-Tier Probing (GitHub REST API dengan Token, GitHub Atom Feed `/releases.atom` bebas kuota, dan Anitya v2 Projects API) serta memperbarui versi & SHA256 secara atomik (`forge-server bump`). Matriks lengkap dapat dilihat di [`recipes/PACKAGE_STATUS.md`](file:///home/admin/Development/Forge/recipes/PACKAGE_STATUS.md).
 - **🌾 Pure Source-Built Seed Toolchain (ADR-019, ADR-028):** Pengemasan `forge toolchain bundle` (`dist/kura-toolchain.tar.xz`) murni 100% dari hasil kompilasi source code di staging tanpa menyalin biner host, menyertakan seluruh `/var/db/forge/recipes/` sehingga lingkungan chroot mandiri seketika.
 - **📦 Meta-Paket Murni ("Everything is a Package", ADR-026):** Basis OS dikelola murni melalui resep meta-paket deklaratif (`forge install base` dan `forge install base-devel`) tanpa hardcode logika OS di dalam biner package manager.
 - **🗃️ Sistem Resep Terdedikasi & `forge sync` (ADR-028):** Repositori resep resmi berlokasi di `/var/db/forge/recipes/`, disinkronkan secara atomik dari `forge-server` melalui perintah `forge sync`.
@@ -103,7 +103,7 @@ forge stage-export --output kura-stage.tar.xz  # Kemas rootfs menjadi stage tarb
 forge-server serve              # Jalankan service HTTP API resep, Web Explorer & Webhook receiver
 
 # --- 2. Upstream Recipe Bumper & Audit Engine ---
-forge-server audit              # Memindai seluruh 184 resep terhadap rilis upstream terbaru
+forge-server audit              # Memindai seluruh resep terhadap rilis upstream terbaru
 forge-server bump <pkg>         # Perbarui resep spesifik ke versi hulu terbaru & auto-push ke GitHub
 forge-server bump --all         # Perbarui SELURUH resep yang memiliki update & auto-push ke GitHub
 
@@ -122,7 +122,7 @@ Server resmi Kura Linux beroperasi di domain **`https://pkgkura.amqs.net`**:
 
 | Endpoint | Metode | Deskripsi |
 | :--- | :---: | :--- |
-| `/` | `GET` | **Public Web Repository Explorer** (Tampilan visual interaktif 184 resep paket) |
+| `/` | `GET` | **Public Web Repository Explorer** (Tampilan visual interaktif katalog resep paket) |
 | `/v1/health` | `GET` | Health check endpoint server status |
 | `/v1/recipes/latest.sha256` | `GET` | Hash SHA256 tarball resep terbaru |
 | `/v1/recipes/latest.tar.zst` | `GET` | Streaming arsip tarball resep terkompresi Zstandard |

@@ -42,7 +42,7 @@ Forge dirancang menggunakan arsitektur modular yang terkonsolidasi secara rapi d
 |                            (Daemon Server & CI/CD Build Farm Suite)                             |
 +=================================================================================================+
 |  1. `forge-server serve`   : Recipe Registry REST API, Web Explorer & Webhook Receiver          |
-|  2. `forge-server audit`   : Upstream Version Audit Engine (184 resep dalam ~3 detik)           |
+|  2. `forge-server audit`   : Upstream Version Audit Engine (Pemindaian katalog paralel ~3 detik) |
 |  3. `forge-server bump`    : Atomic Upstream Recipe Bumper + Auto-Push ke GitHub SSOT           |
 |  4. `forge-server import`  : Profil Silikon Ingestion & Binary Catalog Ingester                 |
 |  5. `forge-server build`   : CI/CD Worker Builder (Lock-CPU CFLAGS -> .forge.tar.zst)            |
