@@ -8,7 +8,7 @@ license = "GPL-3.0-or-later"
 upstream = "https://kuralinux.org"
 
 [dependencies]
-runtime = ["glibc", "llvm", "mold", "make", "ninja", "gcc", "binutils", "pkgconf", "linux-headers", "patch"]
+runtime = ["glibc", "llvm", "mold", "make", "ninja", "gcc", "binutils", "pkgconf", "linux-headers", "patch", "bubblewrap"]
 build = ["gcc"]
 
 [sources]
