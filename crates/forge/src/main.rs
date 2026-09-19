@@ -5,7 +5,7 @@ use forge::{
     BinhostClient, CpuProfile, DependencyResolver, ForgeConfig, ForgeLockGuard, InstalledDatabase,
     MergeTransaction, PackageCascadeResolver, PackageProvider, RecipeBuilder, RecipeImporter,
     StageExportOptions, StageExporter, StageFormat, SyncClient, ToolchainComponent,
-    ToolchainManager, WavefrontScheduler,
+    ToolchainManager, UseFlagsTui, WavefrontScheduler,
 };
 use std::path::{Path, PathBuf};
 
@@ -51,6 +51,17 @@ enum Commands {
         /// Jumlah worker kompilasi paralel (misal: -j8 atau --jobs 8)
         #[arg(short = 'j', long)]
         jobs: Option<usize>,
+
+        /// Tampilkan dialog interaktif TUI untuk memilih USE flags sebelum kompilasi
+        #[arg(long)]
+        interactive_use: bool,
+    },
+
+    /// Konfigurasi visual interaktif USE Flags sistem atau per-paket (TUI Menuconfig)
+    Menuconfig {
+        /// Nama paket opsional jika ingin mengatur override USE flags per-paket
+        #[arg(short, long)]
+        package: Option<String>,
     },
 
     /// Hapus paket secara bersih berdasarkan manifest
@@ -174,6 +185,41 @@ fn main() -> Result<()> {
             println!("{} Konfigurasi Forge berhasil disimpan!", "✓".green());
         }
 
+        Commands::Menuconfig { package } => {
+            let config = ForgeConfig::load_or_default(None);
+            let target_root = PathBuf::from(&config.general.root);
+            forge::PrivilegeManager::ensure_root_or_escalate(&target_root, "menuconfig")?;
+
+            let config_path = Path::new("/etc/forge/forge.conf");
+            let current_flags = match &package {
+                Some(pkg) => UseFlagsTui::load_package_use(Path::new("/etc/forge"), pkg)
+                    .unwrap_or_else(|| config.use_flags.flags.clone()),
+                None => config.use_flags.flags.clone(),
+            };
+
+            let recipe = if let Some(ref pkg) = package {
+                let scanner = forge::RecipeScanner::new(None);
+                scanner.load_recipe(pkg).map(|(r, _)| r).ok()
+            } else {
+                None
+            };
+
+            let new_flags = UseFlagsTui::prompt_interactive(
+                &current_flags,
+                recipe.as_ref(),
+                package.as_deref(),
+            )?;
+
+            match package {
+                Some(ref pkg) => {
+                    UseFlagsTui::save_package_use(Path::new("/etc/forge"), pkg, &new_flags)?;
+                }
+                None => {
+                    UseFlagsTui::save_global_config(config_path, &new_flags)?;
+                }
+            }
+        }
+
         Commands::Install {
             target,
             binhost,
@@ -181,10 +227,29 @@ fn main() -> Result<()> {
             interactive,
             build_source,
             jobs,
+            interactive_use,
         } => {
-            let config = ForgeConfig::load_or_default(None);
+            let mut config = ForgeConfig::load_or_default(None);
             let target_root = PathBuf::from(&config.general.root);
             forge::PrivilegeManager::ensure_root_or_escalate(&target_root, "install")?;
+
+            // Muat override USE flags per-paket jika ada
+            if let Some(pkg_flags) = UseFlagsTui::load_package_use(Path::new("/etc/forge"), &target) {
+                println!(
+                    "  [i] Menggunakan override USE flags per-paket dari /etc/forge/package.use/{}: {}",
+                    target.cyan(),
+                    pkg_flags.yellow()
+                );
+                config.use_flags.flags = format!("{} {}", config.use_flags.flags, pkg_flags);
+            }
+
+            // Jika interactive_use diminta, buka prompt TUI sebelum resolusi
+            if interactive_use {
+                let scanner = forge::RecipeScanner::new(None);
+                let recipe = scanner.load_recipe(&target).map(|(r, _)| r).ok();
+                let selected = UseFlagsTui::prompt_interactive(&config.use_flags.flags, recipe.as_ref(), Some(&target))?;
+                config.use_flags.flags = selected;
+            }
 
             let _lock = ForgeLockGuard::acquire("forge", true)?;
             println!(">>> Memproses instalasi: {}", target.bold().green());

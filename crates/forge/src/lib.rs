@@ -22,6 +22,7 @@ pub mod privilege;
 pub mod hooks;
 pub mod scheduler;
 pub mod downloader;
+pub mod menuconfig;
 
 pub use builder::RecipeBuilder;
 pub use toolchain::{ToolchainComponent, ToolchainManager, ToolchainStatus};
@@ -42,6 +43,7 @@ pub use privilege::*;
 pub use hooks::*;
 pub use scheduler::*;
 pub use downloader::*;
+pub use menuconfig::*;
 
 /// Konfigurasi Global Forge (/etc/forge/forge.conf)
 #[derive(Debug, Clone, Serialize, Deserialize)]

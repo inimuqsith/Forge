@@ -284,5 +284,7 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-048** | Generic Post-Merge File Triggers & Hooks Engine (`HookEngine`) | ✅ Diterapkan |
 | **ADR-049** | Wavefront Parallel DAG Scheduler & Multi-Worker Build Pool (`WavefrontScheduler`) | ✅ Diterapkan |
 | **ADR-050** | Resumable HTTP Source Downloader with Multi-Mirror Fallback & Integrity Engine (`SourceDownloader`) | ✅ Diterapkan |
+| **ADR-051** | TUI Menuconfig & Dynamic Recipe USE Flags Selector (`UseFlagsTui`) | ✅ Diterapkan |
+
 
 
