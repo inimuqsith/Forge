@@ -196,7 +196,29 @@ flowchart TD
 
 ---
 
-## 8. Format Standar Resep All-in-One (`recipe.toml`)
+## 8. Arsitektur 3-Peran Terisolasi (*Separation of Concerns: Maintainer vs Server vs Client*)
+
+Untuk mencegah tumpang tindih tanggung jawab, ekosistem Forge membagi seluruh operasi ke dalam **3 domain terisolasi**:
+
+```mermaid
+flowchart TD
+    subgraph S1 ["1. Workstation Maintainer (Developer Laptop / Workstation)"]
+        M1["Maintainer Repo Git"] --> M2["scripts/maintainer/ (Python Modular)"]
+        M2 --> M3["• Edit & Lint Resep (100% Valid)<br/>• Evaluasi DAG (Pure Runtime vs Build)<br/>• Visual Recipe Inspector & Live Editor<br/>• Upstream Search & Scaffolder<br/>• Regenerasi SSOT PACKAGE_STATUS.md"]
+    end
+
+    subgraph S2 ["2. Cloud Server & CI/CD Hub (VPS pkgkura.amqs.net)"]
+        SV1["forge-server (Rust Daemon)"] --> SV2["• Endpoint Sync Resep (/v1/)<br/>• GitHub Webhook Receiver & Auto-Rebundle<br/>• Worker CI/CD Lock-CPU (forge-server build)<br/>• Indeks Repositori Biner (packages.db.zst)"]
+    end
+
+    subgraph S3 ["3. Target OS Kura Linux (Pengguna Akhir / Chroot)"]
+        U1["forge CLI (Rust Native Engine)"] --> U2["• forge install <pkg><br/>• forge update @world<br/>• Sandbox RAM tmpfs & Ccache 4.13.5<br/>• Transactional Atomic Merger & Rollback"]
+    end
+```
+
+---
+
+## 9. Format Standar Resep All-in-One (`recipe.toml`)
 
 ```toml
 [package]
@@ -230,7 +252,7 @@ DESTDIR="${DESTDIR}" ninja -C build install
 
 ---
 
-## 9. Indeks Keputusan Arsitektur Resmi (ADR Index)
+## 10. Indeks Keputusan Arsitektur Resmi (ADR Index)
 
 | ADR | Judul Keputusan | Status |
 | :--- | :--- | :---: |
@@ -288,6 +310,4 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-052** | Seccomp BPF Syscall Filtering & Build Hardening Engine (`SeccompFilterBuilder`) | ✅ Diterapkan |
 | **ADR-053** | Automated Server Source Code Rebuild & Seamless Self-Restart on Git Webhook | ✅ Diterapkan |
 | **ADR-054** | Pure Self-Updating Package Philosophy & Live Git VCS Head Probe Update Engine | ✅ Diterapkan |
-
-
-
+| **ADR-055** | Isolated 3-Tier Separation of Concerns & Modular Python Maintainer Suite Architecture (`scripts/maintainer/`) | ✅ Diterapkan |

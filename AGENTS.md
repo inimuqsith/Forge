@@ -90,6 +90,9 @@ Kompilasi engine `forge` dan `forge-server` dioptimalkan secara ekstrem untuk pe
 ├── crates/                 # Modul-modul crate Rust (Clean 2-Crate Layout)
 │   ├── forge/              # Binary klien 'forge' & library engine (CLI, builder, CPU profiler, binhost, cachyos, cascade, toolchain, stage)
 │   └── forge-server/       # Binary daemon 'forge-server' (serve, import, profiles, index, bumper, webhook, CI/CD build farm)
+├── scripts/                # Toolkit modular developer/maintainer
+│   ├── maintainer.py       # Entrypoint & CLI/TUI dispatcher maintainer suite
+│   └── maintainer/         # Modul Python (catalog, dag, tree, curated, inspector, linter, search, sources, matrix)
 ├── config/                 # Template konfigurasi bawaan
 │   └── forge.conf.example  # Konfigurasi tunggal package manager
 ├── recipes/                # Pohon repositori resep resmi Kura Linux (lihat recipes/PACKAGE_STATUS.md)
@@ -148,6 +151,21 @@ forge-server import <profile.json> [--as <name>] # Simpan profil CPU target & se
 forge-server list-profiles      # Tampilkan seluruh profil CPU yang tersimpan
 forge-server build <package>    # CI/CD Worker: Build paket dengan profil aktif & publikasi binhost
 forge-server index              # Regenerasi database index repositori biner packages.db.zst
+```
+
+### C. Developer & Maintainer Suite (`scripts/maintainer/`):
+```bash
+# --- 1. Dashboard Interaktif TUI ---
+python3 scripts/maintainer.py                   # Buka TUI All-In-One (Menu 1-12)
+
+# --- 2. Perintah CLI Maintainer Langsung ---
+python3 scripts/maintainer.py --dag all --runtime  # Evaluasi Graf Dependensi Runtime (227 paket 0 siklus)
+python3 scripts/maintainer.py --dag all --build    # Evaluasi Graf Kompilasi dengan isolasi Seed Tier ADR-019
+python3 scripts/maintainer.py --inspect <pkg>      # Visual Box-Card Inspector & Live Dependency Editor
+python3 scripts/maintainer.py --tree <pkg>         # Tampilkan hierarki pohon dependensi ASCII
+python3 scripts/maintainer.py --lint               # Validasi 100% kelengkapan metadata & keamanan DESTDIR
+python3 scripts/maintainer.py --search <query>     # Multi-source search katalog lokal, Anitya, & GitHub
+python3 scripts/maintainer.py --matrix             # Regenerasi SSOT recipes/PACKAGE_STATUS.md
 ```
 
 ---

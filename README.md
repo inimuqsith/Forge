@@ -109,11 +109,22 @@ forge-server audit              # Memindai seluruh resep terhadap rilis upstream
 forge-server bump <pkg>         # Perbarui resep spesifik ke versi hulu terbaru & auto-push ke GitHub
 forge-server bump --all         # Perbarui SELURUH resep yang memiliki update & auto-push ke GitHub
 
-# --- 3. Manajemen Profil CPU & CI/CD Builder ---
-forge-server import <cpu-profile.json> [--as <name>] # Impor profil CPU target & set sebagai aktif
-forge-server list-profiles      # Tampilkan seluruh profil CPU yang tersimpan di server
-forge-server build <package>    # CI/CD Worker: Kompilasi paket dengan profil CPU aktif & publikasi binhost
-forge-server index              # Regenerasi database index repositori biner packages.db.zst
+### C. Developer & Maintainer Suite (`scripts/maintainer/`)
+
+Toolkit Python modular khusus maintainer repository lokal:
+
+```bash
+# --- 1. Mode Interaktif TUI Dashboard ---
+python3 scripts/maintainer.py                   # Buka TUI All-In-One (Menu 1-12)
+
+# --- 2. CLI Perintah Langsung ---
+python3 scripts/maintainer.py --dag all --runtime  # Evaluasi Graf Dependensi Runtime (227 paket 0 siklus)
+python3 scripts/maintainer.py --dag all --build    # Evaluasi Graf Kompilasi dengan isolasi Seed Tier ADR-019
+python3 scripts/maintainer.py --inspect <pkg>      # Dashboard Visual Box-Card Inspector & Live Editor
+python3 scripts/maintainer.py --tree <pkg>         # Tampilkan hierarki pohon dependensi ASCII
+python3 scripts/maintainer.py --lint               # Validasi kelengkapan metadata & keamanan DESTDIR
+python3 scripts/maintainer.py --search <query>     # Cari paket di katalog lokal, Anitya, & GitHub
+python3 scripts/maintainer.py --matrix             # Regenerasi SSOT recipes/PACKAGE_STATUS.md
 ```
 
 ---
