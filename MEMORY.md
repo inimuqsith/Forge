@@ -160,11 +160,11 @@
 - [x] **CLI Sub-perintah `forge recipe-import`:**
   - Mendukung file lokal maupun unduhan langsung dari URL hulu (`http://`, `https://`).
   - Opsi penyimpanan `--output <PATH>`.
-- [x] **Katalog 105 Resep Esensial Kura Linux (`recipes/`):**
+- [x] **Katalog 141 Resep Esensial Kura Linux (`recipes/`):**
   - `recipes/system/` (22 paket fondasi & toolchain: `glibc`, `gcc`, `llvm`, `clang`, `mold`, `binutils`, `make`, `ninja`, `cmake`, `meson`, `m4`, `autoconf`, `automake`, `libtool`, `patch`, `bison`, `flex`, `linux-headers`, `openrc`, `pkgconf`, `base`, `base-devel`).
-  - `recipes/core/` (51 paket utilitas inti, daemons & library).
-  - `recipes/extra/` (32 paket dev tools, CLI modern & runtime).
-- [x] **Unit & Integration Tests:** `test_parse_pkgbuild_metadata`, `test_transpile_build_package_steps`, `test_dependency_normalization`, `test_validate_all_recipes_in_repo_are_valid_toml` (100% lulus pada 105 resep).
+  - `recipes/core/` (62 paket utilitas inti, daemons & library).
+  - `recipes/extra/` (57 paket dev tools, CLI modern & runtime).
+- [x] **Unit & Integration Tests:** `test_parse_pkgbuild_metadata`, `test_transpile_build_package_steps`, `test_dependency_normalization`, `test_validate_all_recipes_in_repo_are_valid_toml`, `test_scan_actual_workspace_recipes` (100% lulus pada seluruh resep riil).
 
 ---
 
