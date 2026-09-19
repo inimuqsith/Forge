@@ -167,6 +167,11 @@ impl MergeTransaction {
                 PathBuf::from("/").join(relative)
             };
 
+            // Abaikan berkas indeks/katalog transien sistem bersama (seperti /usr/share/info/dir) saat scan staging
+            if Self::is_shared_system_file(&normalized_rel) {
+                continue;
+            }
+
             let mode = symlink_meta.permissions().mode();
             let size = symlink_meta.len();
 
@@ -212,6 +217,18 @@ impl MergeTransaction {
         Ok(())
     }
 
+    /// Cek apakah berkas merupakan berkas sistem/katalog bersama transien yang tidak boleh memicu tabrakan (ADR-057)
+    pub fn is_shared_system_file(path: &Path) -> bool {
+        let p_str = path.to_string_lossy();
+        let clean = p_str.trim_start_matches('/');
+        clean == "usr/share/info/dir"
+            || clean == "share/info/dir"
+            || clean == "etc/ld.so.cache"
+            || clean == "usr/share/glib-2.0/schemas/gschemas.compiled"
+            || clean == "usr/share/applications/mimeinfo.cache"
+            || clean.starts_with("usr/share/mime/")
+    }
+
     /// Melakukan Pre-flight Collision Scan terhadap InstalledDatabase
     pub fn preflight_scan(&self, db: &InstalledDatabase) -> Result<CollisionReport> {
         let mut report = CollisionReport {
@@ -220,8 +237,8 @@ impl MergeTransaction {
         };
 
         for entry in &self.entries {
-            // Direktori sistem bersama tidak dianggap tabrakan
-            if entry.file_type == FileType::Directory {
+            // Direktori sistem bersama atau berkas indeks agregat bersama tidak dianggap tabrakan
+            if entry.file_type == FileType::Directory || Self::is_shared_system_file(&entry.relative_path) {
                 continue;
             }
 
@@ -745,5 +762,55 @@ mod tests {
         // Verifikasi database record terhapus
         let check = db.get_package("unmerge_app").unwrap();
         assert!(check.is_none());
+    }
+
+    #[test]
+    fn test_shared_system_files_ignored_in_preflight_scan() {
+        let env = tempdir().unwrap();
+        let target_root = env.path().join("target");
+        let db_root = env.path().join("db");
+        let stage_glibc = env.path().join("stage_glibc");
+        let stage_m4 = env.path().join("stage_m4");
+
+        // 1. Glibc memiliki /usr/share/info/dir dan /usr/bin/gencat
+        fs::create_dir_all(stage_glibc.join("usr/share/info")).unwrap();
+        fs::create_dir_all(stage_glibc.join("usr/bin")).unwrap();
+        fs::write(stage_glibc.join("usr/share/info/dir"), b"glibc info dir").unwrap();
+        fs::write(stage_glibc.join("usr/bin/gencat"), b"gencat").unwrap();
+
+        let db = InstalledDatabase::new(&db_root);
+        let mut txn1 = MergeTransaction::new(
+            "glibc",
+            "2.44",
+            "0",
+            &stage_glibc,
+            &target_root,
+            &db_root,
+        );
+        txn1.execute_merge(&db).unwrap();
+
+        // 2. M4 juga membuat /usr/share/info/dir dan /usr/bin/m4
+        fs::create_dir_all(stage_m4.join("usr/share/info")).unwrap();
+        fs::create_dir_all(stage_m4.join("usr/bin")).unwrap();
+        fs::write(stage_m4.join("usr/share/info/dir"), b"m4 info dir").unwrap();
+        fs::write(stage_m4.join("usr/bin/m4"), b"m4 binary").unwrap();
+
+        let mut txn2 = MergeTransaction::new(
+            "m4",
+            "1.4.19",
+            "0",
+            &stage_m4,
+            &target_root,
+            &db_root,
+        );
+        txn2.scan_staging().unwrap();
+
+        // 3. Preflight scan m4 tidak boleh melaporkan konflik pada /usr/share/info/dir
+        let report = txn2.preflight_scan(&db).unwrap();
+        assert!(!report.has_conflicts(), "Shared info/dir tidak boleh dianggap konflik");
+
+        // 4. Merge m4 harus sukses
+        let res2 = txn2.execute_merge(&db);
+        assert!(res2.is_ok(), "Merge m4 harus sukses tanpa tabrakan berkas");
     }
 }

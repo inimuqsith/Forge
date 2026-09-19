@@ -312,3 +312,4 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-054** | Pure Self-Updating Package Philosophy & Live Git VCS Head Probe Update Engine | ✅ Diterapkan |
 | **ADR-055** | Isolated 3-Tier Separation of Concerns & Modular Python Maintainer Suite Architecture (`scripts/maintainer/`) | ✅ Diterapkan |
 | **ADR-056** | Implicit Ambient Build Tools Exemption & Foundation Toolchain Bootstrap Cycle Elimination | ✅ Diterapkan |
+| **ADR-057** | Shared Aggregate Index Sanitization & Collision Exemption Engine (`/usr/share/info/dir`) | ✅ Diterapkan |

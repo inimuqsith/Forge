@@ -159,6 +159,8 @@ impl RecipeBuilder {
             fs::create_dir_all(parent)?;
         }
 
+        Self::sanitize_staging_dir(staging_dir);
+
         // Hitung total size dan files_count
         let mut files_count = 0usize;
         let mut installed_size = 0u64;
@@ -484,8 +486,39 @@ impl RecipeBuilder {
             }
         }
 
+        Self::sanitize_staging_dir(destdir);
+
         println!("  [✓] Kompilasi & staging {} berhasil di {:?}", pkg_name, destdir);
         Ok(destdir.to_path_buf())
+    }
+
+    /// Bersihkan berkas transien/indeks katalog sistem bersama dari direktori staging sebelum packaging/merging (ADR-057)
+    pub fn sanitize_staging_dir(destdir: &Path) {
+        let transient_files = [
+            "usr/share/info/dir",
+            "share/info/dir",
+            "etc/ld.so.cache",
+            "usr/share/glib-2.0/schemas/gschemas.compiled",
+            "usr/share/applications/mimeinfo.cache",
+            "usr/share/mime/XMLnamespaces",
+            "usr/share/mime/globs",
+            "usr/share/mime/globs2",
+            "usr/share/mime/magic",
+            "usr/share/mime/subclasses",
+            "usr/share/mime/types",
+            "usr/share/mime/version",
+            "usr/share/mime/aliases",
+            "usr/share/mime/generic-icons",
+            "usr/share/mime/icons",
+            "usr/share/mime/treemagic",
+        ];
+
+        for rel in &transient_files {
+            let target = destdir.join(rel);
+            if target.exists() {
+                let _ = fs::remove_file(&target);
+            }
+        }
     }
 }
 
