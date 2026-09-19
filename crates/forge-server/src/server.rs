@@ -239,8 +239,10 @@ pub fn sync_and_rebundle_recipes(recipes_dir: &Path, cache_dir: &Path) -> anyhow
     Ok((packages.len(), hash, git_updated))
 }
 
-async fn github_webhook_handler(
-    State(state): State<Arc<ServerState>>,
+async fn handle_sync_rebundle(
+    state: Arc<ServerState>,
+    success_message: &'static str,
+    action_desc: &'static str,
 ) -> (StatusCode, Json<SyncWebhookResponse>) {
     let recipes_dir = state.recipes_dir.clone();
     let cache_dir = state.cache_dir.clone();
@@ -254,7 +256,7 @@ async fn github_webhook_handler(
             StatusCode::OK,
             Json(SyncWebhookResponse {
                 status: "ok".to_string(),
-                message: "Recipes successfully synchronized and rebundled from GitHub webhook".to_string(),
+                message: success_message.to_string(),
                 package_count: count,
                 sha256: Some(hash),
                 git_updated,
@@ -264,7 +266,7 @@ async fn github_webhook_handler(
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(SyncWebhookResponse {
                 status: "error".to_string(),
-                message: format!("Failed to synchronize recipes: {:#}", e),
+                message: format!("Failed to {}: {:#}", action_desc, e),
                 package_count: 0,
                 sha256: None,
                 git_updated: false,
@@ -281,6 +283,17 @@ async fn github_webhook_handler(
             }),
         ),
     }
+}
+
+async fn github_webhook_handler(
+    State(state): State<Arc<ServerState>>,
+) -> (StatusCode, Json<SyncWebhookResponse>) {
+    handle_sync_rebundle(
+        state,
+        "Recipes successfully synchronized and rebundled from GitHub webhook",
+        "synchronize recipes",
+    )
+    .await
 }
 
 async fn github_webhook_info_handler(
@@ -307,45 +320,12 @@ async fn github_webhook_info_handler(
 async fn recipes_refresh_handler(
     State(state): State<Arc<ServerState>>,
 ) -> (StatusCode, Json<SyncWebhookResponse>) {
-    let recipes_dir = state.recipes_dir.clone();
-    let cache_dir = state.cache_dir.clone();
-    let result = tokio::task::spawn_blocking(move || {
-        sync_and_rebundle_recipes(&recipes_dir, &cache_dir)
-    })
-    .await;
-
-    match result {
-        Ok(Ok((count, hash, git_updated))) => (
-            StatusCode::OK,
-            Json(SyncWebhookResponse {
-                status: "ok".to_string(),
-                message: "Recipes successfully refreshed and rebundled".to_string(),
-                package_count: count,
-                sha256: Some(hash),
-                git_updated,
-            }),
-        ),
-        Ok(Err(e)) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(SyncWebhookResponse {
-                status: "error".to_string(),
-                message: format!("Failed to refresh recipes: {:#}", e),
-                package_count: 0,
-                sha256: None,
-                git_updated: false,
-            }),
-        ),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(SyncWebhookResponse {
-                status: "error".to_string(),
-                message: format!("Task execution error: {:#}", e),
-                package_count: 0,
-                sha256: None,
-                git_updated: false,
-            }),
-        ),
-    }
+    handle_sync_rebundle(
+        state,
+        "Recipes successfully refreshed and rebundled",
+        "refresh recipes",
+    )
+    .await
 }
 
 fn escape_html(s: &str) -> String {

@@ -15,7 +15,7 @@ repository = "https://github.com/kuralinux/forge"
 [workspace.metadata.sonar]
 project-key = "inimuqsith_Forge"
 organization = "inimuqsith"
-exclusions = ["target/**"]
+exclusions = ["target/**", "scripts/**"]
 
 [workspace.dependencies]
 anyhow = "1.0"
