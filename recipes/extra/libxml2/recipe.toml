@@ -13,11 +13,12 @@ build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/GNOME/libxml2/archive/refs/tags/v2.15.4.tar.gz"
+    "https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.4.tar.xz"
 ]
 sha256 = [
-    "bb01bd9ac9a7403f9706816fd6d3e7888041d32b0211075feb20e755d2a9f29d"
+    "98087fd181d9070724f3fbc65c7377db03038eb92bd882374daff44940138821"
 ]
+
 
 [build]
 type = "autotools"
