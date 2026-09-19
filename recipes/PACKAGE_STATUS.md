@@ -9,9 +9,9 @@
 | Kategori | Total Paket | Status Kesiapan | Deskripsi Ruang Lingkup |
 | :--- | :---: | :---: | :--- |
 | **`recipes/system/`** | 22 | ✅ 100% Verified | Fondasi OS & Toolchain Kompilasi |
-| **`recipes/core/`** | 63 | ✅ 100% Verified | Sistem Inti, Storage, Filesystem, Networking & Daemons |
+| **`recipes/core/`** | 65 | ✅ 100% Verified | Sistem Inti, Storage, Filesystem, Networking, Security & Bootloader |
 | **`recipes/extra/`** | 100 | ✅ 100% Verified | Development Tools, CLI Modern, Desktop Apps, Audio, Qt6 & KDE Plasma 6 Desktop |
-| **TOTAL RESEP RESMI** | **185** | **✅ 100% Audited** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Audio, Qt6 & KDE Plasma 6)** |
+| **TOTAL RESEP RESMI** | **187** | **✅ 100% Audited** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Audio, Qt6 & KDE Plasma 6)** |
 
 ---
 
@@ -44,7 +44,7 @@
 
 ---
 
-## 2. Kategori `recipes/core/` (63 Paket — Sistem Inti, Storage, Filesystem, Networking & Daemons)
+## 2. Kategori `recipes/core/` (65 Paket — Sistem Inti, Storage, Filesystem, Networking, Security & Bootloader)
 
 | Paket | Versi Hulu | Status | Runtime Dependencies | Build Dependencies | Deskripsi |
 | :--- | :---: | :---: | :--- | :--- | :--- |
@@ -62,7 +62,8 @@
 | **`diffutils`** | `3.12` | ✅ Verified | - | - | GNU diff, cmp, diff3 and sdiff programs |
 | **`dosfstools`** | `4.2` | ✅ Verified | - | - | DOS filesystem utilities |
 | **`e2fsprogs`** | `1.47.4` | ✅ Verified | - | - | Ext2/3/4 filesystem management utilities (mke2fs, fsck.ext4) |
-| **`efibootmgr`** | `18` | ✅ Verified | - | - | Linux user-space application to modify the EFI Boot Manager |
+| **`efibootmgr`** | `18` | ✅ Verified | `glibc`, `efivar`, `popt` | `gcc`, `make`, `pkgconf`... | Linux user-space application to modify the EFI Boot Manager |
+| **`efivar`** | `39` | ✅ Verified | `glibc`, `popt` | `gcc`, `make`, `pkgconf`... | Tools and library to manipulate EFI variables |
 | **`elogind`** | `257.16` | ✅ Verified | - | - | The systemd project |
 | **`ethtool`** | `7.1` | ✅ Verified | - | - | Utility for examining and tuning network interfaces and drivers |
 | **`eudev`** | `3.2.14` | ✅ Verified | - | - | Standalone device manager fork of systemd-udev for OpenRC |
@@ -72,7 +73,7 @@
 | **`gawk`** | `5.4.1` | ✅ Verified | - | - | GNU awk pattern scanning and processing language |
 | **`grep`** | `3.12` | ✅ Verified | - | - | GNU grep, egrep and fgrep |
 | **`groff`** | `1.24.1` | ✅ Verified | - | - | GNU troff text-formatting system |
-| **`grub`** | `2.14` | ✅ Verified | - | - | GNU GRand Unified Bootloader (2) |
+| **`grub`** | `2.14` | ✅ Verified | `glibc`, `xz` | `gcc`, `make`, `pkgconf`... | GNU GRand Unified Bootloader (2) |
 | **`gzip`** | `1.14` | ✅ Verified | - | - | Popular data compression program |
 | **`hwdata`** | `0.411` | ✅ Verified | - | - | Hardware identification databases (pci.ids, usb.ids, oui.txt) |
 | **`iproute2`** | `7.2.0` | ✅ Verified | - | - | IP routing and network device configuration suite (ip, ss, tc) |
@@ -88,10 +89,11 @@
 | **`ncurses`** | `6.5` | ✅ Verified | - | - | System V Release 4.0 curses emulation library |
 | **`nftables`** | `1.1.1` | ✅ Verified | - | - | Netfilter userspace packet filtering framework |
 | **`openssl`** | `4.1.0-alpha1` | ✅ Verified | - | - | Robust, commercial-grade TLS/SSL cryptography toolkit |
-| **`pam`** | `1.7.1` | ✅ Verified | `glibc` | `gcc`, `make`, `flex`... | Pluggable Authentication Modules for Linux |
+| **`pam`** | `1.7.2` | ✅ Verified | `glibc` | `gcc`, `make`, `flex`... | Pluggable Authentication Modules for Linux |
 | **`parted`** | `3.7` | ✅ Verified | - | - | A program for creating, destroying, resizing, checking and copying partitions |
 | **`pciutils`** | `3.15.0` | ✅ Verified | - | - | PCI bus configuration and diagnostic tools (lspci, setpci) |
 | **`polkit`** | `127` | ✅ Verified | - | - | Application development toolkit for controlling system-wide privileges |
+| **`popt`** | `1.19` | ✅ Verified | `glibc` | `gcc`, `make`, `autoconf`... | Command line option parsing library |
 | **`procps-ng`** | `4.0.7` | ✅ Verified | - | - | Utilities for monitoring your system and its processes (ps, top, free) |
 | **`psmisc`** | `23.7` | ✅ Verified | - | - | Miscellaneous proc-based tools (killall, fuser, pstree) |
 | **`readline`** | `8.2.13` | ✅ Verified | - | - | GNU Readline command line editing library |

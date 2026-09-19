@@ -334,7 +334,13 @@ pub fn clean_version_tag(tag: &str, pkg_name: &str) -> String {
         }
     }
 
-    let trimmed = cleaned.trim_start_matches('.').to_string();
+    let mut trimmed = cleaned.trim_start_matches('.').to_string();
+    if trimmed.ends_with("-release") {
+        trimmed = trimmed[..trimmed.len() - "-release".len()].to_string();
+    } else if trimmed.ends_with("_release") {
+        trimmed = trimmed[..trimmed.len() - "_release".len()].to_string();
+    }
+
     // Versi valid harus diawali dengan angka (digit)
     if let Some(first_char) = trimmed.chars().next() {
         if !first_char.is_ascii_digit() {

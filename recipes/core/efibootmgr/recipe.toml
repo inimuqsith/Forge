@@ -1,26 +1,27 @@
 [package]
 name = "efibootmgr"
 version = "18"
-release = 4
-slot = "0"
+release = 1
 description = "Linux user-space application to modify the EFI Boot Manager"
 license = "GPL-2.0-or-later"
-upstream = "https://github.com/rhboot/efibootmgr"
+homepage = "https://github.com/rhboot/efibootmgr"
+slot = "0"
 
 [dependencies]
-runtime = ["glibc", "popt"]
-build = ["gcc", "efivar", "git"]
+depends = ["glibc", "efivar", "popt"]
+makedepends = ["gcc", "make", "pkgconf", "linux-headers"]
 
 [sources]
-urls = [
-    "https://github.com/rhboot/efibootmgr/archive/refs/tags/18.tar.gz"
-]
+urls = ["https://github.com/rhboot/efibootmgr/archive/refs/tags/18.tar.gz"]
 sha256 = ["442867d12f8525034a404fc8af3036dba8e1fc970998af2486c3b940dfad0874"]
 
 [build]
-type = "custom"
-script = """
-cd "${srcdir}/efibootmgr-${pkgver}"
-make ${MAKEFLAGS}
-make DESTDIR="${DESTDIR}" install
+compiler_override = "gcc"
+disable_custom_march = true
+cflags = "-O2 -pipe"
+compile = """
+make -j$(nproc) EFIDIR="kura"
+"""
+install = """
+make DESTDIR="${DESTDIR}" sbindir=/usr/bin mandir=/usr/share/man install
 """

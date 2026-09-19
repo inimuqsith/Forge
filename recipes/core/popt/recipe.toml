@@ -1,0 +1,31 @@
+[package]
+name = "popt"
+version = "1.19"
+release = 1
+description = "Command line option parsing library"
+license = "MIT"
+homepage = "https://github.com/rpm-software-management/popt"
+slot = "0"
+
+[dependencies]
+depends = ["glibc"]
+makedepends = ["gcc", "make", "autoconf", "automake", "libtool", "pkgconf"]
+
+[sources]
+urls = ["https://github.com/rpm-software-management/popt/archive/refs/tags/popt-1.19-release.tar.gz"]
+sha256 = ["6eb40d650526cb9fe63eb4415bcecdf9cf306f7556e77eff689abc5a44670060"]
+
+[build]
+configure = """
+./autogen.sh || true
+./configure \
+    --prefix=/usr \
+    --disable-static \
+    --disable-nls
+"""
+compile = """
+make -j$(nproc)
+"""
+install = """
+make DESTDIR="${DESTDIR}" install
+"""

@@ -1,0 +1,27 @@
+[package]
+name = "efivar"
+version = "39"
+release = 1
+description = "Tools and library to manipulate EFI variables"
+license = "LGPL-2.1-or-later"
+homepage = "https://github.com/rhboot/efivar"
+slot = "0"
+
+[dependencies]
+depends = ["glibc", "popt"]
+makedepends = ["gcc", "make", "pkgconf", "linux-headers"]
+
+[sources]
+urls = ["https://github.com/rhboot/efivar/archive/refs/tags/39.tar.gz"]
+sha256 = ["c9edd15f2eeeea63232f3e669a48e992c7be9aff57ee22672ac31f5eca1609a6"]
+
+[build]
+compiler_override = "gcc"
+disable_custom_march = true
+cflags = "-O2 -pipe"
+compile = """
+make -j$(nproc)
+"""
+install = """
+make DESTDIR="${DESTDIR}" libdir=/usr/lib bindir=/usr/bin mandir=/usr/share/man includedir=/usr/include install
+"""

@@ -27,9 +27,11 @@ coverage/
 cpu-profile.json
 .sonar/
 
-# --- Editor & OS Artifacts ---
+# --- Editor, Python & OS Artifacts ---
 .vscode/
 .idea/
 *.swp
 *~
 .DS_Store
+__pycache__/
+*.pyc

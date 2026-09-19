@@ -4,11 +4,30 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use crate::{ForgeConfig, PackageMetadata, Recipe};
+use crate::{BuildMeta, ForgeConfig, PackageMetadata, Recipe};
+
+/// Daftar paket tingkat rendah / bare-metal / bootloader yang wajib otomatis
+/// dikecualikan dari optimasi agresif (-march=native / SIMD / mold) demi mencegah triple-fault dan kegagalan boot.
+pub const SENSITIVE_BAREMETAL_PACKAGES: &[&str] = &[
+    "glibc",
+    "grub",
+    "efibootmgr",
+    "syslinux",
+    "memtest86+",
+    "valgrind",
+    "efivar",
+];
 
 pub struct RecipeBuilder;
 
 impl RecipeBuilder {
+    /// Cek apakah paket wajib menggunakan compiler & flag aman (GCC + BFD ld + -O2)
+    pub fn is_compiler_exempt(pkg_name: &str, build_meta: &BuildMeta) -> bool {
+        SENSITIVE_BAREMETAL_PACKAGES.contains(&pkg_name)
+            || build_meta.compiler_override.as_deref() == Some("gcc")
+            || build_meta.disable_custom_march
+    }
+
     /// Baca dan parse file recipe.toml
     pub fn load_recipe(path: &Path) -> Result<Recipe> {
         let content = fs::read_to_string(path)
@@ -285,11 +304,9 @@ impl RecipeBuilder {
             }
         }
 
-        // 3. Terapkan HIERARKI KONFIGURASI COMPILER & FORGE
+        // 3. Terapkan HIERARKI KONFIGURASI COMPILER & FORGE (ADR-002 & Bare-Metal Safety Guard)
         let build_meta = recipe.build.clone().unwrap_or_default();
-        let is_glibc_or_exempt = pkg_name == "glibc"
-            || build_meta.compiler_override.as_deref() == Some("gcc")
-            || build_meta.disable_custom_march;
+        let is_exempt = Self::is_compiler_exempt(&pkg_name, &build_meta);
 
         let ccache_available = config.build.enable_ccache
             && Command::new("which")
@@ -310,8 +327,8 @@ impl RecipeBuilder {
             }
         };
 
-        let (cc_base, cxx_base, ld, cflags, cxxflags, ldflags) = if is_glibc_or_exempt {
-            println!("  [!] Menerapkan aturan pengecualian Forge (ADR-002): Compiler GCC standar tanpa CFLAGS custom");
+        let (cc_base, cxx_base, ld, cflags, cxxflags, ldflags) = if is_exempt {
+            println!("  [!] Menerapkan aturan pengecualian Forge (ADR-002 / Bare-Metal Safety Guard): Compiler GCC standar tanpa CFLAGS custom");
             (
                 "gcc".to_string(),
                 "g++".to_string(),
@@ -439,5 +456,33 @@ chmod +x "$DESTDIR/usr/bin/client-test-bin"
         assert!(!Path::new("/usr/bin/client-test-bin").exists(), "forge build TIDAK BOLEH memasang ke host filesystem /");
 
         Ok(())
+    }
+
+    #[test]
+    fn test_sensitive_baremetal_packages_are_auto_exempted() {
+        let empty_meta = BuildMeta::default();
+
+        // 1. Paket dalam daftar bawaan SENSITIVE_BAREMETAL_PACKAGES harus otomatis exempt
+        assert!(RecipeBuilder::is_compiler_exempt("glibc", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("grub", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("efibootmgr", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("syslinux", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("memtest86+", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("valgrind", &empty_meta));
+        assert!(RecipeBuilder::is_compiler_exempt("efivar", &empty_meta));
+
+        // 2. Paket aplikasi biasa tanpa override TIDAK BOLEH exempt (wajib Clang + mold + -march=native)
+        assert!(!RecipeBuilder::is_compiler_exempt("fastfetch", &empty_meta));
+        assert!(!RecipeBuilder::is_compiler_exempt("ripgrep", &empty_meta));
+        assert!(!RecipeBuilder::is_compiler_exempt("plasma-desktop", &empty_meta));
+
+        // 3. Paket kustom dengan override gcc / disable_custom_march harus di-exempt
+        let mut gcc_meta = BuildMeta::default();
+        gcc_meta.compiler_override = Some("gcc".to_string());
+        assert!(RecipeBuilder::is_compiler_exempt("my-custom-pkg", &gcc_meta));
+
+        let mut march_meta = BuildMeta::default();
+        march_meta.disable_custom_march = true;
+        assert!(RecipeBuilder::is_compiler_exempt("my-custom-pkg2", &march_meta));
     }
 }
