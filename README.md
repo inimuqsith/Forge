@@ -64,14 +64,16 @@ flowchart TD
 ### A. Klien Pengguna (`forge`)
 
 ```bash
-# --- 1. Inisialisasi Konfigurasi Package Manager ---
+# --- 1. Inisialisasi Konfigurasi & USE Flags ---
 forge setup                     # Inisialisasi konfigurasi package manager (/etc/forge/forge.conf)
+forge menuconfig                # TUI interaktif untuk konfigurasi USE flags global / per-paket
 
 # --- 2. Manajemen Paket (Default: Source Compilation First) ---
 forge install base              # Pasang sistem dasar Kura Linux (Meta-Paket)
 forge install base-devel        # Pasang toolchain kompilasi Kura Linux (Meta-Paket)
 forge install <pkg>             # Kompilasi dari source code secara native (Default Gentoo-style)
 forge install --native <pkg>    # Paksa kompilasi 100% dari kode sumber (Portage mode)
+forge install --strip <pkg>     # Kompilasi dengan pembersihan simbol debug (modul & biner ramping)
 forge install --binhost <pkg>   # 3-Tier Cascade: Forge Binhost -> Fallback CachyOS Zen4/v4/v3 -> Source
 forge build <pkg>               # Kompilasi dari source & kemas ke .forge.tar.zst tanpa pasang ke host
 forge recipe-import <url|file>  # Transpilasi PKGBUILD Arch / APKBUILD Alpine ke recipe.toml
@@ -140,7 +142,7 @@ Server resmi Kura Linux beroperasi di domain **`https://pkgkura.amqs.net`**:
 # Kompilasi rilis dengan optimasi native silikon & linker mold
 cargo build --release
 
-# Menjalankan test suite komprehensif (66 unit & integration tests)
+# Menjalankan test suite komprehensif (95 unit & integration tests)
 cargo test --workspace
 ```
 
@@ -188,6 +190,6 @@ DESTDIR="${DESTDIR}" ninja -C build install
 
 - **Pedoman AI & Protokol Mutlak HITL:** Lihat [`AGENTS.md`](file:///home/admin/Development/Forge/AGENTS.md).
 - **Blueprint Arsitektur & Desain Sistem:** Lihat [`ARCHITECTURE.md`](file:///home/admin/Development/Forge/ARCHITECTURE.md).
-- **Memori Persisten, Roadmap 14 Fase & 39 ADR:** Lihat [`MEMORY.md`](file:///home/admin/Development/Forge/MEMORY.md).
+- **Memori Persisten, Roadmap 14 Fase & 52 ADR:** Lihat [`MEMORY.md`](file:///home/admin/Development/Forge/MEMORY.md).
 - **Manual GitOps, Webhook & Upstream Bumper:** Lihat [`docs/GITOPS_AND_BUMPER_MANUAL.md`](file:///home/admin/Development/Forge/docs/GITOPS_AND_BUMPER_MANUAL.md).
 - **Spesifikasi Resep Paket & USE Flags:** Lihat [`docs/RECIPE_SPECIFICATION.md`](file:///home/admin/Development/Forge/docs/RECIPE_SPECIFICATION.md).

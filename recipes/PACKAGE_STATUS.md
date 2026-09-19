@@ -8,14 +8,14 @@
 
 | Kategori | Total Paket | Status Kesiapan | Deskripsi Ruang Lingkup |
 | :--- | :---: | :---: | :--- |
-| **`recipes/system/`** | 22 | ✅ 100% Verified | Fondasi OS & Toolchain Kompilasi |
+| **`recipes/system/`** | 23 | ✅ 100% Verified | Fondasi OS, Kernel & Toolchain Kompilasi |
 | **`recipes/core/`** | 66 | ✅ 100% Verified | Sistem Inti, Storage, Filesystem, Networking, Security & Bootloader |
 | **`recipes/extra/`** | 100 | ✅ 100% Verified | Development Tools, CLI Modern, Desktop Apps, Audio, Qt6 & KDE Plasma 6 Desktop |
-| **TOTAL RESEP RESMI** | **188** | **✅ 100% Audited** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Audio, Qt6 & KDE Plasma 6)** |
+| **TOTAL RESEP RESMI** | **189** | **✅ 100% Audited** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Audio, Qt6 & KDE Plasma 6)** |
 
 ---
 
-## 1. Kategori `recipes/system/` (22 Paket — Fondasi OS & Toolchain Kompilasi)
+## 1. Kategori `recipes/system/` (23 Paket — Fondasi OS & Toolchain Kompilasi)
 
 | Paket | Versi Hulu | Status | Runtime Dependencies | Build Dependencies | Deskripsi |
 | :--- | :---: | :---: | :--- | :--- | :--- |
@@ -31,6 +31,7 @@
 | **`gcc`** | `16.2.0` | ✅ Verified | - | - | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
 | **`glibc`** | `2.44` | ✅ Verified | - | - | GNU C Library (Standard Core System C Library - Latest 2.44) |
 | **`libtool`** | `2.6.2` | ✅ Verified | - | - | Generic library support script |
+| **`linux-cachyos-bore`** | `6.14.0_git` | ✅ Verified | `kmod`, `eudev` | `clang`, `llvm`, `mold`, `make`, `bc`, `bison`, `flex`, `zstd` | Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO |
 | **`linux-headers`** | `7.2` | ✅ Verified | - | - | Linux kernel API headers for userspace |
 | **`llvm`** | `23.1.1` | ✅ Verified | - | - | LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22) |
 | **`m4`** | `1.4.21` | ✅ Verified | - | - | GNU Macro Processor |
