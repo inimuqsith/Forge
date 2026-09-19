@@ -510,8 +510,21 @@ impl InstalledDatabase {
         dirs_to_prune.sort_by(|a, b| b.components().count().cmp(&a.components().count()));
         dirs_to_prune.dedup();
 
+        let essential_system_dirs: std::collections::HashSet<PathBuf> = [
+            "", "bin", "sbin", "lib", "lib64", "usr", "usr/bin", "usr/sbin", "usr/lib",
+            "usr/lib64", "usr/include", "usr/share", "etc", "var", "var/db", "var/cache",
+            "var/log", "tmp", "dev", "proc", "sys", "run", "boot", "home", "root",
+        ]
+        .iter()
+        .map(|d| target_root.join(d))
+        .collect();
+
         for dir in dirs_to_prune {
             if dir.exists() && dir.is_dir() {
+                // Jangan pernah hapus direktori fondasi sistem atau target root itu sendiri
+                if essential_system_dirs.contains(&dir) || dir == target_root {
+                    continue;
+                }
                 // Cek apakah direktori kosong
                 if let Ok(mut read_dir) = fs::read_dir(&dir) {
                     if read_dir.next().is_none() {
