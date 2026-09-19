@@ -1,6 +1,6 @@
 [package]
 name = "patch"
-version = "3.1.2"
+version = "2.7.6"
 release = 1
 slot = "0"
 description = "Utility to apply diffs to files"
@@ -13,9 +13,11 @@ build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://ftp.gnu.org/gnu/patch/patch-3.1.2.tar.xz"
+    "https://ftp.gnu.org/gnu/patch/patch-2.7.6.tar.xz"
 ]
-sha256 = []
+sha256 = [
+    "ac610bda97abe0d9f6b7c963255a11dcb196c25e337c61f94e4778d632f1d8fd"
+]
 
 [build]
 type = "autotools"

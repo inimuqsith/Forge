@@ -53,12 +53,12 @@
 | **`cmake`** | 3.31.5 | ✅ Verified | `glibc`, `openssl`, `zlib` | `gcc`, `make` | Cross-platform build automation |
 | **`meson`** | 1.12.0 | ✅ Verified | `python`, `ninja` | `python` | Fast build system |
 | **`pkgconf`** | 3.0.7 | ✅ Verified | `glibc` | `gcc`, `make` | Package compiler metadata toolkit |
-| **`linux-headers`**| 7.3-rc3 | ✅ Verified | - | `make`, `rsync` | Kernel userspace API headers |
+| **`linux-headers`**| 6.13.6 | ✅ Verified | - | `make`, `rsync` | Kernel userspace API headers |
 | **`m4`** | 1.4.21 | ✅ Verified | `glibc` | `gcc`, `make` | Macro processor |
 | **`autoconf`** | 2.73 | ✅ Verified | `m4`, `perl` | `make` | Extensible package of M4 macros |
 | **`automake`** | 1.18 | ✅ Verified | `autoconf` | `make` | Tool for generating GNU Makefiles |
 | **`libtool`** | 2.6.2 | ✅ Verified | `m4` | `gcc`, `make` | Generic library support script |
-| **`patch`** | 3.1.2 | ✅ Verified | `glibc` | `gcc`, `make` | Tool for patching source trees |
+| **`patch`** | 2.7.6 | ✅ Verified | `glibc` | `gcc`, `make` | Tool for patching source trees |
 | **`bison`** | 3.8.2 | ✅ Verified | `glibc`, `m4` | `gcc`, `make` | Parser generator |
 | **`flex`** | 2.6.4 | ✅ Verified | `glibc`, `m4` | `gcc`, `make`, `bison` | Fast lexical analyzer generator |
 

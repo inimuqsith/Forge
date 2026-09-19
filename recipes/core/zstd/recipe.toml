@@ -1,6 +1,6 @@
 [package]
 name = "zstd"
-version = "1.5.7-kernel"
+version = "1.5.7"
 release = 1
 slot = "0"
 description = "Zstandard - Fast real-time compression algorithm"
@@ -13,9 +13,11 @@ build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/facebook/zstd/releases/download/v1.5.7-kernel/zstd-1.5.7-kernel.tar.gz"
+    "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz"
 ]
-sha256 = []
+sha256 = [
+    "eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3"
+]
 
 [build]
 type = "make"

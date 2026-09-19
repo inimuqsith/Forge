@@ -1,6 +1,6 @@
 [package]
 name = "glib2"
-version = "4.3.9"
+version = "2.82.5"
 release = 1
 slot = "0"
 description = "Core low-level data structure and utility library from GNOME"
@@ -13,9 +13,11 @@ build = ["meson", "ninja", "pkgconf", "gcc"]
 
 [sources]
 urls = [
-    "https://download.gnome.org/sources/glib/2.82/glib-4.3.9.tar.xz"
+    "https://download.gnome.org/sources/glib/2.82/glib-2.82.5.tar.xz"
 ]
-sha256 = []
+sha256 = [
+    "05c2031f9bdf6b5aba7a06ca84f0b4aced28b19bf1b50c6ab25cc675277cbc3f"
+]
 
 [build]
 type = "meson"
