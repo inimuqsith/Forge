@@ -8,18 +8,12 @@ license = "Apache-2.0"
 upstream = "https://www.openssl.org/"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-    "perl",
-]
+runtime = ["glibc"]
+build = ["make", "gcc", "perl"]
 
 [sources]
 urls = [
-    "https://github.com/openssl/openssl/releases/download/openssl-4.1.0-alpha1/openssl-4.1.0-alpha1.tar.gz",
+    "https://github.com/openssl/openssl/releases/download/openssl-4.1.0-alpha1/openssl-4.1.0-alpha1.tar.gz"
 ]
 sha256 = ["160271e66902844ee37e776b98df59a903739cd22a44f43126dab9fe9efd59bd"]
 

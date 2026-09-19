@@ -8,20 +8,14 @@ license = "GPL-2.0-or-later"
 upstream = "https://gitlab.com/psmisc/psmisc"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "ncurses",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc", "ncurses"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://downloads.sourceforge.net/psmisc/psmisc-23.7.tar.xz",
+    "https://downloads.sourceforge.net/psmisc/psmisc-23.7.tar.xz"
 ]
-sha256 = []
+sha256 = ["58c55d9c1402474065adae669511c191de374b0871eec781239ab400b907c327"]
 
 [build]
 type = "autotools"

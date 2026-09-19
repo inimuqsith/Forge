@@ -4,12 +4,12 @@ version = "1.49"
 release = 1
 slot = "0"
 description = "Specifications of extended Wayland protocols"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://wayland.freedesktop.org/"
 
 [dependencies]
 runtime = ["glibc"]
-build = ["gcc", "wayland", "meson"]
+build = ["gcc", "wayland", "meson", "ninja"]
 
 [sources]
 urls = [

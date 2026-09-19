@@ -8,19 +8,12 @@ license = "ISC"
 upstream = "https://tmux.github.io/"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "ncurses",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc", "ncurses"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/tmux/tmux/releases/download/3.8-rc/tmux-3.8-rc.tar.gz",
+    "https://github.com/tmux/tmux/releases/download/3.8-rc/tmux-3.8-rc.tar.gz"
 ]
 sha256 = ["decb97e52e91a459f9b9d5726d64cd7cb87506eca1090817da6cc84a9a71eb51"]
 

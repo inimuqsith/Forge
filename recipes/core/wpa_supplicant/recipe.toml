@@ -8,20 +8,12 @@ license = "BSD-3-Clause"
 upstream = "https://w1.fi/wpa_supplicant/"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "openssl",
-    "readline",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc", "openssl", "readline"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://w1.fi/releases/wpa_supplicant-2.12.tar.gz",
+    "https://w1.fi/releases/wpa_supplicant-2.12.tar.gz"
 ]
 sha256 = ["08e23937e16d0155e55cab2b51f51fbe10d80a1aa91c4e15442645059b737ef6"]
 

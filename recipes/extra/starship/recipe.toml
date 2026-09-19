@@ -8,7 +8,7 @@ license = "ISC"
 upstream = "https://starship.rs/"
 
 [dependencies]
-runtime = ["glibc", "libc.so", "libm.so", "gcc"]
+runtime = ["glibc", "gcc"]
 build = ["gcc", "cmake", "git", "rust"]
 
 [sources]
@@ -18,12 +18,9 @@ urls = [
 sha256 = ["98b0ec0611e7006395bf917547ebd3c3360c2b3d016144cf1637bfae7b37256d"]
 
 [build]
-type = "cmake"
+type = "cargo"
 script = """
 cd "${srcdir}/starship-${pkgver}"
-cmake -B build -G Ninja \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr
-ninja -C build ${MAKEFLAGS}
-DESTDIR="${DESTDIR}" ninja -C build install
+cargo build --release --locked
+install -Dm755 "target/release/starship" "${DESTDIR}/usr/bin/starship"
 """

@@ -8,17 +8,12 @@ license = "GPL-3.0-or-later"
 upstream = "https://savannah.gnu.org/projects/which/"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://ftp.gnu.org/gnu/which/which-8.0.6.tar.gz",
+    "https://ftp.gnu.org/gnu/which/which-8.0.6.tar.gz"
 ]
 sha256 = []
 

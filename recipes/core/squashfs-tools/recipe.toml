@@ -8,14 +8,14 @@ license = "GPL-2.0-or-later"
 upstream = "https://github.com/plougher/squashfs-tools"
 
 [dependencies]
-runtime = ["glibc", "gcc", "lz4", "liblz4.so", "lzo", "liblzo2.so", "xz", "zlib", "zstd"]
+runtime = ["glibc", "gcc", "lz4", "lzo", "xz", "zlib", "zstd"]
 build = ["gcc", "help2man"]
 
 [sources]
 urls = [
-    "https://github.com/squashfs-tools/squashfs-tools/archive/refs/tags/v4.7.5.tar.gz"
+    "https://github.com/plougher/squashfs-tools/archive/refs/tags/4.7.5.tar.gz"
 ]
-sha256 = []
+sha256 = ["547b7b7f4d2e44bf91b6fc554664850c69563701deab9fd9cd7e21f694c88ea6"]
 
 [build]
 type = "custom"

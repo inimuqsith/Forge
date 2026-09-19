@@ -8,18 +8,12 @@ license = "BSD-3-Clause"
 upstream = "https://troglobit.com/projects/sysklogd/"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/troglobit/sysklogd/releases/download/v2.7.2/sysklogd-2.7.2.tar.gz",
+    "https://github.com/troglobit/sysklogd/releases/download/v2.7.2/sysklogd-2.7.2.tar.gz"
 ]
 sha256 = ["bc410ca64551a11fac6518b418fb6b8afbd888a70af2c5eb353334a706727bca"]
 

@@ -8,19 +8,14 @@ license = "MIT AND BSD-3-Clause"
 upstream = "https://github.com/cronie-crond/cronie"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://github.com/cronie-crond/cronie/releases/download/cronie-1.7.2/cronie-1.7.2.tar.gz",
+    "https://github.com/cronie-crond/cronie/releases/download/cronie-1.7.2/cronie-1.7.2.tar.gz"
 ]
-sha256 = []
+sha256 = ["f1da374a15ba7605cf378347f96bc8b678d3d7c0765269c8242cfe5b0789c571"]
 
 [build]
 type = "autotools"

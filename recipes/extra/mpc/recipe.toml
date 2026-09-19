@@ -8,19 +8,12 @@ license = "LGPL-3.0-or-later"
 upstream = "https://www.multiprecision.org/mpc/"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "gmp",
-    "mpfr",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc", "gmp", "mpfr"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://ftp.gnu.org/gnu/mpc/mpc-1.4.1.tar.gz",
+    "https://ftp.gnu.org/gnu/mpc/mpc-1.4.1.tar.gz"
 ]
 sha256 = []
 

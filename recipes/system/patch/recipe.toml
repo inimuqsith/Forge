@@ -8,17 +8,12 @@ license = "GPL-3.0-or-later"
 upstream = "https://savannah.gnu.org/projects/patch/"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://ftp.gnu.org/gnu/patch/patch-3.1.2.tar.xz",
+    "https://ftp.gnu.org/gnu/patch/patch-3.1.2.tar.xz"
 ]
 sha256 = []
 

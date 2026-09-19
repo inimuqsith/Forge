@@ -8,23 +8,14 @@ license = "GPL-3.0-or-later"
 upstream = "https://www.gnu.org/software/wget/"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "openssl",
-    "pcre2",
-    "zlib",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc", "openssl", "pcre2", "zlib"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz",
+    "https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz"
 ]
-sha256 = []
+sha256 = ["766e48423e79359ea31e41db9e5c289675947a7fcf2efdcedb726ac9d0da3784"]
 
 [build]
 type = "autotools"

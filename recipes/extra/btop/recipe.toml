@@ -8,17 +8,12 @@ license = "Apache-2.0"
 upstream = "https://github.com/aristocratos/btop"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://github.com/aristocratos/btop/archive/refs/tags/v1.4.7.tar.gz",
+    "https://github.com/aristocratos/btop/archive/refs/tags/v1.4.7.tar.gz"
 ]
 sha256 = ["933de2e4d1b2211a638be463eb6e8616891bfba73aef5d38060bd8319baeefc6"]
 

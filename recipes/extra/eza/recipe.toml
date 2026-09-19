@@ -8,17 +8,17 @@ license = "EUPL-1.2"
 upstream = "https://github.com/eza-community/$pkgname"
 
 [dependencies]
-runtime = ["glibc", "libc.so", "libm.so", "gcc", "libgit2", "libgit2.so"]
+runtime = ["glibc", "gcc", "libgit2"]
 build = ["gcc", "cargo", "pandoc"]
 
 [sources]
 urls = [
-    "https://github.com/eza/eza/archive/refs/tags/v0.23.5.tar.gz"
+    "https://github.com/eza-community/eza/archive/refs/tags/v0.23.5.tar.gz"
 ]
 sha256 = ["bbf179f2611c904014431740b559e8055276c12fcf978a7e31c271663548337f"]
 
 [build]
-type = "custom"
+type = "cargo"
 script = """
 cd "${srcdir}/eza-${pkgver}"
 cargo build --release --locked

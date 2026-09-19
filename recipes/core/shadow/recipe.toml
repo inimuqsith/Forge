@@ -8,21 +8,12 @@ license = "BSD-3-Clause"
 upstream = "https://github.com/shadow-maint/shadow"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "acl",
-    "libcap",
-    "libseccomp",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc", "acl", "libcap", "libseccomp"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/shadow-maint/shadow/releases/download/v4.17.3/shadow-4.17.3.tar.xz",
+    "https://github.com/shadow-maint/shadow/releases/download/v4.17.3/shadow-4.17.3.tar.xz"
 ]
 sha256 = []
 

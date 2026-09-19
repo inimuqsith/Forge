@@ -8,20 +8,12 @@ license = "GPL-3.0-or-later"
 upstream = "https://ccache.dev/"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "zstd",
-]
-build = [
-    "cmake",
-    "ninja",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc", "zstd"]
+build = ["cmake", "ninja", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/ccache/ccache/releases/download/v4.14/ccache-4.14.tar.xz",
+    "https://github.com/ccache/ccache/releases/download/v4.14/ccache-4.14.tar.xz"
 ]
 sha256 = ["b093ac5d38204cb4d9f29b0bbd570675aa5a592a78e6675b2c506dbe045234e7"]
 

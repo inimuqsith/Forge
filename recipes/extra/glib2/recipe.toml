@@ -8,22 +8,12 @@ license = "LGPL-2.1-or-later"
 upstream = "https://gitlab.gnome.org/GNOME/glib"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "libffi",
-    "pcre2",
-    "zlib",
-]
-build = [
-    "meson",
-    "ninja",
-    "pkgconf",
-    "gcc",
-]
+runtime = ["glibc", "libffi", "pcre2", "zlib"]
+build = ["meson", "ninja", "pkgconf", "gcc"]
 
 [sources]
 urls = [
-    "https://download.gnome.org/sources/glib/2.82/glib-4.3.9.tar.xz",
+    "https://download.gnome.org/sources/glib/2.82/glib-4.3.9.tar.xz"
 ]
 sha256 = []
 

@@ -4,18 +4,18 @@ version = "7.1"
 release = 1
 slot = "0"
 description = "Btrfs filesystem utilities"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://btrfs.readthedocs.io"
 
 [dependencies]
-runtime = ["glibc", "libgcrypt", "lzo", "systemd-libs", "util-linux-libs", "zlib", "zstd"]
+runtime = ["glibc", "libgcrypt", "lzo", "eudev", "util-linux", "zlib", "zstd"]
 build = ["gcc", "asciidoc", "e2fsprogs", "git", "python", "python-setuptools", "python-sphinx", "python-sphinx_rtd_theme", "xmlto"]
 
 [sources]
 urls = [
-    "https://github.com/btrfs-progs/btrfs-progs/archive/refs/tags/v7.1.tar.gz"
+    "https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v7.1.tar.xz"
 ]
-sha256 = []
+sha256 = ["d1f55cc2971398c9142eaa79d203e63d586a3b4b867f956664a1d68322cd4e34"]
 
 [build]
 type = "autotools"

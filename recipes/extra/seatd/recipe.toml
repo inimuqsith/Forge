@@ -4,11 +4,11 @@ version = "0.9.3"
 release = 1
 slot = "0"
 description = "A minimal seat management daemon, and a universal seat management library"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://sr.ht/~kennylevinsen/seatd/"
 
 [dependencies]
-runtime = ["glibc", "systemd-libs"]
+runtime = ["glibc", "eudev"]
 build = ["gcc", "meson", "ninja", "scdoc"]
 
 [sources]

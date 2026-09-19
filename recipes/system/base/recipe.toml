@@ -8,27 +8,14 @@ license = "GPL-3.0-or-later"
 upstream = "https://kuralinux.org"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "bash",
-    "coreutils",
-    "sed",
-    "grep",
-    "gawk",
-    "tar",
-    "xz",
-    "zstd",
-    "findutils",
-    "diffutils",
-    "file",
-    "which",
-    "util-linux",
-    "shadow",
-    "openrc",
-    "eudev",
-    "kmod",
-    "ca-certificates",
+runtime = ["glibc", "coreutils", "sed", "grep", "gawk", "tar", "xz", "zstd", "findutils", "diffutils", "file", "which", "util-linux", "shadow", "openrc", "eudev", "kmod", "ca-certificates"]
+build = ["gcc"]
+
+[sources]
+urls = [
+
 ]
+sha256 = []
 
 [build]
 type = "meta"

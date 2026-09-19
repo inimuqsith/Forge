@@ -8,21 +8,12 @@ license = "MIT"
 upstream = "https://gitlab.gnome.org/GNOME/libxml2"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "zlib",
-    "xz",
-    "icu",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc", "zlib", "xz", "icu"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://download.gnome.org/sources/libxml2/2.13/libxml2-2.15.4.tar.xz",
+    "https://download.gnome.org/sources/libxml2/2.13/libxml2-2.15.4.tar.xz"
 ]
 sha256 = []
 

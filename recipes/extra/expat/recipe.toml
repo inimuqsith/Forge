@@ -8,17 +8,12 @@ license = "MIT"
 upstream = "https://libexpat.github.io/"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-2.8.4.tar.xz",
+    "https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-2.8.4.tar.xz"
 ]
 sha256 = []
 

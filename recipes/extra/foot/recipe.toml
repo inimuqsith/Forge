@@ -8,12 +8,12 @@ license = "MIT"
 upstream = "https://codeberg.org/dnkl/$pkgbase"
 
 [dependencies]
-runtime = ["glibc", "fcft", "fontconfig", "libfcft.so", "libutf8proc", "libxkbcommon", "ncurses", "pixman", "wayland"]
+runtime = ["glibc", "fcft", "fontconfig", "libutf8proc", "libxkbcommon", "ncurses", "pixman", "wayland"]
 build = ["gcc", "git", "llvm", "meson", "ninja", "python", "scdoc", "sway", "tllist", "wayland-protocols"]
 
 [sources]
 urls = [
-    "https://github.com/foot/foot/archive/refs/tags/v1.28.0.tar.gz"
+    "https://codeberg.org/dnkl/foot/archive/1.28.0.tar.gz"
 ]
 sha256 = ["05a057b1145507625d9f548ae546705d58ba60cbb26a8958ce72f0b9c1bdee46"]
 

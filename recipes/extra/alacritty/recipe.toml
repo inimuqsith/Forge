@@ -4,7 +4,7 @@ version = "0.17.0"
 release = 1
 slot = "0"
 description = "A cross-platform, GPU-accelerated terminal emulator"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://github.com/alacritty/alacritty"
 
 [dependencies]
@@ -18,12 +18,9 @@ urls = [
 sha256 = ["fa03da86b110adcaaf9f476ee5de8ce1e59b913b2cf4e5d0374bf70af9c092c7"]
 
 [build]
-type = "cmake"
+type = "cargo"
 script = """
 cd "${srcdir}/alacritty-${pkgver}"
-cmake -B build -G Ninja \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr
-ninja -C build ${MAKEFLAGS}
-DESTDIR="${DESTDIR}" ninja -C build install
+cargo build --release --locked
+install -Dm755 "target/release/alacritty" "${DESTDIR}/usr/bin/alacritty"
 """

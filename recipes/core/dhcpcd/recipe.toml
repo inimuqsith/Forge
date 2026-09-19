@@ -8,19 +8,12 @@ license = "BSD-2-Clause"
 upstream = "https://roy.marples.name/projects/dhcpcd"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "openssl",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc", "openssl"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/NetworkConfiguration/dhcpcd/releases/download/v10.5.2/dhcpcd-10.5.2.tar.xz",
+    "https://github.com/NetworkConfiguration/dhcpcd/releases/download/v10.5.2/dhcpcd-10.5.2.tar.xz"
 ]
 sha256 = ["3e476657fdb6eeb38b277da3a48d0ac0113ecce5858ebdcddff2b629faed52b4"]
 

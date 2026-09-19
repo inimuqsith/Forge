@@ -8,22 +8,12 @@ license = "GPL-2.0-or-later"
 upstream = "https://github.com/util-linux/util-linux"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "ncurses",
-    "zlib",
-    "libcap",
-    "libseccomp",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc", "ncurses", "zlib", "libcap", "libseccomp"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/util-linux/util-linux/releases/download/v2.42.3/util-linux-2.42.3.tar.xz",
+    "https://github.com/util-linux/util-linux/releases/download/v2.42.3/util-linux-2.42.3.tar.xz"
 ]
 sha256 = []
 

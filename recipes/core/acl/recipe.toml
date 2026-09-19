@@ -8,17 +8,12 @@ license = "GPL-2.0-or-later AND LGPL-2.1-or-later"
 upstream = "https://savannah.nongnu.org/projects/acl"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://download.savannah.nongnu.org/releases/acl/acl-2.4.0.tar.xz",
+    "https://download.savannah.nongnu.org/releases/acl/acl-2.4.0.tar.xz"
 ]
 sha256 = ["e661131456d2708a01c614a0f400e11d7d1bfaeb6f3e74b75bb980b72f0161a3"]
 

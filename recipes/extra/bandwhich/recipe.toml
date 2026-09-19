@@ -4,7 +4,7 @@ version = "0.23.1"
 release = 3
 slot = "0"
 description = "Terminal bandwidth utilization tool"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://github.com/imsnif/bandwhich"
 
 [dependencies]
@@ -18,7 +18,7 @@ urls = [
 sha256 = ["aafb96d059cf9734da915dca4f5940c319d2e6b54e2ffb884332e9f5e820e6d7"]
 
 [build]
-type = "custom"
+type = "cargo"
 script = """
 cd "${srcdir}/bandwhich-${pkgver}"
 cargo build --release --locked

@@ -8,15 +8,12 @@ license = "GPL-2.0-or-later"
 upstream = "https://github.com/vcrhonek/hwdata"
 
 [dependencies]
-runtime = [
-]
-build = [
-    "make",
-]
+runtime = ["glibc"]
+build = ["make"]
 
 [sources]
 urls = [
-    "https://github.com/vcrhonek/hwdata/archive/refs/tags/v0.411.tar.gz",
+    "https://github.com/vcrhonek/hwdata/archive/refs/tags/v0.411.tar.gz"
 ]
 sha256 = ["d75462181fbd307228e0a48b8d1449f1773ea4b1f17e8a1d56346907f999ce33"]
 

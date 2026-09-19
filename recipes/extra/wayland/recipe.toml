@@ -4,12 +4,12 @@ version = "1.26.0"
 release = 1
 slot = "0"
 description = "A computer display server protocol"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://wayland.freedesktop.org/"
 
 [dependencies]
 runtime = ["glibc", "libffi", "expat", "libxml2", "default-cursors"]
-build = ["gcc", "meson", "libxslt", "doxygen", "xmlto", "graphviz", "docbook-xsl", "mdbook"]
+build = ["gcc", "meson", "libxslt", "doxygen", "xmlto", "graphviz", "docbook-xsl", "mdbook", "ninja"]
 
 [sources]
 urls = [

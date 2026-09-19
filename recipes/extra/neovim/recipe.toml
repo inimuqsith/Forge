@@ -8,19 +8,12 @@ license = "Apache-2.0"
 upstream = "https://neovim.io/"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "cmake",
-    "ninja",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc"]
+build = ["cmake", "ninja", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/neovim/neovim/archive/refs/tags/v0.12.5.tar.gz",
+    "https://github.com/neovim/neovim/archive/refs/tags/v0.12.5.tar.gz"
 ]
 sha256 = ["a810c95332317bd0017e1ca07e376a8472c79075cbed00fa3737d190a8a0a45a"]
 

@@ -8,17 +8,12 @@ license = "BSD-3-Clause OR GPL-2.0-only"
 upstream = "https://sites.google.com/site/fullycapable/"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.78.tar.xz",
+    "https://kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.78.tar.xz"
 ]
 sha256 = ["0d621e562fd932ccf67b9660fb018e468a683d7b827541df27813228c996bb11"]
 

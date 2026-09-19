@@ -8,12 +8,14 @@ license = "GPL-3.0-or-later"
 upstream = "https://github.com/cowsay-org/cowsay"
 
 [dependencies]
-runtime = ["bash", "perl"]
+runtime = ["glibc", "perl"]
 build = ["make"]
 
 [sources]
-urls = ["https://github.com/cowsay-org/cowsay/archive/refs/tags/v3.8.4.tar.gz"]
-sha256 = []
+urls = [
+    "https://github.com/cowsay-org/cowsay/archive/refs/tags/v3.8.4.tar.gz"
+]
+sha256 = ["c15bc10712835d3a9bcda780dc9453362567bf48d1185905dc7ef2334d79aadd"]
 
 [build]
 type = "generic"

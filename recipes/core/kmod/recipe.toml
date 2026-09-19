@@ -8,22 +8,12 @@ license = "GPL-2.0-or-later AND LGPL-2.1-or-later"
 upstream = "https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "zlib",
-    "xz",
-    "zstd",
-    "openssl",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc", "zlib", "xz", "zstd", "openssl"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://kernel.org/pub/linux/utils/kernel/kmod/kmod-34.2.tar.xz",
+    "https://kernel.org/pub/linux/utils/kernel/kmod/kmod-34.2.tar.xz"
 ]
 sha256 = ["5a5d5073070cc7e0c7a7a3c6ec2a0e1780850c8b47b3e3892226b93ffcb9cb54"]
 

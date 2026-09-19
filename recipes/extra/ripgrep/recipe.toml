@@ -8,19 +8,12 @@ license = "MIT OR Unlicense"
 upstream = "https://github.com/BurntSushi/ripgrep"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "pcre2",
-]
-build = [
-    "cargo",
-    "rust",
-    "pkgconf",
-]
+runtime = ["glibc", "pcre2"]
+build = ["cargo", "rust", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/BurntSushi/ripgrep/archive/refs/tags/15.2.0.tar.gz",
+    "https://github.com/BurntSushi/ripgrep/archive/refs/tags/15.2.0.tar.gz"
 ]
 sha256 = ["7605249d3eb0d5f170e3414498e3344e26b1e7a147aec518b57090b80036a562"]
 

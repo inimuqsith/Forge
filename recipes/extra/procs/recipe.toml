@@ -13,12 +13,12 @@ build = ["gcc", "cargo", "asciidoctor"]
 
 [sources]
 urls = [
-    "https://github.com/procs/procs/archive/refs/tags/v0.14.12.tar.gz"
+    "https://github.com/dalance/procs/archive/refs/tags/v0.14.12.tar.gz"
 ]
 sha256 = ["f2fab583fe98a9ae9505c5eecf4f3d9d4ad9bcb5d478a8222d52c87aa1ac602e"]
 
 [build]
-type = "custom"
+type = "cargo"
 script = """
 cd "${srcdir}/procs-${pkgver}"
 cargo build --release --locked

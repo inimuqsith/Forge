@@ -8,24 +8,12 @@ license = "BSD-2-Clause"
 upstream = "https://libarchive.org/"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "zlib",
-    "bzip2",
-    "xz",
-    "zstd",
-    "openssl",
-    "expat",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc", "zlib", "bzip2", "xz", "zstd", "openssl", "expat"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/libarchive/libarchive/releases/download/v3.8.9/libarchive-3.8.9.tar.xz",
+    "https://github.com/libarchive/libarchive/releases/download/v3.8.9/libarchive-3.8.9.tar.xz"
 ]
 sha256 = ["888c934f9d95648ecb9163dc8e23ab80a476ecb81a8f1154704a227b5b676dde"]
 

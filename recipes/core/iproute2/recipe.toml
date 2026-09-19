@@ -8,22 +8,12 @@ license = "GPL-2.0-only"
 upstream = "https://wiki.linuxfoundation.org/networking/iproute2"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "libcap",
-    "libseccomp",
-]
-build = [
-    "make",
-    "gcc",
-    "bison",
-    "flex",
-    "pkgconf",
-]
+runtime = ["glibc", "libcap", "libseccomp"]
+build = ["make", "gcc", "bison", "flex", "pkgconf"]
 
 [sources]
 urls = [
-    "https://kernel.org/pub/linux/utils/net/iproute2/iproute2-7.2.0.tar.xz",
+    "https://kernel.org/pub/linux/utils/net/iproute2/iproute2-7.2.0.tar.xz"
 ]
 sha256 = ["4c2fa124c2cf0afd7ca34d1eeacba6ba048a56f6374e2aab93dafbdbd4eea9c0"]
 

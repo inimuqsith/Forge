@@ -4,11 +4,11 @@ version = "3.7"
 release = 1
 slot = "0"
 description = "A program for creating, destroying, resizing, checking and copying partitions"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://www.gnu.org/software/parted/parted.html"
 
 [dependencies]
-runtime = ["glibc", "device-mapper", "util-linux-libs"]
+runtime = ["glibc", "device-mapper", "util-linux"]
 build = ["gcc", "pkg-config"]
 
 [sources]

@@ -8,21 +8,12 @@ license = "GPL-2.0-or-later"
 upstream = "https://www.gnu.org/software/libtool/"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "m4",
-]
-build = [
-    "make",
-    "m4",
-    "autoconf",
-    "automake",
-    "gcc",
-]
+runtime = ["glibc", "m4"]
+build = ["make", "m4", "autoconf", "automake", "gcc"]
 
 [sources]
 urls = [
-    "https://ftp.gnu.org/gnu/libtool/libtool-2.6.2.tar.xz",
+    "https://ftp.gnu.org/gnu/libtool/libtool-2.6.2.tar.xz"
 ]
 sha256 = ["2ef1067c16c97db930fd740cc9bc3d3ba9a583804ae5ac42cc3e8719e49e191e"]
 

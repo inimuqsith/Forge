@@ -8,17 +8,17 @@ license = "MIT"
 upstream = "https://github.com/ClementTsang/bottom"
 
 [dependencies]
-runtime = ["glibc", "libc.so", "libm.so", "gcc"]
+runtime = ["glibc", "gcc"]
 build = ["gcc", "git", "rust"]
 
 [sources]
 urls = [
-    "https://github.com/bottom/bottom/archive/refs/tags/v0.14.9.tar.gz"
+    "https://github.com/ClementTsang/bottom/archive/refs/tags/0.14.9.tar.gz"
 ]
-sha256 = []
+sha256 = ["1dbb940c763fb583b7e1c7dfa165b73ed9a0ba712e72cc97311c5b1c098d5b72"]
 
 [build]
-type = "custom"
+type = "cargo"
 script = """
 cd "${srcdir}/bottom-${pkgver}"
 cargo build --release --locked

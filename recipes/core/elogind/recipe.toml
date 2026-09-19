@@ -4,12 +4,12 @@ version = "257.16"
 release = 1
 slot = "0"
 description = "The systemd project"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://github.com/elogind/elogind"
 
 [dependencies]
 runtime = ["glibc", "libelogind", "pam", "acl"]
-build = ["gcc", "intltool", "libtool", "gperf", "gtk-doc", "git", "libcap", "meson"]
+build = ["gcc", "intltool", "libtool", "gperf", "gtk-doc", "git", "libcap", "meson", "ninja"]
 
 [sources]
 urls = [

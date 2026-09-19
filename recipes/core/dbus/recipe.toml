@@ -4,18 +4,18 @@ version = "1.16.2"
 release = 1
 slot = "0"
 description = "Freedesktop.org message bus system"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://www.freedesktop.org/wiki/Software/dbus/"
 
 [dependencies]
-runtime = ["glibc", "audit", "expat", "libcap-ng", "systemd-libs"]
-build = ["gcc", "docbook-xsl", "doxygen", "git", "glib2", "mallard-ducktype", "meson", "python", "qt5-tools", "xmlto", "yelp-tools"]
+runtime = ["glibc", "audit", "expat", "libcap-ng", "eudev"]
+build = ["gcc", "docbook-xsl", "doxygen", "git", "glib2", "mallard-ducktype", "meson", "python", "qt5-tools", "xmlto", "yelp-tools", "ninja"]
 
 [sources]
 urls = [
-    "https://github.com/dbus/dbus/archive/refs/tags/v1.16.2.tar.gz"
+    "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz"
 ]
-sha256 = []
+sha256 = ["0ba2a1a4b16afe7bceb2c07e9ce99a8c2c3508e5dec290dbb643384bd6beb7e2"]
 
 [build]
 type = "meson"

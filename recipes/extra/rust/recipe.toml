@@ -8,24 +8,12 @@ license = "Apache-2.0 OR MIT"
 upstream = "https://www.rust-lang.org/"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "llvm",
-    "zlib",
-    "openssl",
-    "curl",
-]
-build = [
-    "python",
-    "cmake",
-    "ninja",
-    "gcc",
-    "make",
-]
+runtime = ["glibc", "llvm", "zlib", "openssl", "curl"]
+build = ["python", "cmake", "ninja", "gcc", "make"]
 
 [sources]
 urls = [
-    "https://static.rust-lang.org/dist/rustc-1.98.1-src.tar.xz",
+    "https://static.rust-lang.org/dist/rustc-1.98.1-src.tar.xz"
 ]
 sha256 = ["be1816e7f6c40abb90245ad6e024bed2a7e88d7dda4561e4d5470207df616b9f"]
 

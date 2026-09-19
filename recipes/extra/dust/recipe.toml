@@ -8,17 +8,17 @@ license = "Apache-2.0"
 upstream = "https://github.com/bootandy/dust"
 
 [dependencies]
-runtime = ["glibc", "libc.so", "gcc"]
+runtime = ["glibc", "gcc"]
 build = ["gcc", "git", "rust"]
 
 [sources]
 urls = [
-    "https://github.com/dust/dust/archive/refs/tags/v1.2.6.tar.gz"
+    "https://github.com/bootandy/dust/archive/refs/tags/v1.2.6.tar.gz"
 ]
-sha256 = []
+sha256 = ["9dd1ec7576d43574e6f48342cb96a5087338b4c308460a848f5895f72ddc3bc9"]
 
 [build]
-type = "custom"
+type = "cargo"
 script = """
 cd "${srcdir}/dust-${pkgver}"
 cargo build --release --locked

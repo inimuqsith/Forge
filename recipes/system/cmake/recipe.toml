@@ -8,22 +8,12 @@ license = "BSD-3-Clause"
 upstream = "https://cmake.org/"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "openssl",
-    "zlib",
-    "libarchive",
-]
-build = [
-    "make",
-    "gcc",
-    "binutils",
-    "pkgconf",
-]
+runtime = ["glibc", "openssl", "zlib", "libarchive"]
+build = ["make", "gcc", "binutils", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/Kitware/CMake/releases/download/v4.3.5/cmake-4.3.5.tar.gz",
+    "https://github.com/Kitware/CMake/releases/download/v4.3.5/cmake-4.3.5.tar.gz"
 ]
 sha256 = ["24fc974191ef48da4ff309671fdb5989f43e07ecde0e2589eaf9d72672d8612b"]
 

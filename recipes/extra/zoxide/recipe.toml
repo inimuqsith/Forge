@@ -4,7 +4,7 @@ version = "0.10.0"
 release = 1
 slot = "0"
 description = "A smarter cd command for your terminal"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://github.com/ajeetdsouza/zoxide"
 
 [dependencies]
@@ -13,12 +13,12 @@ build = ["gcc", "git", "rust"]
 
 [sources]
 urls = [
-    "https://github.com/zoxide/zoxide/archive/refs/tags/v0.10.0.tar.gz"
+    "https://github.com/ajeetdsouza/zoxide/archive/refs/tags/v0.10.0.tar.gz"
 ]
-sha256 = []
+sha256 = ["4fcd4272b013a10b637dbcc299c58a9924b94470a9042677ca1a204cc2e9150e"]
 
 [build]
-type = "custom"
+type = "cargo"
 script = """
 cd "${srcdir}/zoxide-${pkgver}"
 cargo build --release --locked

@@ -8,20 +8,14 @@ license = "Info-ZIP"
 upstream = "http://infozip.sourceforge.net/UnZip.html"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "bzip2",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc", "bzip2"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://downloads.sourceforge.net/infozip/unzip60.tar.gz",
+    "https://downloads.sourceforge.net/infozip/unzip60.tar.gz"
 ]
-sha256 = []
+sha256 = ["036d96991646d0449ed0aa952e4fbe21b476ce994abc276e49d30e686708bd37"]
 
 [build]
 type = "make"

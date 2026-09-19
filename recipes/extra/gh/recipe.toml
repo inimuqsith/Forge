@@ -9,7 +9,7 @@ upstream = "https://github.com/cli/cli"
 
 [dependencies]
 runtime = ["glibc", "git"]
-build = ["gcc", "make"]
+build = ["gcc", "make", "go"]
 
 [sources]
 urls = [
@@ -21,6 +21,6 @@ sha256 = ["a266fe8575c0e061b987920c1831a15f71bf0036a8729a5ebb93c2fb0164899c"]
 type = "custom"
 script = """
 cd "${srcdir}/gh-${pkgver}"
-make ${MAKEFLAGS}
-make DESTDIR="${DESTDIR}" install
+go build -o "gh" .
+install -Dm755 "gh" "${DESTDIR}/usr/bin/gh"
 """

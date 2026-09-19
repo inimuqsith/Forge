@@ -4,7 +4,7 @@ version = "1.4.6"
 release = 2
 slot = "0"
 description = "A command-line tool for generating regular expressions from user-provided input strings"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://github.com/pemistahl/grex"
 
 [dependencies]
@@ -13,12 +13,12 @@ build = ["gcc", "cargo"]
 
 [sources]
 urls = [
-    "https://github.com/grex/grex/archive/refs/tags/v1.4.6.tar.gz"
+    "https://github.com/pemistahl/grex/archive/refs/tags/v1.4.6.tar.gz"
 ]
-sha256 = []
+sha256 = ["2ab9cb4c3d921711f23ea33a9e60dc11e9eaab450b16d1f2247bea2276822433"]
 
 [build]
-type = "custom"
+type = "cargo"
 script = """
 cd "${srcdir}/grex-${pkgver}"
 cargo build --release --locked

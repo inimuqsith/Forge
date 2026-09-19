@@ -8,21 +8,14 @@ license = "ISC"
 upstream = "https://github.com/Duncaen/OpenDoas"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-    "bison",
-    "flex",
-]
+runtime = ["glibc"]
+build = ["make", "gcc", "bison", "flex"]
 
 [sources]
 urls = [
-    "https://github.com/Duncaen/OpenDoas/archive/refs/tags/v6.8.2.tar.gz",
+    "https://github.com/Duncaen/OpenDoas/archive/refs/tags/v6.8.2.tar.gz"
 ]
-sha256 = []
+sha256 = ["6da058a0e70b7543bc60624389b0b00b686189ec933828c522bf8b2600495a67"]
 
 [build]
 type = "make"

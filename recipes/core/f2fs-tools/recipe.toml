@@ -4,7 +4,7 @@ version = "1.16.0"
 release = 4
 slot = "0"
 description = "Tools for Flash-Friendly File System (F2FS)"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git/about/"
 
 [dependencies]
@@ -13,7 +13,7 @@ build = ["gcc", "git"]
 
 [sources]
 urls = [
-    "https://github.com/f2fs-tools/f2fs-tools/archive/refs/tags/v1.16.0.tar.gz"
+    "https://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git/snapshot/f2fs-tools-1.16.0.tar.gz"
 ]
 sha256 = ["87d0ecee953f1c800c8c1869b5cdca8e37d5df1fe7e40a80e21b187425205c48"]
 

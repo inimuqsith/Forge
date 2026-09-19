@@ -8,20 +8,12 @@ license = "GPL-3.0-or-later"
 upstream = "https://nano-editor.org/"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "ncurses",
-    "file",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc", "ncurses", "file"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://nano-editor.org/dist/v8/nano-9.2.tar.xz",
+    "https://nano-editor.org/dist/v8/nano-9.2.tar.xz"
 ]
 sha256 = []
 

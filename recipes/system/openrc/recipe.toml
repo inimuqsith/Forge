@@ -21,13 +21,7 @@ sha256 = ["f52dd53d6bd798476f8f0b74c5722afa1a59e408a4ec49c1333e5a152a25440d"]
 type = "meson"
 script = """
 cd "${srcdir}/openrc-${pkgver}"
-meson setup build \
-    --prefix=/ \
-    --sysconfdir=/etc \
-    --libdir=/lib \
-    --sbindir=/sbin \
-    -Dpam=false \
-    -Dnewnet=true
+meson setup build --prefix=/ --sysconfdir=/etc --libdir=/lib --sbindir=/sbin -Dpam=false -Dnewnet=true
 ninja -C build ${MAKEFLAGS}
 DESTDIR="${DESTDIR}" ninja -C build install
 """

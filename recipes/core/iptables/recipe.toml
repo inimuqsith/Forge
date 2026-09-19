@@ -8,20 +8,14 @@ license = "GPL-2.0-only"
 upstream = "https://netfilter.org/projects/iptables/"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://netfilter.org/projects/iptables/files/iptables-1.8.11.tar.xz",
+    "https://netfilter.org/projects/iptables/files/iptables-1.8.11.tar.xz"
 ]
-sha256 = []
+sha256 = ["d87303d55ef8c92bcad4dd3f978b26d272013642b029425775f5bad1009fe7b2"]
 
 [build]
 type = "autotools"

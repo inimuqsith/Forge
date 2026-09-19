@@ -4,7 +4,7 @@ version = "0.65.1"
 release = 1
 slot = "0"
 description = "Simple terminal UI for git commands"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://github.com/jesseduffield/lazygit"
 
 [dependencies]
@@ -13,7 +13,7 @@ build = ["gcc", "go"]
 
 [sources]
 urls = [
-    "https://github.com/lazygit/lazygit/archive/refs/tags/v0.65.1.tar.gz"
+    "https://github.com/jesseduffield/lazygit/archive/refs/tags/v0.65.1.tar.gz"
 ]
 sha256 = ["df30ec1a5032b3c5672a30090fe787fb32d4122fd996d6d85e1d10135acfbc89"]
 
@@ -21,6 +21,6 @@ sha256 = ["df30ec1a5032b3c5672a30090fe787fb32d4122fd996d6d85e1d10135acfbc89"]
 type = "custom"
 script = """
 cd "${srcdir}/lazygit-${pkgver}"
-make ${MAKEFLAGS}
-make DESTDIR="${DESTDIR}" install
+go build -o "lazygit" .
+install -Dm755 "lazygit" "${DESTDIR}/usr/bin/lazygit"
 """

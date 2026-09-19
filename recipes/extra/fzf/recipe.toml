@@ -4,7 +4,7 @@ version = "0.74.4"
 release = 1
 slot = "0"
 description = "Command-line fuzzy finder"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://github.com/junegunn/fzf"
 
 [dependencies]
@@ -13,9 +13,9 @@ build = ["gcc", "git", "go"]
 
 [sources]
 urls = [
-    "https://github.com/fzf/fzf/archive/refs/tags/v0.74.4.tar.gz"
+    "https://github.com/junegunn/fzf/archive/refs/tags/v0.74.4.tar.gz"
 ]
-sha256 = []
+sha256 = ["1046857c337f5bd05f6fa482446b5a42a011615105743efbe4efee0970b24bb7"]
 
 [build]
 type = "custom"

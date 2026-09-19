@@ -8,18 +8,12 @@ license = "GPL-3.0-or-later"
 upstream = "https://www.greenwoodsoftware.com/less/"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "ncurses",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc", "ncurses"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://www.greenwoodsoftware.com/less/less-710.tar.gz",
+    "https://www.greenwoodsoftware.com/less/less-710.tar.gz"
 ]
 sha256 = ["d1008fb78dcae1323ddab664bcb352a61f022b1b131bd8018548e021d975ec7a"]
 

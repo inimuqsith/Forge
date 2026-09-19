@@ -8,17 +8,12 @@ license = "custom"
 upstream = "https://github.com/lsof-org/lsof"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://github.com/lsof-org/lsof/archive/refs/tags/4.99.7.tar.gz",
+    "https://github.com/lsof-org/lsof/archive/refs/tags/4.99.7.tar.gz"
 ]
 sha256 = ["bac1b0acbc50aede42fc97dffaa0b0475e97973e36a6351de5f349c6155afc68"]
 

@@ -8,17 +8,12 @@ license = "GPL-2.0-or-later"
 upstream = "http://mama.indstate.edu/users/ice/tree/"
 
 [dependencies]
-runtime = [
-    "glibc",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://gitlab.com/OldManProgrammer/unix-tree/-/archive/2.3.2/unix-tree-2.3.2.tar.gz",
+    "https://gitlab.com/OldManProgrammer/unix-tree/-/archive/2.3.2/unix-tree-2.3.2.tar.gz"
 ]
 sha256 = ["513a53cbc42ca1f4ea06af2bab1f5283524a3848266b1d162416f8033afc4985"]
 

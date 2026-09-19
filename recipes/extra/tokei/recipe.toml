@@ -4,7 +4,7 @@ version = "15.0.0"
 release = 1
 slot = "0"
 description = "A blazingly fast CLOC (Count Lines Of Code) program"
-license = "("
+license = "GPL-2.0-or-later"
 upstream = "https://github.com/XAMPPRocky/tokei"
 
 [dependencies]
@@ -13,12 +13,12 @@ build = ["gcc", "rust", "cargo"]
 
 [sources]
 urls = [
-    "https://github.com/XAMPPRocky/tokei/archive/v15.0.0.tar.gz"
+    "https://github.com/XAMPPRocky/tokei/archive/refs/tags/v15.0.0.tar.gz"
 ]
-sha256 = []
+sha256 = ["966da7b9a81ac6cb777b9f159f4c02e5b83a8b8bd30ebf5991007839926b600c"]
 
 [build]
-type = "custom"
+type = "cargo"
 script = """
 cd "${srcdir}/tokei-${pkgver}"
 cargo build --release --locked

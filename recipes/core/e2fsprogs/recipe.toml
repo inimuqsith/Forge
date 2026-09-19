@@ -8,19 +8,12 @@ license = "GPL-2.0-or-later AND LGPL-2.0-or-later"
 upstream = "http://e2fsprogs.sourceforge.net/"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "util-linux",
-]
-build = [
-    "make",
-    "gcc",
-    "pkgconf",
-]
+runtime = ["glibc", "util-linux"]
+build = ["make", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v1.47.4/e2fsprogs-1.47.4.tar.xz",
+    "https://kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v1.47.4/e2fsprogs-1.47.4.tar.xz"
 ]
 sha256 = ["fd5bf388cbdbe006a3d3b318d983b2948382440acc85a87f1e7d108653e8db0b"]
 

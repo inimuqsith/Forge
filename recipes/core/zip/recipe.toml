@@ -8,18 +8,12 @@ license = "Info-ZIP"
 upstream = "http://infozip.sourceforge.net/Zip.html"
 
 [dependencies]
-runtime = [
-    "glibc",
-    "bzip2",
-]
-build = [
-    "make",
-    "gcc",
-]
+runtime = ["glibc", "bzip2"]
+build = ["make", "gcc"]
 
 [sources]
 urls = [
-    "https://downloads.sourceforge.net/infozip/zip30.tar.gz",
+    "https://downloads.sourceforge.net/infozip/zip30.tar.gz"
 ]
 sha256 = ["d7638871c015f6fea8cfac3ea08cf6202d7ca6fb6e5d739af2fd44f472cd56f1"]
 
