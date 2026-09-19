@@ -150,7 +150,7 @@ sequenceDiagram
 
 ## 6. Multi-Tier Zero-Quota Upstream Version Probing & Bumper Engine
 
-Engine `RecipeBumper` (`crates/forge-server/src/bumper.rs`) menggunakan strategi 3-tier probing cerdas untuk mengaudit dan memperbarui resep hulu tanpa pernah terhambat *rate-limiting*:
+Engine `RecipeAuditor` & `RecipeBumper` ([`scripts/maintainer/audit.py`](file:///home/admin/Development/Forge/scripts/maintainer/audit.py) & [`scripts/maintainer/bumper.py`](file:///home/admin/Development/Forge/scripts/maintainer/bumper.py)) menggunakan strategi 3-tier probing cerdas untuk mengaudit dan memperbarui resep hulu tanpa pernah terhambat *rate-limiting*:
 
 ```mermaid
 flowchart TD

@@ -11,6 +11,8 @@ from .linter import RecipeLinter
 from .search import UpstreamSearchEngine
 from .sources import SourceVerifier
 from .matrix import SgotMatrixGenerator
+from .audit import RecipeAuditor
+from .bumper import RecipeBumper
 
 __all__ = [
     "MaintainerCatalog",
@@ -25,4 +27,6 @@ __all__ = [
     "UpstreamSearchEngine",
     "SourceVerifier",
     "SgotMatrixGenerator",
+    "RecipeAuditor",
+    "RecipeBumper",
 ]

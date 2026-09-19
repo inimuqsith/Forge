@@ -138,31 +138,32 @@ forge stage-export --output kura-stage.tar.xz  # Kemas rootfs menjadi stage tarb
 
 ### B. Infrastruktur Server & CI/CD (`forge-server`):
 ```bash
-# --- 1. Server Registry & Web Explorer ---
+# --- 1. Server Registry & Webhook Sync ---
 forge-server serve              # Jalankan service API resep, Web Explorer & Webhook receiver
 
-# --- 2. Upstream Recipe Bumper & Audit Engine ---
-forge-server audit              # Audit seluruh resep paket vs rilis hulu terbaru
-forge-server bump <pkg>         # Perbarui resep spesifik ke versi hulu & auto-push ke GitHub SSOT
-forge-server bump --all         # Perbarui SEMUA resep yang outdated & auto-push ke GitHub SSOT
-
-# --- 3. CI/CD Build Farm & Binary Ingestion ---
+# --- 2. CI/CD Build Farm & Binary Ingestion ---
 forge-server import <profile.json> [--as <name>] # Simpan profil CPU target & set sebagai aktif
 forge-server list-profiles      # Tampilkan seluruh profil CPU yang tersimpan
 forge-server build <package>    # CI/CD Worker: Build paket dengan profil aktif & publikasi binhost
 forge-server index              # Regenerasi database index repositori biner packages.db.zst
+
+# --- 3. Digital Signing Ed25519 ---
+forge-server keygen             # Generate pasangan kunci digital signing Ed25519
+forge-server sign <package>     # Tandatangani paket biner dengan private key
 ```
 
 ### C. Developer & Maintainer Suite (`scripts/maintainer/`):
 ```bash
 # --- 1. Dashboard Interaktif TUI ---
-python3 scripts/maintainer.py                   # Buka TUI All-In-One (Menu 1-12)
+python3 scripts/maintainer.py                      # Buka TUI All-In-One (Menu 1-12)
 
 # --- 2. Perintah CLI Maintainer Langsung ---
 python3 scripts/maintainer.py --dag all --runtime  # Evaluasi Graf Dependensi Runtime (227 paket 0 siklus)
 python3 scripts/maintainer.py --dag all --build    # Evaluasi Graf Kompilasi dengan isolasi Seed Tier ADR-019
 python3 scripts/maintainer.py --inspect <pkg>      # Visual Box-Card Inspector & Live Dependency Editor
 python3 scripts/maintainer.py --tree <pkg>         # Tampilkan hierarki pohon dependensi ASCII
+python3 scripts/maintainer.py --audit              # Audit seluruh 227 resep vs rilis hulu terbaru
+python3 scripts/maintainer.py --bump all --no-push # Auto-bump seluruh resep outdated & hitung SHA256
 python3 scripts/maintainer.py --lint               # Validasi 100% kelengkapan metadata & keamanan DESTDIR
 python3 scripts/maintainer.py --search <query>     # Multi-source search katalog lokal, Anitya, & GitHub
 python3 scripts/maintainer.py --matrix             # Regenerasi SSOT recipes/PACKAGE_STATUS.md

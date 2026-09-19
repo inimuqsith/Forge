@@ -16,6 +16,7 @@ from maintainer import (
     MaintainerCatalog, DagSolver, DependencyTreeVisualizer,
     CuratedEcosystemHub, RecipeInspector, RecipeLinter,
     UpstreamSearchEngine, SourceVerifier, SgotMatrixGenerator,
+    RecipeAuditor, RecipeBumper,
     BOOTSTRAP_TOOLCHAIN
 )
 from maintainer.catalog import (
@@ -39,8 +40,8 @@ PILIH MENU OPERASI MAINTAINER:
   {CYAN}3.{RESET} 🌲  Tampilkan ASCII Dependency Tree suatu target
   {CYAN}4.{RESET} 🔄  Reverse Dependency Search ('Siapa yang butuh paket X?')
   {CYAN}5.{RESET} 🔍  Upstream Search Engine (Cari di Katalog Lokal, Anitya, & GitHub)
-  {CYAN}6.{RESET} 📋  Audit Versi Hulu Seluruh Resep (`forge-server audit`)
-  {CYAN}7.{RESET} 🚀  Auto-Bump Versi Resep ke Rilis Hulu Terbaru (`forge-server bump`)
+  {CYAN}6.{RESET} 📋  Audit Versi Hulu Seluruh Resep (`RecipeAuditor`)
+  {CYAN}7.{RESET} 🚀  Auto-Bump Versi Resep ke Rilis Hulu Terbaru (`RecipeBumper`)
   {CYAN}8.{RESET} 🔒  Verifikasi Integritas Source URL & SHA256 Tarball
   {CYAN}9.{RESET} 🛡️   Linter Resep, Sintaks TOML & Keamanan DESTDIR
   {CYAN}10.{RESET} 📦 Visual Recipe Inspector & Live Dependency Editor
@@ -61,6 +62,8 @@ def interactive_menu():
     searcher = UpstreamSearchEngine(catalog)
     verifier = SourceVerifier(catalog)
     matrix_gen = SgotMatrixGenerator(catalog)
+    auditor = RecipeAuditor(catalog)
+    bumper = RecipeBumper(catalog)
 
     while True:
         missing = dag_solver.check_all_missing_dependencies()
@@ -153,17 +156,21 @@ def interactive_menu():
 
         # 6. AUDIT
         elif choice == "6":
-            subprocess.run(["cargo", "run", "-p", "forge-server", "--", "audit"])
+            print(f"\n{BOLD}Memindai seluruh rilis upstream hulu (227 resep)...{RESET}")
+            results = auditor.audit_all()
+            auditor.print_audit_report(results)
 
         # 7. BUMP
         elif choice == "7":
             sub = input(f"{BOLD}Pilih mode bump: [1] Seluruh Paket Outdated (--all) | [2] Paket Spesifik : {RESET}").strip()
             if sub == "1":
-                subprocess.run(["cargo", "run", "-p", "forge-server", "--", "bump", "--all", "--no-push"])
+                bumper.bump_all(no_push=True)
             elif sub == "2":
                 p_name = input("Nama paket: ").strip()
                 if p_name:
-                    subprocess.run(["cargo", "run", "-p", "forge-server", "--", "bump", p_name, "--no-push"])
+                    ok, msg = bumper.bump_package(p_name, fetch_sha=True)
+                    tag = f"{GREEN}✓{RESET}" if ok else f"{RED}✗{RESET}"
+                    print(f"  {tag} {msg}")
 
         # 8. VERIFIKASI SHA256
         elif choice == "8":
@@ -215,6 +222,9 @@ def main():
     parser.add_argument("--depth", type=int, default=4, help="Max depth for ASCII dependency tree")
     parser.add_argument("--inspect", help="Open visual box-card inspector for a package")
     parser.add_argument("--search", help="Search upstream packages")
+    parser.add_argument("--audit", action="store_true", help="Audit upstream versions for all recipes")
+    parser.add_argument("--bump", help="Bump a package version or 'all' to latest upstream")
+    parser.add_argument("--no-push", action="store_true", help="Do not push changes to Git after bumping")
     parser.add_argument("--lint", action="store_true", help="Lint all recipes")
     parser.add_argument("--matrix", action="store_true", help="Regenerate PACKAGE_STATUS.md SSOT matrix")
     args = parser.parse_args()
@@ -254,6 +264,22 @@ def main():
         results = searcher.search_upstream(args.search)
         for r in results:
             print(f"- {r['name']} ({r['source']}): {r['description']}")
+        return
+
+    if args.audit:
+        auditor = RecipeAuditor(catalog)
+        results = auditor.audit_all()
+        auditor.print_audit_report(results)
+        return
+
+    if args.bump:
+        bumper = RecipeBumper(catalog)
+        if args.bump.lower() in ("all", "@world", "*"):
+            bumper.bump_all(no_push=args.no_push)
+        else:
+            ok, msg = bumper.bump_package(args.bump, fetch_sha=True)
+            tag = f"{GREEN}✓{RESET}" if ok else f"{RED}✗{RESET}"
+            print(f"{tag} {msg}")
         return
 
     if args.lint:

@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::*;
-use forge_server::{ForgeServer, RecipeBumper, ServerBuilder, ServerImporter, ServerIndexer, ServerProfileManager, ServerState};
+use forge_server::{ForgeServer, ServerBuilder, ServerImporter, ServerIndexer, ServerProfileManager, ServerState};
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -34,39 +34,6 @@ enum Commands {
         /// Bundel ulang recipes sebelum menjalankan server
         #[arg(long)]
         bundle: bool,
-    },
-
-    /// Audit seluruh resep: bandingkan versi lokal dengan versi rilis hulu (upstream)
-    Audit {
-        /// Path direktori resep
-        #[arg(long, default_value = "recipes")]
-        recipes_path: PathBuf,
-    },
-
-    /// Perbarui (bump) versi resep ke rilis hulu terbaru secara otomatis dan push ke GitHub (SSOT)
-    Bump {
-        /// Nama paket spesifik yang akan di-bump (gunakan --all untuk bump semua paket yang ada update)
-        package: Option<String>,
-
-        /// Bump semua paket yang memiliki rilis hulu baru
-        #[arg(long)]
-        all: bool,
-
-        /// Override versi target secara manual
-        #[arg(long)]
-        version: Option<String>,
-
-        /// Path direktori resep
-        #[arg(long, default_value = "recipes")]
-        recipes_path: PathBuf,
-
-        /// Jangan unduh tarball baru untuk kalkulasi SHA256 checksum
-        #[arg(long)]
-        no_sha: bool,
-
-        /// Jangan lakukan git push ke GitHub setelah bump
-        #[arg(long)]
-        no_push: bool,
     },
 
     /// Impor berkas profil CPU (cpu-profile.json) dan set sebagai profil aktif CI/CD
@@ -320,134 +287,6 @@ fn main() -> Result<()> {
                     println!("       ISA : {}", entry.isa_summary.dimmed());
                 }
             }
-        }
-
-        Commands::Audit { recipes_path } => {
-            let rt = tokio::runtime::Runtime::new()?;
-            rt.block_on(async {
-                println!("{}", "=== Forge Server Upstream Recipe Version Audit ===".bold().cyan());
-                println!("Memindai direktori resep: {}\n", recipes_path.display().to_string().yellow());
-
-                let checks = RecipeBumper::audit_all(&recipes_path).await?;
-                let mut updates_available = 0;
-
-                println!("{:<22} {:<10} {:<12} {:<14} {:<8} {}", "PAKET".bold(), "KATEGORI".bold(), "VERSI LOKAL".bold(), "VERSI HULU".bold(), "STATUS".bold(), "SUMBER / PROVIDER".bold());
-                println!("{}", "-".repeat(95).dimmed());
-
-                for c in &checks {
-                    let status_str = if c.has_update {
-                        updates_available += 1;
-                        "[UPDATE]".bold().yellow()
-                    } else if c.latest_version.is_some() {
-                        "[LATEST]".green()
-                    } else {
-                        "[? UNK ]".dimmed()
-                    };
-
-                    let latest_str = c.latest_version.as_deref().unwrap_or("-");
-
-                    println!(
-                        "{:<22} {:<10} {:<12} {:<14} {:<8} {}",
-                        c.name.bold(),
-                        c.category.cyan(),
-                        c.current_version.white(),
-                        if c.has_update { latest_str.bold().yellow() } else { latest_str.dimmed() },
-                        status_str,
-                        c.provider.dimmed()
-                    );
-                }
-
-                println!("{}", "-".repeat(95).dimmed());
-                println!(
-                    "Total paket: {} | Paket mutakhir: {} | Perlu diperbarui: {}",
-                    checks.len().to_string().bold(),
-                    (checks.len() - updates_available).to_string().bold().green(),
-                    updates_available.to_string().bold().yellow()
-                );
-
-                if updates_available > 0 {
-                    println!("\n{} Jalankan '{}' untuk memperbarui semua resep.", "[i]".blue(), "forge-server bump --all".bold().green());
-                }
-
-                Ok::<(), anyhow::Error>(())
-            })?;
-        }
-
-        Commands::Bump {
-            package,
-            all,
-            version,
-            recipes_path,
-            no_sha,
-            no_push,
-        } => {
-            let rt = tokio::runtime::Runtime::new()?;
-            rt.block_on(async {
-                let fetch_sha = !no_sha;
-                let auto_push = !no_push;
-
-                if all {
-                    println!("{}", "=== Memperbarui Seluruh Resep yang Memiliki Versi Hulu Baru ===".bold().cyan());
-                    let checks = RecipeBumper::audit_all(&recipes_path).await?;
-                    let mut bumped_count = 0;
-
-                    for c in &checks {
-                        if c.has_update {
-                            if let Some(ref latest) = c.latest_version {
-                                println!("{} Memperbarui {} (v{} -> v{})...", "[*]".blue(), c.name.bold(), c.current_version, latest.bold().green());
-                                match RecipeBumper::bump_package_by_name(&recipes_path, &c.name, Some(latest), fetch_sha).await {
-                                    Ok(msg) => {
-                                        println!("  {} {}", "✓".green(), msg);
-                                        bumped_count += 1;
-                                    }
-                                    Err(e) => {
-                                        println!("  {} Gagal bump {}: {:#}", "✗".red(), c.name, e);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    println!("\n{} Selesai memperbarui {} paket.", "[✓]".green(), bumped_count.to_string().bold().green());
-
-                    if auto_push && bumped_count > 0 {
-                        println!("{} Mem-push perubahan langsung ke GitHub (Single Source of Truth)...", "[*]".blue());
-                        let _ = tokio::process::Command::new("git").args(["add", "recipes"]).status().await;
-                        let _ = tokio::process::Command::new("git").args(["commit", "-m", "chore(recipes): automated upstream recipe version bump"]).status().await;
-                        let push_status = tokio::process::Command::new("git").args(["push", "origin", "main"]).status().await;
-                        if let Ok(st) = push_status {
-                            if st.success() {
-                                println!("{} Berhasil di-push ke GitHub!", "✓".green());
-                            } else {
-                                println!("{} Peringatan: Git push gagal. Silakan push manual.", "[!]".yellow());
-                            }
-                        }
-                    }
-                } else if let Some(pkg) = package {
-                    println!("{} Memperbarui paket '{}'...", "[*]".blue(), pkg.bold().cyan());
-                    let msg = RecipeBumper::bump_package_by_name(&recipes_path, &pkg, version.as_deref(), fetch_sha).await?;
-                    println!("{} {}", "✓".green(), msg);
-
-                    if auto_push {
-                        println!("{} Mem-push perubahan langsung ke GitHub (Single Source of Truth)...", "[*]".blue());
-                        let _ = tokio::process::Command::new("git").args(["add", "recipes"]).status().await;
-                        let commit_msg = format!("chore(recipes): bump {} to latest version", pkg);
-                        let _ = tokio::process::Command::new("git").args(["commit", "-m", &commit_msg]).status().await;
-                        let push_status = tokio::process::Command::new("git").args(["push", "origin", "main"]).status().await;
-                        if let Ok(st) = push_status {
-                            if st.success() {
-                                println!("{} Berhasil di-push ke GitHub!", "✓".green());
-                            } else {
-                                println!("{} Peringatan: Git push gagal. Silakan push manual.", "[!]".yellow());
-                            }
-                        }
-                    }
-                } else {
-                    anyhow::bail!("Harap tentukan nama paket atau gunakan flag '--all'!");
-                }
-
-                Ok::<(), anyhow::Error>(())
-            })?;
         }
 
         Commands::Index { storage_path } => {

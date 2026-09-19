@@ -21,30 +21,19 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Setup Rust Toolchain
-        uses: dtolnay/rust-toolchain@4dd527f00d81cb40e6ae5d105260170a4421b585 # stable
-
-      - name: Cache Cargo Dependencies
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-forge-server-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-forge-server-
-
-      - name: Build forge-server Tool
-        run: cargo build --release -p forge-server --locked
+          python-version: '3.12'
 
       - name: Audit Upstream Recipes Status
-        run: ./target/release/forge-server audit --recipes-path recipes
+        run: python3 scripts/maintainer.py --audit
 
       - name: Auto-Bump Outdated Recipes
-        run: ./target/release/forge-server bump --all --recipes-path recipes --no-push
+        run: python3 scripts/maintainer.py --bump all --no-push
+
+      - name: Regenerate Documentation SSOT Matrix
+        run: python3 scripts/maintainer.py --matrix
 
       - name: Commit and Push Updated Recipes
         run: |
