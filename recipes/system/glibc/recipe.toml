@@ -8,8 +8,8 @@ license = "LGPL-2.1-or-later"
 upstream = "https://www.gnu.org/software/libc/"
 
 [dependencies]
-runtime = ["linux-headers"]
-build = ["gcc", "binutils", "make", "bison", "gawk", "sed"]
+runtime = []
+build = ["linux-headers", "gcc", "binutils", "make", "bison", "gawk", "sed"]
 
 [sources]
 urls = [
