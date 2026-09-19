@@ -1,6 +1,6 @@
 [package]
 name = "bubblewrap"
-version = "0.11.0"
+version = "0.12.0"
 release = 1
 slot = "0"
 description = "Unprivileged sandboxing tool based on Linux user namespaces"
@@ -13,10 +13,10 @@ build = ["meson", "ninja", "pkgconf", "gcc"]
 
 [sources]
 urls = [
-    "https://github.com/containers/bubblewrap/releases/download/v0.11.0/bubblewrap-0.11.0.tar.xz"
+    "https://github.com/containers/bubblewrap/releases/download/v0.12.0/bubblewrap-0.12.0.tar.xz"
 ]
 sha256 = [
-    "988fd6b232dafa04b8b8198723efeaccdb3c6aa9c1c7936219d5791a8b7a8646"
+    "9760d007363e3abba7c747489910f9f82d9fca53ba3bd3282e396fa3c97a3314"
 ]
 
 [build]

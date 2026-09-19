@@ -52,7 +52,7 @@
 | **`acpid`** | `2.0.34` | ✅ Verified | - | - | Flexible and extensible ACPI event daemon |
 | **`bash`** | `5.3` | ✅ Verified | - | - | GNU Bourne Again SHell |
 | **`btrfs-progs`** | `7.1` | ✅ Verified | - | - | Btrfs filesystem utilities |
-| **`bubblewrap`** | `0.11.0` | ✅ Verified | `glibc`, `libcap` | `gcc`, `meson`, `ninja`, `pkgconf` | Unprivileged sandboxing tool based on Linux user namespaces |
+| **`bubblewrap`** | `0.12.0` | ✅ Verified | `glibc`, `libcap` | `gcc`, `meson`, `ninja`, `pkgconf` | Unprivileged sandboxing tool based on Linux user namespaces |
 | **`bzip2`** | `1.0.8` | ✅ Verified | - | - | A high-quality data compression program |
 | **`ca-certificates`** | `20260909` | ✅ Verified | - | - | Common CA root certificates bundle from Mozilla |
 | **`coreutils`** | `9.12` | ✅ Verified | - | - | The basic file, shell and text manipulation utilities of the GNU operating system |
