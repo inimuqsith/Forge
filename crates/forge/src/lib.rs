@@ -36,7 +36,7 @@ pub use merger::*;
 pub use sync::SyncClient;
 pub use importer::RecipeImporter;
 pub use lock::ForgeLockGuard;
-pub use sandbox::SandboxRunner;
+pub use sandbox::{SandboxRunner, SeccompFilterBuilder, SockFilter};
 pub use stage::*;
 pub use crypto::*;
 pub use privilege::*;
