@@ -137,10 +137,7 @@ impl SyncClient {
 
         let open_res = std::fs::File::open(&temp_archive)
             .map_err(|e| SyncError::Other(anyhow::anyhow!(e)));
-        let archive_file = match open_res {
-            Ok(f) => f,
-            Err(e) => return Err(e),
-        };
+        let archive_file = open_res?;
 
         let decoder = zstd::Decoder::new(archive_file)
             .map_err(|e| SyncError::Other(anyhow::anyhow!(e).context("Gagal menginisialisasi Zstandard decoder")))?;

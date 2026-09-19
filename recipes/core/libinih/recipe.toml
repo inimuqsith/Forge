@@ -1,6 +1,6 @@
 [package]
 name = "libinih"
-version = "58"
+version = "62"
 release = 1
 slot = "0"
 description = "Simple INI file parser written in C"
@@ -13,10 +13,10 @@ build = ["meson", "ninja", "gcc", "pkgconf"]
 
 [sources]
 urls = [
-    "https://github.com/benhoyt/inih/archive/refs/tags/r58.tar.gz"
+    "https://github.com/benhoyt/inih/archive/refs/tags/r62.tar.gz"
 ]
 sha256 = [
-    "e79216260d5dffe809bda840be48ab0eec7737b2bb9f02d2275c1b46344ea7b7"
+    "9c15fa751bb8093d042dae1b9f125eb45198c32c6704cd5481ccde460d4f8151"
 ]
 
 [build]

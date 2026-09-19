@@ -30,7 +30,7 @@ pub struct CachyOsPackageMeta {
 
 /// Bersihkan nama dependensi dari versi (misal: "glibc>=2.38" -> "glibc")
 pub fn clean_package_name(dep: &str) -> &str {
-    dep.split(|c| c == '>' || c == '<' || c == '=' || c == ':')
+    dep.split(['>', '<', '=', ':'])
         .next()
         .unwrap_or(dep)
         .trim()

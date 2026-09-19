@@ -22,13 +22,17 @@ impl ManifestEntryType {
             ManifestEntryType::Dir => "dir",
         }
     }
+}
 
-    pub fn from_str(s: &str) -> Option<Self> {
+impl std::str::FromStr for ManifestEntryType {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
-            "obj" => Some(ManifestEntryType::Obj),
-            "sym" => Some(ManifestEntryType::Sym),
-            "dir" => Some(ManifestEntryType::Dir),
-            _ => None,
+            "obj" => Ok(ManifestEntryType::Obj),
+            "sym" => Ok(ManifestEntryType::Sym),
+            "dir" => Ok(ManifestEntryType::Dir),
+            _ => anyhow::bail!("Tipe entri manifest tidak valid: {}", s),
         }
     }
 }
@@ -82,8 +86,9 @@ impl ManifestEntry {
             bail!("Baris manifest kosong");
         }
 
-        let entry_type = ManifestEntryType::from_str(parts[0])
-            .ok_or_else(|| anyhow::anyhow!("Tipe entri manifest tidak valid: {}", parts[0]))?;
+        let entry_type = parts[0]
+            .parse::<ManifestEntryType>()
+            .with_context(|| format!("Tipe entri manifest tidak valid pada baris: {}", line))?;
 
         match entry_type {
             ManifestEntryType::Obj => {
@@ -512,11 +517,10 @@ impl InstalledDatabase {
                     }
                 }
                 ManifestEntryType::Sym => {
-                    if target_file_path.is_symlink() || target_file_path.exists() {
-                        if fs::remove_file(&target_file_path).is_ok() {
+                    if (target_file_path.is_symlink() || target_file_path.exists())
+                        && fs::remove_file(&target_file_path).is_ok() {
                             report.symlinks_removed += 1;
                         }
-                    }
                 }
                 ManifestEntryType::Dir => {
                     dirs_to_prune.push(target_file_path);
@@ -526,7 +530,7 @@ impl InstalledDatabase {
 
         // 2. Reverse Directory Pruning (Leaf-to-Root)
         // Urutkan direktori berdasarkan kedalaman path (komponen terbanyak di awal)
-        dirs_to_prune.sort_by(|a, b| b.components().count().cmp(&a.components().count()));
+        dirs_to_prune.sort_by_key(|b| std::cmp::Reverse(b.components().count()));
         dirs_to_prune.dedup();
 
         let essential_system_dirs: std::collections::HashSet<PathBuf> = [

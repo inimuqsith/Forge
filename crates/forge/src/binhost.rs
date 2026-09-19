@@ -179,7 +179,7 @@ impl BinhostClient {
         .await
         .context("Gagal mengeksekusi worker thread ekstraksi tarball")??;
 
-        let package_name = url.split('/').last().unwrap_or("package").to_string();
+        let package_name = url.split('/').next_back().unwrap_or("package").to_string();
 
         Ok(DownloadStreamResult {
             package_name,

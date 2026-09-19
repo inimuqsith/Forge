@@ -100,7 +100,7 @@
 | **`libevdev`** | `1.13.7` | ✅ Verified | `glibc` | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | Wrapper library for evdev devices |
 | **`libgcrypt`** | `1.12.4` | ✅ Verified | `glibc`, `libgpg-error` | `make`, `gcc` | General purpose cryptographic library based on the code from GnuPG |
 | **`libgpg-error`** | `1.61` | ✅ Verified | `glibc` | `make`, `gcc` | Small library with error codes and strings based on libgcrypt |
-| **`libinih`** | `58` | ✅ Verified | `glibc` | `meson`, `ninja`, `gcc`, `pkgconf` | Simple INI file parser written in C |
+| **`libinih`** | `62` | ✅ Verified | `glibc` | `meson`, `ninja`, `gcc`, `pkgconf` | Simple INI file parser written in C |
 | **`libpciaccess`** | `0.19` | ✅ Verified | `glibc`, `zlib` | `meson`, `ninja`, `gcc`, `pkgconf` | Generic PCI access library |
 | **`libseccomp`** | `2.6.1` | ✅ Verified | `glibc` | `make`, `gcc` | Enhanced Seccomp library and kernel syscall filtering interface |
 | **`liburcu`** | `0.15.0` | ✅ Verified | `glibc` | `make`, `gcc` | Userspace RCU (read-copy-update) library |

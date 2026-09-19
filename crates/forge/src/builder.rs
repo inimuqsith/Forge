@@ -326,7 +326,7 @@ impl RecipeBuilder {
                     let raw_repo = clean_url
                         .trim_end_matches(".git")
                         .split('/')
-                        .last()
+                        .next_back()
                         .unwrap_or(pkg_name.as_str());
                     let target_dir = build_root.join(raw_repo);
 
@@ -348,11 +348,10 @@ impl RecipeBuilder {
                     cmd.arg(&clean_url).arg(&target_dir);
 
                     let status = cmd.status().context("Gagal mengeksekusi git clone")?;
-                    if !status.success() {
-                        if custom_src_dir.is_none() {
+                    if !status.success()
+                        && custom_src_dir.is_none() {
                             bail!("git clone gagal untuk {}", clean_url);
                         }
-                    }
 
                     // Ambil commit hash HEAD
                     if let Ok(rev_out) = Command::new("git")
@@ -367,7 +366,7 @@ impl RecipeBuilder {
                         }
                     }
                 } else {
-                    let filename = url.split('/').last().unwrap_or("source.tar.gz");
+                    let filename = url.split('/').next_back().unwrap_or("source.tar.gz");
                     let target_file = distfiles_dir.join(filename);
 
                     let expected_sha = sources.sha256.get(i).cloned();
@@ -380,10 +379,9 @@ impl RecipeBuilder {
                         show_progress: true,
                     };
 
-                    let dl_res = crate::downloader::SourceDownloader::download(url, &target_file, &dl_options);
-                    if dl_res.is_err() && !target_file.exists() {
-                        if custom_src_dir.is_none() {
-                            anyhow::bail!("Gagal mengunduh sumber dari {}: {:#}", url, dl_res.unwrap_err());
+                    if let Err(e) = crate::downloader::SourceDownloader::download(url, &target_file, &dl_options) {
+                        if !target_file.exists() && custom_src_dir.is_none() {
+                            anyhow::bail!("Gagal mengunduh sumber dari {}: {:#}", url, e);
                         }
                     }
 
@@ -403,7 +401,7 @@ impl RecipeBuilder {
 
         // 3. Terapkan HIERARKI KONFIGURASI COMPILER & FORGE (ADR-002 & Bare-Metal Safety Guard)
         let build_meta = recipe.build.clone().unwrap_or_default();
-        let is_exempt = Self::is_compiler_exempt(&pkg_name, &build_meta);
+        let is_exempt = Self::is_compiler_exempt(pkg_name, &build_meta);
 
         let ccache_available = config.build.enable_ccache
             && Command::new("which")

@@ -44,8 +44,8 @@ impl VersionConstraint {
 
         // Cek jika diawali operator prefix seperti ">=gcc-15"
         for op in ops {
-            if trimmed.starts_with(op) {
-                let rest = trimmed[op.len()..].trim();
+            if let Some(stripped) = trimmed.strip_prefix(op) {
+                let rest = stripped.trim();
                 let pkg_id = PackageId::parse(rest);
                 return (
                     pkg_id,
@@ -117,15 +117,15 @@ impl PackageId {
         let trimmed = raw.trim();
         // Bersihkan version constraint prefix jika ada (misal >=, <=, =, ~, ^)
         let cleaned = trimmed
-            .trim_start_matches(|c| c == '>' || c == '<' || c == '=' || c == '~' || c == '^')
+            .trim_start_matches(['>', '<', '=', '~', '^'])
             .trim();
 
         // Ekstraksi jika ada slot (name:slot)
         if let Some((name_part, slot_part)) = cleaned.split_once(':') {
-            let pure_name = name_part.split('/').last().unwrap_or(name_part);
+            let pure_name = name_part.split('/').next_back().unwrap_or(name_part);
             Self::new(pure_name, slot_part)
         } else {
-            let pure_name = cleaned.split('/').last().unwrap_or(cleaned);
+            let pure_name = cleaned.split('/').next_back().unwrap_or(cleaned);
             // Bersihkan version suffix jika formatnya name-1.0 (kecuali base-devel)
             Self::new(pure_name, "0")
         }
@@ -762,11 +762,7 @@ impl DependencyResolver {
 }
 
 fn extract_condition_flag(dep_str: &str) -> Option<String> {
-    if let Some(pos) = dep_str.find('?') {
-        Some(dep_str[..pos].trim().to_string())
-    } else {
-        None
-    }
+    dep_str.find('?').map(|pos| dep_str[..pos].trim().to_string())
 }
 
 fn config_flag_tokens(_recipe: &Recipe) -> Vec<String> {

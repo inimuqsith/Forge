@@ -158,7 +158,7 @@ impl WavefrontScheduler {
 
         // 1. Inisialisasi in-degree runtime untuk semua paket
         let mut in_degrees: HashMap<PackageId, usize> = HashMap::new();
-        for (id, _) in &graph.nodes {
+        for id in graph.nodes.keys() {
             let deg = graph
                 .dependencies_of
                 .get(id)

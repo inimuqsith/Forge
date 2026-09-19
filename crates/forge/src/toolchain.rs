@@ -154,7 +154,7 @@ impl ToolchainManager {
                     // Salin usr/include dari staging paket (termasuk C & Linux headers)
                     let stage_include = pkg_path.join("usr/include");
                     if stage_include.exists() {
-                        let _ = Command::new("cp").arg("-r").arg(&stage_include).arg(&usr_inc.parent().unwrap()).status();
+                        let _ = Command::new("cp").arg("-r").arg(&stage_include).arg(usr_inc.parent().unwrap()).status();
                     }
 
                     copied_packages.push(pkg_name);
