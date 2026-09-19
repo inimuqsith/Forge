@@ -31,11 +31,11 @@
 | **`forge`** | `git` | ✅ Verified | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `clang`, `llvm`, `git`, `ca-certificates`, `tar`, `xz` | `rust`, `mold`, `clang`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
 | **`gcc`** | `16.2.0` | ✅ Verified | `glibc`, `gmp`, `mpfr`, `mpc`, `zstd` | `binutils`, `make`, `bison`, `flex` | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
 | **`gettext`** | `1.0` | ✅ Verified | `glibc`, `acl`, `ncurses` | `make`, `gcc` | GNU internationalization and localization utilities |
-| **`glibc`** | `2.44` | ✅ Verified | - | `linux-headers`, `gcc`, `binutils`, `make`, `bison`, `gawk`, `sed` | GNU C Library (Standard Core System C Library - Latest 2.44) |
+| **`glibc`** | `2.44` | ✅ Verified | - | `linux-headers` | GNU C Library (Standard Core System C Library - Latest 2.44) |
 | **`gperf`** | `3.3` | ✅ Verified | `glibc` | `make`, `gcc` | Perfect hash function generator |
 | **`libtool`** | `2.6.2` | ✅ Verified | `glibc`, `m4` | `make`, `m4`, `autoconf`, `automake`, `gcc` | Generic library support script |
 | **`linux-cachyos-bore`** | `git` | ✅ Verified | `kmod`, `eudev` | `clang`, `llvm`, `mold`, `make`, `bc`, `bison`, `flex`, `elfutils`, `openssl`, `rsync`, `kmod`, `zstd`, `diffutils` | Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO |
-| **`linux-headers`** | `7.2` | ✅ Verified | - | `make` | Linux kernel API headers for userspace |
+| **`linux-headers`** | `7.2` | ✅ Verified | - | - | Linux kernel API headers for userspace |
 | **`llvm`** | `23.1.1` | ✅ Verified | `glibc`, `zlib`, `zstd`, `libxml2` | `cmake`, `ninja`, `pkgconf`, `make`, `python` | LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22) |
 | **`m4`** | `1.4.21` | ✅ Verified | `glibc` | `make`, `gcc` | GNU Macro Processor |
 | **`make`** | `4.4.1` | ✅ Verified | `glibc` | `gcc` | GNU Make utility to maintain groups of programs |

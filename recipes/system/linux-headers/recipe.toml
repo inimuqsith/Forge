@@ -9,7 +9,7 @@ upstream = "https://www.kernel.org/"
 
 [dependencies]
 runtime = []
-build = ["make"]
+build = []
 
 [sources]
 urls = [

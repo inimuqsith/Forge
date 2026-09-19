@@ -9,7 +9,7 @@ upstream = "https://www.gnu.org/software/libc/"
 
 [dependencies]
 runtime = []
-build = ["linux-headers", "gcc", "binutils", "make", "bison", "gawk", "sed"]
+build = ["linux-headers"]
 
 [sources]
 urls = [
