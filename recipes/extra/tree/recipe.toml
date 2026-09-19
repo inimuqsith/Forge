@@ -9,7 +9,7 @@ upstream = "http://mama.indstate.edu/users/ice/tree/"
 
 [dependencies]
 runtime = ["glibc"]
-build = ["make", "gcc"]
+build = []
 
 [sources]
 urls = [
@@ -21,6 +21,6 @@ sha256 = ["513a53cbc42ca1f4ea06af2bab1f5283524a3848266b1d162416f8033afc4985"]
 type = "make"
 script = """
 cd "${srcdir}/unix-tree-${pkgver}"
-make PREFIX=/usr ${MAKEFLAGS}
+make PREFIX=/usr CC="${CC:-clang}" ${MAKEFLAGS}
 make PREFIX=/usr DESTDIR="${DESTDIR}" install
 """

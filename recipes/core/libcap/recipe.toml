@@ -9,7 +9,7 @@ upstream = "https://sites.google.com/site/fullycapable/"
 
 [dependencies]
 runtime = ["glibc"]
-build = ["make", "gcc"]
+build = []
 
 [sources]
 urls = [
@@ -21,6 +21,6 @@ sha256 = ["0d621e562fd932ccf67b9660fb018e468a683d7b827541df27813228c996bb11"]
 type = "make"
 script = """
 cd "${srcdir}/libcap-${pkgver}"
-make prefix=/usr lib=lib ${MAKEFLAGS}
+make prefix=/usr lib=lib CC="${CC:-clang}" ${MAKEFLAGS}
 make prefix=/usr lib=lib DESTDIR="${DESTDIR}" install
 """

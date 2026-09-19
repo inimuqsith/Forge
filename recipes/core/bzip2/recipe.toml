@@ -9,7 +9,7 @@ upstream = "https://sourceware.org/bzip2/"
 
 [dependencies]
 runtime = ["glibc"]
-build = ["make", "gcc"]
+build = []
 
 [sources]
 urls = [
@@ -21,8 +21,8 @@ sha256 = ["ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"]
 type = "make"
 script = """
 cd "${srcdir}/bzip2-${pkgver}"
-make -f Makefile-libbz2_so ${MAKEFLAGS}
-make ${MAKEFLAGS}
+make -f Makefile-libbz2_so CC="${CC:-clang}" ${MAKEFLAGS}
+make CC="${CC:-clang}" ${MAKEFLAGS}
 make PREFIX="${DESTDIR}/usr" install
 cp -a libbz2.so* "${DESTDIR}/usr/lib/"
 """

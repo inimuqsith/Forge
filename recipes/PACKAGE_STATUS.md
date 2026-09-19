@@ -61,7 +61,7 @@
 | **`bluez`** | `5.87` | ✅ Verified | `glibc`, `dbus`, `glib2`, `eudev`, `readline` | `gcc`, `make`, `pkgconf`, `libtool` | Official Linux Bluetooth protocol stack with OpenRC service |
 | **`btrfs-progs`** | `7.1` | ✅ Verified | `glibc`, `libgcrypt`, `lzo`, `eudev`, `util-linux`, `zlib`, `zstd` | `gcc`, `e2fsprogs`, `pkgconf`, `make` | Btrfs filesystem utilities |
 | **`bubblewrap`** | `0.12.0` | ✅ Verified | `glibc`, `libcap` | `meson`, `ninja`, `pkgconf`, `gcc` | Unprivileged sandboxing tool based on Linux user namespaces |
-| **`bzip2`** | `1.0.8` | ✅ Verified | `glibc` | `make`, `gcc` | A high-quality data compression program |
+| **`bzip2`** | `1.0.8` | ✅ Verified | `glibc` | - | A high-quality data compression program |
 | **`ca-certificates`** | `20260909` | ✅ Verified | `glibc`, `openssl` | `python` | Common CA root certificates bundle from Mozilla |
 | **`coreutils`** | `9.12` | ✅ Verified | `glibc`, `libcap`, `acl` | `make`, `gcc`, `pkgconf` | The basic file, shell and text manipulation utilities of the GNU operating system |
 | **`cronie`** | `1.7.2` | ✅ Verified | `glibc` | `make`, `gcc` | Standard cron daemon and crontab scheduler |
@@ -94,7 +94,7 @@
 | **`kmod`** | `34.2` | ✅ Verified | `glibc`, `zlib`, `xz`, `zstd`, `openssl` | `gcc`, `make`, `pkgconf` | Linux kernel module management tools and library (lsmod, modprobe, insmod) |
 | **`less`** | `710` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | A terminal based program for viewing text files |
 | **`libarchive`** | `3.8.9` | ✅ Verified | `glibc`, `zlib`, `bzip2`, `xz`, `zstd`, `openssl`, `expat` | `make`, `gcc`, `pkgconf` | Multi-format archive and compression library (bsdtar, bsdcpio) |
-| **`libcap`** | `2.78` | ✅ Verified | `glibc` | `make`, `gcc` | POSIX 1003.1e capabilities library and tools (setcap, getcap) |
+| **`libcap`** | `2.78` | ✅ Verified | `glibc` | - | POSIX 1003.1e capabilities library and tools (setcap, getcap) |
 | **`libcap-ng`** | `0.9.6` | ✅ Verified | `glibc` | `make`, `gcc` | Alternate POSIX capabilities library |
 | **`libedit`** | `20260512-3.1` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | NetBSD Editline library (BSD-licensed alternative to GNU readline) |
 | **`libevdev`** | `1.13.7` | ✅ Verified | `glibc` | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | Wrapper library for evdev devices |
@@ -116,7 +116,7 @@
 | **`openssl`** | `4.1.0-alpha1` | ✅ Verified | `glibc` | `make`, `gcc`, `perl` | Robust, commercial-grade TLS/SSL cryptography toolkit |
 | **`pam`** | `1.7.2` | ✅ Verified | `glibc` | `gcc`, `make`, `flex`, `bison`, `linux-headers`, `pkgconf` | Pluggable Authentication Modules for Linux |
 | **`parted`** | `3.7` | ✅ Verified | `glibc`, `util-linux` | `make`, `gcc`, `pkgconf` | A program for creating, destroying, resizing, checking and copying partitions |
-| **`pciutils`** | `3.15.0` | ✅ Verified | `glibc`, `hwdata`, `kmod` | `make`, `gcc`, `pkgconf` | PCI bus configuration and diagnostic tools (lspci, setpci) |
+| **`pciutils`** | `3.15.0` | ✅ Verified | `glibc`, `hwdata`, `kmod` | `pkgconf` | PCI bus configuration and diagnostic tools (lspci, setpci) |
 | **`polkit`** | `127` | ✅ Verified | `glibc`, `duktape`, `expat`, `glib2`, `pam`, `eudev` | `gcc`, `dbus`, `glib2`, `gobject-introspection`, `meson`, `ninja`, `pkgconf` | Application development toolkit for controlling system-wide privileges |
 | **`popt`** | `1.19` | ✅ Verified | `glibc` | `gcc`, `make`, `autoconf`, `automake`, `libtool`, `pkgconf` | Command line option parsing library |
 | **`procps-ng`** | `4.0.7` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Utilities for monitoring your system and its processes (ps, top, free) |
@@ -250,7 +250,7 @@
 | **`tllist`** | `1.1.0` | ✅ Verified | - | `meson`, `ninja`, `pkgconf` | C header-only implementation of a typed linked list |
 | **`tmux`** | `3.8-rc` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Terminal multiplexer workspace utility |
 | **`tokei`** | `15.0.0` | ✅ Verified | `glibc`, `gcc` | `gcc`, `rust`, `cargo` | A blazingly fast CLOC (Count Lines Of Code) program |
-| **`tree`** | `2.3.2` | ✅ Verified | `glibc` | `make`, `gcc` | Recursive directory indentation and tree-format listing program |
+| **`tree`** | `2.3.2` | ✅ Verified | `glibc` | - | Recursive directory indentation and tree-format listing program |
 | **`vscode-oss`** | `1.135.06055` | ✅ Verified | `glibc`, `ca-certificates`, `dbus`, `ncurses` | `tar`, `gzip` | Free/Libre Open Source Software Binaries of Visual Studio Code (VSCodium) |
 | **`vulkan-headers`** | `1.4.363` | ✅ Verified | - | `cmake`, `ninja` | Vulkan Header files and API registry |
 | **`vulkan-loader`** | `1.4.363` | ✅ Verified | `glibc`, `vulkan-headers`, `wayland` | `cmake`, `ninja`, `pkgconf`, `python` | Vulkan Installable Client Driver (ICD) Loader |
