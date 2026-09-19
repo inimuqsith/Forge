@@ -390,7 +390,7 @@ impl RecipeBuilder {
             }
 
             let script_content = format!("set -e\n{}", build_meta.script);
-            let exit_status = runner.run_script(&script_content, &build_root, destdir, &env_vars)
+            let exit_status = runner.run_script_for_package(pkg_name, &script_content, &build_root, destdir, &env_vars, false)
                 .context("Gagal mengeksekusi script kompilasi di dalam sandbox")?;
 
             if !exit_status.success() {

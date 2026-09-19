@@ -16,6 +16,11 @@ impl SandboxRunner {
         Self { bwrap_path }
     }
 
+    /// Inisialisasi dengan path kustom untuk keperluan testing atau override
+    pub fn with_bwrap_path(bwrap_path: Option<PathBuf>) -> Self {
+        Self { bwrap_path }
+    }
+
     /// Apakah Bubblewrap (`bwrap`) tersedia pada sistem host
     pub fn is_bwrap_available(&self) -> bool {
         self.bwrap_path.is_some()
@@ -62,13 +67,19 @@ impl SandboxRunner {
         ]
     }
 
-    /// Jalankan script bash di dalam sandbox Bubblewrap (atau fallback mode jika bwrap tidak ada)
-    pub fn run_script(
+    /// Jalankan script kompilasi dengan validasi ketat Bubblewrap:
+    /// - Jika `bwrap` terpasang: Eksekusi di dalam Bubblewrap sandbox (--ro-bind / /).
+    /// - Jika `bwrap` TIDAK terpasang:
+    ///   * Pengecualian khusus: Paket 'bubblewrap' / 'bwrap' diizinkan di-build tanpa sandbox (self-bootstrap).
+    ///   * Paket lainnya: DITOLAK SEKETIKA (Fatal Error) untuk melindungi filesystem host.
+    pub fn run_script_for_package(
         &self,
+        pkg_name: &str,
         script: &str,
         build_dir: &Path,
         destdir: &Path,
         env_vars: &HashMap<String, String>,
+        allow_unsafe_fallback: bool,
     ) -> Result<ExitStatus> {
         std::fs::create_dir_all(build_dir)
             .with_context(|| format!("Gagal membuat direktori build {:?}", build_dir))?;
@@ -85,8 +96,40 @@ impl SandboxRunner {
             cmd.status()
                 .with_context(|| "Gagal mengeksekusi bash script di dalam sandbox Bubblewrap")
         } else {
-            Self::run_script_fallback(script, build_dir, destdir, env_vars)
+            let is_self_bootstrap = pkg_name == "bubblewrap" || pkg_name == "bwrap";
+            if is_self_bootstrap {
+                println!(
+                    "  [!] Mode Khusus Self-Bootstrap: Mengompilasi '{}' dalam mode un-sandboxed agar isolasi Bubblewrap tersedia untuk paket selanjutnya...",
+                    pkg_name
+                );
+                Self::run_script_fallback(script, build_dir, destdir, env_vars)
+            } else if allow_unsafe_fallback {
+                println!(
+                    "  [⚠️] PERINGATAN KESELAMATAN: Berjalan dalam mode un-sandboxed (--unsafe-no-sandbox aktif)!"
+                );
+                Self::run_script_fallback(script, build_dir, destdir, env_vars)
+            } else {
+                anyhow::bail!(
+                    "\n[FATAL ERROR] Isolasi Sandbox Bubblewrap ('bwrap') WAJIB digunakan untuk mengompilasi paket '{}', namun biner 'bwrap' tidak ditemukan di sistem host!\n\n\
+                    Demi menjaga kebersihan dan melindungi filesystem host '/', Forge melarang kompilasi un-sandboxed.\n\
+                    Pengecualian satu-satunya: paket 'bubblewrap' itu sendiri diizinkan untuk di-build pertama kali via:\n\
+                      forge install bubblewrap\n\
+                    Atau silakan pasang 'bubblewrap' pada sistem host Anda sebelum melanjutkan.",
+                    pkg_name
+                );
+            }
         }
+    }
+
+    /// Jalankan script bash (kompatibilitas mundur)
+    pub fn run_script(
+        &self,
+        script: &str,
+        build_dir: &Path,
+        destdir: &Path,
+        env_vars: &HashMap<String, String>,
+    ) -> Result<ExitStatus> {
+        self.run_script_for_package("generic", script, build_dir, destdir, env_vars, false)
     }
 
     /// Mode eksekusi fallback langsung dengan validasi lingkungan dan chdir
@@ -168,5 +211,47 @@ echo "var=$MY_TEST_VAR" >> "$DESTDIR/output.txt"
         let content = std::fs::read_to_string(&output_file).unwrap();
         assert!(content.contains("hello from fallback sandbox"));
         assert!(content.contains("var=kura_linux_rulez"));
+    }
+
+    #[test]
+    fn test_sandbox_rejects_non_bubblewrap_package_when_bwrap_missing() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let build_dir = temp_dir.path().join("build");
+        let destdir = temp_dir.path().join("stage");
+        let env_vars = HashMap::new();
+
+        let runner = SandboxRunner::with_bwrap_path(None);
+        let res = runner.run_script_for_package(
+            "fastfetch",
+            "echo 'build fastfetch'",
+            &build_dir,
+            &destdir,
+            &env_vars,
+            false,
+        );
+
+        assert!(res.is_err(), "Harus gagal ketika bwrap tidak ada untuk paket selain bubblewrap");
+        let err = res.unwrap_err().to_string();
+        assert!(err.contains("Isolasi Sandbox Bubblewrap ('bwrap') WAJIB"), "Error harus mengandung pesan penegakan wajib: {}", err);
+    }
+
+    #[test]
+    fn test_sandbox_allows_bubblewrap_self_bootstrap_when_bwrap_missing() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let build_dir = temp_dir.path().join("build");
+        let destdir = temp_dir.path().join("stage");
+        let env_vars = HashMap::new();
+
+        let runner = SandboxRunner::with_bwrap_path(None);
+        let res = runner.run_script_for_package(
+            "bubblewrap",
+            "echo 'bootstrap bwrap'",
+            &build_dir,
+            &destdir,
+            &env_vars,
+            false,
+        );
+
+        assert!(res.is_ok(), "Harus diizinkan untuk paket 'bubblewrap' agar self-bootstrap berhasil");
     }
 }

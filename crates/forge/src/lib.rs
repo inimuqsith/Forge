@@ -21,7 +21,7 @@ pub mod stage;
 pub use builder::RecipeBuilder;
 pub use toolchain::{ToolchainComponent, ToolchainManager, ToolchainStatus};
 pub use cpu::{CpuProfile, CacheInfo, RecommendedFlags};
-pub use binhost::{BinhostCatalog, BinhostClient, BinhostPackageEntry};
+pub use binhost::{BinhostCatalog, BinhostClient, BinhostPackageEntry, DownloadStreamResult, PackageSignature};
 pub use cachyos::{CachyOsAdapter, CachyOsTier, CachyOsPackageMeta, parse_alpm_desc, parse_repo_db_tar_zst};
 pub use cascade::{CascadeResolution, PackageCascadeResolver, PackageProvider};
 pub use resolver::*;

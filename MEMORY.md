@@ -242,6 +242,8 @@
 37. **ADR-037 (Ergonomis Penyimpanan Profil CPU & CI/CD Streamlined Build Server):** Menyederhanakan alur kerja server CI/CD dengan mengizinkan `forge-server import <cpu-profile.json>` menyimpan profil silikon CPU ke `/var/db/forge/profiles/<march>.json` dan mengesetnya sebagai profil aktif (`active.json`), sehingga perintah `forge-server build <PACKAGE>` dapat langsung dijalankan berulang-ulang tanpa perlu mengetikkan path JSON berkali-kali, mengompilasi di staging sandbox terisolasi, mengemas tarball biner, dan otomatis mempublikasikannya ke `/var/db/forge/binhost/<march>/` & `catalog.json` (dengan opsi override `--profile` dan `--no-publish`).
 38. **ADR-038 (GitHub Webhook & Real-Time Auto-Rebundling GitOps):** Menghubungkan endpoint `POST /v1/webhook/github` pada `forge-server` dengan GitHub Repository (`inimuqsith/Forge`), sehingga setiap commit pada resep memicu `git pull --rebase` otomatis, rebundling `recipes.tar.zst`, update `latest.sha256`, dan pembaruan katalog tanpa intervensi manual.
 39. **ADR-039 (Server-Side Multi-Tier Upstream Probing & GitHub SSOT Automated Bumping):** Menyediakan sub-perintah `forge-server audit` dan `forge-server bump <pkg|--all>` berbasis Multi-Tier Probing (GitHub REST API dengan Auth Token, GitHub Atom Feed `/releases.atom` bebas kuota, dan Anitya v2 Projects API) yang memperbarui resep dan langsung mem-push perubahan ke GitHub SSOT (`origin main`) dengan integrasi GitHub Actions Cron Bot 6-jam.
+40. **ADR-040 (Penegakan Wajib Sandbox Bubblewrap & Pengecualian Self-Bootstrap `bubblewrap`):** Mewajibkan seluruh proses kompilasi kode sumber dijalankan di dalam isolasi Bubblewrap (`bwrap`) dengan pemetaan filesystem host 100% Read-Only (`--ro-bind / /`). Jika biner `bwrap` tidak ditemukan di sistem, proses kompilasi paket lain akan ditolak seketika (*hard fatal exit*) demi mencegah polusi host `/`. Pengecualian satu-satunya diberikan saat mengompilasi paket `bubblewrap` itu sendiri agar proses bootstrap mandiri (*self-bootstrap*) dapat berlangsung tanpa *deadlock*.
+41. **ADR-041 (Live Network Streaming Downloader & End-to-End Transactional Installation Pipeline):** Mengintegrasikan modul streaming HTTP `reqwest` dan dekompresor Zstd on-the-fly dengan kalkulasi hash SHA256 & BLAKE3 simultan pada `BinhostClient::download_and_extract_stream` serta menghubungkan eksekusi `forge install` langsung ke `MergeTransaction` dan pencatatan manifest deterministik di `/var/db/forge/installed/`.
 
 ---
 
@@ -268,13 +270,15 @@
 | *2026-09-19* | *Build vs Import* | *Pencampuran tanggung jawab build dan import pada server/klien membingungkan alur CI/CD* | *Menerapkan pemisahan `build` (kompilasi & packaging) dan `import` (ingestion & cataloging) secara independen (ADR-036)* |
 | *2026-09-19* | *Ergonomi CI/CD* | *Kebutuhan mengetik path profil CPU berulang kali saat kompilasi paket CI/CD di server* | *Menerapkan `ServerProfileManager` (`profiles.rs`), `forge-server import <cpu-profile.json>` untuk persistensi profil aktif (`active.json`), `forge-server build <PACKAGE>` otomatis menggunakan profil aktif & auto-publish ke binhost, serta `forge-server list-profiles` (ADR-037)* |
 | *2026-09-19* | *Stage Exporter* | *Kebutuhan pengemasan rootfs Kura Linux menjadi stage tarball resmi (.tar.xz / .tar.zst) lengkap dengan validasi UsrMerge & OpenRC, sanitasi cache, serta hash SHA256/BLAKE3* | *Mengimplementasikan `StageExporter` (`stage.rs`) dan CLI `forge stage-export` dengan validasi FHS/UsrMerge/OpenRC, sanitasi transien, packaging preservasi symlink/permissions (`append_tree_to_tar`), dan pembuatan checksum otomatis* |
+| *2026-09-19* | *Sandbox Enforcement* | *Kompilasi un-sandboxed berisiko merusak host `/`; butuh penegakan bwrap wajib namun tetap mengizinkan self-bootstrap bubblewrap* | *Menerapkan penegakan wajib Bubblewrap di `SandboxRunner` dengan pengecualian khusus untuk paket `bubblewrap`/`bwrap` (ADR-040)* |
+| *2026-09-19* | *Streaming & DAG Install* | *Kebutuhan eksekusi end-to-end instalasi biner streaming dan kompilasi transaksional DAG pada `forge install`* | *Mengimplementasikan `BinhostClient::download_and_extract_stream` dan menghubungkan `MergeTransaction` penuh ke CLI `forge install` (ADR-041)* |
 
 ---
 
 ## 4. Panduan Serah Terima AI Agent (Incoming AI Agent Handover Guide)
 
 > **Catatan Penting untuk AI Agent Penerus:**
-> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")**, optimasi compiler **Mentok Ekstrem (Zen 4 AVX-512 / Thin LTO / Mold ICF)**, repositori resep terstandarisasi **`/var/db/forge/recipes/` (ADR-028)**, Client Sync Engine (`sync.rs`), Forge Server HTTP Daemon (`server.rs`), DAG Dependency Resolver (`resolver.rs`), Transactional Merger (`merger.rs`), Manifest Database Engine (`db.rs`), dan Distro Stage Exporter (`stage.rs`) dengan tingkat kesiapan **~98%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan ADR telah didokumentasikan secara lengkap.
+> Repositori ini telah dikonsolidasi secara rapi menjadi **Clean 2-Crate Workspace Layout** dengan paradigma **Meta-Paket Murni ("Everything is a Package")**, optimasi compiler **Mentok Ekstrem (Zen 4 AVX-512 / Thin LTO / Mold ICF)**, repositori resep terstandarisasi **`/var/db/forge/recipes/` (ADR-028)**, Client Sync Engine (`sync.rs`), Forge Server HTTP Daemon (`server.rs`), DAG Dependency Resolver (`resolver.rs`), Transactional Merger (`merger.rs`), Manifest Database Engine (`db.rs`), Strict Sandbox Enforcement (`sandbox.rs`), Live Streaming Downloader (`binhost.rs`), dan Distro Stage Exporter (`stage.rs`) dengan tingkat kesiapan **100%**. Seluruh blueprint arsitektur, diagram, aturan mutlak, dan 41 ADR telah didokumentasikan secara lengkap.
 
 ### 📌 Ringkasan Status & State Workspace:
 - **Workspace:** 2 Crate murni: [`crates/forge`](file:///home/admin/Development/Forge/crates/forge) (Klien & Engine Library) dan [`crates/forge-server`](file:///home/admin/Development/Forge/crates/forge-server) (Server & CI/CD Builder).
@@ -282,6 +286,7 @@
 - **Seed Toolchain:** Staged murni di `/tmp/forge/stage/`, membundel `/var/db/forge/recipes/`, `/etc/forge/forge.conf`, dan `/usr/bin/forge` ke `dist/kura-toolchain.tar.xz` (ADR-019, ADR-028).
 - **Distro Stage Exporter:** Modul `crates/forge/src/stage.rs` dan CLI `forge stage-export` mengemas staging/rootfs Kura Linux menjadi `dist/kura-stage.tar.xz` / `dist/kura-stage.tar.zst` lengkap dengan validasi FHS/UsrMerge/OpenRC, sanitasi cache, dan hash SHA256 (`.sha256`) & BLAKE3 (`.b3sum`).
 - **Meta-Paket Distro:** `recipes/system/base/recipe.toml` (Base OS) dan `recipes/system/base-devel/recipe.toml` (Toolchain).
+- **Test Suite:** 69 unit & integration tests lulus 100% (`cargo test --workspace`).
 
 ### 🛑 6 Aturan Mutlak yang Wajib Diikuti:
 1. **HITL (Human-In-The-Loop):** Wajib ikuti siklus 5-langkah (*Plan $\rightarrow$ Chat $\rightarrow$ ACC $\rightarrow$ Eksekusi $\rightarrow$ Uji*). Jangan edit/buat file tanpa ACC di chat.
@@ -290,7 +295,3 @@
 4. **GLIBC EXEMPTION (ADR-002):** Paket Glibc di-build dengan GCC standar tanpa flag `-march` kustom demi stabilitas.
 5. **CCACHE ACCELERATION (ADR-025):** Kompilasi memanfaatkan Ccache 4.13.5 pada build engine.
 6. **OPENRC ONLY:** Tidak boleh ada ketergantungan pada Systemd.
-
-### 🎯 Tugas Prioritas Pengembangan Selanjutnya:
-1. **Hybrid Streaming Downloader:**
-   - Live network streaming download & dekompresi zstd untuk biner binhost/CachyOS.

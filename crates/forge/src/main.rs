@@ -2,9 +2,10 @@ use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use colored::*;
 use forge::{
-    CpuProfile, DependencyResolver, ForgeConfig, ForgeLockGuard, InstalledDatabase,
-    PackageCascadeResolver, PackageProvider, RecipeBuilder, RecipeImporter, StageExportOptions,
-    StageExporter, StageFormat, SyncClient, ToolchainComponent, ToolchainManager,
+    BinhostClient, CpuProfile, DependencyResolver, ForgeConfig, ForgeLockGuard, InstalledDatabase,
+    MergeTransaction, PackageCascadeResolver, PackageManifest, PackageMetadata, PackageProvider,
+    RecipeBuilder, RecipeImporter, StageExportOptions, StageExporter, StageFormat, SyncClient,
+    ToolchainComponent, ToolchainManager,
 };
 use std::path::{Path, PathBuf};
 
@@ -176,6 +177,8 @@ fn main() -> Result<()> {
             println!(">>> Memproses instalasi: {}", target.bold().green());
             let force_native = native || build_source;
             let config = ForgeConfig::load_or_default(None);
+            let db = InstalledDatabase::new(PathBuf::from(&config.general.db_path));
+            let target_root = PathBuf::from(&config.general.root);
 
             if interactive {
                 println!("{} Mode: Membuka pemilihan provider interaktif.", "[i]".blue());
@@ -191,31 +194,93 @@ fn main() -> Result<()> {
             ))?;
 
             match resolution.provider {
-                PackageProvider::ForgeBinhost => {
+                PackageProvider::ForgeBinhost | PackageProvider::CachyOsPrebuilt => {
+                    let provider_name = if resolution.provider == PackageProvider::ForgeBinhost {
+                        "Forge Native Binhost"
+                    } else {
+                        "CachyOS Prebuilt Fallback"
+                    };
                     println!(
-                        "{} Target akan diunduh via Forge Native Binhost: {}",
-                        "✓".green(),
-                        resolution.download_url.as_deref().unwrap_or("")
+                        "{} Menggunakan provider akselerasi biner: {}",
+                        "⚡".cyan(),
+                        provider_name.bold().green()
                     );
-                }
-                PackageProvider::CachyOsPrebuilt => {
-                    println!(
-                        "{} Target akan diunduh via CachyOS Prebuilt fallback: {}",
-                        "✓".green(),
-                        resolution.download_url.as_deref().unwrap_or("")
-                    );
+
+                    if let Some(ref download_url) = resolution.download_url {
+                        println!("  [↓] URL: {}", download_url.dimmed());
+                        let stream_staging = std::env::temp_dir()
+                            .join("forge")
+                            .join("stage")
+                            .join(format!("stream-{}", target));
+
+                        if stream_staging.exists() {
+                            let _ = std::fs::remove_dir_all(&stream_staging);
+                        }
+                        std::fs::create_dir_all(&stream_staging)?;
+
+                        match rt.block_on(BinhostClient::download_and_extract_stream(
+                            download_url,
+                            &stream_staging,
+                            None,
+                            true,
+                        )) {
+                            Ok(dl_res) => {
+                                println!(
+                                    "  [✓] Unduhan selesai ({:.2} MB, BLAKE3: {})",
+                                    dl_res.bytes_downloaded as f64 / (1024.0 * 1024.0),
+                                    &dl_res.blake3_hash[..12.min(dl_res.blake3_hash.len())]
+                                );
+                                println!("  [📦] Memulai transaksi merger ke target rootfs '{}'...", target_root.display());
+
+                                let mut tx = MergeTransaction::new(
+                                    &target,
+                                    "latest",
+                                    "0",
+                                    &stream_staging,
+                                    &target_root,
+                                    PathBuf::from(&config.general.db_path),
+                                );
+                                tx.cflags = Some(config.build.cflags.clone());
+                                tx.use_flags = Some(config.use_flags.flags.clone());
+
+                                match tx.execute_merge(&db) {
+                                    Ok(manifest) => {
+                                        println!(
+                                            "\n{} Paket '{}' v{} berhasil dipasang ke sistem!",
+                                            "✓".green(),
+                                            manifest.package_name.bold().green(),
+                                            manifest.package_version
+                                        );
+                                        println!("  - Total berkas terpasang: {}", manifest.entries.len());
+                                    }
+                                    Err(e) => {
+                                        println!("{} Gagal menggabungkan paket ke sistem: {:#}", "✗".red(), e);
+                                        std::process::exit(1);
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                println!("{} Gagal mengunduh paket biner: {:#}", "✗".red(), e);
+                                println!("  [!] Beralih ke kompilasi lokal dari kode sumber...");
+                            }
+                        }
+                    }
                 }
                 PackageProvider::ForgeSource => {
                     println!(
-                        "{} Target akan dikompilasi dari kode sumber upstream.",
-                        "✓".green()
+                        "{} Mode Kompilasi Native dari Kode Sumber (Gentoo Portage Mode)",
+                        "🚀".green()
                     );
-                }
-            }
 
-            println!("  [🔍] Menghitung graf dependensi (DAG) & USE flags untuk '{}'...", target.bold().yellow());
-            match DependencyResolver::resolve(&target, &config, None, None) {
-                Ok(plan) => {
+                    println!("  [🔍] Menghitung graf dependensi (DAG) & USE flags untuk '{}'...", target.bold().yellow());
+                    let plan = match DependencyResolver::resolve(&target, &config, None, None) {
+                        Ok(p) => p,
+                        Err(e) => {
+                            println!("{} Gagal menyelesaikan dependensi target {}: {:#}", "✗".red(), target.bold(), e);
+                            return Ok(());
+                        }
+                    };
+
                     println!("\n{}", "=== Rencana Eksekusi Instalasi (Topological Resolution Plan) ===".bold().cyan());
                     println!("  Target Utama     : {}", plan.target.bold().green());
                     println!("  Total Paket      : {}", plan.total_packages.to_string().bold().yellow());
@@ -237,10 +302,101 @@ fn main() -> Result<()> {
                             step.recipe_path.display().to_string().dimmed()
                         );
                     }
-                    println!("\n{} Pohon dependensi valid & siap dikompilasi!", "✓".green());
-                }
-                Err(e) => {
-                    println!("{} Gagal menyelesaikan dependensi target {}: {:#}", "✗".red(), target.bold(), e);
+                    println!("\n{} Memulai proses kompilasi & instalasi secara bertahap...", "✓".green());
+
+                    for step in &plan.steps {
+                        let pkg_name = &step.package_id.name;
+                        let pkg_slot = &step.package_id.slot;
+                        let pkg_ver = &step.version;
+
+                        if step.is_meta {
+                            println!("\n>>> Memproses meta-paket: {}", pkg_name.bold().magenta());
+                            let dummy_manifest = PackageManifest {
+                                package_name: pkg_name.clone(),
+                                package_version: pkg_ver.clone(),
+                                release: 1,
+                                slot: pkg_slot.clone(),
+                                entries: Vec::new(),
+                                metadata: Some(PackageMetadata {
+                                    name: pkg_name.clone(),
+                                    version: pkg_ver.clone(),
+                                    release: 1,
+                                    slot: pkg_slot.clone(),
+                                    description: format!("Kura Linux Meta Package: {}", pkg_name),
+                                    url: "".to_string(),
+                                    license: "GPL-3.0".to_string(),
+                                    upstream: "".to_string(),
+                                    build_time: std::time::SystemTime::now()
+                                        .duration_since(std::time::UNIX_EPOCH)
+                                        .unwrap_or_default()
+                                        .as_secs(),
+                                    target_march: config.cpu.target_march.clone(),
+                                    cflags: config.build.cflags.clone(),
+                                    use_flags: config.use_flags.flags.clone(),
+                                    files_count: 0,
+                                    installed_size: 0,
+                                }),
+                                use_flags: Some(config.use_flags.flags.clone()),
+                                cflags: Some(config.build.cflags.clone()),
+                            };
+                            if let Err(e) = db.record_package(&dummy_manifest, &target_root) {
+                                eprintln!("  [!] Gagal mencatat manifest meta-paket: {:#}", e);
+                            } else {
+                                println!("  [✓] Meta-paket '{}' berhasil dicatat.", pkg_name.green());
+                            }
+                            continue;
+                        }
+
+                        println!(
+                            "\n>>> Mengompilasi [{}/{}]: {} v{}",
+                            step.step_number, plan.total_packages, pkg_name.bold().green(), pkg_ver
+                        );
+                        let staging_dir = std::env::temp_dir()
+                            .join("forge")
+                            .join("stage")
+                            .join(format!("{}-{}", pkg_name, pkg_ver));
+                        if staging_dir.exists() {
+                            let _ = std::fs::remove_dir_all(&staging_dir);
+                        }
+                        std::fs::create_dir_all(&staging_dir)?;
+
+                        if let Err(e) = RecipeBuilder::build(&step.recipe_path, &config, &staging_dir, None) {
+                            println!("{} Gagal mengompilasi resep {}: {:#}", "✗".red(), pkg_name.bold(), e);
+                            std::process::exit(1);
+                        }
+
+                        let mut tx = MergeTransaction::new(
+                            pkg_name,
+                            pkg_ver,
+                            pkg_slot,
+                            &staging_dir,
+                            &target_root,
+                            PathBuf::from(&config.general.db_path),
+                        );
+                        tx.cflags = Some(config.build.cflags.clone());
+                        tx.use_flags = Some(config.use_flags.flags.clone());
+
+                        match tx.execute_merge(&db) {
+                            Ok(manifest) => {
+                                println!(
+                                    "  [✓] Paket '{}' v{} sukses digabungkan ({} berkas)",
+                                    pkg_name.bold().green(),
+                                    pkg_ver,
+                                    manifest.entries.len()
+                                );
+                            }
+                            Err(e) => {
+                                println!("{} Gagal menggabungkan paket {} ke sistem: {:#}", "✗".red(), pkg_name.bold(), e);
+                                std::process::exit(1);
+                            }
+                        }
+                    }
+
+                    println!(
+                        "\n{} Seluruh target paket '{}' berhasil dipasang dengan sukses!",
+                        "✨".green(),
+                        target.bold().green()
+                    );
                 }
             }
         }

@@ -273,3 +273,5 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-037** | Ergonomis Penyimpanan Profil CPU & CI/CD Streamlined Build Server | ✅ Diterapkan |
 | **ADR-038** | GitHub Webhook & Real-Time Auto-Rebundling GitOps | ✅ Diterapkan |
 | **ADR-039** | Server-Side Multi-Tier Upstream Probing & GitHub SSOT Automated Bumping | ✅ Diterapkan |
+| **ADR-040** | Penegakan Wajib Sandbox Bubblewrap & Pengecualian Self-Bootstrap `bubblewrap` | ✅ Diterapkan |
+| **ADR-041** | Live Network Streaming Downloader & End-to-End Transactional Installation Pipeline | ✅ Diterapkan |
