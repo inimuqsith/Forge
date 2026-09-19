@@ -286,7 +286,7 @@
 - **Seed Toolchain:** Staged murni di `/tmp/forge/stage/`, membundel `/var/db/forge/recipes/`, `/etc/forge/forge.conf`, dan `/usr/bin/forge` ke `dist/kura-toolchain.tar.xz` (ADR-019, ADR-028).
 - **Distro Stage Exporter:** Modul `crates/forge/src/stage.rs` dan CLI `forge stage-export` mengemas staging/rootfs Kura Linux menjadi `dist/kura-stage.tar.xz` / `dist/kura-stage.tar.zst` lengkap dengan validasi FHS/UsrMerge/OpenRC, sanitasi cache, dan hash SHA256 (`.sha256`) & BLAKE3 (`.b3sum`).
 - **Meta-Paket Distro:** `recipes/system/base/recipe.toml` (Base OS) dan `recipes/system/base-devel/recipe.toml` (Toolchain).
-- **Test Suite:** 69 unit & integration tests lulus 100% (`cargo test --workspace`).
+- **Test Suite:** 70 unit & integration tests lulus 100% (`cargo test --workspace`).
 
 ### 🛑 6 Aturan Mutlak yang Wajib Diikuti:
 1. **HITL (Human-In-The-Loop):** Wajib ikuti siklus 5-langkah (*Plan $\rightarrow$ Chat $\rightarrow$ ACC $\rightarrow$ Eksekusi $\rightarrow$ Uji*). Jangan edit/buat file tanpa ACC di chat.

@@ -182,21 +182,24 @@ impl RecipeBumper {
         let mut modified_lines = Vec::new();
         let mut in_package_section = false;
         let mut in_sources_section = false;
+        let mut in_sha256_array = false;
 
         for line in content.lines() {
             let trimmed = line.trim();
             if trimmed == "[package]" {
                 in_package_section = true;
                 in_sources_section = false;
+                in_sha256_array = false;
                 modified_lines.push(line.to_string());
                 continue;
             } else if trimmed.starts_with('[') {
+                in_package_section = false;
+                in_sha256_array = false;
                 if trimmed == "[sources]" {
                     in_sources_section = true;
                 } else {
                     in_sources_section = false;
                 }
-                in_package_section = false;
                 modified_lines.push(line.to_string());
                 continue;
             }
@@ -213,15 +216,26 @@ impl RecipeBumper {
             }
 
             if in_sources_section {
+                if in_sha256_array {
+                    if trimmed.contains(']') {
+                        in_sha256_array = false;
+                    }
+                    continue;
+                }
+
+                if let Some(ref sha) = new_sha256 {
+                    if trimmed.starts_with("sha256") {
+                        if !trimmed.contains(']') {
+                            in_sha256_array = true;
+                        }
+                        modified_lines.push(format!("sha256 = [\n    \"{}\"\n]", sha));
+                        continue;
+                    }
+                }
+
                 let mut current_line = line.to_string();
                 if current_line.contains(&old_version) {
                     current_line = current_line.replace(&old_version, new_version);
-                }
-                if let Some(ref sha) = new_sha256 {
-                    if trimmed.starts_with("sha256") {
-                        modified_lines.push(format!("sha256 = [\"{}\"]", sha));
-                        continue;
-                    }
                 }
                 modified_lines.push(current_line);
                 continue;
@@ -646,6 +660,47 @@ sha256 = ["old_hash_here"]
         assert!(updated_content.contains("version = \"2.39.0\""));
         assert!(updated_content.contains("release = 1"));
         assert!(updated_content.contains("sha256 = [\"old_hash_here\"]"));
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_bump_multiline_sha256_replacement() -> Result<()> {
+        let temp = tempdir()?;
+        let recipe_file = temp.path().join("recipe.toml");
+
+        let initial_content = r#"[package]
+name = "bubblewrap"
+version = "0.11.0"
+release = 1
+slot = "0"
+description = "Sandbox tool"
+
+[sources]
+urls = [
+    "https://github.com/containers/bubblewrap/releases/download/v0.11.0/bubblewrap-0.11.0.tar.xz"
+]
+sha256 = [
+    "old_multiline_hash_here_1111111111111111111111111111111111111111111"
+]
+
+[build]
+type = "meson"
+script = "ninja"
+"#;
+        std::fs::write(&recipe_file, initial_content)?;
+
+        // Test with manual replacement simulation
+        let (old_ver, _) = RecipeBumper::bump_recipe_file(&recipe_file, "0.12.0", false).await?;
+        assert_eq!(old_ver, "0.11.0");
+
+        let updated_content = std::fs::read_to_string(&recipe_file)?;
+        assert!(updated_content.contains("version = \"0.12.0\""));
+        assert!(updated_content.contains("bubblewrap-0.12.0.tar.xz"));
+        // Memastikan tidak ada format array bertumpuk dan TOML valid
+        let parsed: forge::Recipe = toml::from_str(&updated_content)?;
+        assert_eq!(parsed.package.version, "0.12.0");
+        assert_eq!(parsed.sources.unwrap().sha256.len(), 1);
 
         Ok(())
     }
