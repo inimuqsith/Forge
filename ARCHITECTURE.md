@@ -286,6 +286,7 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-050** | Resumable HTTP Source Downloader with Multi-Mirror Fallback & Integrity Engine (`SourceDownloader`) | ✅ Diterapkan |
 | **ADR-051** | TUI Menuconfig & Dynamic Recipe USE Flags Selector (`UseFlagsTui`) | ✅ Diterapkan |
 | **ADR-052** | Seccomp BPF Syscall Filtering & Build Hardening Engine (`SeccompFilterBuilder`) | ✅ Diterapkan |
+| **ADR-053** | Automated Server Source Code Rebuild & Seamless Self-Restart on Git Webhook | ✅ Diterapkan |
 
 
 

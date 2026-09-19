@@ -36,6 +36,8 @@ pub struct SyncWebhookResponse {
     pub package_count: usize,
     pub sha256: Option<String>,
     pub git_updated: bool,
+    #[serde(default)]
+    pub server_rebuilding: bool,
 }
 
 pub struct ForgeServer;
@@ -207,16 +209,21 @@ async fn binhost_package_handler(
 }
 
 /// Sinkronisasi resep dari Git repo jika tersedia dan bungkus ulang ke recipes.tar.zst
-pub fn sync_and_rebundle_recipes(recipes_dir: &Path, cache_dir: &Path) -> anyhow::Result<(usize, String, bool)> {
+/// Mengembalikan: (package_count, sha256_hash, git_updated, server_src_changed, Option<git_root_path>)
+pub fn sync_and_rebundle_recipes(
+    recipes_dir: &Path,
+    cache_dir: &Path,
+) -> anyhow::Result<(usize, String, bool, bool, Option<PathBuf>)> {
     let mut git_updated = false;
+    let mut server_src_changed = false;
     let git_dir_candidate1 = recipes_dir.join(".git");
     let git_dir_candidate2 = recipes_dir.parent().map(|p| p.join(".git"));
 
     let target_git_dir = if git_dir_candidate1.exists() {
-        Some(recipes_dir)
+        Some(recipes_dir.to_path_buf())
     } else if let Some(ref p2) = git_dir_candidate2 {
         if p2.exists() {
-            recipes_dir.parent()
+            recipes_dir.parent().map(|p| p.to_path_buf())
         } else {
             None
         }
@@ -224,19 +231,111 @@ pub fn sync_and_rebundle_recipes(recipes_dir: &Path, cache_dir: &Path) -> anyhow
         None
     };
 
-    if let Some(target_git) = target_git_dir {
+    if let Some(ref target_git) = target_git_dir {
+        let old_head = std::process::Command::new("git")
+            .args(["-C", &target_git.to_string_lossy(), "rev-parse", "HEAD"])
+            .output()
+            .ok()
+            .and_then(|o| {
+                if o.status.success() {
+                    Some(String::from_utf8_lossy(&o.stdout).trim().to_string())
+                } else {
+                    None
+                }
+            });
+
         let output = std::process::Command::new("git")
             .args(["-C", &target_git.to_string_lossy(), "pull", "--rebase"])
             .output();
         if let Ok(out) = output {
             git_updated = out.status.success();
         }
+
+        let new_head = std::process::Command::new("git")
+            .args(["-C", &target_git.to_string_lossy(), "rev-parse", "HEAD"])
+            .output()
+            .ok()
+            .and_then(|o| {
+                if o.status.success() {
+                    Some(String::from_utf8_lossy(&o.stdout).trim().to_string())
+                } else {
+                    None
+                }
+            });
+
+        if let (Some(ref old), Some(ref new)) = (old_head, new_head) {
+            if old != new {
+                let diff_output = std::process::Command::new("git")
+                    .args(["-C", &target_git.to_string_lossy(), "diff", "--name-only", old, new])
+                    .output();
+                if let Ok(diff_out) = diff_output {
+                    let diff_text = String::from_utf8_lossy(&diff_out.stdout);
+                    for line in diff_text.lines() {
+                        let trimmed = line.trim();
+                        if trimmed.starts_with("crates/forge-server/")
+                            || trimmed.starts_with("crates/forge/")
+                            || trimmed == "Cargo.toml"
+                            || trimmed == "Cargo.lock"
+                        {
+                            server_src_changed = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     let tar_file = cache_dir.join("recipes.tar.zst");
     let hash = ForgeServer::bundle_recipes(recipes_dir, &tar_file)?;
     let packages = ForgeServer::scan_packages(recipes_dir);
-    Ok((packages.len(), hash, git_updated))
+    Ok((packages.len(), hash, git_updated, server_src_changed, target_git_dir))
+}
+
+/// Memicu proses kompilasi ulang biner forge-server dan melakukan restart/process replacement secara graceful (ADR-053)
+pub async fn trigger_server_self_rebuild_and_restart(git_root: PathBuf) {
+    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+    eprintln!("[Auto-Rebuild] Terdeteksi perubahan kode sumber forge-server. Memulai background cargo build --release...");
+
+    let build_res = tokio::task::spawn_blocking(move || {
+        std::process::Command::new("cargo")
+            .args(["build", "--release", "-p", "forge-server"])
+            .current_dir(&git_root)
+            .output()
+    })
+    .await;
+
+    match build_res {
+        Ok(Ok(output)) if output.status.success() => {
+            eprintln!("[Auto-Rebuild] Kompilasi biner baru sukses! Memulai graceful self-restart...");
+            if let Ok(exe) = std::env::current_exe() {
+                #[cfg(unix)]
+                {
+                    use std::os::unix::process::CommandExt;
+                    let args: Vec<_> = std::env::args().skip(1).collect();
+                    let err = std::process::Command::new(&exe).args(&args).exec();
+                    eprintln!(
+                        "[Auto-Rebuild] In-place exec gagal ({:?}), keluar dengan status 0 untuk daemon restart...",
+                        err
+                    );
+                }
+                std::process::exit(0);
+            }
+        }
+        Ok(Ok(output)) => {
+            eprintln!(
+                "[Auto-Rebuild] Kompilasi gagal dengan exit code {}: {}",
+                output.status,
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
+        Ok(Err(e)) => {
+            eprintln!("[Auto-Rebuild] Gagal mengeksekusi proses cargo: {}", e);
+        }
+        Err(e) => {
+            eprintln!("[Auto-Rebuild] Async task execution error: {}", e);
+        }
+    }
 }
 
 async fn handle_sync_rebundle(
@@ -252,16 +351,31 @@ async fn handle_sync_rebundle(
     .await;
 
     match result {
-        Ok(Ok((count, hash, git_updated))) => (
-            StatusCode::OK,
-            Json(SyncWebhookResponse {
-                status: "ok".to_string(),
-                message: success_message.to_string(),
-                package_count: count,
-                sha256: Some(hash),
-                git_updated,
-            }),
-        ),
+        Ok(Ok((count, hash, git_updated, server_src_changed, git_root_opt))) => {
+            if server_src_changed {
+                if let Some(git_root) = git_root_opt {
+                    tokio::spawn(async move {
+                        trigger_server_self_rebuild_and_restart(git_root).await;
+                    });
+                }
+            }
+
+            (
+                StatusCode::OK,
+                Json(SyncWebhookResponse {
+                    status: "ok".to_string(),
+                    message: if server_src_changed {
+                        format!("{} (Auto-rebuilding server binary in background)", success_message)
+                    } else {
+                        success_message.to_string()
+                    },
+                    package_count: count,
+                    sha256: Some(hash),
+                    git_updated,
+                    server_rebuilding: server_src_changed,
+                }),
+            )
+        }
         Ok(Err(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(SyncWebhookResponse {
@@ -270,6 +384,7 @@ async fn handle_sync_rebundle(
                 package_count: 0,
                 sha256: None,
                 git_updated: false,
+                server_rebuilding: false,
             }),
         ),
         Err(e) => (
@@ -280,6 +395,7 @@ async fn handle_sync_rebundle(
                 package_count: 0,
                 sha256: None,
                 git_updated: false,
+                server_rebuilding: false,
             }),
         ),
     }
@@ -314,6 +430,7 @@ async fn github_webhook_info_handler(
         package_count: packages.len(),
         sha256,
         git_updated: false,
+        server_rebuilding: false,
     })
 }
 
@@ -1827,6 +1944,31 @@ license = "GPL-3.0"
         let json_body: SyncWebhookResponse = serde_json::from_str(&text)?;
         assert_eq!(json_body.status, "ok");
         assert_eq!(json_body.package_count, 1);
+        assert!(!json_body.server_rebuilding);
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_sync_and_rebundle_recipes_returns_extended_status() -> anyhow::Result<()> {
+        let temp = tempfile::tempdir()?;
+        let recipes_dir = temp.path().join("recipes");
+        let extra_dir = recipes_dir.join("extra").join("fastfetch");
+        std::fs::create_dir_all(&extra_dir)?;
+        std::fs::write(
+            extra_dir.join("recipe.toml"),
+            "[package]\nname = \"fastfetch\"\nversion = \"2.38.0\"\n",
+        )?;
+        let cache_dir = temp.path().join("cache");
+
+        let (count, hash, git_updated, server_src_changed, git_root) =
+            sync_and_rebundle_recipes(&recipes_dir, &cache_dir)?;
+
+        assert_eq!(count, 1);
+        assert!(!hash.is_empty());
+        assert!(!git_updated);
+        assert!(!server_src_changed);
+        assert!(git_root.is_none());
 
         Ok(())
     }
