@@ -25,6 +25,7 @@ distfiles/
 coverage/
 *.profraw
 cpu-profile.json
+.sonar/
 
 # --- Editor & OS Artifacts ---
 .vscode/

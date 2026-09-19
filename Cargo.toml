@@ -12,6 +12,11 @@ authors = ["Kura Linux Team <admin@kuralinux.org>"]
 license = "GPL-3.0-or-later"
 repository = "https://github.com/kuralinux/forge"
 
+[workspace.metadata.sonar]
+project-key = "inimuqsith_Forge"
+organization = "inimuqsith"
+exclusions = ["target/**"]
+
 [workspace.dependencies]
 anyhow = "1.0"
 thiserror = "2.0"
