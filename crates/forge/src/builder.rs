@@ -412,14 +412,20 @@ impl RecipeBuilder {
 
         let ccache_dir = {
             let p = PathBuf::from(&config.build.ccache_dir);
-            if fs::create_dir_all(&p).is_ok() && fs::File::create(p.join(".write_test")).is_ok() {
+            let dir = if fs::create_dir_all(&p).is_ok() && fs::File::create(p.join(".write_test")).is_ok() {
                 let _ = fs::remove_file(p.join(".write_test"));
                 p
             } else {
                 let fallback = distfiles_dir.join(".ccache");
                 fs::create_dir_all(&fallback).ok();
                 fallback
-            }
+            };
+            let abs = if dir.is_absolute() {
+                dir
+            } else {
+                std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")).join(dir)
+            };
+            abs.canonicalize().unwrap_or(abs)
         };
 
         let (cc_base, cxx_base, ld, cflags, cxxflags, ldflags) = if is_exempt {

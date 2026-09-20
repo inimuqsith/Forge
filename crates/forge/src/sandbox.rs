@@ -252,6 +252,16 @@ impl SandboxRunner {
         destdir: &Path,
         seccomp_fd: Option<i32>,
     ) -> Vec<String> {
+        Self::build_bwrap_args_extended(build_dir, destdir, seccomp_fd, &[])
+    }
+
+    /// Bangun daftar argumen Bubblewrap dengan dukungan custom writable bind mounts (seperti CCACHE_DIR)
+    pub fn build_bwrap_args_extended(
+        build_dir: &Path,
+        destdir: &Path,
+        seccomp_fd: Option<i32>,
+        extra_binds: &[PathBuf],
+    ) -> Vec<String> {
         let mut args = vec![
             "--ro-bind".to_string(),
             "/".to_string(),
@@ -265,6 +275,15 @@ impl SandboxRunner {
             "--bind".to_string(),
             "/tmp".to_string(),
             "/tmp".to_string(),
+        ];
+
+        for extra in extra_binds {
+            args.push("--bind".to_string());
+            args.push(extra.display().to_string());
+            args.push(extra.display().to_string());
+        }
+
+        args.extend_from_slice(&[
             "--proc".to_string(),
             "/proc".to_string(),
             "--dev".to_string(),
@@ -273,7 +292,7 @@ impl SandboxRunner {
             "--cap-drop".to_string(),
             "ALL".to_string(),
             "--die-with-parent".to_string(),
-        ];
+        ]);
 
         if let Some(fd) = seccomp_fd {
             args.push("--seccomp".to_string());
@@ -284,7 +303,7 @@ impl SandboxRunner {
     }
 
     /// Jalankan script kompilasi dengan validasi ketat Bubblewrap + Seccomp BPF:
-    /// - Jika `bwrap` terpasang: Eksekusi di dalam Bubblewrap sandbox (--ro-bind / /, --cap-drop ALL, --seccomp FD).
+    /// - Jika `bwrap` terpasang: Eksekusi di dalam Bubblewrap sandbox (--ro-bind / /, --cap-drop ALL, --seccomp FD, --bind CCACHE_DIR).
     /// - Jika `bwrap` TIDAK terpasang:
     ///   * Pengecualian khusus: Paket 'bubblewrap' / 'bwrap' diizinkan di-build tanpa sandbox (self-bootstrap).
     ///   * Paket lainnya: DITOLAK SEKETIKA (Fatal Error) untuk melindungi filesystem host.
@@ -301,6 +320,24 @@ impl SandboxRunner {
             .with_context(|| format!("Gagal membuat direktori build {:?}", build_dir))?;
         std::fs::create_dir_all(destdir)
             .with_context(|| format!("Gagal membuat direktori destdir {:?}", destdir))?;
+
+        // Deteksi direktori writable tambahan (misal CCACHE_DIR)
+        let mut extra_binds = Vec::new();
+        if let Some(ccache_dir_str) = env_vars.get("CCACHE_DIR") {
+            let ccache_path = PathBuf::from(ccache_dir_str);
+            if !ccache_path.as_os_str().is_empty() {
+                let abs_ccache_path = if ccache_path.is_absolute() {
+                    ccache_path
+                } else {
+                    std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")).join(&ccache_path)
+                };
+                let _ = std::fs::create_dir_all(&abs_ccache_path);
+                if abs_ccache_path.exists() {
+                    let canonical = abs_ccache_path.canonicalize().unwrap_or(abs_ccache_path);
+                    extra_binds.push(canonical);
+                }
+            }
+        }
 
         if let Some(ref bwrap) = self.bwrap_path {
             // Persiapkan filter Seccomp BPF
@@ -321,7 +358,7 @@ impl SandboxRunner {
             let fd = read_file.as_raw_fd();
 
             let mut cmd = Command::new(bwrap);
-            let bwrap_args = Self::build_bwrap_args_with_seccomp(build_dir, destdir, Some(fd));
+            let bwrap_args = Self::build_bwrap_args_extended(build_dir, destdir, Some(fd), &extra_binds);
             cmd.args(bwrap_args);
             cmd.arg("--").arg("bash").arg("-c").arg(script);
             cmd.envs(env_vars);
@@ -344,7 +381,7 @@ impl SandboxRunner {
                     // Fallback jika lingkungan host melarang seccomp (misal nested unprivileged container)
                     eprintln!("  [!] Warning: Seccomp BPF filter gagal dimuat ({}), mengulang tanpa filter seccomp...", e);
                     let mut fallback_cmd = Command::new(bwrap);
-                    let fallback_args = Self::build_bwrap_args(build_dir, destdir);
+                    let fallback_args = Self::build_bwrap_args_extended(build_dir, destdir, None, &extra_binds);
                     fallback_cmd.args(fallback_args);
                     fallback_cmd.arg("--").arg("bash").arg("-c").arg(script);
                     fallback_cmd.envs(env_vars);
@@ -527,6 +564,17 @@ pub mod tests {
         assert!(args.contains(&"--seccomp".to_string()));
         let sec_idx = args.iter().position(|r| r == "--seccomp").unwrap();
         assert_eq!(args[sec_idx + 1], "42");
+    }
+
+    #[test]
+    fn test_sandbox_command_construction_with_extra_binds() {
+        let build_dir = Path::new("/tmp/forge/build/test-pkg-1.0");
+        let destdir = Path::new("/tmp/forge/stage/test-pkg");
+        let ccache_dir = PathBuf::from("/var/cache/forge/ccache");
+
+        let args = SandboxRunner::build_bwrap_args_extended(build_dir, destdir, None, &[ccache_dir.clone()]);
+        assert!(args.contains(&"--bind".to_string()));
+        assert!(args.contains(&ccache_dir.display().to_string()));
     }
 
     #[test]

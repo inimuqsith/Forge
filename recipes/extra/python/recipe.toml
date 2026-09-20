@@ -21,7 +21,7 @@ sha256 = ["3b48dac8fb59f62eaa67ac83c1eb12bda1b7a08406dd286e252c11a66be27f81"]
 type = "autotools"
 script = """
 cd "${srcdir}/Python-${pkgver}"
-./configure --prefix=/usr --enable-shared --with-system-expat --with-system-ffi --enable-optimizations
+./configure --prefix=/usr --enable-shared --with-system-expat --with-system-ffi
 make ${MAKEFLAGS}
 make DESTDIR="${DESTDIR}" install
 ln -sf python3 "${DESTDIR}/usr/bin/python"
