@@ -20,7 +20,7 @@ sha256 = ["d75462181fbd307228e0a48b8d1449f1773ea4b1f17e8a1d56346907f999ce33"]
 [build]
 type = "autotools"
 script = """
-cd "${srcdir}/hwdata-0.392"
+cd "${srcdir}/hwdata-${pkgver}"
 ./configure --prefix=/usr --sysconfdir=/etc --datadir=/usr/share
 make ${MAKEFLAGS}
 make DESTDIR="${DESTDIR}" install
