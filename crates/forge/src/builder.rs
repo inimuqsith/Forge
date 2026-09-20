@@ -503,6 +503,9 @@ impl RecipeBuilder {
             env_vars.insert("USE".to_string(), config.use_flags.flags.clone());
             env_vars.insert("USE_FLAGS".to_string(), config.use_flags.flags.clone());
             env_vars.insert("CCACHE_DIR".to_string(), ccache_dir.display().to_string());
+            if ccache_available {
+                env_vars.insert("CCACHE_MAXSIZE".to_string(), config.build.ccache_max_size.clone());
+            }
             env_vars.insert("CARGO_HOME".to_string(), cargo_dir.display().to_string());
             env_vars.insert("CFLAGS".to_string(), cflags.clone());
             env_vars.insert("CXXFLAGS".to_string(), cxxflags.clone());

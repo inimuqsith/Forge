@@ -69,6 +69,7 @@ jobs = "auto"
 prefix = "/usr"
 enable_ccache = true
 ccache_dir = "/var/cache/forge/ccache"
+ccache_max_size = "20G"
 cargo_cache_dir = "/var/cache/forge/cargo"
 
 [use]
