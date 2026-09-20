@@ -335,3 +335,4 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-077** | Explicit CMake/Build ASM Compiler Declaration & Global Environment Export (`ASM`) | ✅ Diterapkan |
 | **ADR-078** | Elimination of Redundant LLVM `libunwind` Runtime in GNU Toolchain | ✅ Diterapkan |
 | **ADR-079** | C-Dependency Crate LTO Sanitization for In-Tree Cargo Package Builds | ✅ Diterapkan |
+| **ADR-080** | Smart Staging Cache Reuse & Idempotent Resumption in Wavefront Scheduler | ✅ Diterapkan |

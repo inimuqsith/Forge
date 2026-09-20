@@ -274,6 +274,11 @@ impl WavefrontScheduler {
                         let tx_clone = tx.clone();
                         let config_clone = self.config.clone();
                         let node_clone = node.clone();
+                        let force_rebuild = if is_target {
+                            self.scheduler_cfg.reinstall || self.scheduler_cfg.rebuild_deps
+                        } else {
+                            self.scheduler_cfg.rebuild_deps
+                        };
 
                         thread::spawn(move || {
                             let task_start = Instant::now();
@@ -289,6 +294,25 @@ impl WavefrontScheduler {
                                 .join("stage")
                                 .join(format!("{}-{}", node_clone.id.name, node_clone.version));
 
+                            // 1. Periksa apakah paket sudah sukses di-stage sebelumnya dan berisi berkas
+                            let is_already_staged = staging_dir.exists()
+                                && staging_dir.read_dir().map(|mut entries| entries.next().is_some()).unwrap_or(false);
+
+                            // 2. Jika sudah ada di staging dan tidak dipaksa rebuild, langsung gunakan hasil staging
+                            if is_already_staged && !force_rebuild {
+                                let elapsed = task_start.elapsed().as_millis();
+                                let _ = tx_clone.send(TaskEvent::Success {
+                                    worker_id,
+                                    package_id: node_clone.id.clone(),
+                                    version: node_clone.version.clone(),
+                                    is_meta: false,
+                                    staging_dir: Some(staging_dir),
+                                    duration_ms: elapsed,
+                                });
+                                return;
+                            }
+
+                            // 3. Jika belum ada atau dipaksa rebuild (--rebuild / --deep), bersihkan dan buat direktori staging baru
                             if staging_dir.exists() {
                                 let _ = std::fs::remove_dir_all(&staging_dir);
                             }
@@ -991,6 +1015,69 @@ touch "${DESTDIR}/usr/lib/libdep.so"
         assert_eq!(summary_rebuild.total_packages, 2);
         assert_eq!(summary_rebuild.compiled_packages, 2);
         assert_eq!(summary_rebuild.skipped_packages, 0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_wavefront_reuses_existing_staging_directory() -> Result<()> {
+        let temp = tempfile::tempdir()?;
+        let target_root = temp.path().join("rootfs");
+        fs::create_dir_all(&target_root)?;
+
+        let mut config = ForgeConfig::default();
+        config.general.db_path = temp.path().join("installed.db").to_str().unwrap().to_string();
+        let db = InstalledDatabase::new(temp.path().join("installed.db"));
+
+        // Siapkan staging direktori buatan untuk cached-pkg-1.0.0 di /tmp/forge/stage/
+        let staging_dir = std::env::temp_dir()
+            .join("forge")
+            .join("stage")
+            .join("cached-pkg-1.0.0");
+        fs::create_dir_all(staging_dir.join("usr/bin"))?;
+        fs::write(staging_dir.join("usr/bin/cached-binary"), b"pre-compiled")?;
+
+        let recipe = temp.path().join("cached_pkg.toml");
+        fs::write(
+            &recipe,
+            r#"
+[package]
+name = "cached-pkg"
+version = "1.0.0"
+
+[build]
+type = "shell"
+script = """
+exit 1
+"""
+"#,
+        )?;
+
+        let mut graph = DependencyGraph::new();
+        let node = PackageNode {
+            id: PackageId::new("cached-pkg", "0"),
+            version: "1.0.0".to_string(),
+            release: 1,
+            description: "Cached pkg".to_string(),
+            recipe_path: recipe,
+            is_meta: false,
+            active_use_flags: HashSet::new(),
+            is_installed: false,
+            installed_version: None,
+        };
+        graph.add_node(node);
+        let plan = graph.topological_sort("cached-pkg")?;
+
+        // Eksekusi tanpa rebuild paksa: harus menggunakan staging yang sudah ada dan tidak mengeksekusi script 'exit 1'
+        let scheduler = WavefrontScheduler::with_options(config, Some(1), false, false);
+        let summary = scheduler.execute(&graph, &plan, &target_root, &db)?;
+
+        assert_eq!(summary.total_packages, 1);
+        assert_eq!(summary.compiled_packages, 1);
+        assert!(target_root.join("usr/bin/cached-binary").exists());
+
+        // Bersihkan direktori staging tes
+        let _ = fs::remove_dir_all(&staging_dir);
 
         Ok(())
     }

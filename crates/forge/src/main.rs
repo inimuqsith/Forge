@@ -57,11 +57,11 @@ enum Commands {
         interactive_use: bool,
 
         /// Evaluasi dan kompilasi ulang seluruh rantai dependensi tanpa memedulikan paket yang sudah terpasang
-        #[arg(short = 'D', long = "deep", alias = "rebuild-deps")]
+        #[arg(short = 'D', long = "deep", alias = "rebuild-deps", alias = "rebuild-all")]
         deep: bool,
 
         /// Paksa kompilasi/instalasi ulang paket target utama meskipun sudah terpasang dengan versi yang sama
-        #[arg(long = "reinstall")]
+        #[arg(long = "reinstall", alias = "rebuild")]
         reinstall: bool,
     },
 
@@ -104,11 +104,11 @@ enum Commands {
         jobs: Option<usize>,
 
         /// Evaluasi dan kompilasi ulang seluruh rantai dependensi tanpa memedulikan paket yang sudah terpasang
-        #[arg(short = 'D', long = "deep", alias = "rebuild-deps")]
+        #[arg(short = 'D', long = "deep", alias = "rebuild-deps", alias = "rebuild-all")]
         deep: bool,
 
         /// Paksa kompilasi/instalasi ulang target meskipun versinya sudah terpasang
-        #[arg(long = "reinstall")]
+        #[arg(long = "reinstall", alias = "rebuild")]
         reinstall: bool,
     },
 
