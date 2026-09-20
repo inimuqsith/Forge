@@ -9,9 +9,9 @@
 | Kategori | Total Paket | Status Kesiapan | Deskripsi Ruang Lingkup |
 | :--- | :---: | :---: | :--- |
 | **`recipes/system/`** | 27 | 🟡 Belum Diuji | Toolchain Sistem, Kernel Headers, C Library & Inisialisasi OpenRC |
-| **`recipes/core/`** | 88 | 🟡 Belum Diuji | Utilitas Dasar, CLI Tools, Filesystem, Networking & Service Daemons |
+| **`recipes/core/`** | 89 | 🟡 Belum Diuji | Utilitas Dasar, CLI Tools, Filesystem, Networking & Service Daemons |
 | **`recipes/extra/`** | 113 | 🟡 Belum Diuji | Bahasa Pemrograman, Desktop Environment, Library Grafis, Audio & Qt6/KDE |
-| **TOTAL RESEP RESMI** | **228** | **🟡 227 Resep Terdaftar (Belum Diuji)** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Hardware, Firmware, Audio, Qt6 & KDE Plasma 6)** |
+| **TOTAL RESEP RESMI** | **229** | **🟡 227 Resep Terdaftar (Belum Diuji)** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Hardware, Firmware, Audio, Qt6 & KDE Plasma 6)** |
 
 ---
 
@@ -49,7 +49,7 @@
 
 ---
 
-## 2. Kategori `recipes/core/` (88 Paket — Utilitas Dasar, CLI Tools, Filesystem, Networking & Service Daemons)
+## 2. Kategori `recipes/core/` (89 Paket — Utilitas Dasar, CLI Tools, Filesystem, Networking & Service Daemons)
 
 | Paket | Versi Hulu | Status | Runtime Dependencies | Build Dependencies | Deskripsi |
 | :--- | :---: | :---: | :--- | :--- | :--- |
@@ -66,7 +66,7 @@
 | **`ca-certificates`** | `20260909` | 🟡 Belum Diuji | `glibc`, `openssl` | `python` | Common CA root certificates bundle from Mozilla |
 | **`coreutils`** | `9.12` | 🟡 Belum Diuji | `glibc`, `libcap`, `acl`, `attr` | `make`, `gcc`, `pkgconf` | The basic file, shell and text manipulation utilities of the GNU operating system |
 | **`cronie`** | `1.7.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Standard cron daemon and crontab scheduler |
-| **`curl`** | `8.22.0` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `zstd` | `make`, `gcc`, `pkgconf` | Command line tool and library for transferring data with URLs |
+| **`curl`** | `8.22.0` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `zstd`, `nghttp2` | `make`, `gcc`, `pkgconf` | Command line tool and library for transferring data with URLs |
 | **`dbus`** | `1.16.2` | 🟡 Belum Diuji | `glibc`, `expat`, `libcap-ng`, `eudev` | `gcc`, `meson`, `ninja`, `pkgconf`, `glib2`, `python` | Freedesktop.org message bus system |
 | **`dhcpcd`** | `10.5.2` | 🟡 Belum Diuji | `glibc`, `openssl` | `make`, `gcc`, `pkgconf` | RFC2131 and RFC3315 compliant DHCP/DHCPv6 and IPv4LL dual-stack client |
 | **`diffutils`** | `3.12` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | GNU diff, cmp, diff3 and sdiff programs |
@@ -114,6 +114,7 @@
 | **`nano`** | `9.2` | 🟡 Belum Diuji | `glibc`, `ncurses`, `file` | `make`, `gcc`, `pkgconf` | Pico editor clone with enhancements |
 | **`ncurses`** | `6.5` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | System V Release 4.0 curses emulation library |
 | **`nftables`** | `1.1.7` | 🟡 Belum Diuji | `glibc`, `gmp`, `readline` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | Netfilter userspace packet filtering framework |
+| **`nghttp2`** | `1.70.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `make`, `gcc`, `pkgconf` | HTTP/2 C library and tools |
 | **`openssl`** | `4.1.0-alpha1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `perl` | Robust, commercial-grade TLS/SSL cryptography toolkit |
 | **`pam`** | `1.7.2` | 🟡 Belum Diuji | `glibc` | `gcc`, `make`, `flex`, `bison`, `linux-headers`, `pkgconf` | Pluggable Authentication Modules for Linux |
 | **`parted`** | `3.7` | 🟡 Belum Diuji | `glibc`, `util-linux` | `make`, `gcc`, `pkgconf` | A program for creating, destroying, resizing, checking and copying partitions |
@@ -177,7 +178,7 @@
 | **`freetype`** | `2.14.3` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `libpng` | `meson`, `ninja`, `pkgconf` | Freely available software library to render fonts |
 | **`fzf`** | `0.74.4` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `go` | Command-line fuzzy finder |
 | **`gh`** | `2.101.0` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `make`, `go` | The GitHub CLI |
-| **`git`** | `2.55.0` | 🟡 Belum Diuji | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
+| **`git`** | `2.55.0` | 🟡 Belum Diuji | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2`, `nghttp2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
 | **`glib2`** | `2.90.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `pcre2`, `zlib` | `meson`, `ninja`, `pkgconf`, `gcc` | Core low-level data structure and utility library from GNOME |
 | **`gmp`** | `6.3.0` | 🟡 Belum Diuji | `glibc` | `m4` | GNU Multiple Precision Arithmetic Library |
 | **`go`** | `1.27.1` | 🟡 Belum Diuji | `glibc`, `ca-certificates` | `make`, `gcc`, `bash` | Open source programming language that makes it easy to build simple, fast, and reliable software |

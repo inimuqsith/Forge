@@ -8,7 +8,7 @@ license = "curl"
 upstream = "https://curl.se/"
 
 [dependencies]
-runtime = ["glibc", "openssl", "zlib", "zstd"]
+runtime = ["glibc", "openssl", "zlib", "zstd", "nghttp2"]
 build = ["make", "gcc", "pkgconf"]
 
 [sources]
@@ -23,7 +23,7 @@ sha256 = [
 type = "autotools"
 script = """
 cd "${srcdir}/curl-${pkgver}"
-./configure --prefix=/usr --with-ssl --with-zlib --with-zstd --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
+./configure --prefix=/usr --with-ssl --with-zlib --with-zstd --with-nghttp2 --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 make ${MAKEFLAGS}
 make DESTDIR="${DESTDIR}" install
 """

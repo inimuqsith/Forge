@@ -8,7 +8,7 @@ license = "GPL-2.0-only"
 upstream = "https://git-scm.com/"
 
 [dependencies]
-runtime = ["glibc", "curl", "openssl", "zlib", "expat", "pcre2"]
+runtime = ["glibc", "curl", "openssl", "zlib", "expat", "pcre2", "nghttp2"]
 build = ["make", "gcc", "pkgconf"]
 
 [sources]

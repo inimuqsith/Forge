@@ -343,5 +343,7 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-085** | Spaced Path Manifest Parsing & Bubblewrap Network Sharing for Cargo | ✅ Diterapkan |
 | **ADR-086** | Explicit Readline Shared Library Linking with `--no-as-needed` for Ncurses DT_NEEDED Entry | ✅ Diterapkan |
 | **ADR-087** | Topological Priority Queue & Real-Time Pipelined Transactional Merge in Wavefront Scheduler | ✅ Diterapkan |
+| **ADR-088** | HTTP/2 Library Integration via `nghttp2` for Git HTTPS & Curl Remote Operations | ✅ Diterapkan |
+
 
 

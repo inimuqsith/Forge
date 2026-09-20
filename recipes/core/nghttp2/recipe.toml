@@ -1,0 +1,29 @@
+[package]
+name = "nghttp2"
+version = "1.70.0"
+release = 1
+slot = "0"
+description = "HTTP/2 C library and tools"
+license = "MIT"
+upstream = "https://nghttp2.org/"
+
+[dependencies]
+runtime = ["glibc", "zlib"]
+build = ["make", "gcc", "pkgconf"]
+
+[sources]
+urls = [
+    "https://github.com/nghttp2/nghttp2/releases/download/v1.70.0/nghttp2-1.70.0.tar.xz"
+]
+sha256 = [
+    "e05cb1388eaca3830aded4ccf20044b6e1ac1a61411dcca11b0437c4285c8bc2"
+]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/nghttp2-${pkgver}"
+./configure --prefix=/usr --disable-static --enable-lib-only
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""
