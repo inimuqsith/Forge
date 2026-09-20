@@ -496,6 +496,11 @@ impl RecipeBuilder {
             env_vars.insert("pkgname".to_string(), pkg_name.clone());
             env_vars.insert("pkgver".to_string(), pkg_ver.clone());
 
+            // Isolasi otomatis CARGO_HOME ke ${srcdir}/.cargo_home untuk seluruh paket berbasis Rust/Cargo (ADR-083)
+            let cargo_home = build_root.join(".cargo_home");
+            let _ = fs::create_dir_all(&cargo_home);
+            env_vars.insert("CARGO_HOME".to_string(), cargo_home.display().to_string());
+
             let runner = crate::sandbox::SandboxRunner::new();
             if runner.is_bwrap_available() {
                 println!("  [🛡️] Sandbox Bubblewrap aktif (--ro-bind / /, namespace terisolasi)");
