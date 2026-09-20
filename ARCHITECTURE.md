@@ -336,3 +336,4 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-078** | Elimination of Redundant LLVM `libunwind` Runtime in GNU Toolchain | ✅ Diterapkan |
 | **ADR-079** | C-Dependency Crate LTO Sanitization for In-Tree Cargo Package Builds | ✅ Diterapkan |
 | **ADR-080** | Smart Staging Cache Reuse & Idempotent Resumption in Wavefront Scheduler | ✅ Diterapkan |
+| **ADR-081** | Deterministic Staging Completion Markers, Partial Cleanup on Build Error & Atomic Merger Hardening | ✅ Diterapkan |

@@ -512,6 +512,9 @@ impl RecipeBuilder {
 
         Self::sanitize_staging_dir(destdir);
 
+        // Tulis penanda integritas staging 100% sukses (ADR-081)
+        let _ = fs::write(destdir.join(".forge_staging_complete"), b"OK");
+
         println!("  [✓] Kompilasi & staging {} berhasil di {:?}", pkg_name, destdir);
         Ok(destdir.to_path_buf())
     }

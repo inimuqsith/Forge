@@ -294,9 +294,9 @@ impl WavefrontScheduler {
                                 .join("stage")
                                 .join(format!("{}-{}", node_clone.id.name, node_clone.version));
 
-                            // 1. Periksa apakah paket sudah sukses di-stage sebelumnya dan berisi berkas
-                            let is_already_staged = staging_dir.exists()
-                                && staging_dir.read_dir().map(|mut entries| entries.next().is_some()).unwrap_or(false);
+                            // 1. Periksa apakah paket sudah sukses di-stage sebelumnya (via marker .forge_staging_complete atau non-empty dir)
+                            let is_already_staged = staging_dir.join(".forge_staging_complete").exists()
+                                || (staging_dir.exists() && staging_dir.read_dir().map(|mut entries| entries.next().is_some()).unwrap_or(false));
 
                             // 2. Jika sudah ada di staging dan tidak dipaksa rebuild, langsung gunakan hasil staging
                             if is_already_staged && !force_rebuild {
@@ -339,6 +339,10 @@ impl WavefrontScheduler {
                                     });
                                 }
                                 Err(e) => {
+                                    // Bersihkan staging parsial yang gagal agar tidak terdeteksi sebagai staging valid pada run berikutnya (ADR-081)
+                                    if staging_dir.exists() {
+                                        let _ = std::fs::remove_dir_all(&staging_dir);
+                                    }
                                     let _ = tx_clone.send(TaskEvent::Failed {
                                         worker_id,
                                         package_id: node_clone.id.clone(),
@@ -1078,6 +1082,64 @@ exit 1
 
         // Bersihkan direktori staging tes
         let _ = fs::remove_dir_all(&staging_dir);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_wavefront_failed_build_cleans_staging_directory() -> Result<()> {
+        let temp = tempfile::tempdir()?;
+        let target_root = temp.path().join("rootfs");
+        fs::create_dir_all(&target_root)?;
+
+        let mut config = ForgeConfig::default();
+        config.general.db_path = temp.path().join("installed.db").to_str().unwrap().to_string();
+        let db = InstalledDatabase::new(temp.path().join("installed.db"));
+
+        let staging_dir = std::env::temp_dir()
+            .join("forge")
+            .join("stage")
+            .join("fail-pkg-1.0.0");
+        let _ = fs::remove_dir_all(&staging_dir);
+
+        let recipe = temp.path().join("fail_pkg.toml");
+        fs::write(
+            &recipe,
+            r#"
+[package]
+name = "fail-pkg"
+version = "1.0.0"
+
+[build]
+type = "shell"
+script = """
+mkdir -p "${DESTDIR}/usr/bin"
+echo partial > "${DESTDIR}/usr/bin/partial-file"
+exit 1
+"""
+"#,
+        )?;
+
+        let mut graph = DependencyGraph::new();
+        let node = PackageNode {
+            id: PackageId::new("fail-pkg", "0"),
+            version: "1.0.0".to_string(),
+            release: 1,
+            description: "Fail pkg".to_string(),
+            recipe_path: recipe,
+            is_meta: false,
+            active_use_flags: HashSet::new(),
+            is_installed: false,
+            installed_version: None,
+        };
+        graph.add_node(node);
+        let plan = graph.topological_sort("fail-pkg")?;
+
+        let scheduler = WavefrontScheduler::with_options(config, Some(1), false, false);
+        let res = scheduler.execute(&graph, &plan, &target_root, &db);
+
+        assert!(res.is_err(), "Eksekusi build yang gagal harus mengembalikan Err");
+        assert!(!staging_dir.exists(), "Direktori staging parsial harus dibersihkan total saat build gagal");
 
         Ok(())
     }

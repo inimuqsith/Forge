@@ -231,6 +231,8 @@ impl MergeTransaction {
             || clean == ".BUILDINFO"
             || clean == ".MTREE"
             || clean == ".INSTALL"
+            || clean == ".forge_staging_complete"
+            || clean.ends_with("/.forge_staging_complete")
     }
 
     /// Melakukan Pre-flight Collision Scan terhadap InstalledDatabase
@@ -355,14 +357,13 @@ impl MergeTransaction {
                         }
                     }
 
-                    // Penulisan atomik: Tulis ke temp file lalu rename
-                    if let Some(parent) = target_path.parent() {
-                        if !parent.exists() {
-                            let _ = fs::create_dir_all(parent);
-                        }
+                    let parent = target_path.parent().unwrap_or(&self.target_root);
+                    if !parent.exists() {
+                        let _ = fs::create_dir_all(parent);
                     }
 
-                    let tmp_target = target_path.with_extension(format!("forge_tmp.{}", self.id));
+                    let file_name = target_path.file_name().and_then(|n| n.to_str()).unwrap_or("tmp");
+                    let tmp_target = parent.join(format!(".{}.forge_tmp.{}", file_name, self.id));
                     if let Err(e) = fs::copy(&staged_source, &tmp_target) {
                         let _ = self.rollback();
                         return Err(e).context(format!("Gagal copy ke temporary target {:?}", tmp_target));
@@ -388,13 +389,12 @@ impl MergeTransaction {
                 }
                 FileType::Symlink => {
                     if let Some(ref sym_target) = entry.symlink_target {
-                        if let Some(parent) = target_path.parent() {
-                            if !parent.exists() {
-                                let _ = fs::create_dir_all(parent);
-                            }
+                        let parent = target_path.parent().unwrap_or(&self.target_root);
+                        if !parent.exists() {
+                            let _ = fs::create_dir_all(parent);
                         }
 
-                        if target_path.exists() || target_path.is_symlink() {
+                        if fs::symlink_metadata(&target_path).is_ok() {
                             let _ = fs::remove_file(&target_path);
                         }
 
