@@ -330,3 +330,4 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-072** | Pip-less Standard `setup.py` Bootstrapping for Meson Build Engine | ✅ Diterapkan |
 | **ADR-073** | Target CFLAGS Sanitization for GCC Runtime Libraries (`-flto=auto`) | ✅ Diterapkan |
 | **ADR-074** | Automated Pre-Build Workspace Sanitization (`/tmp/forge/build/`) | ✅ Diterapkan |
+| **ADR-075** | Exclusion of LTO in GCC Target Runtime Libraries (`-fno-lto` for `libgcc`) | ✅ Diterapkan |

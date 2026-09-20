@@ -277,6 +277,7 @@
 72. **ADR-072 (Pip-less Standard `setup.py` Bootstrapping for Meson Build Engine):** Mengalihkan proses instalasi resep `recipes/system/meson/recipe.toml` dari `python -m pip install` ke skrip standar `python setup.py build` dan `python setup.py install --root="${DESTDIR}" --prefix=/usr --optimize=1`, mengeliminasi ketergantungan modul eksternal `pip` pada sistem host saat kompilasi sandbox bootstrap.
 73. **ADR-073 (Target CFLAGS Sanitization for GCC Runtime Libraries):** Menyelaraskan flag kompilasi target pada `recipes/system/gcc/recipe.toml` dengan mendefinisikan `CFLAGS_FOR_TARGET` dan `CXXFLAGS_FOR_TARGET` yang mengubah `-flto=thin` (eksklusif Clang/LLVM) menjadi `-flto=auto` (standar GCC LTO) agar kompilator internal `xgcc` berhasil mengompilasi runtime internal `libgcc`, `libatomic`, dan `libstdc++`.
 74. **ADR-074 (Automated Pre-Build Workspace Sanitization):** Menerapkan pembersihan otomatis direktori build `/tmp/forge/build/{pkg}-{ver}/` pada awal eksekusi `RecipeBuilder::build` (`builder.rs`) sebelum ekstraksi sumber dilakukan, memastikan tidak ada berkas kotor, cache configure yang rusak, atau artefak sisa dari kompilasi sebelumnya yang gagal tanpa memerlukan intervensi manual dari pengguna.
+75. **ADR-075 (Exclusion of LTO in GCC Target Runtime Libraries):** Menghapus seluruh flag LTO (`-flto`, `-flto=auto`, `-flto=thin`) dan menyuntikkan `-fno-lto` pada `CFLAGS_FOR_TARGET` dan `CXXFLAGS_FOR_TARGET` di `recipes/system/gcc/recipe.toml` guna mencegah konflik *symbol versioning* (`.symver`) pada pustaka tingkat rendah Linux ABI (`libgcc_s.so`, `libatomic`, `libstdc++`).
 
 ---
 
@@ -333,6 +334,7 @@
 | *2026-09-20* | *Meson Pip-less Bootstrap Failure* | *Perintah `python -m pip install` gagal di sandbox karena Python host belum memiliki pip* | *Mengalihkan script resep meson ke `python setup.py build` dan `python setup.py install --root="${DESTDIR}" --prefix=/usr --optimize=1` (ADR-072)* |
 | *2026-09-20* | *GCC libgcc -flto=thin Target Syntax Collision* | *Internal GCC compiler (xgcc/cc1) menolak `-flto=thin` saat mengompilasi libgcc/libstdc++* | *Mendefinisikan `CFLAGS_FOR_TARGET` & `CXXFLAGS_FOR_TARGET` yang mengubah `-flto=thin` menjadi `-flto=auto` di resep GCC (ADR-073)* |
 | *2026-09-20* | *Dirty Build Directory Collision* | *Sisa konfigurasi dan berkas setengah jadi dari build yang gagal sebelumnya tertinggal di /tmp/forge/build/* | *Menambahkan sanitasi pre-build otomatis di `RecipeBuilder::build` untuk menghapus `build_root` lama sebelum ekstraksi (ADR-074)* |
+| *2026-09-20* | *GCC libgcc_s.so LTO Symbol Versioning Conflict* | *LTO code generator meregenerasi simbol .symver pada libgcc_s.so sehingga memicu konflik ganda di gas assembler* | *Mengecualikan seluruh opsi LTO dan menyuntikkan `-fno-lto` pada `CFLAGS_FOR_TARGET` & `CXXFLAGS_FOR_TARGET` di resep GCC (ADR-075)* |
 
 ---
 

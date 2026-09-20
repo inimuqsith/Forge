@@ -22,8 +22,8 @@ sha256 = ["e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e"]
 type = "autotools"
 script = """
 mkdir -p build && cd build
-export CFLAGS_FOR_TARGET="$(echo \"${CFLAGS}\" | sed 's/-flto=thin/-flto=auto/g')"
-export CXXFLAGS_FOR_TARGET="${CFLAGS_FOR_TARGET}"
+export CFLAGS_FOR_TARGET="$(echo \"${CFLAGS}\" | sed -E 's/-flto(=[^ ]*)?//g') -fno-lto"
+export CXXFLAGS_FOR_TARGET="$(echo \"${CXXFLAGS}\" | sed -E 's/-flto(=[^ ]*)?//g') -fno-lto"
 ../gcc-${pkgver}/configure --prefix=/usr --libdir=/usr/lib --libexecdir=/usr/lib --enable-languages=c,c++ --enable-default-pie --enable-default-ssp --disable-multilib --disable-bootstrap --disable-werror --with-system-zlib
 make ${MAKEFLAGS} CFLAGS_FOR_TARGET="${CFLAGS_FOR_TARGET}" CXXFLAGS_FOR_TARGET="${CXXFLAGS_FOR_TARGET}"
 make DESTDIR="${DESTDIR}" install
