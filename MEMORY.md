@@ -278,6 +278,7 @@
 73. **ADR-073 (Target CFLAGS Sanitization for GCC Runtime Libraries):** Menyelaraskan flag kompilasi target pada `recipes/system/gcc/recipe.toml` dengan mendefinisikan `CFLAGS_FOR_TARGET` dan `CXXFLAGS_FOR_TARGET` yang mengubah `-flto=thin` (eksklusif Clang/LLVM) menjadi `-flto=auto` (standar GCC LTO) agar kompilator internal `xgcc` berhasil mengompilasi runtime internal `libgcc`, `libatomic`, dan `libstdc++`.
 74. **ADR-074 (Automated Pre-Build Workspace Sanitization):** Menerapkan pembersihan otomatis direktori build `/tmp/forge/build/{pkg}-{ver}/` pada awal eksekusi `RecipeBuilder::build` (`builder.rs`) sebelum ekstraksi sumber dilakukan, memastikan tidak ada berkas kotor, cache configure yang rusak, atau artefak sisa dari kompilasi sebelumnya yang gagal tanpa memerlukan intervensi manual dari pengguna.
 75. **ADR-075 (Exclusion of LTO in GCC Target Runtime Libraries):** Menghapus seluruh flag LTO (`-flto`, `-flto=auto`, `-flto=thin`) dan menyuntikkan `-fno-lto` pada `CFLAGS_FOR_TARGET` dan `CXXFLAGS_FOR_TARGET` di `recipes/system/gcc/recipe.toml` guna mencegah konflik *symbol versioning* (`.symver`) pada pustaka tingkat rendah Linux ABI (`libgcc_s.so`, `libatomic`, `libstdc++`).
+76. **ADR-076 (Obsolete Meson Option Removal for Bubblewrap v0.12.0):** Menghapus argumen usang `-Drequire_userns=true` dari pemanggilan `meson setup` di `recipes/core/bubblewrap/recipe.toml` karena implementasi user namespace telah dijadikan bawaan paten secara internal oleh upstream Bubblewrap.
 
 ---
 
@@ -335,6 +336,7 @@
 | *2026-09-20* | *GCC libgcc -flto=thin Target Syntax Collision* | *Internal GCC compiler (xgcc/cc1) menolak `-flto=thin` saat mengompilasi libgcc/libstdc++* | *Mendefinisikan `CFLAGS_FOR_TARGET` & `CXXFLAGS_FOR_TARGET` yang mengubah `-flto=thin` menjadi `-flto=auto` di resep GCC (ADR-073)* |
 | *2026-09-20* | *Dirty Build Directory Collision* | *Sisa konfigurasi dan berkas setengah jadi dari build yang gagal sebelumnya tertinggal di /tmp/forge/build/* | *Menambahkan sanitasi pre-build otomatis di `RecipeBuilder::build` untuk menghapus `build_root` lama sebelum ekstraksi (ADR-074)* |
 | *2026-09-20* | *GCC libgcc_s.so LTO Symbol Versioning Conflict* | *LTO code generator meregenerasi simbol .symver pada libgcc_s.so sehingga memicu konflik ganda di gas assembler* | *Mengecualikan seluruh opsi LTO dan menyuntikkan `-fno-lto` pada `CFLAGS_FOR_TARGET` & `CXXFLAGS_FOR_TARGET` di resep GCC (ADR-075)* |
+| *2026-09-20* | *Bubblewrap Obsolete Meson Option Error* | *Meson setup gagal karena opsi `-Drequire_userns=true` telah dihapus di upstream Bubblewrap v0.12.0* | *Menghapus `-Drequire_userns=true` dari `recipes/core/bubblewrap/recipe.toml` (ADR-076)* |
 
 ---
 

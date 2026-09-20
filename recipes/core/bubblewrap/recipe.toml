@@ -23,7 +23,7 @@ sha256 = [
 type = "meson"
 script = """
 cd "${srcdir}/bubblewrap-${pkgver}"
-meson setup build --prefix=/usr --buildtype=release -Dman=disabled -Drequire_userns=true
+meson setup build --prefix=/usr --buildtype=release -Dman=disabled
 ninja -C build ${MAKEFLAGS}
 DESTDIR="${DESTDIR}" ninja -C build install
 """

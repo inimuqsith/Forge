@@ -331,3 +331,4 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-073** | Target CFLAGS Sanitization for GCC Runtime Libraries (`-flto=auto`) | ✅ Diterapkan |
 | **ADR-074** | Automated Pre-Build Workspace Sanitization (`/tmp/forge/build/`) | ✅ Diterapkan |
 | **ADR-075** | Exclusion of LTO in GCC Target Runtime Libraries (`-fno-lto` for `libgcc`) | ✅ Diterapkan |
+| **ADR-076** | Obsolete Meson Option Removal for Bubblewrap v0.12.0 (`require_userns`) | ✅ Diterapkan |
