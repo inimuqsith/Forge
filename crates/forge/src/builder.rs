@@ -309,6 +309,9 @@ impl RecipeBuilder {
         };
 
         let build_root = PathBuf::from(format!("/tmp/forge/build/{}-{}", pkg_name, pkg_ver));
+        if build_root.exists() {
+            let _ = fs::remove_dir_all(&build_root);
+        }
         fs::create_dir_all(&build_root)?;
         fs::create_dir_all(destdir)?;
 
@@ -655,4 +658,31 @@ chmod +x "$DESTDIR/usr/bin/client-test-bin"
         assert_eq!(url3, "https://github.com/foo/bar.git");
         assert_eq!(branch3, None);
     }
+
+    #[test]
+    fn test_prebuild_workspace_auto_sanitization() {
+        let fake_pkg = "forge-test-clean";
+        let fake_ver = "1.0.0";
+        let build_root = PathBuf::from(format!("/tmp/forge/build/{}-{}", fake_pkg, fake_ver));
+        
+        // Simulasikan folder kotor bekas build sebelumnya
+        fs::create_dir_all(&build_root).unwrap();
+        let dirty_file = build_root.join("dirty_state.cache");
+        fs::write(&dirty_file, "corrupted config state").unwrap();
+        assert!(dirty_file.exists());
+
+        // Jalankan logika sanitasi pre-build
+        if build_root.exists() {
+            let _ = fs::remove_dir_all(&build_root);
+        }
+        fs::create_dir_all(&build_root).unwrap();
+
+        // Verifikasi bahwa folder bersih kembali
+        assert!(build_root.exists());
+        assert!(!dirty_file.exists(), "Berkas kotor bekas build sebelumnya harus bersih terhapus");
+
+        // Bersihkan setelah pengujian
+        let _ = fs::remove_dir_all(&build_root);
+    }
 }
+

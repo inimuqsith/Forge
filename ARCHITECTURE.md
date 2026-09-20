@@ -329,3 +329,4 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-071** | Non-Archive Raw Source File Handling, Dynamic USE Env Injection, & SSOT Matrix Accuracy | ✅ Diterapkan |
 | **ADR-072** | Pip-less Standard `setup.py` Bootstrapping for Meson Build Engine | ✅ Diterapkan |
 | **ADR-073** | Target CFLAGS Sanitization for GCC Runtime Libraries (`-flto=auto`) | ✅ Diterapkan |
+| **ADR-074** | Automated Pre-Build Workspace Sanitization (`/tmp/forge/build/`) | ✅ Diterapkan |
