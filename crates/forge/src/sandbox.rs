@@ -289,6 +289,7 @@ impl SandboxRunner {
             "--dev".to_string(),
             "/dev".to_string(),
             "--unshare-all".to_string(),
+            "--share-net".to_string(),
             "--cap-drop".to_string(),
             "ALL".to_string(),
             "--die-with-parent".to_string(),
@@ -549,6 +550,7 @@ pub mod tests {
 
         // 3. Validasi isolasi kernel namespace & proc/dev
         assert!(args.contains(&"--unshare-all".to_string()));
+        assert!(args.contains(&"--share-net".to_string()));
         assert!(args.contains(&"--die-with-parent".to_string()));
         assert!(args.contains(&"--proc".to_string()));
         assert!(args.contains(&"--dev".to_string()));

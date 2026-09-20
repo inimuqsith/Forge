@@ -340,4 +340,5 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-082** | Hermetic Offline Stage0 Bootstrapping for Rust Toolchain | ✅ Diterapkan |
 | **ADR-083** | Unified Monolithic LLVM Toolchain Consolidation & Clang Meta-Package Alias | ✅ Diterapkan |
 | **ADR-084** | O(1) In-Memory Pre-Flight Collision Indexing & Shared System Cargo Cache | ✅ Diterapkan |
+| **ADR-085** | Spaced Path Manifest Parsing & Bubblewrap Network Sharing for Cargo | ✅ Diterapkan |
 

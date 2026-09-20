@@ -347,6 +347,7 @@
 | *2026-09-20* | *Rust Hermetic Offline Stage0 Bootstrap* | *Skrip `x.py` gagal mengunduh stage0 di sandbox Bubblewrap terisolasi tanpa internet* | *Mendeklarasikan tarball stage0 (`1.97.1`) di `sources.urls` dan mengarahkan `config.toml` ke `${srcdir}/stage0` tanpa ketergantungan host (ADR-082)* |
 | *2026-09-21* | *LLVM vs Clang Merger Collision* | *Paket monolitik llvm (3.4GB) dan paket terpisah clang sama-sama memasang /usr/bin/clang sehingga ditolak pre-flight collision detector* | *Mengubah resep `clang` menjadi meta-package alias (`runtime = ["llvm"]`, `type = "meta"`), membersihkan dependensi redundant `clang` pada seluruh resep sistem & extra, dan meregenerasi matriks SSOT (ADR-083)* |
 | *2026-09-21* | *Collision Scan Bottleneck & Cargo Caching* | *Preflight collision scan memindai ulang disk per-file O(N x M) memakan ~2 menit pada paket besar, dan crate Rust diunduh ulang di setiap paket* | *Menerapkan O(1) in-memory ownership index di `db.rs` & `merger.rs` serta menginjeksi shared system `CARGO_HOME` dengan writable sandbox bind mount (ADR-084)* |
+| *2026-09-21* | *Spaced Path Manifest & Cargo Network Isolation* | *Nama berkas dengan spasi (CMake generator docs) menggagalkan parsing manifest database sehingga memicu rebuild terus-menerus, dan Cargo butuh akses jaringan* | *Memperbaiki `ManifestEntry::parse_line` untuk mendukung path berspasi via reverse token parsing dan menambahkan `--share-net` pada Bubblewrap sandbox runner (ADR-085)* |
 
 
 ---

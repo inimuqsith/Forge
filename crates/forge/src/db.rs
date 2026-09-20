@@ -79,7 +79,7 @@ impl ManifestEntry {
         }
     }
 
-    /// Parse baris teks manifest ke `ManifestEntry`
+    /// Parse baris teks manifest ke `ManifestEntry` (dengan dukungan path berspasi, ADR-085)
     pub fn parse_line(line: &str) -> Result<ManifestEntry> {
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.is_empty() {
@@ -90,19 +90,24 @@ impl ManifestEntry {
             .parse::<ManifestEntryType>()
             .with_context(|| format!("Tipe entri manifest tidak valid pada baris: {}", line))?;
 
+        let n = parts.len();
         match entry_type {
             ManifestEntryType::Obj => {
-                if parts.len() < 5 {
+                if n < 5 {
                     bail!("Format baris obj tidak lengkap: {}", line);
                 }
-                let path = PathBuf::from(parts[1]);
-                let size: u64 = parts[2].parse().context("Gagal parse size berkas")?;
-                let mtime: u64 = parts[3].parse().context("Gagal parse mtime berkas")?;
-                let sha256 = if parts[4] == "-" { None } else { Some(parts[4].to_string()) };
+                let sha_str = parts[n - 1];
+                let mtime_str = parts[n - 2];
+                let size_str = parts[n - 3];
+                let path_str = parts[1..n - 3].join(" ");
+
+                let size: u64 = size_str.parse().context("Gagal parse size berkas")?;
+                let mtime: u64 = mtime_str.parse().context("Gagal parse mtime berkas")?;
+                let sha256 = if sha_str == "-" { None } else { Some(sha_str.to_string()) };
 
                 Ok(ManifestEntry {
                     entry_type,
-                    path,
+                    path: PathBuf::from(path_str),
                     size,
                     mtime,
                     sha256,
@@ -110,17 +115,21 @@ impl ManifestEntry {
                 })
             }
             ManifestEntryType::Sym => {
-                if parts.len() < 5 {
+                if n < 5 {
                     bail!("Format baris symlink tidak lengkap: {}", line);
                 }
-                let path = PathBuf::from(parts[1]);
-                let target = PathBuf::from(parts[2]);
-                let size: u64 = parts[3].parse().context("Gagal parse size symlink")?;
-                let mtime: u64 = parts[4].parse().context("Gagal parse mtime symlink")?;
+                let mtime_str = parts[n - 1];
+                let size_str = parts[n - 2];
+                let target_str = parts[n - 3];
+                let path_str = parts[1..n - 3].join(" ");
+
+                let size: u64 = size_str.parse().context("Gagal parse size symlink")?;
+                let mtime: u64 = mtime_str.parse().context("Gagal parse mtime symlink")?;
+                let target = PathBuf::from(target_str);
 
                 Ok(ManifestEntry {
                     entry_type,
-                    path,
+                    path: PathBuf::from(path_str),
                     size,
                     mtime,
                     sha256: None,
@@ -128,16 +137,19 @@ impl ManifestEntry {
                 })
             }
             ManifestEntryType::Dir => {
-                if parts.len() < 4 {
+                if n < 4 {
                     bail!("Format baris dir tidak lengkap: {}", line);
                 }
-                let path = PathBuf::from(parts[1]);
-                let size: u64 = parts[2].parse().context("Gagal parse size dir")?;
-                let mtime: u64 = parts[3].parse().context("Gagal parse mtime dir")?;
+                let mtime_str = parts[n - 1];
+                let size_str = parts[n - 2];
+                let path_str = parts[1..n - 2].join(" ");
+
+                let size: u64 = size_str.parse().context("Gagal parse size dir")?;
+                let mtime: u64 = mtime_str.parse().context("Gagal parse mtime dir")?;
 
                 Ok(ManifestEntry {
                     entry_type,
-                    path,
+                    path: PathBuf::from(path_str),
                     size,
                     mtime,
                     sha256: None,
@@ -628,6 +640,47 @@ mod tests {
         assert_eq!(dir_line, "dir /etc/forge 0 1773948201");
         let dir_parsed = ManifestEntry::parse_line(&dir_line).unwrap();
         assert_eq!(dir_parsed, dir_entry);
+    }
+
+    #[test]
+    fn test_manifest_entry_parsing_with_spaces() {
+        // Test obj with spaces in path (e.g. CMake generator docs)
+        let obj_line = "obj /usr/share/cmake-4.3/Help/generator/Visual Studio 10 2010.rst 446 1789927229 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+        let obj_parsed = ManifestEntry::parse_line(obj_line).unwrap();
+        assert_eq!(obj_parsed.entry_type, ManifestEntryType::Obj);
+        assert_eq!(
+            obj_parsed.path,
+            PathBuf::from("/usr/share/cmake-4.3/Help/generator/Visual Studio 10 2010.rst")
+        );
+        assert_eq!(obj_parsed.size, 446);
+        assert_eq!(obj_parsed.mtime, 1789927229);
+        assert_eq!(
+            obj_parsed.sha256,
+            Some("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string())
+        );
+
+        // Test symlink with spaces in path
+        let sym_line = "sym /usr/share/my docs/link to target.rst ../target.rst 0 1789927229";
+        let sym_parsed = ManifestEntry::parse_line(sym_line).unwrap();
+        assert_eq!(sym_parsed.entry_type, ManifestEntryType::Sym);
+        assert_eq!(
+            sym_parsed.path,
+            PathBuf::from("/usr/share/my docs/link to target.rst")
+        );
+        assert_eq!(sym_parsed.symlink_target, Some(PathBuf::from("../target.rst")));
+        assert_eq!(sym_parsed.size, 0);
+        assert_eq!(sym_parsed.mtime, 1789927229);
+
+        // Test dir with spaces in path
+        let dir_line = "dir /usr/share/my docs/sub folder 0 1789927229";
+        let dir_parsed = ManifestEntry::parse_line(dir_line).unwrap();
+        assert_eq!(dir_parsed.entry_type, ManifestEntryType::Dir);
+        assert_eq!(
+            dir_parsed.path,
+            PathBuf::from("/usr/share/my docs/sub folder")
+        );
+        assert_eq!(dir_parsed.size, 0);
+        assert_eq!(dir_parsed.mtime, 1789927229);
     }
 
     #[test]
