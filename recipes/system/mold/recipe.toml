@@ -1,7 +1,7 @@
 [package]
 name = "mold"
 version = "2.42.1"
-release = 2
+release = 3
 slot = "0"
 description = "High-performance modern linker (Latest 2.42.1)"
 license = "MIT"
@@ -21,7 +21,7 @@ sha256 = ["0580221bfdad7148ceeafd0ad3c1c7b3ca9e66b45950405230cc3f81a205c816"]
 type = "cmake"
 script = """
 cd "${srcdir}/mold-${pkgver}"
-cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DMOLD_USE_SYSTEM_MIMALLOC=OFF -DMOLD_USE_SYSTEM_TBB=OFF -DMOLD_USE_SYSTEM_BLAKE3=OFF
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DMOLD_USE_SYSTEM_MIMALLOC=OFF -DMOLD_USE_SYSTEM_TBB=OFF -DCMAKE_DISABLE_FIND_PACKAGE_BLAKE3=ON
 cmake --build build ${MAKEFLAGS}
 DESTDIR="${DESTDIR}" cmake --install build
 """

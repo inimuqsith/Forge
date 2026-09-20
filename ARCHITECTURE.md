@@ -347,6 +347,7 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-089** | Integration of Compilation Toolchain into `forge` Runtime Dependencies & Elimination of `base-devel` Meta-Package | ✅ Diterapkan |
 | **ADR-090** | Complete Decompression Suite (`gzip`, `bzip2`, `xz`, `zstd`, `tar`) Integration into `forge` Runtime Dependencies | ✅ Diterapkan |
 | **ADR-091** | Hermetic In-Tree BLAKE3 Bundling for Mold Linker via `-DMOLD_USE_SYSTEM_BLAKE3=OFF` | ✅ Diterapkan |
+| **ADR-092** | Force In-Tree Bundled BLAKE3 for Mold Linker via `-DCMAKE_DISABLE_FIND_PACKAGE_BLAKE3=ON` | ✅ Diterapkan |
 
 
 
