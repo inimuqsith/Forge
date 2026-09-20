@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from maintainer import (
     MaintainerCatalog, DagSolver, DependencyTreeVisualizer,
     CuratedEcosystemHub, RecipeInspector, RecipeLinter,
-    UpstreamSearchEngine, SourceVerifier, SgotMatrixGenerator,
+    UpstreamSearchEngine, SourceVerifier, SsotMatrixGenerator,
     RecipeAuditor, RecipeBumper,
     BOOTSTRAP_TOOLCHAIN
 )
@@ -61,7 +61,7 @@ def interactive_menu():
     linter = RecipeLinter(catalog)
     searcher = UpstreamSearchEngine(catalog)
     verifier = SourceVerifier(catalog)
-    matrix_gen = SgotMatrixGenerator(catalog)
+    matrix_gen = SsotMatrixGenerator(catalog)
     auditor = RecipeAuditor(catalog)
     bumper = RecipeBumper(catalog)
 
@@ -291,7 +291,7 @@ def main():
         return
 
     if args.matrix:
-        matrix_gen = SgotMatrixGenerator(catalog)
+        matrix_gen = SsotMatrixGenerator(catalog)
         matrix_gen.regenerate_ssot_matrix()
         return
 

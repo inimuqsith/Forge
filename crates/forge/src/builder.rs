@@ -385,15 +385,29 @@ impl RecipeBuilder {
                         }
                     }
 
-                    // Ekstrak ke build directory jika arsip ada
+                    // Ekstrak ke build directory jika arsip atau salin langsung jika berkas non-arsip
                     if target_file.exists() {
-                        println!("  [📦] Mengekstrak sumber ke {:?}", build_root);
-                        let _ = Command::new("tar")
-                            .arg("-xf")
-                            .arg(&target_file)
-                            .arg("-C")
-                            .arg(&build_root)
-                            .status();
+                        let is_archive = filename.ends_with(".tar.gz")
+                            || filename.ends_with(".tar.xz")
+                            || filename.ends_with(".tar.zst")
+                            || filename.ends_with(".tar.bz2")
+                            || filename.ends_with(".tgz")
+                            || filename.ends_with(".tbz2")
+                            || filename.ends_with(".txz");
+
+                        if is_archive {
+                            println!("  [📦] Mengekstrak sumber ke {:?}", build_root);
+                            let _ = Command::new("tar")
+                                .arg("-xf")
+                                .arg(&target_file)
+                                .arg("-C")
+                                .arg(&build_root)
+                                .status();
+                        } else {
+                            println!("  [📦] Menyalin sumber non-arsip ({}) ke {:?}", filename, build_root);
+                            let dest_file = build_root.join(filename);
+                            let _ = fs::copy(&target_file, &dest_file);
+                        }
                     }
                 }
             }
@@ -464,6 +478,8 @@ impl RecipeBuilder {
             env_vars.insert("CC".to_string(), cc.clone());
             env_vars.insert("CXX".to_string(), cxx.clone());
             env_vars.insert("LD".to_string(), ld.clone());
+            env_vars.insert("USE".to_string(), config.use_flags.flags.clone());
+            env_vars.insert("USE_FLAGS".to_string(), config.use_flags.flags.clone());
             env_vars.insert("CCACHE_DIR".to_string(), ccache_dir.display().to_string());
             env_vars.insert("CFLAGS".to_string(), cflags.clone());
             env_vars.insert("CXXFLAGS".to_string(), cxxflags.clone());

@@ -7,7 +7,7 @@ from collections import defaultdict
 from .catalog import MaintainerCatalog, CATEGORIES, CATEGORY_DESCS, PACKAGE_STATUS_FILE
 
 
-class SgotMatrixGenerator:
+class SsotMatrixGenerator:
     def __init__(self, catalog: MaintainerCatalog):
         self.catalog = catalog
 
@@ -27,9 +27,9 @@ class SgotMatrixGenerator:
 
         for cat in CATEGORIES:
             count = len(cat_data[cat])
-            lines.append(f"| **`recipes/{cat}/`** | {count} | ✅ 100% Verified | {CATEGORY_DESCS.get(cat, '')} |")
+            lines.append(f"| **`recipes/{cat}/`** | {count} | 🟡 Belum Diuji | {CATEGORY_DESCS.get(cat, '')} |")
 
-        lines.append(f"| **TOTAL RESEP RESMI** | **{total_count}** | **✅ 100% Audited** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Hardware, Firmware, Audio, Qt6 & KDE Plasma 6)** |\n")
+        lines.append(f"| **TOTAL RESEP RESMI** | **{total_count}** | **🟡 227 Resep Terdaftar (Belum Diuji)** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Hardware, Firmware, Audio, Qt6 & KDE Plasma 6)** |\n")
         lines.append("---\n")
 
         section_num = 1
@@ -41,10 +41,10 @@ class SgotMatrixGenerator:
             for p in pkgs:
                 r_str = ", ".join(f"`{d}`" for d in p.raw_runtime_deps) if p.raw_runtime_deps else "-"
                 b_str = ", ".join(f"`{d}`" for d in p.raw_build_deps) if p.raw_build_deps else "-"
-                lines.append(f"| **`{p.name}`** | `{p.version}` | ✅ Verified | {r_str} | {b_str} | {p.description} |")
+                lines.append(f"| **`{p.name}`** | `{p.version}` | 🟡 Belum Diuji | {r_str} | {b_str} | {p.description} |")
             lines.append("\n---\n")
             section_num += 1
 
         content = "\n".join(lines).strip() + "\n"
         PACKAGE_STATUS_FILE.write_text(content, encoding="utf-8")
-        print(f"✓ Berhasil meregenerasi {PACKAGE_STATUS_FILE} ({total_count} paket terdaftar).")
+        print(f"✓ Berhasil meregenerasi {PACKAGE_STATUS_FILE} ({total_count} paket terdaftar, status: Belum Diuji).")

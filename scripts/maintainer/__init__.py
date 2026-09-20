@@ -10,7 +10,7 @@ from .inspector import RecipeInspector
 from .linter import RecipeLinter
 from .search import UpstreamSearchEngine
 from .sources import SourceVerifier
-from .matrix import SgotMatrixGenerator
+from .matrix import SsotMatrixGenerator
 from .audit import RecipeAuditor
 from .bumper import RecipeBumper
 
@@ -26,7 +26,7 @@ __all__ = [
     "RecipeLinter",
     "UpstreamSearchEngine",
     "SourceVerifier",
-    "SgotMatrixGenerator",
+    "SsotMatrixGenerator",
     "RecipeAuditor",
     "RecipeBumper",
 ]
