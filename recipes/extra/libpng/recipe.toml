@@ -1,6 +1,6 @@
 [package]
 name = "libpng"
-version = "1.6.47"
+version = "1.6.58"
 release = 1
 slot = "0"
 description = "Official PNG reference library"
@@ -16,7 +16,7 @@ urls = [
     "https://download.sourceforge.net/libpng/libpng-1.6.47.tar.xz"
 ]
 sha256 = [
-    "b213cb381fbb1175327bd708a77aab708a05adde7b471bc267bd15ac99893631"
+    "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"
 ]
 
 [build]

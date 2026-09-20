@@ -1,6 +1,6 @@
 [package]
 name = "readline"
-version = "8.2.13"
+version = "8.3"
 release = 1
 slot = "0"
 description = "GNU Readline command line editing library"
@@ -15,7 +15,9 @@ build = ["make", "gcc"]
 urls = [
     "https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz"
 ]
-sha256 = ["3feb7171f16a84ee82ca18a36d7b9be109a52c04f492a053331d7d1095007c35"]
+sha256 = [
+    "3feb7171f16a84ee82ca18a36d7b9be109a52c04f492a053331d7d1095007c35"
+]
 
 [build]
 type = "autotools"

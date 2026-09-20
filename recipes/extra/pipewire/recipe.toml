@@ -1,6 +1,6 @@
 [package]
 name = "pipewire"
-version = "1.4.11"
+version = "1.6.9"
 release = 1
 slot = "0"
 description = "Low-latency audio/video routing daemon and multimedia processing graph"
@@ -16,7 +16,7 @@ urls = [
   "https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/1.4.11/pipewire-1.4.11.tar.gz"
 ]
 sha256 = [
-  "a385ad74fe9c04523d65cac32b6a4429ee18a7ec8d96b424df5e284b0922c7f1"
+    "dbc3624cf71215c26a22fc98f6f71f7b8599f5f6b415eab4a5c90ca96c170c7c"
 ]
 
 [build]

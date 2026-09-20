@@ -89,7 +89,7 @@
 | **`intel-ucode`** | `20260812` | ✅ Verified | - | - | Microcode update files and early-initramfs image for Intel CPUs |
 | **`intltool`** | `0.51.0` | ✅ Verified | `perl` | `make`, `gcc`, `perl` | Internationalization tool collection |
 | **`iproute2`** | `7.2.0` | ✅ Verified | `glibc`, `libcap`, `libseccomp` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | IP routing and network device configuration suite (ip, ss, tc) |
-| **`iptables`** | `1.8.11` | ✅ Verified | `glibc` | `make`, `gcc`, `pkgconf` | Linux kernel packet filtering and NAT control utility |
+| **`iptables`** | `1.8.13` | ✅ Verified | `glibc` | `make`, `gcc`, `pkgconf` | Linux kernel packet filtering and NAT control utility |
 | **`kbd`** | `2.10.0` | ✅ Verified | `glibc` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | Keytable files and keyboard utilities (loadkeys, setfont) |
 | **`kmod`** | `34.2` | ✅ Verified | `glibc`, `zlib`, `xz`, `zstd`, `openssl` | `gcc`, `make`, `pkgconf` | Linux kernel module management tools and library (lsmod, modprobe, insmod) |
 | **`less`** | `710` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | A terminal based program for viewing text files |
@@ -112,7 +112,7 @@
 | **`mtdev`** | `1.1.7` | ✅ Verified | `glibc` | `make`, `gcc` | Multitouch Protocol Translation Library |
 | **`nano`** | `9.2` | ✅ Verified | `glibc`, `ncurses`, `file` | `make`, `gcc`, `pkgconf` | Pico editor clone with enhancements |
 | **`ncurses`** | `6.5` | ✅ Verified | `glibc` | `make`, `gcc`, `pkgconf` | System V Release 4.0 curses emulation library |
-| **`nftables`** | `1.1.1` | ✅ Verified | `glibc`, `gmp`, `readline` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | Netfilter userspace packet filtering framework |
+| **`nftables`** | `1.1.7` | ✅ Verified | `glibc`, `gmp`, `readline` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | Netfilter userspace packet filtering framework |
 | **`openssl`** | `4.1.0-alpha1` | ✅ Verified | `glibc` | `make`, `gcc`, `perl` | Robust, commercial-grade TLS/SSL cryptography toolkit |
 | **`pam`** | `1.7.2` | ✅ Verified | `glibc` | `gcc`, `make`, `flex`, `bison`, `linux-headers`, `pkgconf` | Pluggable Authentication Modules for Linux |
 | **`parted`** | `3.7` | ✅ Verified | `glibc`, `util-linux` | `make`, `gcc`, `pkgconf` | A program for creating, destroying, resizing, checking and copying partitions |
@@ -121,7 +121,7 @@
 | **`popt`** | `1.19` | ✅ Verified | `glibc` | `gcc`, `make`, `autoconf`, `automake`, `libtool`, `pkgconf` | Command line option parsing library |
 | **`procps-ng`** | `4.0.7` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Utilities for monitoring your system and its processes (ps, top, free) |
 | **`psmisc`** | `23.7` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | Miscellaneous proc-based tools (killall, fuser, pstree) |
-| **`readline`** | `8.2.13` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | GNU Readline command line editing library |
+| **`readline`** | `8.3` | ✅ Verified | `glibc`, `ncurses` | `make`, `gcc` | GNU Readline command line editing library |
 | **`sed`** | `4.10` | ✅ Verified | `glibc`, `acl` | `make`, `gcc` | GNU stream editor |
 | **`shadow`** | `4.20.2` | ✅ Verified | `glibc`, `acl`, `libcap`, `libseccomp` | `make`, `gcc`, `pkgconf` | Password and account management utilities |
 | **`squashfs-tools`** | `4.7.5` | ✅ Verified | `glibc`, `gcc`, `lz4`, `lzo`, `xz`, `zlib`, `zstd` | `gcc`, `make`, `pkgconf` | Tools for squashfs, a highly compressed read-only filesystem for Linux |
@@ -209,7 +209,7 @@
 | **`libgit2`** | `1.9.7` | ✅ Verified | `glibc`, `openssl`, `zlib`, `pcre2` | `cmake`, `ninja`, `gcc`, `pkgconf`, `python` | Highly portable, pure C implementation of the Git core methods |
 | **`libinput`** | `1.32.0` | ✅ Verified | `glibc`, `eudev`, `libevdev`, `mtdev` | `meson`, `ninja`, `pkgconf` | Input device management and event handling library |
 | **`libksysguard`** | `6.7.5` | ✅ Verified | `qt6-base`, `qt6-declarative`, `kcoreaddons`, `kconfig`, `ki18n`, `kauth`, `zlib` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Task management and system monitoring library for KDE Plasma |
-| **`libpng`** | `1.6.47` | ✅ Verified | `glibc`, `zlib` | `make`, `gcc` | Official PNG reference library |
+| **`libpng`** | `1.6.58` | ✅ Verified | `glibc`, `zlib` | `make`, `gcc` | Official PNG reference library |
 | **`libssh2`** | `1.11.1` | ✅ Verified | `glibc`, `openssl`, `zlib` | `make`, `gcc`, `pkgconf` | Client-side C library implementing the SSH2 protocol |
 | **`libutf8proc`** | `2.11.3` | ✅ Verified | `glibc` | `make`, `gcc` | Clean C library for processing UTF-8 Unicode data |
 | **`libxcb`** | `1.17.0` | ✅ Verified | `glibc` | `make`, `gcc`, `pkgconf`, `python` | X11 C Bindings library |
@@ -227,7 +227,7 @@
 | **`nushell`** | `0.115.1` | ✅ Verified | `glibc`, `curl`, `gcc`, `libgit2`, `libssh2`, `openssl`, `sqlite`, `zstd` | `gcc`, `rust`, `mold`, `clang`, `llvm`, `pkgconf`, `git` | A new type of shell |
 | **`openssh`** | `10.5p1` | ✅ Verified | `glibc`, `openssl`, `zlib`, `libcap` | `make`, `gcc`, `pkgconf` | Premier connectivity tool for remote login with the SSH protocol |
 | **`pcre2`** | `10.48` | ✅ Verified | `glibc`, `zlib`, `bzip2`, `readline` | `make`, `gcc`, `pkgconf` | Perl Compatible Regular Expressions 2 (PCRE2) |
-| **`pipewire`** | `1.4.11` | ✅ Verified | `glibc`, `alsa-lib`, `dbus`, `elogind` | `meson`, `ninja`, `pkgconf` | Low-latency audio/video routing daemon and multimedia processing graph |
+| **`pipewire`** | `1.6.9` | ✅ Verified | `glibc`, `alsa-lib`, `dbus`, `elogind` | `meson`, `ninja`, `pkgconf` | Low-latency audio/video routing daemon and multimedia processing graph |
 | **`pixman`** | `0.46.4` | ✅ Verified | `glibc` | `meson`, `ninja`, `pkgconf` | Low-level pixel manipulation and rasterization library |
 | **`plasma-desktop`** | `6.7.5` | ✅ Verified | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `qt6-svg`, `kcoreaddons`, `kconfig`, `kwindowsystem`, `ki18n`, `kauth`, `kwidgetsaddons`, `kservice`, `kcrash`, `kdbusaddons`, `kglobalaccel`, `plasma-workspace`, `libksysguard`, `breeze` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | KDE Plasma Desktop user interface, panels, widgets and settings |
 | **`plasma-workspace`** | `6.7.5` | ✅ Verified | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `qt6-svg`, `kcoreaddons`, `kconfig`, `kwindowsystem`, `ki18n`, `kauth`, `kservice`, `kcrash`, `kdbusaddons`, `kglobalaccel`, `kpipewire`, `layer-shell-qt`, `libksysguard`, `breeze`, `kwin`, `pam`, `shadow` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | KDE Plasma Workspace components and session management |
