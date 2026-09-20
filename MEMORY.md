@@ -279,6 +279,7 @@
 74. **ADR-074 (Automated Pre-Build Workspace Sanitization):** Menerapkan pembersihan otomatis direktori build `/tmp/forge/build/{pkg}-{ver}/` pada awal eksekusi `RecipeBuilder::build` (`builder.rs`) sebelum ekstraksi sumber dilakukan, memastikan tidak ada berkas kotor, cache configure yang rusak, atau artefak sisa dari kompilasi sebelumnya yang gagal tanpa memerlukan intervensi manual dari pengguna.
 75. **ADR-075 (Exclusion of LTO in GCC Target Runtime Libraries):** Menghapus seluruh flag LTO (`-flto`, `-flto=auto`, `-flto=thin`) dan menyuntikkan `-fno-lto` pada `CFLAGS_FOR_TARGET` dan `CXXFLAGS_FOR_TARGET` di `recipes/system/gcc/recipe.toml` guna mencegah konflik *symbol versioning* (`.symver`) pada pustaka tingkat rendah Linux ABI (`libgcc_s.so`, `libatomic`, `libstdc++`).
 76. **ADR-076 (Obsolete Meson Option Removal for Bubblewrap v0.12.0):** Menghapus argumen usang `-Drequire_userns=true` dari pemanggilan `meson setup` di `recipes/core/bubblewrap/recipe.toml` karena implementasi user namespace telah dijadikan bawaan paten secara internal oleh upstream Bubblewrap.
+77. **ADR-083 (Unified Monolithic LLVM Toolchain Consolidation & Clang Meta-Package Alias):** Menstandarisasi paket toolchain `recipes/system/llvm/recipe.toml` sebagai penyedia monolitik Clang, LLD, dan Compiler-RT, mengubah `recipes/system/clang/recipe.toml` menjadi meta-package alias (`type = "meta"`, `runtime = ["llvm"]`), serta membersihkan dependensi redundant `"clang"` pada seluruh resep sistem dan extra guna mengeliminasi tabrakan berkas kepemilikan (`/usr/bin/clang`) pada `merger.rs`.
 
 ---
 
@@ -343,6 +344,8 @@
 | *2026-09-20* | *Blind Staging Directory Deletion in Scheduler* | *Scheduler menghapus paksa direktori staging (/tmp/forge/stage/) saat worker jalan sehingga paket besar (LLVM 3.4GB) terpaksa di-compile ulang* | *Menerapkan smart staging cache reuse dan resumption di `scheduler.rs`, melestarikan hasil staging dan hanya me-rebuild jika flag `--rebuild` / `--rebuild-deps` disetel (ADR-080)* |
 | *2026-09-20* | *Partial Staging Leak, Atomic Collision & Dangling Symlinks* | *Staging parsial tertinggal jika build gagal, risiko tabrakan nama file sementara `with_extension`, dan symlink broken gagal di-replace* | *Menerapkan marker `.forge_staging_complete`, pembersihan staging saat `Err`, dot-prefixed temp atomic filename, dan `symlink_metadata` cleanup (ADR-081)* |
 | *2026-09-20* | *Rust Hermetic Offline Stage0 Bootstrap* | *Skrip `x.py` gagal mengunduh stage0 di sandbox Bubblewrap terisolasi tanpa internet* | *Mendeklarasikan tarball stage0 (`1.97.1`) di `sources.urls` dan mengarahkan `config.toml` ke `${srcdir}/stage0` tanpa ketergantungan host (ADR-082)* |
+| *2026-09-21* | *LLVM vs Clang Merger Collision* | *Paket monolitik llvm (3.4GB) dan paket terpisah clang sama-sama memasang /usr/bin/clang sehingga ditolak pre-flight collision detector* | *Mengubah resep `clang` menjadi meta-package alias (`runtime = ["llvm"]`, `type = "meta"`), membersihkan dependensi redundant `clang` pada seluruh resep sistem & extra, dan meregenerasi matriks SSOT (ADR-083)* |
+
 
 ---
 

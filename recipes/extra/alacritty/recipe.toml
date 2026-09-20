@@ -9,7 +9,7 @@ upstream = "https://github.com/alacritty/alacritty"
 
 [dependencies]
 runtime = ["glibc", "freetype", "fontconfig", "libxi", "libxcursor", "libxkbcommon", "libxrandr", "libxcb"]
-build = ["gcc", "rust", "mold", "clang", "llvm", "cmake", "ncurses", "pkgconf", "libxcb"]
+build = ["gcc", "rust", "mold", "llvm", "cmake", "ncurses", "pkgconf", "libxcb"]
 
 [sources]
 urls = [

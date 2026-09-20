@@ -9,11 +9,11 @@ upstream = "https://github.com/inimuqsith/Forge"
 
 [dependencies]
 runtime = [
-    "glibc", "zlib", "zstd", "bubblewrap", "mold", "clang", "llvm",
+    "glibc", "zlib", "zstd", "bubblewrap", "mold", "llvm",
     "git", "ca-certificates", "tar", "xz"
 ]
 build = [
-    "rust", "mold", "clang", "llvm", "pkgconf", "git"
+    "rust", "mold", "llvm", "pkgconf", "git"
 ]
 
 [sources]

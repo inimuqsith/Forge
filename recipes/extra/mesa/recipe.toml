@@ -9,7 +9,7 @@ upstream = "https://mesa.freedesktop.org/"
 
 [dependencies]
 runtime = ["glibc", "libdrm", "expat", "zstd", "zlib", "libxkbcommon", "wayland"]
-build = ["meson", "ninja", "pkgconf", "python", "bison", "flex", "llvm", "clang", "wayland-protocols", "vulkan-headers"]
+build = ["meson", "ninja", "pkgconf", "python", "bison", "flex", "llvm", "wayland-protocols", "vulkan-headers"]
 
 [sources]
 urls = [

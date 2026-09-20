@@ -3,25 +3,20 @@ name = "clang"
 version = "23.1.1"
 release = 1
 slot = "22"
-description = "C, C++, and Objective-C front-end for LLVM (v22)"
+description = "C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm)"
 license = "Apache-2.0-with-LLVM-exception"
 upstream = "https://clang.llvm.org/"
 
 [dependencies]
-runtime = ["llvm", "glibc"]
-build = ["cmake", "ninja", "pkgconf", "make", "python"]
+runtime = ["llvm"]
+build = []
 
 [sources]
-urls = [
-    "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.1/llvm-project-23.1.1.src.tar.xz"
-]
-sha256 = ["ebe9be46fe8756d58c5b198ffad0fa2a766257add81a4dc52179bfacc7888ee6"]
+urls = []
+sha256 = []
 
 [build]
-type = "cmake"
+type = "meta"
 script = """
-cd "${srcdir}/llvm-project-${pkgver}.src"
-cmake -G Ninja -B build llvm -DLLVM_ENABLE_PROJECTS="clang" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DLLVM_USE_LINKER=mold
-ninja -C build clang ${MAKEFLAGS}
-DESTDIR="${DESTDIR}" ninja -C build install-clang install-clang-headers
+echo "Package clang is provided by the monolithic llvm toolchain package."
 """

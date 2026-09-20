@@ -25,16 +25,16 @@
 | **`base-devel`** | `1.0.0` | 🟡 Belum Diuji | `glibc`, `llvm`, `mold`, `make`, `ninja`, `gcc`, `binutils`, `pkgconf`, `linux-headers`, `patch`, `bubblewrap` | - | Kura Linux Base Development Toolchain (Meta-Package) |
 | **`binutils`** | `2.47` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd` | `bison`, `flex` | GNU binary utilities (as, ld, readelf, objdump, strip, ar) |
 | **`bison`** | `3.8.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `gcc` | General-purpose parser generator |
-| **`clang`** | `23.1.1` | 🟡 Belum Diuji | `llvm`, `glibc` | `cmake`, `ninja`, `pkgconf`, `make`, `python` | C, C++, and Objective-C front-end for LLVM (v22) |
+| **`clang`** | `23.1.1` | 🟡 Belum Diuji | `llvm` | - | C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm) |
 | **`cmake`** | `4.3.5` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libarchive` | `make`, `gcc`, `binutils`, `pkgconf` | Cross-platform open-source build system generator |
 | **`flex`** | `2.6.4` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
-| **`forge`** | `git` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `clang`, `llvm`, `git`, `ca-certificates`, `tar`, `xz` | `rust`, `mold`, `clang`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
+| **`forge`** | `git` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `llvm`, `git`, `ca-certificates`, `tar`, `xz` | `rust`, `mold`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
 | **`gcc`** | `16.2.0` | 🟡 Belum Diuji | `glibc`, `gmp`, `mpfr`, `mpc`, `zstd` | `bison`, `flex` | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
 | **`gettext`** | `1.0` | 🟡 Belum Diuji | `glibc`, `acl`, `ncurses` | `make`, `gcc` | GNU internationalization and localization utilities |
 | **`glibc`** | `2.44` | 🟡 Belum Diuji | - | `linux-headers` | GNU C Library (Standard Core System C Library - Latest 2.44) |
 | **`gperf`** | `3.3` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Perfect hash function generator |
 | **`libtool`** | `2.6.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `autoconf`, `automake`, `gcc` | Generic library support script |
-| **`linux-cachyos-bore`** | `git` | 🟡 Belum Diuji | `kmod`, `eudev` | `clang`, `llvm`, `mold`, `make`, `bc`, `bison`, `flex`, `elfutils`, `openssl`, `rsync`, `kmod`, `zstd`, `diffutils` | Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO |
+| **`linux-cachyos-bore`** | `git` | 🟡 Belum Diuji | `kmod`, `eudev` | `llvm`, `mold`, `make`, `bc`, `bison`, `flex`, `elfutils`, `openssl`, `rsync`, `kmod`, `zstd`, `diffutils` | Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO |
 | **`linux-headers`** | `7.2` | 🟡 Belum Diuji | - | - | Linux kernel API headers for userspace |
 | **`llvm`** | `23.1.1` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `libxml2` | `cmake`, `ninja`, `pkgconf`, `make`, `python` | LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22) |
 | **`m4`** | `1.4.21` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | GNU Macro Processor |
@@ -147,7 +147,7 @@
 
 | Paket | Versi Hulu | Status | Runtime Dependencies | Build Dependencies | Deskripsi |
 | :--- | :---: | :---: | :--- | :--- | :--- |
-| **`alacritty`** | `0.17.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `fontconfig`, `libxi`, `libxcursor`, `libxkbcommon`, `libxrandr`, `libxcb` | `gcc`, `rust`, `mold`, `clang`, `llvm`, `cmake`, `ncurses`, `pkgconf`, `libxcb` | A cross-platform, GPU-accelerated terminal emulator |
+| **`alacritty`** | `0.17.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `fontconfig`, `libxi`, `libxcursor`, `libxkbcommon`, `libxrandr`, `libxcb` | `gcc`, `rust`, `mold`, `llvm`, `cmake`, `ncurses`, `pkgconf`, `libxcb` | A cross-platform, GPU-accelerated terminal emulator |
 | **`alsa-lib`** | `1.2.16.1` | 🟡 Belum Diuji | `glibc` | `autoconf`, `automake`, `libtool`, `make`, `pkgconf` | Advanced Linux Sound Architecture (ALSA) core runtime library |
 | **`alsa-utils`** | `1.2.16` | 🟡 Belum Diuji | `glibc`, `alsa-lib`, `ncurses` | `autoconf`, `automake`, `libtool`, `make`, `pkgconf`, `gettext` | Advanced Linux Sound Architecture (ALSA) utilities (alsamixer, amixer, aplay) |
 | **`antigravity-cli`** | `1.2.7` | 🟡 Belum Diuji | `glibc`, `ca-certificates` | `tar`, `gzip` | Official Google DeepMind Antigravity CLI (agy) for agentic AI pair programming |
@@ -166,7 +166,7 @@
 | **`dust`** | `1.2.6` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `git`, `rust` | A more intuitive version of du in rust |
 | **`expat`** | `2.8.4` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | XML parser library written in C |
 | **`extra-cmake-modules`** | `6.30.0` | 🟡 Belum Diuji | - | `cmake` | Extra modules and scripts for CMake used by KDE Frameworks |
-| **`eza`** | `0.23.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `clang`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
+| **`eza`** | `0.23.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
 | **`fastfetch`** | `2.68.1` | 🟡 Belum Diuji | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
 | **`fcft`** | `3.3.3` | 🟡 Belum Diuji | `glibc`, `fontconfig`, `freetype`, `pixman`, `libutf8proc` | `meson`, `ninja`, `gcc`, `pkgconf`, `tllist` | Simple library for font loading and glyph rasterization |
 | **`fd`** | `10.5.0` | 🟡 Belum Diuji | `glibc` | `cargo`, `rust` | Simple, fast and user-friendly alternative to find |
@@ -184,7 +184,7 @@
 | **`grex`** | `1.4.6` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line tool for generating regular expressions from user-provided input strings |
 | **`harfbuzz`** | `14.4.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |
 | **`helium-browser`** | `0.17.2.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
-| **`helix`** | `25.07.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `mold`, `clang`, `llvm`, `pkgconf`, `git` | A post-modern modal text editor |
+| **`helix`** | `25.07.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A post-modern modal text editor |
 | **`htop`** | `3.5.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Interactive process viewer for Unix systems |
 | **`hyperfine`** | `1.20.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line benchmarking tool |
 | **`icu`** | `78.3` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | International Components for Unicode library |
@@ -220,18 +220,18 @@
 | **`libxrandr`** | `1.5.5` | 🟡 Belum Diuji | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | X11 RandR extension library |
 | **`libxslt`** | `1.1.45` | 🟡 Belum Diuji | `glibc`, `libxml2` | `make`, `gcc`, `pkgconf` | XML stylesheet transformation library (XSLT) |
 | **`lsof`** | `4.99.7` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Lists information about files opened by processes |
-| **`mesa`** | `26.2.3` | 🟡 Belum Diuji | `glibc`, `libdrm`, `expat`, `zstd`, `zlib`, `libxkbcommon`, `wayland` | `meson`, `ninja`, `pkgconf`, `python`, `bison`, `flex`, `llvm`, `clang`, `wayland-protocols`, `vulkan-headers` | Open-source OpenGL and Vulkan 3D graphics drivers |
+| **`mesa`** | `26.2.3` | 🟡 Belum Diuji | `glibc`, `libdrm`, `expat`, `zstd`, `zlib`, `libxkbcommon`, `wayland` | `meson`, `ninja`, `pkgconf`, `python`, `bison`, `flex`, `llvm`, `wayland-protocols`, `vulkan-headers` | Open-source OpenGL and Vulkan 3D graphics drivers |
 | **`mpc`** | `1.4.1` | 🟡 Belum Diuji | `glibc`, `gmp`, `mpfr` | - | Library for the arithmetic of complex numbers with arbitrarily high precision |
 | **`mpfr`** | `4.2.2` | 🟡 Belum Diuji | `glibc`, `gmp` | - | Multiple-precision floating-point arithmetic library |
 | **`neovim`** | `0.12.5` | 🟡 Belum Diuji | `glibc` | `cmake`, `ninja`, `gcc`, `pkgconf` | Vim-fork focused on extensibility and usability |
-| **`nushell`** | `0.115.1` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `libgit2`, `libssh2`, `openssl`, `sqlite`, `zstd` | `gcc`, `rust`, `mold`, `clang`, `llvm`, `pkgconf`, `git` | A new type of shell |
+| **`nushell`** | `0.115.1` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `libgit2`, `libssh2`, `openssl`, `sqlite`, `zstd` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A new type of shell |
 | **`openssh`** | `10.5p1` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libcap` | `make`, `gcc`, `pkgconf` | Premier connectivity tool for remote login with the SSH protocol |
 | **`pcre2`** | `10.48` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `readline` | `make`, `gcc`, `pkgconf` | Perl Compatible Regular Expressions 2 (PCRE2) |
 | **`pipewire`** | `1.6.9` | 🟡 Belum Diuji | `glibc`, `alsa-lib`, `dbus`, `elogind` | `meson`, `ninja`, `pkgconf` | Low-latency audio/video routing daemon and multimedia processing graph |
 | **`pixman`** | `0.46.4` | 🟡 Belum Diuji | `glibc` | `meson`, `ninja`, `pkgconf` | Low-level pixel manipulation and rasterization library |
 | **`plasma-desktop`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `qt6-svg`, `kcoreaddons`, `kconfig`, `kwindowsystem`, `ki18n`, `kauth`, `kwidgetsaddons`, `kservice`, `kcrash`, `kdbusaddons`, `kglobalaccel`, `plasma-workspace`, `libksysguard`, `breeze` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | KDE Plasma Desktop user interface, panels, widgets and settings |
 | **`plasma-workspace`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `qt6-svg`, `kcoreaddons`, `kconfig`, `kwindowsystem`, `ki18n`, `kauth`, `kservice`, `kcrash`, `kdbusaddons`, `kglobalaccel`, `kpipewire`, `layer-shell-qt`, `libksysguard`, `breeze`, `kwin`, `pam`, `shadow` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | KDE Plasma Workspace components and session management |
-| **`procs`** | `0.14.12` | 🟡 Belum Diuji | `glibc`, `gcc` | `rust`, `mold`, `clang`, `llvm`, `pkgconf` | A modern replacement for ps written in Rust |
+| **`procs`** | `0.14.12` | 🟡 Belum Diuji | `glibc`, `gcc` | `rust`, `mold`, `llvm`, `pkgconf` | A modern replacement for ps written in Rust |
 | **`python`** | `3.14.7` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `bzip2`, `xz`, `sqlite`, `libffi`, `expat`, `ncurses`, `readline` | `make`, `gcc`, `pkgconf` | Next generation of the high-level scripting language Python |
 | **`qt6-base`** | `6.8.2` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `zstd`, `dbus`, `libxkbcommon`, `fontconfig`, `freetype`, `harfbuzz`, `mesa`, `libdrm` | `cmake`, `ninja`, `pkgconf`, `vulkan-headers` | Cross-platform application and UI framework (Core, Gui, Widgets, Network, DBus) |
 | **`qt6-declarative`** | `6.8.2` | 🟡 Belum Diuji | `qt6-base` | `cmake`, `ninja`, `pkgconf`, `python` | Classes for QML and JavaScript languages for Qt6 |
@@ -257,7 +257,7 @@
 | **`wayland`** | `1.26.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `expat`, `libxml2` | `gcc`, `meson`, `ninja`, `pkgconf`, `libxslt` | A computer display server protocol |
 | **`wayland-protocols`** | `1.49` | 🟡 Belum Diuji | `glibc` | `gcc`, `wayland`, `meson`, `ninja` | Specifications of extended Wayland protocols |
 | **`wireplumber`** | `0.5.17` | 🟡 Belum Diuji | `glibc`, `pipewire`, `glib2` | `meson`, `ninja`, `pkgconf`, `glib2` | Modular session manager daemon and policy router for PipeWire |
-| **`zellij`** | `0.45.1` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `zlib` | `rust`, `mold`, `clang`, `llvm`, `pkgconf` | A terminal multiplexer |
+| **`zellij`** | `0.45.1` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `zlib` | `rust`, `mold`, `llvm`, `pkgconf` | A terminal multiplexer |
 | **`zlib`** | `1.3.2` | 🟡 Belum Diuji | `glibc` | - | Standard compression library implementing DEFLATE algorithm |
 | **`zoxide`** | `0.10.0` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `rust` | A smarter cd command for your terminal |
 

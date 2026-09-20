@@ -10,7 +10,7 @@ upstream = "https://github.com/CachyOS/linux-cachyos"
 [dependencies]
 runtime = ["kmod", "eudev"]
 build = [
-    "clang", "llvm", "mold", "make", "bc", "bison", "flex",
+    "llvm", "mold", "make", "bc", "bison", "flex",
     "elfutils", "openssl", "rsync", "kmod", "zstd", "diffutils"
 ]
 

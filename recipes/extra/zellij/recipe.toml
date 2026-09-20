@@ -9,7 +9,7 @@ upstream = "https://zellij.dev"
 
 [dependencies]
 runtime = ["glibc", "curl", "gcc", "zlib"]
-build = ["rust", "mold", "clang", "llvm", "pkgconf"]
+build = ["rust", "mold", "llvm", "pkgconf"]
 
 [sources]
 urls = [
