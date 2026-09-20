@@ -13,27 +13,49 @@ build = ["python", "cmake", "ninja", "gcc", "make"]
 
 [sources]
 urls = [
-    "https://static.rust-lang.org/dist/rustc-1.98.1-src.tar.xz"
+    "https://static.rust-lang.org/dist/rustc-1.98.1-src.tar.xz",
+    "https://static.rust-lang.org/dist/rustc-1.97.1-x86_64-unknown-linux-gnu.tar.xz",
+    "https://static.rust-lang.org/dist/cargo-1.97.1-x86_64-unknown-linux-gnu.tar.xz",
+    "https://static.rust-lang.org/dist/rust-std-1.97.1-x86_64-unknown-linux-gnu.tar.xz"
 ]
-sha256 = ["be1816e7f6c40abb90245ad6e024bed2a7e88d7dda4561e4d5470207df616b9f"]
+sha256 = [
+    "be1816e7f6c40abb90245ad6e024bed2a7e88d7dda4561e4d5470207df616b9f",
+    "9819d0a32d56bd339585319c80260e332779f5541fd66838ab7e016d6c814819",
+    "e1be5f5ff7f7f80ca506fb65770b759edbdc6d303781ed71c5de8ec8a8394779",
+    "1c1e704ae80126b7de34f72ea2825f7fd01736dec20732faed47374b95282fba"
+]
 
 [build]
 type = "custom"
 script = """
+# Rakit toolchain stage0 lokal dari hasil ekstraksi tarball
+mkdir -p "${srcdir}/stage0"
+cp -a "${srcdir}"/rustc-1.97.1-*/rustc/* "${srcdir}/stage0/"
+cp -a "${srcdir}"/cargo-1.97.1-*/cargo/* "${srcdir}/stage0/"
+cp -a "${srcdir}"/rust-std-1.97.1-*/rust-std-x86_64-unknown-linux-gnu/* "${srcdir}/stage0/"
+
+export PATH="${srcdir}/stage0/bin:${PATH}"
+export LD_LIBRARY_PATH="${srcdir}/stage0/lib:${LD_LIBRARY_PATH}"
+
 cd "${srcdir}/rustc-${pkgver}-src"
-cat << 'EOF' > config.toml
+cat << EOF > config.toml
 [llvm]
+download-ci-llvm = false
 link-shared = true
 [rust]
 channel = "stable"
 rpath = false
 [build]
+rustc = "${srcdir}/stage0/bin/rustc"
+cargo = "${srcdir}/stage0/bin/cargo"
 vendor = true
 extended = true
 tools = ["cargo", "rustfmt", "clippy"]
+docs = false
 [install]
 prefix = "/usr"
 EOF
-python x.py build -j ${MAKEFLAGS#-j}
-DESTDIR="${DESTDIR}" python x.py install
+
+python3 ./x.py build -j ${MAKEFLAGS#-j}
+DESTDIR="${DESTDIR}" python3 ./x.py install
 """

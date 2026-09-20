@@ -337,3 +337,4 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-079** | C-Dependency Crate LTO Sanitization for In-Tree Cargo Package Builds | ✅ Diterapkan |
 | **ADR-080** | Smart Staging Cache Reuse & Idempotent Resumption in Wavefront Scheduler | ✅ Diterapkan |
 | **ADR-081** | Deterministic Staging Completion Markers, Partial Cleanup on Build Error & Atomic Merger Hardening | ✅ Diterapkan |
+| **ADR-082** | Hermetic Offline Stage0 Bootstrapping for Rust Toolchain | ✅ Diterapkan |
