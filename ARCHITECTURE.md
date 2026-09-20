@@ -328,3 +328,4 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-070** | Fast Clean Python Bootstrap Build without PGO Overhead | ✅ Diterapkan |
 | **ADR-071** | Non-Archive Raw Source File Handling, Dynamic USE Env Injection, & SSOT Matrix Accuracy | ✅ Diterapkan |
 | **ADR-072** | Pip-less Standard `setup.py` Bootstrapping for Meson Build Engine | ✅ Diterapkan |
+| **ADR-073** | Target CFLAGS Sanitization for GCC Runtime Libraries (`-flto=auto`) | ✅ Diterapkan |

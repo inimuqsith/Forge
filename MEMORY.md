@@ -275,6 +275,7 @@
 70. **ADR-070 (Fast Clean Python Bootstrap Build without PGO Overhead):** Menghapus flag `--enable-optimizations` pada konfigurasi `recipes/extra/python/recipe.toml` untuk mengeliminasi bottleneck eksekusi seluruh unit test suite CPython saat bootstrap di sandbox, mempercepat kompilasi Python dari ~15 menit menjadi ~25 detik.
 71. **ADR-071 (Non-Archive Raw Source File Handling, Dynamic USE Env Injection, & SSOT Matrix Accuracy):** Mengembangkan deteksi ekstensi berkas sumber di `builder.rs` (`.tar.*`, `.tgz`, `.tbz2`, `.txz` diekstrak dengan `tar -xf`, sedangkan berkas mentah seperti `.pem`, `.patch`, `.diff`, `.txt` disalin langsung via `fs::copy` ke `${srcdir}`), mengekspor variabel lingkungan `USE` dan `USE_FLAGS` ke subshell proses kompilasi, serta menstandarkan seluruh label status di `scripts/maintainer/matrix.py` dan `recipes/PACKAGE_STATUS.md` menjadi `🟡 Belum Diuji` guna menjaga kejelasan data pengujian live.
 72. **ADR-072 (Pip-less Standard `setup.py` Bootstrapping for Meson Build Engine):** Mengalihkan proses instalasi resep `recipes/system/meson/recipe.toml` dari `python -m pip install` ke skrip standar `python setup.py build` dan `python setup.py install --root="${DESTDIR}" --prefix=/usr --optimize=1`, mengeliminasi ketergantungan modul eksternal `pip` pada sistem host saat kompilasi sandbox bootstrap.
+73. **ADR-073 (Target CFLAGS Sanitization for GCC Runtime Libraries):** Menyelaraskan flag kompilasi target pada `recipes/system/gcc/recipe.toml` dengan mendefinisikan `CFLAGS_FOR_TARGET` dan `CXXFLAGS_FOR_TARGET` yang mengubah `-flto=thin` (eksklusif Clang/LLVM) menjadi `-flto=auto` (standar GCC LTO) agar kompilator internal `xgcc` berhasil mengompilasi runtime internal `libgcc`, `libatomic`, dan `libstdc++`.
 
 ---
 
@@ -329,6 +330,7 @@
 | *2026-09-20* | *Sandbox Ccache Read-Only & Python PGO Bottleneck* | *Bubblewrap tidak me-mount CCACHE_DIR sebagai writable dan Python `--enable-optimizations` memakan waktu 15+ menit saat bootstrap* | *Menambahkan writable bind mount untuk CCACHE_DIR di `sandbox.rs` (ADR-069) dan menghapus `--enable-optimizations` di resep Python (ADR-070)* |
 | *2026-09-20* | *Raw Non-Archive Sources & USE Flag Injection* | *Berkas non-arsip (.pem ca-certificates) dipaksa diekstrak dengan tar -xf sehingga gagal dan variabel USE belum diinjeksi ke build subshell* | *Menerapkan penanganan berkas sumber non-arsip via direct copy, injeksi variabel USE/USE_FLAGS ke env_vars, dan mengatur seluruh status katalog SSOT menjadi Belum Diuji (ADR-071)* |
 | *2026-09-20* | *Meson Pip-less Bootstrap Failure* | *Perintah `python -m pip install` gagal di sandbox karena Python host belum memiliki pip* | *Mengalihkan script resep meson ke `python setup.py build` dan `python setup.py install --root="${DESTDIR}" --prefix=/usr --optimize=1` (ADR-072)* |
+| *2026-09-20* | *GCC libgcc -flto=thin Target Syntax Collision* | *Internal GCC compiler (xgcc/cc1) menolak `-flto=thin` saat mengompilasi libgcc/libstdc++* | *Mendefinisikan `CFLAGS_FOR_TARGET` & `CXXFLAGS_FOR_TARGET` yang mengubah `-flto=thin` menjadi `-flto=auto` di resep GCC (ADR-073)* |
 
 ---
 
