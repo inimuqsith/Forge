@@ -345,6 +345,7 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-087** | Topological Priority Queue & Real-Time Pipelined Transactional Merge in Wavefront Scheduler | ✅ Diterapkan |
 | **ADR-088** | HTTP/2 Library Integration via `nghttp2` for Git HTTPS & Curl Remote Operations | ✅ Diterapkan |
 | **ADR-089** | Integration of Compilation Toolchain into `forge` Runtime Dependencies & Elimination of `base-devel` Meta-Package | ✅ Diterapkan |
+| **ADR-090** | Complete Decompression Suite (`gzip`, `bzip2`, `xz`, `zstd`, `tar`) Integration into `forge` Runtime Dependencies | ✅ Diterapkan |
 
 
 

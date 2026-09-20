@@ -11,7 +11,7 @@ upstream = "https://github.com/inimuqsith/Forge"
 runtime = [
     "glibc", "zlib", "zstd", "bubblewrap", "mold", "llvm",
     "make", "gcc", "binutils", "pkgconf", "ninja", "patch", "linux-headers",
-    "git", "ca-certificates", "tar", "xz"
+    "git", "ca-certificates", "tar", "xz", "gzip", "bzip2"
 ]
 build = [
     "rust", "mold", "llvm", "pkgconf", "git"
