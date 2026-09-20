@@ -338,3 +338,5 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-080** | Smart Staging Cache Reuse & Idempotent Resumption in Wavefront Scheduler | ✅ Diterapkan |
 | **ADR-081** | Deterministic Staging Completion Markers, Partial Cleanup on Build Error & Atomic Merger Hardening | ✅ Diterapkan |
 | **ADR-082** | Hermetic Offline Stage0 Bootstrapping for Rust Toolchain | ✅ Diterapkan |
+| **ADR-083** | Hermetic Rust Vendoring & Zero-Host Cargo Builds Isolation | ✅ Diterapkan |
+

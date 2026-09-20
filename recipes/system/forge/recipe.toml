@@ -29,6 +29,10 @@ type = "custom"
 script = """
 cd "${srcdir}/Forge" || cd "${srcdir}"
 
+# Isolasi hermetis CARGO_HOME agar tidak bergantung atau mencemari direktori host (~/.cargo)
+export CARGO_HOME="${srcdir}/.cargo_home"
+mkdir -p "${CARGO_HOME}"
+
 # Bersihkan flag LTO dari CFLAGS/CXXFLAGS/LDFLAGS agar cc-rs crate (ring, zstd-sys) mengompilasi native C machine code
 export CFLAGS="$(echo "${CFLAGS}" | sed -E 's/-flto(=[^ ]*)?//g') -fno-lto"
 export CXXFLAGS="$(echo "${CXXFLAGS}" | sed -E 's/-flto(=[^ ]*)?//g') -fno-lto"
