@@ -1,6 +1,6 @@
 # AGENTS.md — Forge Package Manager Development Guidelines
 
-> **Forge**: *High-Performance Source-First & Hybrid Package Manager* yang ditulis murni menggunakan **Rust** (ditenagai backend compiler **LLVM 22**, ultra-fast linker **mold**, optimasi **LTO (Thin/Full)**, dan dukungan **PGO**) khusus untuk distribusi **Kura Linux**. Mengadopsi filosofi inti **Gentoo Portage** (*Source-First Native Compilation*, *USE Flags*, *Slots*) dan arsitektur modular modern ala Arch/Alpine (*Meta-Packages: `base`, `base-devel`*), didukung ekosistem terpisah **`forge-server`** (Registry Resep, **Upstream Bumper & Audit**, dan **CI/CD Builder Lock-CPU**), repositori terpusat **GitOps SSOT**, kemampuan akselerasi **Forge Binhost**, integrasi repositori biner **CachyOS/Arch**, pelacakan manifest deterministik, integrasi **OpenRC**, akselerasi **Ccache 4.13.5**, isolasi build RAM (`tmpfs`), serta pembuatan stage distribusi (`forge stage-export`).
+> **Forge**: *High-Performance Source-First & Hybrid Package Manager* yang ditulis murni menggunakan **Rust** (ditenagai backend compiler **LLVM 22**, ultra-fast linker **mold**, optimasi **LTO (Thin/Full)**, dan dukungan **PGO**) khusus untuk distribusi **Kura Linux**. Mengadopsi filosofi inti **Gentoo Portage** (*Source-First Native Compilation*, *USE Flags*, *Slots*) dan arsitektur modular modern (*`base`*, *`forge`* self-hosted toolchain integration), didukung ekosistem terpisah **`forge-server`** (Registry Resep, **Upstream Bumper & Audit**, dan **CI/CD Builder Lock-CPU**), repositori terpusat **GitOps SSOT**, kemampuan akselerasi **Forge Binhost**, integrasi repositori biner **CachyOS/Arch**, pelacakan manifest deterministik, integrasi **OpenRC**, akselerasi **Ccache 4.13.5**, isolasi build RAM (`tmpfs`), serta pembuatan stage distribusi (`forge stage-export`).
 
 ---
 
@@ -33,8 +33,8 @@
    - Perintah `forge cpu-dump`: Ekstraksi mikroarsitektur, feature ISA flags (AVX-512, AVX2, dll.), cache, dan rekomendasi compiler flags ke `cpu-profile.json`.
 4. **Opsi Akselerasi & Kebebasan Pengguna:**
    - Menyediakan opsi akselerasi Binhost (`forge install --binhost <pkg>`) dan fallback 3-tier cascade dengan perlindungan Core OS Anti-Brick CachyOS.
-5. **Filosofi Meta-Paket ("Everything is a Package"):**
-   - Tidak ada target magis `@system` yang di-hardcode. Basis sistem dikelola murni melalui resep meta-paket standar: `forge install base` (sistem inti OS) dan `forge install base-devel` (toolchain kompilasi).
+5. **Filosofi Meta-Paket & Self-Hosted Engine ("Everything is a Package"):**
+   - Tidak ada target magis `@system` yang di-hardcode. Basis sistem dikelola murni melalui resep meta-paket standar: `forge install base` (sistem inti OS) dan seluruh toolchain kompilasi mandiri terintegrasi di `forge install forge` (ADR-089).
    - Perintah `forge stage-export` untuk membuat arsip stage distribusi (`kura-stage.tar.xz`).
    - Integrasi OpenRC hook `/etc/init.d/` dan `rc-update`.
 
@@ -97,7 +97,7 @@ Kompilasi engine `forge` dan `forge-server` dioptimalkan secara ekstrem untuk pe
 │   └── forge.conf.default  # Konfigurasi standar paten package manager
 ├── recipes/                # Pohon repositori resep resmi Kura Linux (lihat recipes/PACKAGE_STATUS.md)
 │   ├── PACKAGE_STATUS.md   # Matriks lengkap, dependensi, dan status kesiapan paket (SSOT)
-│   ├── system/             # Resep sistem inti & toolchain (base, base-devel, glibc, gcc, llvm, openrc, dll.)
+│   ├── system/             # Resep sistem inti & toolchain (base, glibc, gcc, llvm, mold, make, openrc, dll.)
 │   ├── core/               # Resep utilitas, filesystem, networking & daemons inti sistem
 │   └── extra/              # Resep aplikasi dev, CLI modern, desktop, audio & Qt6/KF6/Plasma 6
 ├── tests/                  # Test suite integrasi & sandbox testing
@@ -117,7 +117,7 @@ forge setup                     # Inisialisasi konfigurasi package manager (/etc
 
 # --- 2. Manajemen Paket (Default: Source Compilation First) ---
 forge install base              # Pasang sistem dasar Kura Linux (Meta-Paket)
-forge install base-devel        # Pasang toolchain kompilasi Kura Linux (Meta-Paket)
+forge install forge             # Pasang package manager & toolchain kompilasi mandiri
 forge install <pkg>             # Kompilasi paket dari source code secara native (Gentoo-style)
 forge install --native <pkg>    # Paksa kompilasi 100% dari kode sumber (Portage mode)
 forge install --binhost <pkg>   # 3-Tier Cascade: Forge Binhost -> CachyOS -> Native Source

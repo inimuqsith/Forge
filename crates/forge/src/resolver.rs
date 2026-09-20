@@ -688,8 +688,7 @@ impl DependencyResolver {
 
         let (recipe, recipe_path) = scanner.load_recipe(&pkg_id.name)?;
         let is_meta = recipe.build.as_ref().map(|b| b.r#type == "meta").unwrap_or(false)
-            || pkg_id.name == "base"
-            || pkg_id.name == "base-devel";
+            || pkg_id.name == "base";
 
         let mut active_flags = HashSet::new();
         // Cek flag relevan untuk paket jika didefinisikan
@@ -981,11 +980,11 @@ mod tests {
 
         // 1. Meta-package node
         let meta_node = PackageNode {
-            id: PackageId::new("base-devel", "0"),
+            id: PackageId::new("base", "0"),
             version: "1.0.0".into(),
             release: 1,
-            description: "Base development meta-package".into(),
-            recipe_path: PathBuf::from("recipes/system/base-devel/recipe.toml"),
+            description: "Base system meta-package".into(),
+            recipe_path: PathBuf::from("recipes/system/base/recipe.toml"),
             is_meta: true,
             active_use_flags: HashSet::new(),
             is_installed: false,
@@ -1009,7 +1008,7 @@ mod tests {
 
             // Hubungkan meta-package ke setiap anggota dengan DependencyKind::MetaMember
             graph.add_edge(DependencyEdge {
-                from: PackageId::new("base-devel", "0"),
+                from: PackageId::new("base", "0"),
                 to: PackageId::new(*pkg, "0"),
                 kind: DependencyKind::MetaMember,
                 condition_flag: None,
@@ -1044,13 +1043,13 @@ mod tests {
 
         graph.add_node(meta_node);
 
-        let plan = graph.topological_sort("base-devel").expect("Meta-package DAG harus valid");
-        assert_eq!(plan.target, "base-devel");
+        let plan = graph.topological_sort("base").expect("Meta-package DAG harus valid");
+        assert_eq!(plan.target, "base");
         assert_eq!(plan.total_packages, 6);
 
-        // Step terakhir wajib adalah meta-package base-devel itu sendiri
+        // Step terakhir wajib adalah meta-package base itu sendiri
         let last_step = plan.steps.last().unwrap();
-        assert_eq!(last_step.package_id.name, "base-devel");
+        assert_eq!(last_step.package_id.name, "base");
         assert!(last_step.is_meta);
 
         // linux-headers harus dibangun sebelum glibc

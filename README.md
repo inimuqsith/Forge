@@ -1,6 +1,6 @@
 # Forge — The High-Performance Source-First Package Manager
 
-> **Forge**: *High-Performance Source-First & Hybrid Package Manager* yang ditulis murni menggunakan bahasa **Rust** khusus untuk distribusi **Kura Linux**. Ditenagai compiler **LLVM 22**, ultra-fast linker **`mold`**, Link-Time Optimization (**Thin/Full LTO**), dan dukungan **PGO**, Forge mengusung filosofi kompilasi **Gentoo Portage** (*Source-First Native Compilation*, *USE Flags*, *Slots*), arsitektur modular modern (*`base`*, *`base-devel`*), akselerasi **Ccache (v4.13.5)**, DAG Dependency Resolver, Transactional Merger, isolasi sandbox **Bubblewrap**, repositori terpusat **GitOps SSOT**, serta ekosistem terpisah **`forge-server` (Lock-CPU CI/CD Build Farm & Upstream Bumper)**.
+> **Forge**: *High-Performance Source-First & Hybrid Package Manager* yang ditulis murni menggunakan bahasa **Rust** khusus untuk distribusi **Kura Linux**. Ditenagai compiler **LLVM 22**, ultra-fast linker **`mold`**, Link-Time Optimization (**Thin/Full LTO**), dan dukungan **PGO**, Forge mengusung filosofi kompilasi **Gentoo Portage** (*Source-First Native Compilation*, *USE Flags*, *Slots*), arsitektur modular modern (*`base`*, *`forge`* self-hosted toolchain integration), akselerasi **Ccache (v4.13.5)**, DAG Dependency Resolver, Transactional Merger, isolasi sandbox **Bubblewrap**, repositori terpusat **GitOps SSOT**, serta ekosistem terpisah **`forge-server` (Lock-CPU CI/CD Build Farm & Upstream Bumper)**.
 
 ---
 
@@ -43,7 +43,7 @@ flowchart TD
 - **🐙 GitHub Single Source of Truth (SSOT) & GitOps Automation:** Seluruh resep dikelola di repository GitHub `inimuqsith/Forge`. Webhook real-time secara instan memicu pembaruan dan rebundling tarball di server VPS `https://pkgkura.amqs.net`.
 - **🤖 Zero-Quota Upstream Recipe Bumper & Audit Engine:** Memindai seluruh katalog paket dalam ~3 detik melalui Multi-Tier Probing (GitHub REST API dengan Token, GitHub Atom Feed `/releases.atom` bebas kuota, dan Anitya v2 Projects API) serta memperbarui versi & SHA256 secara atomik (`forge-server bump`). Matriks lengkap dapat dilihat di [`recipes/PACKAGE_STATUS.md`](file:///home/admin/Development/Forge/recipes/PACKAGE_STATUS.md).
 - **🌾 Pure Source-Built Seed Toolchain (ADR-019, ADR-028):** Pengemasan `forge toolchain bundle` (`dist/kura-toolchain.tar.xz`) murni 100% dari hasil kompilasi source code di staging tanpa menyalin biner host, menyertakan seluruh `/var/db/forge/recipes/` sehingga lingkungan chroot mandiri seketika.
-- **📦 Meta-Paket Murni ("Everything is a Package", ADR-026):** Basis OS dikelola murni melalui resep meta-paket deklaratif (`forge install base` dan `forge install base-devel`) tanpa hardcode logika OS di dalam biner package manager.
+- **📦 Meta-Paket Murni & Self-Hosted Engine (ADR-026, ADR-089):** Basis OS dikelola murni melalui resep meta-paket deklaratif (`forge install base`) dan seluruh toolchain kompilasi dilebur langsung ke paket `forge`, menjamin lingkungan kompilasi 100% self-hosted tanpa perlunya meta-paket terpisah.
 - **🗃️ Sistem Resep Terdedikasi & `forge sync` (ADR-028):** Repositori resep resmi berlokasi di `/var/db/forge/recipes/`, disinkronkan secara atomik dari `forge-server` melalui perintah `forge sync`.
 - **🌳 DAG Dependency Graph & Cycle Detection:** Resolver dependensi asiklis terarah dengan pemisahan dependensi runtime (`depends`) dan build-time (`makedepends`), evaluasi USE flags, dan pengurutan topologis.
 - **🔒 Transactional Merger & Collision Detector:** Pre-flight scanning untuk mencegah tabrakan berkas dan penggabungan atomik dari staging `$DESTDIR` ke target `$FORGE_ROOT` dengan auto-rollback jurnal LIFO.
@@ -70,7 +70,7 @@ forge menuconfig                # TUI interaktif untuk konfigurasi USE flags glo
 
 # --- 2. Manajemen Paket (Default: Source Compilation First) ---
 forge install base              # Pasang sistem dasar Kura Linux (Meta-Paket)
-forge install base-devel        # Pasang toolchain kompilasi Kura Linux (Meta-Paket)
+forge install forge             # Pasang package manager & toolchain kompilasi mandiri
 forge install <pkg>             # Kompilasi dari source code secara native (Default Gentoo-style)
 forge install --native <pkg>    # Paksa kompilasi 100% dari kode sumber (Portage mode)
 forge install --strip <pkg>     # Kompilasi dengan pembersihan simbol debug (modul & biner ramping)

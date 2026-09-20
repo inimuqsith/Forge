@@ -10,7 +10,7 @@ Setiap paket dalam ekosistem Kura Linux didefinisikan dalam sebuah berkas `recip
 `/var/db/forge/recipes/<category>/<pkgname>/recipe.toml`
 
 ### Kategori Resmi:
-1. `system/`: Fondasi OS inti, meta-paket (`base`, `base-devel`), compiler toolchain, C runtime library, dan init system OpenRC.
+1. `system/`: Fondasi OS inti, meta-paket (`base`), package manager & compiler toolchain (`forge`), C runtime library, dan init system OpenRC.
 2. `core/`: Utilitas sistem, filesystem tools, networking, dan libraries esensial.
 3. `extra/`: Perangkat lunak pengembangan, CLI modern, text editor, dan runtime bahasa.
 

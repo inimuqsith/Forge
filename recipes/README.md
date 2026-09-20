@@ -25,7 +25,7 @@ recipes/
 ## 📦 Ringkasan 141 Resep Paket Terdaftar:
 
 ### 1. Kategori `system/` (22 Paket Fondasi & Toolchain)
-- **Meta-Paket:** `base` (Fondasi OS), `base-devel` (Toolchain Kompilasi Lengkap).
+- **Meta-Paket & Engine:** `base` (Fondasi OS), `forge` (Package Manager & Integrated Toolchain).
 - **Core Runtime & Init:** `glibc`, `openrc`.
 - **Compilers & Linkers:** `clang`, `gcc`, `llvm`, `mold`.
 - **Build Tools:** `autoconf`, `automake`, `binutils`, `bison`, `cmake`, `flex`, `libtool`, `m4`, `make`, `meson`, `ninja`, `patch`, `pkgconf`.

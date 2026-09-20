@@ -8,27 +8,26 @@
 
 | Kategori | Total Paket | Status Kesiapan | Deskripsi Ruang Lingkup |
 | :--- | :---: | :---: | :--- |
-| **`recipes/system/`** | 27 | 🟡 Belum Diuji | Toolchain Sistem, Kernel Headers, C Library & Inisialisasi OpenRC |
+| **`recipes/system/`** | 26 | 🟡 Belum Diuji | Toolchain Sistem, Kernel Headers, C Library & Inisialisasi OpenRC |
 | **`recipes/core/`** | 89 | 🟡 Belum Diuji | Utilitas Dasar, CLI Tools, Filesystem, Networking & Service Daemons |
 | **`recipes/extra/`** | 113 | 🟡 Belum Diuji | Bahasa Pemrograman, Desktop Environment, Library Grafis, Audio & Qt6/KDE |
-| **TOTAL RESEP RESMI** | **229** | **🟡 227 Resep Terdaftar (Belum Diuji)** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Hardware, Firmware, Audio, Qt6 & KDE Plasma 6)** |
+| **TOTAL RESEP RESMI** | **228** | **🟡 227 Resep Terdaftar (Belum Diuji)** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Hardware, Firmware, Audio, Qt6 & KDE Plasma 6)** |
 
 ---
 
-## 1. Kategori `recipes/system/` (27 Paket — Toolchain Sistem, Kernel Headers, C Library & Inisialisasi OpenRC)
+## 1. Kategori `recipes/system/` (26 Paket — Toolchain Sistem, Kernel Headers, C Library & Inisialisasi OpenRC)
 
 | Paket | Versi Hulu | Status | Runtime Dependencies | Build Dependencies | Deskripsi |
 | :--- | :---: | :---: | :--- | :--- | :--- |
 | **`autoconf`** | `2.73` | 🟡 Belum Diuji | `m4`, `glibc` | `make`, `m4`, `gcc` | Extensible package of M4 macros to produce configuration scripts |
 | **`automake`** | `1.19` | 🟡 Belum Diuji | `autoconf`, `glibc` | `make`, `autoconf`, `gcc` | Tool for automatically generating Makefile.in files |
 | **`base`** | `1.0.0` | 🟡 Belum Diuji | `glibc`, `coreutils`, `sed`, `grep`, `gawk`, `tar`, `gzip`, `bzip2`, `xz`, `zstd`, `findutils`, `diffutils`, `file`, `which`, `util-linux`, `shadow`, `openrc`, `eudev`, `kmod`, `ca-certificates`, `acl`, `attr` | - | Kura Linux Minimal Base System (Meta-Package) |
-| **`base-devel`** | `1.0.0` | 🟡 Belum Diuji | `glibc`, `llvm`, `mold`, `make`, `ninja`, `gcc`, `binutils`, `pkgconf`, `linux-headers`, `patch`, `bubblewrap` | - | Kura Linux Base Development Toolchain (Meta-Package) |
 | **`binutils`** | `2.47` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd` | `bison`, `flex` | GNU binary utilities (as, ld, readelf, objdump, strip, ar) |
 | **`bison`** | `3.8.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `gcc` | General-purpose parser generator |
 | **`clang`** | `23.1.1` | 🟡 Belum Diuji | `llvm` | - | C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm) |
 | **`cmake`** | `4.3.5` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libarchive` | `make`, `gcc`, `binutils`, `pkgconf` | Cross-platform open-source build system generator |
 | **`flex`** | `2.6.4` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
-| **`forge`** | `git` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `llvm`, `git`, `ca-certificates`, `tar`, `xz` | `rust`, `mold`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
+| **`forge`** | `git` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `llvm`, `make`, `gcc`, `binutils`, `pkgconf`, `ninja`, `patch`, `linux-headers`, `git`, `ca-certificates`, `tar`, `xz` | `rust`, `mold`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
 | **`gcc`** | `16.2.0` | 🟡 Belum Diuji | `glibc`, `gmp`, `mpfr`, `mpc`, `zstd` | `bison`, `flex` | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
 | **`gettext`** | `1.0` | 🟡 Belum Diuji | `glibc`, `acl`, `ncurses` | `make`, `gcc` | GNU internationalization and localization utilities |
 | **`glibc`** | `2.44` | 🟡 Belum Diuji | - | `linux-headers` | GNU C Library (Standard Core System C Library - Latest 2.44) |

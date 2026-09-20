@@ -10,6 +10,7 @@ upstream = "https://github.com/inimuqsith/Forge"
 [dependencies]
 runtime = [
     "glibc", "zlib", "zstd", "bubblewrap", "mold", "llvm",
+    "make", "gcc", "binutils", "pkgconf", "ninja", "patch", "linux-headers",
     "git", "ca-certificates", "tar", "xz"
 ]
 build = [

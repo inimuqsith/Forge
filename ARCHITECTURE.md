@@ -59,9 +59,9 @@ Untuk menjaga agar engine Forge tetap ramping, bersih, dan universal (seperti Ar
 1. **Tidak Ada Target Magis yang Di-Hardcode:**
    - Tidak ada target `@system` khusus di dalam biner Rust.
    - Tidak ada wizard `system-setup` yang mencampuri urutan instalasi.
-2. **Sistem Operasi Didefinisikan Sebagai Resep Meta-Paket Deklaratif:**
-   - **`base` (`recipes/system/base/recipe.toml`):** Mendefinisikan fondasi OS minimal (Glibc, Bash, Coreutils, Sed, Grep, OpenRC, Util-linux, Shadow, Eudev, Kmod).
-   - **`base-devel` (`recipes/system/base-devel/recipe.toml`):** Mendefinisikan toolchain kompilasi sistem lengkap (LLVM/Clang, Mold, Make, Ninja, GCC, Binutils, Pkgconf, Linux-Headers).
+2. **Sistem Operasi Didefinisikan Sebagai Resep Meta-Paket Deklaratif & Paket Engine:**
+   - **`base` (`recipes/system/base/recipe.toml`):** Mendefinisikan fondasi OS minimal (Glibc, Bash, Coreutils, Sed, Grep, OpenRC, Util-linux, Shadow, Eudev, Kmod, Acl, Attr).
+   - **`forge` (`recipes/system/forge/recipe.toml`):** Engine package manager source-first yang mengintegrasikan seluruh toolchain kompilasi (LLVM, Mold, GCC, Binutils, Make, Ninja, Patch, Pkgconf, Linux-Headers, Git, Bubblewrap) sebagai dependensi runtime wajib (ADR-089).
 3. **Konfigurasi Tunggal Terpusat (`/etc/forge/forge.conf`):**
    - Menjadi satu-satunya sumber kebenaran (*Single Source of Truth*) untuk variabel compiler (`cflags`, `makeflags`, `ldflags`), target microarchitecture silikon (`target_march`), dan `use_flags` global.
 
@@ -81,7 +81,7 @@ flowchart TD
         D --> E["Ekstrak Seed Toolchain\nke Sysroot /mnt/kura/"]
         E --> F["Masuk chroot /mnt/kura"]
         F --> G["forge install base\n(Memasang Basis OS Minimal)"]
-        F --> H["forge install base-devel\n(Memasang Toolchain Lengkap)"]
+        F --> H["forge install forge\n(Memasang Engine & Toolchain Lengkap)"]
         G & H --> I["forge stage-export\n-> kura-stage.tar.xz (OS Siap Pakai)"]
     end
 
@@ -99,7 +99,7 @@ flowchart TD
 
 ## 4. Pipeline Bootstrap 2-Tahap: Menyelesaikan Paradoks Ayam dan Telur (*The Bootstrap Paradox*)
 
-> **Pertanyaan Mendasar:** *"Bagaimana kita bisa menjalankan `forge install base-devel` di dalam chroot Kura Linux jika di dalam chroot belum ada toolchain compiler untuk mengompilasi?"*
+> **Pertanyaan Mendasar:** *"Bagaimana kita bisa menjalankan kompilasi paket di dalam chroot Kura Linux jika di dalam chroot belum ada toolchain compiler untuk mengompilasi?"*
 
 Masalah ini diselesaikan melalui **Pipeline Bootstrap 2-Tahap**:
 
@@ -113,7 +113,7 @@ Masalah ini diselesaikan melalui **Pipeline Bootstrap 2-Tahap**:
 [ TAHAP 2: Di Dalam Chroot Kura Linux ]
 1. Administrator mengekstrak `dist/kura-toolchain.tar.xz` ke `/mnt/kura/`.
 2. Masuk ke chroot: `chroot /mnt/kura /bin/bash`.
-3. Menjalankan `forge install base` dan `forge install base-devel`.
+3. Menjalankan `forge install base` dan `forge install forge`.
 4. Seluruh toolchain dan sistem inti Kura Linux terkompilasi ulang secara mandiri (self-hosted).
 5. Menjalankan `forge stage-export` untuk menghasilkan tarball distribusi resmi `dist/kura-stage.tar.xz`.
 ```
@@ -344,6 +344,7 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-086** | Explicit Readline Shared Library Linking with `--no-as-needed` for Ncurses DT_NEEDED Entry | ✅ Diterapkan |
 | **ADR-087** | Topological Priority Queue & Real-Time Pipelined Transactional Merge in Wavefront Scheduler | ✅ Diterapkan |
 | **ADR-088** | HTTP/2 Library Integration via `nghttp2` for Git HTTPS & Curl Remote Operations | ✅ Diterapkan |
+| **ADR-089** | Integration of Compilation Toolchain into `forge` Runtime Dependencies & Elimination of `base-devel` Meta-Package | ✅ Diterapkan |
 
 
 

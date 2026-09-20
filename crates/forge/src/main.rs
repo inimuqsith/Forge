@@ -27,9 +27,9 @@ enum Commands {
         defaults: bool,
     },
 
-    /// Pasang paket atau meta-paket (misal: base, base-devel, bash, openssh)
+    /// Pasang paket atau meta-paket (misal: base, forge, bash, openssh)
     Install {
-        /// Nama paket atau meta-paket (misal: base, base-devel, mold, nginx)
+        /// Nama paket atau meta-paket (misal: base, forge, mold, nginx)
         target: String,
 
         /// Opsi Akselerasi: Aktifkan 3-Tier Binhost Cascade Resolution (Forge Binhost -> CachyOS -> Source)
