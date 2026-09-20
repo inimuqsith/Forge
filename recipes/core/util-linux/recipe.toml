@@ -23,7 +23,17 @@ sha256 = [
 type = "autotools"
 script = """
 cd "${srcdir}/util-linux-${pkgver}"
-./configure --prefix=/usr --disable-chfn-chsh --disable-login --disable-nologin --disable-su --disable-setpriv --disable-runuser --without-systemd
+./configure --prefix=/usr \
+    --disable-chfn-chsh \
+    --disable-login \
+    --disable-nologin \
+    --disable-su \
+    --disable-setpriv \
+    --disable-runuser \
+    --without-systemd \
+    --disable-use-tty-group \
+    --disable-makeinstall-chown \
+    --disable-makeinstall-setuid
 make ${MAKEFLAGS}
 make DESTDIR="${DESTDIR}" install
 """
