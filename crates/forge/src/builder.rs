@@ -480,6 +480,7 @@ impl RecipeBuilder {
             let mut env_vars = std::collections::HashMap::new();
             env_vars.insert("CC".to_string(), cc.clone());
             env_vars.insert("CXX".to_string(), cxx.clone());
+            env_vars.insert("ASM".to_string(), cc.clone());
             env_vars.insert("LD".to_string(), ld.clone());
             env_vars.insert("USE".to_string(), config.use_flags.flags.clone());
             env_vars.insert("USE_FLAGS".to_string(), config.use_flags.flags.clone());
