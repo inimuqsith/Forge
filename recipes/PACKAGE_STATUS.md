@@ -84,7 +84,7 @@
 | **`grep`** | `3.12` | 🟡 Belum Diuji | `glibc`, `pcre2` | `make`, `gcc`, `pkgconf` | GNU grep, egrep and fgrep |
 | **`groff`** | `1.24.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `pkgconf` | GNU troff text-formatting system |
 | **`grub`** | `2.14` | 🟡 Belum Diuji | `glibc`, `xz` | `gcc`, `make`, `pkgconf`, `flex`, `bison`, `python` | GNU GRand Unified Bootloader (2) |
-| **`gzip`** | `1.14` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Popular data compression program |
+| **`gzip`** | `1.15` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Popular data compression program |
 | **`hwdata`** | `0.411` | 🟡 Belum Diuji | `glibc` | `make` | Hardware identification databases (pci.ids, usb.ids, oui.txt) |
 | **`intel-ucode`** | `20260812` | 🟡 Belum Diuji | - | - | Microcode update files and early-initramfs image for Intel CPUs |
 | **`intltool`** | `0.51.0` | 🟡 Belum Diuji | `perl` | `make`, `gcc`, `perl` | Internationalization tool collection |
