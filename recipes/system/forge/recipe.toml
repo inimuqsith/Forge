@@ -29,7 +29,12 @@ type = "custom"
 script = """
 cd "${srcdir}/Forge" || cd "${srcdir}"
 
-# Kompilasi rilis forge CLI dengan Mold linker dan LTO
+# Bersihkan flag LTO dari CFLAGS/CXXFLAGS/LDFLAGS agar cc-rs crate (ring, zstd-sys) mengompilasi native C machine code
+export CFLAGS="$(echo "${CFLAGS}" | sed -E 's/-flto(=[^ ]*)?//g') -fno-lto"
+export CXXFLAGS="$(echo "${CXXFLAGS}" | sed -E 's/-flto(=[^ ]*)?//g') -fno-lto"
+export LDFLAGS="$(echo "${LDFLAGS}" | sed -E 's/-flto(=[^ ]*)?//g')"
+
+# Kompilasi rilis forge CLI dengan Mold linker
 cargo build --release -p forge
 
 # Pasang biner forge ke /usr/bin
