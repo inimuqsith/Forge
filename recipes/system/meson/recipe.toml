@@ -21,5 +21,6 @@ sha256 = ["88afe0c20e52030218924ac37d0c81c59b4b5f3ae3752c8c6d7470c7d365886c"]
 type = "custom"
 script = """
 cd "${srcdir}/meson-${pkgver}"
-python -m pip install --no-deps --root="${DESTDIR}" --prefix=/usr .
+python setup.py build
+python setup.py install --root="${DESTDIR}" --prefix=/usr --optimize=1
 """

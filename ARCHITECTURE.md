@@ -313,3 +313,18 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-055** | Isolated 3-Tier Separation of Concerns & Modular Python Maintainer Suite Architecture (`scripts/maintainer/`) | ✅ Diterapkan |
 | **ADR-056** | Implicit Ambient Build Tools Exemption & Foundation Toolchain Bootstrap Cycle Elimination | ✅ Diterapkan |
 | **ADR-057** | Shared Aggregate Index Sanitization & Collision Exemption Engine (`/usr/share/info/dir`) | ✅ Diterapkan |
+| **ADR-058** | CachyOS CDN77 Query Resolver & Isolated Prebuilt Installation | ✅ Diterapkan |
+| **ADR-059** | Automated Recursive Binhost Dependency Resolution | ✅ Diterapkan |
+| **ADR-060** | Canonical Distro Default Config & Serde Layered Overrides | ✅ Diterapkan |
+| **ADR-061** | Disable Go Bindings in libcap C Toolchain Build | ✅ Diterapkan |
+| **ADR-062** | Dependency Graph Pruning & Smart Skip for Installed Nodes | ✅ Diterapkan |
+| **ADR-063** | Official Release Tarball for libxml2 | ✅ Diterapkan |
+| **ADR-064** | Modern libacl Compatibility for GNU tar | ✅ Diterapkan |
+| **ADR-065** | Upstream GNU GCC v16.2.0 SHA256 Checksum Alignment | ✅ Diterapkan |
+| **ADR-066** | Per-Chunk Stream Idle Timeout vs Total Timeout in SourceDownloader | ✅ Diterapkan |
+| **ADR-067** | Upstream URL & Checksum Realignment for gobject-introspection & libcap-ng | ✅ Diterapkan |
+| **ADR-068** | Smart Multi-Ecosystem Auditor Engine & GNU MPC v1.4.1 Bump | ✅ Diterapkan |
+| **ADR-069** | Bubblewrap Sandbox Writable Bind Mount for Ccache Acceleration | ✅ Diterapkan |
+| **ADR-070** | Fast Clean Python Bootstrap Build without PGO Overhead | ✅ Diterapkan |
+| **ADR-071** | Non-Archive Raw Source File Handling, Dynamic USE Env Injection, & SSOT Matrix Accuracy | ✅ Diterapkan |
+| **ADR-072** | Pip-less Standard `setup.py` Bootstrapping for Meson Build Engine | ✅ Diterapkan |
