@@ -216,6 +216,8 @@ pub struct BuildConfig {
     pub enable_ccache: bool,
     #[serde(default = "default_ccache_dir")]
     pub ccache_dir: String,
+    #[serde(default = "default_cargo_cache_dir")]
+    pub cargo_cache_dir: String,
 }
 
 impl Default for BuildConfig {
@@ -229,6 +231,7 @@ impl Default for BuildConfig {
             prefix: default_prefix(),
             enable_ccache: true,
             ccache_dir: default_ccache_dir(),
+            cargo_cache_dir: default_cargo_cache_dir(),
         }
     }
 }
@@ -241,6 +244,7 @@ fn default_jobs() -> String { "auto".to_string() }
 fn default_prefix() -> String { "/usr".to_string() }
 fn default_true() -> bool { true }
 fn default_ccache_dir() -> String { "/var/cache/forge/ccache".to_string() }
+fn default_cargo_cache_dir() -> String { "/var/cache/forge/cargo".to_string() }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UseConfig {

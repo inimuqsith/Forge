@@ -475,7 +475,7 @@ impl RecipeBuilder {
         };
 
         let cargo_dir = {
-            let p = PathBuf::from("/var/cache/forge/cargo");
+            let p = PathBuf::from(&config.build.cargo_cache_dir);
             let dir = if fs::create_dir_all(&p).is_ok() && fs::File::create(p.join(".write_test")).is_ok() {
                 let _ = fs::remove_file(p.join(".write_test"));
                 p
