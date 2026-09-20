@@ -9,9 +9,9 @@
 | Kategori | Total Paket | Status Kesiapan | Deskripsi Ruang Lingkup |
 | :--- | :---: | :---: | :--- |
 | **`recipes/system/`** | 27 | 🟡 Belum Diuji | Toolchain Sistem, Kernel Headers, C Library & Inisialisasi OpenRC |
-| **`recipes/core/`** | 87 | 🟡 Belum Diuji | Utilitas Dasar, CLI Tools, Filesystem, Networking & Service Daemons |
+| **`recipes/core/`** | 88 | 🟡 Belum Diuji | Utilitas Dasar, CLI Tools, Filesystem, Networking & Service Daemons |
 | **`recipes/extra/`** | 113 | 🟡 Belum Diuji | Bahasa Pemrograman, Desktop Environment, Library Grafis, Audio & Qt6/KDE |
-| **TOTAL RESEP RESMI** | **227** | **🟡 227 Resep Terdaftar (Belum Diuji)** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Hardware, Firmware, Audio, Qt6 & KDE Plasma 6)** |
+| **TOTAL RESEP RESMI** | **228** | **🟡 227 Resep Terdaftar (Belum Diuji)** | **Ekosistem Lengkap Kura Linux (Base, Toolchain, Kernel, Hardware, Firmware, Audio, Qt6 & KDE Plasma 6)** |
 
 ---
 
@@ -21,7 +21,7 @@
 | :--- | :---: | :---: | :--- | :--- | :--- |
 | **`autoconf`** | `2.73` | 🟡 Belum Diuji | `m4`, `glibc` | `make`, `m4`, `gcc` | Extensible package of M4 macros to produce configuration scripts |
 | **`automake`** | `1.19` | 🟡 Belum Diuji | `autoconf`, `glibc` | `make`, `autoconf`, `gcc` | Tool for automatically generating Makefile.in files |
-| **`base`** | `1.0.0` | 🟡 Belum Diuji | `glibc`, `coreutils`, `sed`, `grep`, `gawk`, `tar`, `xz`, `zstd`, `findutils`, `diffutils`, `file`, `which`, `util-linux`, `shadow`, `openrc`, `eudev`, `kmod`, `ca-certificates` | - | Kura Linux Minimal Base System (Meta-Package) |
+| **`base`** | `1.0.0` | 🟡 Belum Diuji | `glibc`, `coreutils`, `sed`, `grep`, `gawk`, `tar`, `gzip`, `bzip2`, `xz`, `zstd`, `findutils`, `diffutils`, `file`, `which`, `util-linux`, `shadow`, `openrc`, `eudev`, `kmod`, `ca-certificates`, `acl`, `attr` | - | Kura Linux Minimal Base System (Meta-Package) |
 | **`base-devel`** | `1.0.0` | 🟡 Belum Diuji | `glibc`, `llvm`, `mold`, `make`, `ninja`, `gcc`, `binutils`, `pkgconf`, `linux-headers`, `patch`, `bubblewrap` | - | Kura Linux Base Development Toolchain (Meta-Package) |
 | **`binutils`** | `2.47` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd` | `bison`, `flex` | GNU binary utilities (as, ld, readelf, objdump, strip, ar) |
 | **`bison`** | `3.8.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `gcc` | General-purpose parser generator |
@@ -49,13 +49,14 @@
 
 ---
 
-## 2. Kategori `recipes/core/` (87 Paket — Utilitas Dasar, CLI Tools, Filesystem, Networking & Service Daemons)
+## 2. Kategori `recipes/core/` (88 Paket — Utilitas Dasar, CLI Tools, Filesystem, Networking & Service Daemons)
 
 | Paket | Versi Hulu | Status | Runtime Dependencies | Build Dependencies | Deskripsi |
 | :--- | :---: | :---: | :--- | :--- | :--- |
-| **`acl`** | `2.4.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Access control list utilities and library |
+| **`acl`** | `2.4.0` | 🟡 Belum Diuji | `glibc`, `attr` | `make`, `gcc` | Access control list utilities and library |
 | **`acpid`** | `2.0.34` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Flexible and extensible ACPI event daemon |
 | **`amd-ucode`** | `20260916` | 🟡 Belum Diuji | - | - | Microcode update image and firmware for AMD CPUs |
+| **`attr`** | `2.6.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Extended attribute support library and tools |
 | **`bash`** | `5.3` | 🟡 Belum Diuji | `glibc`, `readline`, `ncurses` | `make`, `gcc`, `bison`, `pkgconf` | GNU Bourne Again SHell |
 | **`bc`** | `1.08.2` | 🟡 Belum Diuji | `glibc`, `readline` | `make`, `gcc`, `flex`, `bison` | Arbitrary precision numeric processing language |
 | **`bluez`** | `5.87` | 🟡 Belum Diuji | `glibc`, `dbus`, `glib2`, `eudev`, `readline` | `gcc`, `make`, `pkgconf`, `libtool` | Official Linux Bluetooth protocol stack with OpenRC service |
@@ -63,7 +64,7 @@
 | **`bubblewrap`** | `0.12.0` | 🟡 Belum Diuji | `glibc`, `libcap` | `meson`, `ninja`, `pkgconf`, `gcc` | Unprivileged sandboxing tool based on Linux user namespaces |
 | **`bzip2`** | `1.0.8` | 🟡 Belum Diuji | `glibc` | - | A high-quality data compression program |
 | **`ca-certificates`** | `20260909` | 🟡 Belum Diuji | `glibc`, `openssl` | `python` | Common CA root certificates bundle from Mozilla |
-| **`coreutils`** | `9.12` | 🟡 Belum Diuji | `glibc`, `libcap`, `acl` | `make`, `gcc`, `pkgconf` | The basic file, shell and text manipulation utilities of the GNU operating system |
+| **`coreutils`** | `9.12` | 🟡 Belum Diuji | `glibc`, `libcap`, `acl`, `attr` | `make`, `gcc`, `pkgconf` | The basic file, shell and text manipulation utilities of the GNU operating system |
 | **`cronie`** | `1.7.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Standard cron daemon and crontab scheduler |
 | **`curl`** | `8.22.0` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `zstd` | `make`, `gcc`, `pkgconf` | Command line tool and library for transferring data with URLs |
 | **`dbus`** | `1.16.2` | 🟡 Belum Diuji | `glibc`, `expat`, `libcap-ng`, `eudev` | `gcc`, `meson`, `ninja`, `pkgconf`, `glib2`, `python` | Freedesktop.org message bus system |
@@ -122,7 +123,7 @@
 | **`procps-ng`** | `4.0.7` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Utilities for monitoring your system and its processes (ps, top, free) |
 | **`psmisc`** | `23.7` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | Miscellaneous proc-based tools (killall, fuser, pstree) |
 | **`readline`** | `8.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | GNU Readline command line editing library |
-| **`sed`** | `4.10` | 🟡 Belum Diuji | `glibc`, `acl` | `make`, `gcc` | GNU stream editor |
+| **`sed`** | `4.10` | 🟡 Belum Diuji | `glibc`, `acl`, `attr` | `make`, `gcc` | GNU stream editor |
 | **`shadow`** | `4.20.2` | 🟡 Belum Diuji | `glibc`, `acl`, `libcap`, `libseccomp` | `make`, `gcc`, `pkgconf` | Password and account management utilities |
 | **`squashfs-tools`** | `4.7.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `lz4`, `lzo`, `xz`, `zlib`, `zstd` | `gcc`, `make`, `pkgconf` | Tools for squashfs, a highly compressed read-only filesystem for Linux |
 | **`sysklogd`** | `2.7.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Standard Linux system and kernel logging daemons (syslogd, klogd) |

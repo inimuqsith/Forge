@@ -1,0 +1,29 @@
+[package]
+name = "attr"
+version = "2.6.0"
+release = 1
+slot = "0"
+description = "Extended attribute support library and tools"
+license = "GPL-2.0-or-later AND LGPL-2.1-or-later"
+upstream = "https://savannah.nongnu.org/projects/attr"
+
+[dependencies]
+runtime = ["glibc"]
+build = ["make", "gcc"]
+
+[sources]
+urls = [
+    "https://download.savannah.nongnu.org/releases/attr/attr-2.6.0.tar.xz"
+]
+sha256 = [
+    "6c8a2148a7b85043b68492bce43316b0e2e214fc4e628c7ede078e76e216330b"
+]
+
+[build]
+type = "autotools"
+script = """
+cd "${srcdir}/attr-${pkgver}"
+./configure --prefix=/usr --sysconfdir=/etc --disable-static
+make ${MAKEFLAGS}
+make DESTDIR="${DESTDIR}" install
+"""

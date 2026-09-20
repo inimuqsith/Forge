@@ -8,7 +8,7 @@ license = "GPL-2.0-or-later AND LGPL-2.1-or-later"
 upstream = "https://savannah.nongnu.org/projects/acl"
 
 [dependencies]
-runtime = ["glibc"]
+runtime = ["glibc", "attr"]
 build = ["make", "gcc"]
 
 [sources]

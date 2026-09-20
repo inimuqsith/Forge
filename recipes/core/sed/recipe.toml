@@ -8,7 +8,7 @@ license = "GPL-3.0-or-later"
 upstream = "https://www.gnu.org/software/sed/"
 
 [dependencies]
-runtime = ["glibc", "acl"]
+runtime = ["glibc", "acl", "attr"]
 build = ["make", "gcc"]
 
 [sources]
