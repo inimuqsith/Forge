@@ -25,7 +25,6 @@ cmake -G Ninja -B build llvm \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=/usr \
   -DLLVM_ENABLE_PROJECTS="clang;lld;compiler-rt" \
-  -DLLVM_ENABLE_RUNTIMES="libunwind" \
   -DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
   -DLLVM_USE_LINKER=mold \
   -DLLVM_INCLUDE_TESTS=OFF \

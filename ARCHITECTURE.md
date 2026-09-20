@@ -333,3 +333,4 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-075** | Exclusion of LTO in GCC Target Runtime Libraries (`-fno-lto` for `libgcc`) | ✅ Diterapkan |
 | **ADR-076** | Obsolete Meson Option Removal for Bubblewrap v0.12.0 (`require_userns`) | ✅ Diterapkan |
 | **ADR-077** | Explicit CMake/Build ASM Compiler Declaration & Global Environment Export (`ASM`) | ✅ Diterapkan |
+| **ADR-078** | Elimination of Redundant LLVM `libunwind` Runtime in GNU Toolchain | ✅ Diterapkan |
