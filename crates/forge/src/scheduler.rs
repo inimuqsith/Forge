@@ -180,7 +180,14 @@ impl WavefrontScheduler {
             });
         }
 
-        // 1. Inisialisasi in-degree runtime untuk semua paket
+        // 1. Inisialisasi in-degree runtime dan mapping urutan topologis (ADR-086)
+        let step_order: HashMap<&PackageId, usize> = plan
+            .steps
+            .iter()
+            .enumerate()
+            .map(|(idx, step)| (&step.package_id, idx))
+            .collect();
+
         let mut in_degrees: HashMap<PackageId, usize> = HashMap::new();
         for id in graph.nodes.keys() {
             let deg = graph
@@ -194,23 +201,23 @@ impl WavefrontScheduler {
             in_degrees.insert(id.clone(), deg);
         }
 
-        // 2. Siapkan queue node berderajat 0 (Wavefront 0)
+        // 2. Siapkan queue node berderajat 0 (Wavefront 0) dengan prioritas urutan topologis (ADR-086)
         let mut initial_nodes: Vec<PackageId> = in_degrees
             .iter()
             .filter(|(_, &deg)| deg == 0)
             .map(|(id, _)| id.clone())
             .collect();
-        initial_nodes.sort();
+        initial_nodes.sort_by_key(|id| step_order.get(id).copied().unwrap_or(usize::MAX));
         let mut ready_queue: VecDeque<PackageId> = initial_nodes.into();
 
         let (tx, rx) = mpsc::channel::<TaskEvent>();
         let mut in_flight: HashSet<PackageId> = HashSet::new();
         let mut completed: HashSet<PackageId> = HashSet::new();
-        let mut staged_packages: HashMap<PackageId, (PathBuf, PackageNode)> = HashMap::new();
         let mut worker_counter = 0usize;
         let mut compiled_count = 0usize;
         let mut meta_count = 0usize;
         let mut skipped_count = 0usize;
+        let mut total_files_installed = 0usize;
 
         // 3. Loop Dispatcher & Event Processor
         while completed.len() < total_packages {
@@ -420,7 +427,7 @@ impl WavefrontScheduler {
                                 }
                             }
                         }
-                        newly_ready.sort();
+                        newly_ready.sort_by_key(|id| step_order.get(id).copied().unwrap_or(usize::MAX));
                         for dep in newly_ready {
                             ready_queue.push_back(dep);
                         }
@@ -462,18 +469,79 @@ impl WavefrontScheduler {
                             package_id.to_string().bold().magenta(),
                             duration_sec
                         );
+                        if let Some(node) = graph.nodes.get(&package_id) {
+                            let dummy_manifest = PackageManifest {
+                                package_name: node.id.name.clone(),
+                                package_version: node.version.clone(),
+                                release: node.release,
+                                slot: node.id.slot.clone(),
+                                entries: Vec::new(),
+                                metadata: Some(PackageMetadata {
+                                    name: node.id.name.clone(),
+                                    version: node.version.clone(),
+                                    release: node.release,
+                                    slot: node.id.slot.clone(),
+                                    description: format!("Kura Linux Meta Package: {}", node.id.name),
+                                    url: "".to_string(),
+                                    license: "GPL-3.0".to_string(),
+                                    upstream: "".to_string(),
+                                    build_time: std::time::SystemTime::now()
+                                        .duration_since(std::time::UNIX_EPOCH)
+                                        .unwrap_or_default()
+                                        .as_secs(),
+                                    target_march: self.config.cpu.target_march.clone(),
+                                    cflags: self.config.build.cflags.clone(),
+                                    use_flags: self.config.use_flags.flags.clone(),
+                                    files_count: 0,
+                                    installed_size: 0,
+                                    git_commit: None,
+                                }),
+                                use_flags: Some(self.config.use_flags.flags.clone()),
+                                cflags: Some(self.config.build.cflags.clone()),
+                            };
+                            if let Err(e) = db.record_package(&dummy_manifest, target_root) {
+                                eprintln!("  [!] Gagal mencatat manifest meta-paket: {:#}", e);
+                            }
+                        }
                     } else {
                         println!(
-                            "  [Worker {:02}] {} Selesai mengompilasi {} v{} ({:.2}s, Staged)",
+                            "  [Worker {:02}] {} Selesai mengompilasi {} v{} ({:.2}s)",
                             worker_id,
                             "✓".green(),
                             package_id.to_string().bold().green(),
                             version,
                             duration_sec
                         );
-                        if let Some(stg) = staging_dir {
+
+                        // Pipelined Real-time Transactional Merge ke target_root (ADR-086)
+                        if let Some(ref stg) = staging_dir {
                             if let Some(node) = graph.nodes.get(&package_id) {
-                                staged_packages.insert(package_id.clone(), (stg, node.clone()));
+                                let mut tx = MergeTransaction::new(
+                                    &node.id.name,
+                                    &node.version,
+                                    &node.id.slot,
+                                    stg,
+                                    target_root,
+                                    PathBuf::from(&self.config.general.db_path),
+                                );
+                                tx.cflags = Some(self.config.build.cflags.clone());
+                                tx.use_flags = Some(self.config.use_flags.flags.clone());
+
+                                let manifest = tx.execute_merge(db).with_context(|| {
+                                    format!("Gagal menggabungkan paket '{}' ke rootfs target", node.id.name)
+                                })?;
+
+                                total_files_installed += manifest.entries.len();
+                                println!(
+                                    "  [✓] Paket '{}' v{} sukses digabungkan ({} berkas)",
+                                    node.id.name.bold().green(),
+                                    node.version,
+                                    manifest.entries.len()
+                                );
+
+                                if self.scheduler_cfg.clean_staging && stg.exists() {
+                                    let _ = std::fs::remove_dir_all(stg);
+                                }
                             }
                         }
                     }
@@ -491,95 +559,11 @@ impl WavefrontScheduler {
                                 }
                             }
                         }
-                        newly_ready.sort();
+                        newly_ready.sort_by_key(|id| step_order.get(id).copied().unwrap_or(usize::MAX));
                         for dep in newly_ready {
                             ready_queue.push_back(dep);
                         }
                     }
-                }
-            }
-        }
-
-        // 4. Coordinated Transactional Merger Phase
-        println!(
-            "\n{}",
-            "=== Transaksi Penggabungan Sistem (Topological Coordinated Merge) ==="
-                .bold()
-                .cyan()
-        );
-        let mut total_files_installed = 0usize;
-
-        for step in &plan.steps {
-            let pkg_id = &step.package_id;
-            let node = match graph.nodes.get(pkg_id) {
-                Some(n) => n,
-                None => continue,
-            };
-
-            if node.is_meta {
-                let dummy_manifest = PackageManifest {
-                    package_name: node.id.name.clone(),
-                    package_version: node.version.clone(),
-                    release: node.release,
-                    slot: node.id.slot.clone(),
-                    entries: Vec::new(),
-                    metadata: Some(PackageMetadata {
-                        name: node.id.name.clone(),
-                        version: node.version.clone(),
-                        release: node.release,
-                        slot: node.id.slot.clone(),
-                        description: format!("Kura Linux Meta Package: {}", node.id.name),
-                        url: "".to_string(),
-                        license: "GPL-3.0".to_string(),
-                        upstream: "".to_string(),
-                        build_time: std::time::SystemTime::now()
-                            .duration_since(std::time::UNIX_EPOCH)
-                            .unwrap_or_default()
-                            .as_secs(),
-                        target_march: self.config.cpu.target_march.clone(),
-                        cflags: self.config.build.cflags.clone(),
-                        use_flags: self.config.use_flags.flags.clone(),
-                        files_count: 0,
-                        installed_size: 0,
-                        git_commit: None,
-                    }),
-                    use_flags: Some(self.config.use_flags.flags.clone()),
-                    cflags: Some(self.config.build.cflags.clone()),
-                };
-                if let Err(e) = db.record_package(&dummy_manifest, target_root) {
-                    eprintln!("  [!] Gagal mencatat manifest meta-paket: {:#}", e);
-                } else {
-                    println!("  [✓] Meta-paket '{}' berhasil dicatat di database.", node.id.name.magenta());
-                }
-                continue;
-            }
-
-            if let Some((staging_dir, _)) = staged_packages.get(pkg_id) {
-                let mut tx = MergeTransaction::new(
-                    &node.id.name,
-                    &node.version,
-                    &node.id.slot,
-                    staging_dir,
-                    target_root,
-                    PathBuf::from(&self.config.general.db_path),
-                );
-                tx.cflags = Some(self.config.build.cflags.clone());
-                tx.use_flags = Some(self.config.use_flags.flags.clone());
-
-                let manifest = tx.execute_merge(db).with_context(|| {
-                    format!("Gagal menggabungkan paket '{}' ke rootfs target", node.id.name)
-                })?;
-
-                total_files_installed += manifest.entries.len();
-                println!(
-                    "  [✓] Paket '{}' v{} sukses digabungkan ({} berkas)",
-                    node.id.name.bold().green(),
-                    node.version,
-                    manifest.entries.len()
-                );
-
-                if self.scheduler_cfg.clean_staging && staging_dir.exists() {
-                    let _ = std::fs::remove_dir_all(staging_dir);
                 }
             }
         }
