@@ -346,6 +346,7 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-088** | HTTP/2 Library Integration via `nghttp2` for Git HTTPS & Curl Remote Operations | ✅ Diterapkan |
 | **ADR-089** | Integration of Compilation Toolchain into `forge` Runtime Dependencies & Elimination of `base-devel` Meta-Package | ✅ Diterapkan |
 | **ADR-090** | Complete Decompression Suite (`gzip`, `bzip2`, `xz`, `zstd`, `tar`) Integration into `forge` Runtime Dependencies | ✅ Diterapkan |
+| **ADR-091** | Hermetic In-Tree BLAKE3 Bundling for Mold Linker via `-DMOLD_USE_SYSTEM_BLAKE3=OFF` | ✅ Diterapkan |
 
 
 
