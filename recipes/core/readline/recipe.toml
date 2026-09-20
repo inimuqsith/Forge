@@ -23,7 +23,7 @@ sha256 = [
 type = "autotools"
 script = """
 cd "${srcdir}/readline-${pkgver}"
-./configure --prefix=/usr --with-curses --disable-static SHLIB_LIBS="-lncursesw"
-make SHLIB_LIBS="-lncursesw" ${MAKEFLAGS}
-make SHLIB_LIBS="-lncursesw" DESTDIR="${DESTDIR}" install
+./configure --prefix=/usr --with-curses --disable-static SHLIB_LIBS="-Wl,--no-as-needed -lncursesw"
+make SHLIB_LIBS="-Wl,--no-as-needed -lncursesw" ${MAKEFLAGS}
+make SHLIB_LIBS="-Wl,--no-as-needed -lncursesw" DESTDIR="${DESTDIR}" install
 """
