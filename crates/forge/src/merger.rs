@@ -235,12 +235,15 @@ impl MergeTransaction {
             || clean.ends_with("/.forge_staging_complete")
     }
 
-    /// Melakukan Pre-flight Collision Scan terhadap InstalledDatabase
+    /// Melakukan Pre-flight Collision Scan terhadap InstalledDatabase (O(1) in-memory index, ADR-084)
     pub fn preflight_scan(&self, db: &InstalledDatabase) -> Result<CollisionReport> {
         let mut report = CollisionReport {
             total_files: self.entries.len(),
             conflicts: Vec::new(),
         };
+
+        // Bangun inverted index O(1) sekali di awal untuk mencegah I/O disk N x M
+        let ownership_index = db.build_ownership_index()?;
 
         for entry in &self.entries {
             // Direktori sistem bersama atau berkas indeks agregat bersama tidak dianggap tabrakan
@@ -248,12 +251,18 @@ impl MergeTransaction {
                 continue;
             }
 
-            if let Some((owner_pkg, _owner_ver)) = db.find_owner(&entry.relative_path)? {
+            let clean_path = if entry.relative_path.starts_with("/") {
+                entry.relative_path.clone()
+            } else {
+                PathBuf::from("/").join(&entry.relative_path)
+            };
+
+            if let Some((owner_pkg, _owner_ver)) = ownership_index.get(&clean_path) {
                 // Tabrakan hanya jika dimiliki oleh paket lain (bukan paket yang sama)
-                if owner_pkg != self.package_name {
+                if *owner_pkg != self.package_name {
                     report.conflicts.push(FileConflict {
                         target_path: entry.relative_path.clone(),
-                        conflicting_package: owner_pkg,
+                        conflicting_package: owner_pkg.clone(),
                     });
                 }
             }

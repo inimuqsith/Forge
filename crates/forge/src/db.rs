@@ -361,6 +361,25 @@ impl InstalledDatabase {
         self.get_package(pkg_name).map(|opt| opt.is_some()).unwrap_or(false)
     }
 
+    /// Membangun inverted index in-memory (PathBuf -> (PackageName, VersionSlot))
+    /// untuk pencarian kepemilikan berkas O(1) ultra-cepat (ADR-084)
+    pub fn build_ownership_index(&self) -> Result<std::collections::HashMap<PathBuf, (String, String)>> {
+        let mut index = std::collections::HashMap::new();
+        let all = self.list_installed()?;
+        for pkg in all {
+            let version_slot = format!("{}:{}", pkg.package_version, pkg.slot);
+            for entry in pkg.entries {
+                let clean_path = if entry.path.starts_with("/") {
+                    entry.path
+                } else {
+                    PathBuf::from("/").join(entry.path)
+                };
+                index.insert(clean_path, (pkg.package_name.clone(), version_slot.clone()));
+            }
+        }
+        Ok(index)
+    }
+
     /// Mencari paket pemilik file tertentu di rootfs
     pub fn find_owner(&self, relative_path: &Path) -> Result<Option<(String, String)>> {
         let clean_path = if relative_path.starts_with("/") {
@@ -369,23 +388,8 @@ impl InstalledDatabase {
             PathBuf::from("/").join(relative_path)
         };
 
-        let all = self.list_installed()?;
-        for pkg in all {
-            for entry in &pkg.entries {
-                let entry_clean = if entry.path.starts_with("/") {
-                    entry.path.clone()
-                } else {
-                    PathBuf::from("/").join(&entry.path)
-                };
-
-                if entry_clean == clean_path {
-                    let version_slot = format!("{}:{}", pkg.package_version, pkg.slot);
-                    return Ok(Some((pkg.package_name, version_slot)));
-                }
-            }
-        }
-
-        Ok(None)
+        let index = self.build_ownership_index()?;
+        Ok(index.get(&clean_path).cloned())
     }
 
     /// Mencatat manifes dan metadata paket yang berhasil di-merge ke database
@@ -670,5 +674,12 @@ mod tests {
 
         let owner = db.find_owner(Path::new("/usr/bin/test-bin")).unwrap();
         assert_eq!(owner, Some(("test-pkg".to_string(), "1.0.0:0".to_string())));
+
+        let index = db.build_ownership_index().unwrap();
+        assert_eq!(
+            index.get(Path::new("/usr/bin/test-bin")),
+            Some(&("test-pkg".to_string(), "1.0.0:0".to_string()))
+        );
+        assert_eq!(index.get(Path::new("/usr/bin/nonexistent")), None);
     }
 }

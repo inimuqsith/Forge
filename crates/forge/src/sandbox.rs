@@ -321,20 +321,24 @@ impl SandboxRunner {
         std::fs::create_dir_all(destdir)
             .with_context(|| format!("Gagal membuat direktori destdir {:?}", destdir))?;
 
-        // Deteksi direktori writable tambahan (misal CCACHE_DIR)
+        // Deteksi direktori writable tambahan (misal CCACHE_DIR dan CARGO_HOME)
         let mut extra_binds = Vec::new();
-        if let Some(ccache_dir_str) = env_vars.get("CCACHE_DIR") {
-            let ccache_path = PathBuf::from(ccache_dir_str);
-            if !ccache_path.as_os_str().is_empty() {
-                let abs_ccache_path = if ccache_path.is_absolute() {
-                    ccache_path
-                } else {
-                    std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")).join(&ccache_path)
-                };
-                let _ = std::fs::create_dir_all(&abs_ccache_path);
-                if abs_ccache_path.exists() {
-                    let canonical = abs_ccache_path.canonicalize().unwrap_or(abs_ccache_path);
-                    extra_binds.push(canonical);
+        for key in &["CCACHE_DIR", "CARGO_HOME"] {
+            if let Some(dir_str) = env_vars.get(*key) {
+                let p = PathBuf::from(dir_str);
+                if !p.as_os_str().is_empty() {
+                    let abs_path = if p.is_absolute() {
+                        p
+                    } else {
+                        std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")).join(&p)
+                    };
+                    let _ = std::fs::create_dir_all(&abs_path);
+                    if abs_path.exists() {
+                        let canonical = abs_path.canonicalize().unwrap_or(abs_path);
+                        if !extra_binds.contains(&canonical) {
+                            extra_binds.push(canonical);
+                        }
+                    }
                 }
             }
         }
@@ -571,10 +575,12 @@ pub mod tests {
         let build_dir = Path::new("/tmp/forge/build/test-pkg-1.0");
         let destdir = Path::new("/tmp/forge/stage/test-pkg");
         let ccache_dir = PathBuf::from("/var/cache/forge/ccache");
+        let cargo_dir = PathBuf::from("/var/cache/forge/cargo");
 
-        let args = SandboxRunner::build_bwrap_args_extended(build_dir, destdir, None, &[ccache_dir.clone()]);
+        let args = SandboxRunner::build_bwrap_args_extended(build_dir, destdir, None, &[ccache_dir.clone(), cargo_dir.clone()]);
         assert!(args.contains(&"--bind".to_string()));
         assert!(args.contains(&ccache_dir.display().to_string()));
+        assert!(args.contains(&cargo_dir.display().to_string()));
     }
 
     #[test]

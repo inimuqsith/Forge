@@ -474,6 +474,24 @@ impl RecipeBuilder {
             (cc_base, cxx_base)
         };
 
+        let cargo_dir = {
+            let p = PathBuf::from("/var/cache/forge/cargo");
+            let dir = if fs::create_dir_all(&p).is_ok() && fs::File::create(p.join(".write_test")).is_ok() {
+                let _ = fs::remove_file(p.join(".write_test"));
+                p
+            } else {
+                let fallback = distfiles_dir.join(".cargo");
+                fs::create_dir_all(&fallback).ok();
+                fallback
+            };
+            let abs = if dir.is_absolute() {
+                dir
+            } else {
+                std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")).join(dir)
+            };
+            abs.canonicalize().unwrap_or(abs)
+        };
+
         // 4. Jalankan script build jika ada
         if !build_meta.script.is_empty() {
             println!("  [🔨] Menjalankan script kompilasi dengan CC={}, LD={}...", cc, ld);
@@ -485,6 +503,7 @@ impl RecipeBuilder {
             env_vars.insert("USE".to_string(), config.use_flags.flags.clone());
             env_vars.insert("USE_FLAGS".to_string(), config.use_flags.flags.clone());
             env_vars.insert("CCACHE_DIR".to_string(), ccache_dir.display().to_string());
+            env_vars.insert("CARGO_HOME".to_string(), cargo_dir.display().to_string());
             env_vars.insert("CFLAGS".to_string(), cflags.clone());
             env_vars.insert("CXXFLAGS".to_string(), cxxflags.clone());
             env_vars.insert("LDFLAGS".to_string(), ldflags.clone());

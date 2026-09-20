@@ -339,4 +339,5 @@ DESTDIR="${DESTDIR}" ninja -C build install
 | **ADR-081** | Deterministic Staging Completion Markers, Partial Cleanup on Build Error & Atomic Merger Hardening | ✅ Diterapkan |
 | **ADR-082** | Hermetic Offline Stage0 Bootstrapping for Rust Toolchain | ✅ Diterapkan |
 | **ADR-083** | Unified Monolithic LLVM Toolchain Consolidation & Clang Meta-Package Alias | ✅ Diterapkan |
+| **ADR-084** | O(1) In-Memory Pre-Flight Collision Indexing & Shared System Cargo Cache | ✅ Diterapkan |
 
