@@ -1,6 +1,6 @@
 [package]
 name = "util-linux"
-version = "2.42.3"
+version = "2.42.4"
 release = 1
 slot = "0"
 description = "Miscellaneous system utilities for Linux"
@@ -16,7 +16,7 @@ urls = [
     "https://kernel.org/pub/linux/utils/util-linux/v2.42/util-linux-2.42.3.tar.xz"
 ]
 sha256 = [
-    "66ac7c0e725278eb2b039e3104f2c91119341d941b41bac7a285c695f940bd57"
+    "fbd62a100ab7bb8746ba0661255c3c48185b1e9021507c624da01fbc696330ec"
 ]
 
 [build]

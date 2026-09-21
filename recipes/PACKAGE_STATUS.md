@@ -130,7 +130,7 @@
 | **`tar`** | `1.35` | 🟡 Belum Diuji | `glibc`, `acl` | `make`, `gcc` | Utility used to store, backup, and transport files |
 | **`unzip`** | `6.0` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Extraction utility for archives compressed in .zip format |
 | **`usbutils`** | `019` | 🟡 Belum Diuji | `glibc`, `hwdata` | `make`, `gcc`, `pkgconf` | USB device listing and inspection utilities (lsusb) |
-| **`util-linux`** | `2.42.3` | 🟡 Belum Diuji | `glibc`, `ncurses`, `zlib`, `libcap`, `libseccomp` | `make`, `gcc`, `pkgconf` | Miscellaneous system utilities for Linux |
+| **`util-linux`** | `2.42.4` | 🟡 Belum Diuji | `glibc`, `ncurses`, `zlib`, `libcap`, `libseccomp` | `make`, `gcc`, `pkgconf` | Miscellaneous system utilities for Linux |
 | **`wget`** | `1.25.0` | 🟡 Belum Diuji | `glibc`, `openssl`, `pcre2`, `zlib` | `make`, `gcc`, `pkgconf` | Network utility to retrieve files from the Web using HTTP, HTTPS and FTP |
 | **`which`** | `2.25` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Displays where a particular program is found in the path |
 | **`wireless-regdb`** | `2026.09.03` | 🟡 Belum Diuji | - | - | Wireless regulatory database for Linux kernel and CRDA |
@@ -239,7 +239,7 @@
 | **`qt6-svg`** | `6.8.2` | 🟡 Belum Diuji | `qt6-base`, `zlib` | `cmake`, `ninja`, `pkgconf` | Classes for displaying the contents of SVG files in Qt6 |
 | **`qt6-wayland`** | `6.8.2` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `libdrm`, `wayland` | `cmake`, `ninja`, `pkgconf`, `wayland-protocols`, `vulkan-headers` | Provides APIs for Wayland client and compositor support in Qt6 |
 | **`ripgrep`** | `15.2.0` | 🟡 Belum Diuji | `glibc`, `pcre2` | `cargo`, `rust`, `pkgconf` | Ultra-fast line-oriented search tool combining grep with find |
-| **`rsync`** | `3.5.0` | 🟡 Belum Diuji | `glibc`, `zstd`, `openssl`, `acl` | `make`, `gcc`, `pkgconf` | Fast and versatile remote file copying tool |
+| **`rsync`** | `3.5.1` | 🟡 Belum Diuji | `glibc`, `zstd`, `openssl`, `acl` | `make`, `gcc`, `pkgconf` | Fast and versatile remote file copying tool |
 | **`rust`** | `1.98.1` | 🟡 Belum Diuji | `glibc`, `llvm`, `zlib`, `openssl`, `curl` | `python`, `cmake`, `ninja`, `gcc`, `make` | Empowering everyone to build reliable and efficient systems programming language |
 | **`sddm`** | `0.21.0` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `pam`, `shadow` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | QML and Wayland based modern display manager |
 | **`seatd`** | `0.9.3` | 🟡 Belum Diuji | `glibc`, `eudev` | `meson`, `ninja`, `pkgconf` | A minimal seat management daemon, and a universal seat management library |
