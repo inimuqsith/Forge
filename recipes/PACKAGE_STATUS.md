@@ -60,7 +60,7 @@
 | **`bc`** | `1.08.2` | 🟡 Belum Diuji | `glibc`, `readline` | `make`, `gcc`, `flex`, `bison` | Arbitrary precision numeric processing language |
 | **`bluez`** | `5.87` | 🟡 Belum Diuji | `glibc`, `dbus`, `glib2`, `eudev`, `readline` | `gcc`, `make`, `pkgconf`, `libtool` | Official Linux Bluetooth protocol stack with OpenRC service |
 | **`btrfs-progs`** | `7.1` | 🟡 Belum Diuji | `glibc`, `libgcrypt`, `lzo`, `eudev`, `util-linux`, `zlib`, `zstd` | `gcc`, `e2fsprogs`, `pkgconf`, `make` | Btrfs filesystem utilities |
-| **`bubblewrap`** | `0.12.0` | 🟡 Belum Diuji | `glibc`, `libcap` | `meson`, `ninja`, `pkgconf`, `gcc` | Unprivileged sandboxing tool based on Linux user namespaces |
+| **`bubblewrap`** | `0.13.0` | 🟡 Belum Diuji | `glibc`, `libcap` | `meson`, `ninja`, `pkgconf`, `gcc` | Unprivileged sandboxing tool based on Linux user namespaces |
 | **`bzip2`** | `1.0.8` | 🟡 Belum Diuji | `glibc` | - | A high-quality data compression program |
 | **`ca-certificates`** | `20260909` | 🟡 Belum Diuji | `glibc`, `openssl` | `python` | Common CA root certificates bundle from Mozilla |
 | **`coreutils`** | `9.12` | 🟡 Belum Diuji | `glibc`, `libcap`, `acl`, `attr` | `make`, `gcc`, `pkgconf` | The basic file, shell and text manipulation utilities of the GNU operating system |
@@ -83,7 +83,7 @@
 | **`gawk`** | `5.4.1` | 🟡 Belum Diuji | `glibc`, `readline`, `gmp`, `mpfr` | `make`, `gcc` | GNU awk pattern scanning and processing language |
 | **`grep`** | `3.12` | 🟡 Belum Diuji | `glibc`, `pcre2` | `make`, `gcc`, `pkgconf` | GNU grep, egrep and fgrep |
 | **`groff`** | `1.24.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `pkgconf` | GNU troff text-formatting system |
-| **`grub`** | `2.14` | 🟡 Belum Diuji | `glibc`, `xz` | `gcc`, `make`, `pkgconf`, `flex`, `bison`, `python` | GNU GRand Unified Bootloader (2) |
+| **`grub`** | `2.16` | 🟡 Belum Diuji | `glibc`, `xz` | `gcc`, `make`, `pkgconf`, `flex`, `bison`, `python` | GNU GRand Unified Bootloader (2) |
 | **`gzip`** | `1.15` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Popular data compression program |
 | **`hwdata`** | `0.411` | 🟡 Belum Diuji | `glibc` | `make` | Hardware identification databases (pci.ids, usb.ids, oui.txt) |
 | **`intel-ucode`** | `20260812` | 🟡 Belum Diuji | - | - | Microcode update files and early-initramfs image for Intel CPUs |
