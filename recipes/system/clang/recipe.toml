@@ -1,6 +1,6 @@
 [package]
 name = "clang"
-version = "23.1.1"
+version = "23.1.2"
 release = 1
 slot = "22"
 description = "C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm)"

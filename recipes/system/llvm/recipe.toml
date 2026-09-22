@@ -1,6 +1,6 @@
 [package]
 name = "llvm"
-version = "23.1.1"
+version = "23.1.2"
 release = 1
 slot = "22"
 description = "LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22)"
@@ -15,7 +15,9 @@ build = ["cmake", "ninja", "pkgconf", "make", "python"]
 urls = [
     "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.1/llvm-project-23.1.1.src.tar.xz"
 ]
-sha256 = ["ebe9be46fe8756d58c5b198ffad0fa2a766257add81a4dc52179bfacc7888ee6"]
+sha256 = [
+    "c98bbef08a2b4c2613cd50e9aa9ae7b69b1fe6c16b2c40373bc0ab6116fdf78a"
+]
 
 [build]
 type = "cmake"
