@@ -41,7 +41,7 @@
 | **`meson`** | `1.12.1` | 🟡 Belum Diuji | `glibc`, `python`, `ninja` | `python` | Fast and user friendly build system |
 | **`mold`** | `2.42.1` | 🟡 Belum Diuji | `glibc`, `zlib`, `openssl` | `gcc`, `cmake`, `make` | High-performance modern linker (Latest 2.42.1) |
 | **`ninja`** | `1.13.2` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `python` | Small build system with a focus on speed (Latest 1.13.2) |
-| **`openrc`** | `0.64` | 🟡 Belum Diuji | `glibc`, `ncurses` | `meson`, `ninja`, `pkgconf`, `make` | Service and init manager for Kura Linux |
+| **`openrc`** | `0.64.1` | 🟡 Belum Diuji | `glibc`, `ncurses` | `meson`, `ninja`, `pkgconf`, `make` | Service and init manager for Kura Linux |
 | **`patch`** | `2.8` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Utility to apply diffs to files |
 | **`perl`** | `5.44.0` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2` | `make`, `gcc` | Highly capable, feature-rich programming language |
 | **`pkgconf`** | `3.0.7` | 🟡 Belum Diuji | `glibc` | `gcc`, `make` | Package compiler and linker metadata toolkit (Latest 3.0.7) |
@@ -157,7 +157,7 @@
 | **`bottom`** | `0.14.9` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `git`, `rust` | A graphical process/system monitor |
 | **`breeze`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `kcoreaddons`, `kconfig`, `kwidgetsaddons`, `kwindowsystem` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Artwork, styles and assets for the Breeze visual theme |
 | **`btop`** | `1.4.7` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Modern and beautiful resource monitor that shows usage and stats for processor, memory, disks, network and processes |
-| **`cairo`** | `1.18.4` | 🟡 Belum Diuji | `glibc`, `pixman`, `freetype`, `fontconfig`, `zlib`, `libpng` | `meson`, `ninja`, `pkgconf` | 2D graphics library with support for multiple output devices |
+| **`cairo`** | `1.18.6` | 🟡 Belum Diuji | `glibc`, `pixman`, `freetype`, `fontconfig`, `zlib`, `libpng` | `meson`, `ninja`, `pkgconf` | 2D graphics library with support for multiple output devices |
 | **`cargo`** | `1.85.0` | 🟡 Belum Diuji | `glibc`, `rust`, `openssl`, `curl`, `zlib` | `rust` | Rust Package Manager and Build Tool |
 | **`ccache`** | `4.14` | 🟡 Belum Diuji | `glibc`, `zstd` | `cmake`, `ninja`, `gcc`, `pkgconf` | Fast compiler cache for C/C++ |
 | **`cowsay`** | `3.8.4` | 🟡 Belum Diuji | `glibc`, `perl` | `make` | Configurable talking cow (Latest 3.8.4) |

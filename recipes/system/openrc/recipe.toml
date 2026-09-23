@@ -1,6 +1,6 @@
 [package]
 name = "openrc"
-version = "0.64"
+version = "0.64.1"
 release = 1
 slot = "0"
 description = "Service and init manager for Kura Linux"
@@ -15,7 +15,9 @@ build = ["meson", "ninja", "pkgconf", "make"]
 urls = [
     "https://github.com/OpenRC/openrc/archive/refs/tags/0.64.tar.gz"
 ]
-sha256 = ["f52dd53d6bd798476f8f0b74c5722afa1a59e408a4ec49c1333e5a152a25440d"]
+sha256 = [
+    "56d6d24c7fd2ca15d1abd1fb82ce5430629a71acb2c3fa12760300243dbd0baa"
+]
 
 [build]
 type = "meson"
