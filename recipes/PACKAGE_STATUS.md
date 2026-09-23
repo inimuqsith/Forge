@@ -38,7 +38,7 @@
 | **`llvm`** | `23.1.2` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `libxml2` | `cmake`, `ninja`, `pkgconf`, `make`, `python` | LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22) |
 | **`m4`** | `1.4.21` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | GNU Macro Processor |
 | **`make`** | `4.4.1` | 🟡 Belum Diuji | `glibc` | - | GNU Make utility to maintain groups of programs |
-| **`meson`** | `1.12.0` | 🟡 Belum Diuji | `glibc`, `python`, `ninja` | `python` | Fast and user friendly build system |
+| **`meson`** | `1.12.1` | 🟡 Belum Diuji | `glibc`, `python`, `ninja` | `python` | Fast and user friendly build system |
 | **`mold`** | `2.42.1` | 🟡 Belum Diuji | `glibc`, `zlib`, `openssl` | `gcc`, `cmake`, `make` | High-performance modern linker (Latest 2.42.1) |
 | **`ninja`** | `1.13.2` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `python` | Small build system with a focus on speed (Latest 1.13.2) |
 | **`openrc`** | `0.64` | 🟡 Belum Diuji | `glibc`, `ncurses` | `meson`, `ninja`, `pkgconf`, `make` | Service and init manager for Kura Linux |
