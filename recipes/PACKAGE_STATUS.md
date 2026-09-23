@@ -124,7 +124,7 @@
 | **`psmisc`** | `23.7` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | Miscellaneous proc-based tools (killall, fuser, pstree) |
 | **`readline`** | `8.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | GNU Readline command line editing library |
 | **`sed`** | `4.10` | 🟡 Belum Diuji | `glibc`, `acl`, `attr` | `make`, `gcc` | GNU stream editor |
-| **`shadow`** | `4.20.2` | 🟡 Belum Diuji | `glibc`, `acl`, `libcap`, `libseccomp` | `make`, `gcc`, `pkgconf` | Password and account management utilities |
+| **`shadow`** | `4.20.3` | 🟡 Belum Diuji | `glibc`, `acl`, `libcap`, `libseccomp` | `make`, `gcc`, `pkgconf` | Password and account management utilities |
 | **`squashfs-tools`** | `4.7.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `lz4`, `lzo`, `xz`, `zlib`, `zstd` | `gcc`, `make`, `pkgconf` | Tools for squashfs, a highly compressed read-only filesystem for Linux |
 | **`sysklogd`** | `2.7.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Standard Linux system and kernel logging daemons (syslogd, klogd) |
 | **`tar`** | `1.35` | 🟡 Belum Diuji | `glibc`, `acl` | `make`, `gcc` | Utility used to store, backup, and transport files |

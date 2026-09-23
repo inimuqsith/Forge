@@ -1,6 +1,6 @@
 [package]
 name = "shadow"
-version = "4.20.2"
+version = "4.20.3"
 release = 1
 slot = "0"
 description = "Password and account management utilities"
