@@ -116,7 +116,7 @@
 | **`nghttp2`** | `1.70.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `make`, `gcc`, `pkgconf` | HTTP/2 C library and tools |
 | **`openssl`** | `4.1.0-alpha1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `perl` | Robust, commercial-grade TLS/SSL cryptography toolkit |
 | **`pam`** | `1.7.2` | 🟡 Belum Diuji | `glibc` | `gcc`, `make`, `flex`, `bison`, `linux-headers`, `pkgconf` | Pluggable Authentication Modules for Linux |
-| **`parted`** | `3.7` | 🟡 Belum Diuji | `glibc`, `util-linux` | `make`, `gcc`, `pkgconf` | A program for creating, destroying, resizing, checking and copying partitions |
+| **`parted`** | `3.8` | 🟡 Belum Diuji | `glibc`, `util-linux` | `make`, `gcc`, `pkgconf` | A program for creating, destroying, resizing, checking and copying partitions |
 | **`pciutils`** | `3.15.0` | 🟡 Belum Diuji | `glibc`, `hwdata`, `kmod` | `pkgconf` | PCI bus configuration and diagnostic tools (lspci, setpci) |
 | **`polkit`** | `127` | 🟡 Belum Diuji | `glibc`, `duktape`, `expat`, `glib2`, `pam`, `eudev` | `gcc`, `dbus`, `glib2`, `gobject-introspection`, `meson`, `ninja`, `pkgconf` | Application development toolkit for controlling system-wide privileges |
 | **`popt`** | `1.19` | 🟡 Belum Diuji | `glibc` | `gcc`, `make`, `autoconf`, `automake`, `libtool`, `pkgconf` | Command line option parsing library |
