@@ -1,6 +1,6 @@
 [package]
 name = "tmux"
-version = "3.8-rc"
+version = "3.8-rc2"
 release = 1
 slot = "0"
 description = "Terminal multiplexer workspace utility"
@@ -15,7 +15,9 @@ build = ["make", "gcc", "pkgconf"]
 urls = [
     "https://github.com/tmux/tmux/releases/download/3.8-rc/tmux-3.8-rc.tar.gz"
 ]
-sha256 = ["decb97e52e91a459f9b9d5726d64cd7cb87506eca1090817da6cc84a9a71eb51"]
+sha256 = [
+    "6a976a6ee712ab12562f4671d7de55a919bc1f0067c3703ed5871378700a2fee"
+]
 
 [build]
 type = "autotools"
