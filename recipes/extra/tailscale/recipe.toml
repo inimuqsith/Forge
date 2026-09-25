@@ -1,6 +1,6 @@
 [package]
 name = "tailscale"
-version = "1.102.4"
+version = "1.102.5"
 release = 1
 slot = "0"
 description = "Zero config VPN daemon and CLI for secure mesh networks"
