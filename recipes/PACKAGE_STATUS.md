@@ -168,7 +168,7 @@
 | **`expat`** | `R_2_8_5` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | XML parser library written in C |
 | **`extra-cmake-modules`** | `6.30.0` | 🟡 Belum Diuji | - | `cmake` | Extra modules and scripts for CMake used by KDE Frameworks |
 | **`eza`** | `0.23.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
-| **`fastfetch`** | `2.68.1` | 🟡 Belum Diuji | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
+| **`fastfetch`** | `2.69.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
 | **`fcft`** | `3.3.3` | 🟡 Belum Diuji | `glibc`, `fontconfig`, `freetype`, `pixman`, `libutf8proc` | `meson`, `ninja`, `gcc`, `pkgconf`, `tllist` | Simple library for font loading and glyph rasterization |
 | **`fd`** | `10.5.0` | 🟡 Belum Diuji | `glibc` | `cargo`, `rust` | Simple, fast and user-friendly alternative to find |
 | **`fish`** | `4.9.3` | 🟡 Belum Diuji | `glibc`, `gcc`, `pcre2` | `gcc`, `cmake`, `ninja`, `rust`, `pkgconf` | Smart and user friendly shell intended mostly for interactive use |
@@ -212,7 +212,7 @@
 | **`libksysguard`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `kcoreaddons`, `kconfig`, `ki18n`, `kauth`, `zlib` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Task management and system monitoring library for KDE Plasma |
 | **`libpng`** | `1.6.58` | 🟡 Belum Diuji | `glibc`, `zlib` | `make`, `gcc` | Official PNG reference library |
 | **`libssh2`** | `1.11.1` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib` | `make`, `gcc`, `pkgconf` | Client-side C library implementing the SSH2 protocol |
-| **`libutf8proc`** | `2.11.3` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Clean C library for processing UTF-8 Unicode data |
+| **`libutf8proc`** | `2.12.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Clean C library for processing UTF-8 Unicode data |
 | **`libxcb`** | `1.17.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf`, `python` | X11 C Bindings library |
 | **`libxcursor`** | `1.2.3` | 🟡 Belum Diuji | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | Cursor management library for X |
 | **`libxi`** | `1.8.3` | 🟡 Belum Diuji | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | X11 Input extension library |
