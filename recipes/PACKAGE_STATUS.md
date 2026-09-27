@@ -76,7 +76,7 @@
 | **`elfutils`** | `0.196` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `xz`, `zstd` | `make`, `gcc`, `pkgconf`, `m4`, `flex`, `bison` | Libraries and tools for handling ELF files and DWARF data |
 | **`elogind`** | `257.16` | 🟡 Belum Diuji | `glibc`, `pam`, `acl`, `libcap` | `gcc`, `intltool`, `libtool`, `gperf`, `libcap`, `meson`, `ninja`, `pkgconf` | The systemd project |
 | **`ethtool`** | `7.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Utility for examining and tuning network interfaces and drivers |
-| **`eudev`** | `3.2.14` | 🟡 Belum Diuji | `glibc`, `kmod`, `hwdata` | `make`, `gcc`, `pkgconf`, `gperf` | Standalone device manager fork of systemd-udev for OpenRC |
+| **`eudev`** | `3.2.15` | 🟡 Belum Diuji | `glibc`, `kmod`, `hwdata` | `make`, `gcc`, `pkgconf`, `gperf` | Standalone device manager fork of systemd-udev for OpenRC |
 | **`f2fs-tools`** | `1.16.0` | 🟡 Belum Diuji | `glibc`, `util-linux` | `gcc`, `git` | Tools for Flash-Friendly File System (F2FS) |
 | **`file`** | `5.48` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `xz`, `zstd` | `make`, `gcc`, `pkgconf` | File type identification utility and libmagic |
 | **`findutils`** | `4.11.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | GNU utilities for finding files (find, xargs, locate) |
