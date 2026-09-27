@@ -1,6 +1,6 @@
 [package]
 name = "ccache"
-version = "4.14"
+version = "4.14.1"
 release = 1
 slot = "0"
 description = "Fast compiler cache for C/C++"
@@ -15,7 +15,9 @@ build = ["cmake", "ninja", "gcc", "pkgconf"]
 urls = [
     "https://github.com/ccache/ccache/releases/download/v4.14/ccache-4.14.tar.xz"
 ]
-sha256 = ["b093ac5d38204cb4d9f29b0bbd570675aa5a592a78e6675b2c506dbe045234e7"]
+sha256 = [
+    "29f10de481ac2c41c91bfabead63d803bd2fe823e09752aade5b0b8704cc4f30"
+]
 
 [build]
 type = "cmake"
