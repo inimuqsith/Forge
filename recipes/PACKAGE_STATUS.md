@@ -82,7 +82,7 @@
 | **`findutils`** | `4.11.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | GNU utilities for finding files (find, xargs, locate) |
 | **`gawk`** | `5.4.1` | 🟡 Belum Diuji | `glibc`, `readline`, `gmp`, `mpfr` | `make`, `gcc` | GNU awk pattern scanning and processing language |
 | **`grep`** | `3.12` | 🟡 Belum Diuji | `glibc`, `pcre2` | `make`, `gcc`, `pkgconf` | GNU grep, egrep and fgrep |
-| **`groff`** | `1.24.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `pkgconf` | GNU troff text-formatting system |
+| **`groff`** | `1.24.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `pkgconf` | GNU troff text-formatting system |
 | **`grub`** | `2.16` | 🟡 Belum Diuji | `glibc`, `xz` | `gcc`, `make`, `pkgconf`, `flex`, `bison`, `python` | GNU GRand Unified Bootloader (2) |
 | **`gzip`** | `1.15` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Popular data compression program |
 | **`hwdata`** | `0.411` | 🟡 Belum Diuji | `glibc` | `make` | Hardware identification databases (pci.ids, usb.ids, oui.txt) |
@@ -177,7 +177,7 @@
 | **`freetype`** | `2.14.3` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `libpng` | `meson`, `ninja`, `pkgconf` | Freely available software library to render fonts |
 | **`fzf`** | `0.74.4` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `go` | Command-line fuzzy finder |
 | **`gh`** | `2.101.0` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `make`, `go` | The GitHub CLI |
-| **`git`** | `2.55.0` | 🟡 Belum Diuji | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2`, `nghttp2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
+| **`git`** | `2.56.0` | 🟡 Belum Diuji | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2`, `nghttp2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
 | **`glib2`** | `2.90.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `pcre2`, `zlib` | `meson`, `ninja`, `pkgconf`, `gcc` | Core low-level data structure and utility library from GNOME |
 | **`gmp`** | `6.3.0` | 🟡 Belum Diuji | `glibc` | `m4` | GNU Multiple Precision Arithmetic Library |
 | **`go`** | `1.27.1` | 🟡 Belum Diuji | `glibc`, `ca-certificates` | `make`, `gcc`, `bash` | Open source programming language that makes it easy to build simple, fast, and reliable software |
