@@ -257,7 +257,7 @@
 | **`vulkan-loader`** | `1.4.364` | 🟡 Belum Diuji | `glibc`, `vulkan-headers`, `wayland` | `cmake`, `ninja`, `pkgconf`, `python` | Vulkan Installable Client Driver (ICD) Loader |
 | **`wayland`** | `1.26.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `expat`, `libxml2` | `gcc`, `meson`, `ninja`, `pkgconf`, `libxslt` | A computer display server protocol |
 | **`wayland-protocols`** | `1.49` | 🟡 Belum Diuji | `glibc` | `gcc`, `wayland`, `meson`, `ninja` | Specifications of extended Wayland protocols |
-| **`wireplumber`** | `0.5.17` | 🟡 Belum Diuji | `glibc`, `pipewire`, `glib2` | `meson`, `ninja`, `pkgconf`, `glib2` | Modular session manager daemon and policy router for PipeWire |
+| **`wireplumber`** | `0.5.18` | 🟡 Belum Diuji | `glibc`, `pipewire`, `glib2` | `meson`, `ninja`, `pkgconf`, `glib2` | Modular session manager daemon and policy router for PipeWire |
 | **`zellij`** | `0.45.1` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `zlib` | `rust`, `mold`, `llvm`, `pkgconf` | A terminal multiplexer |
 | **`zlib`** | `1.3.2` | 🟡 Belum Diuji | `glibc` | - | Standard compression library implementing DEFLATE algorithm |
 | **`zoxide`** | `0.10.0` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `rust` | A smarter cd command for your terminal |

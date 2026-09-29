@@ -1,6 +1,6 @@
 [package]
 name = "wireplumber"
-version = "0.5.17"
+version = "0.5.18"
 release = 1
 slot = "0"
 description = "Modular session manager daemon and policy router for PipeWire"
@@ -16,7 +16,7 @@ urls = [
   "https://gitlab.freedesktop.org/pipewire/wireplumber/-/archive/0.5.17/wireplumber-0.5.17.tar.gz"
 ]
 sha256 = [
-  "85d797ad6336a1be5f39f2059c7677b6f625fc8b07ece37cf50495f9412e0210"
+    "8c8a326a5b2a570681c1503c83f1fce0cc54ba862019815604b2bc92a7d483a1"
 ]
 
 [build]
