@@ -1,6 +1,6 @@
 [package]
 name = "gh"
-version = "2.101.0"
+version = "2.102.0"
 release = 1
 slot = "0"
 description = "The GitHub CLI"
@@ -15,7 +15,9 @@ build = ["gcc", "make", "go"]
 urls = [
     "https://github.com/cli/cli/archive/refs/tags/v2.101.0.tar.gz"
 ]
-sha256 = ["a266fe8575c0e061b987920c1831a15f71bf0036a8729a5ebb93c2fb0164899c"]
+sha256 = [
+    "08bf0ef8b4409893889175e0f5279d30d6edd96465816042c0d7c72eac598158"
+]
 
 [build]
 type = "custom"
