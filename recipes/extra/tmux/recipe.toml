@@ -1,6 +1,6 @@
 [package]
 name = "tmux"
-version = "3.8-rc2"
+version = "3.8-rc3"
 release = 1
 slot = "0"
 description = "Terminal multiplexer workspace utility"
