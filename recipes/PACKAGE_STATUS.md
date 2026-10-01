@@ -108,7 +108,7 @@
 | **`lz4`** | `1.10.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Extremely fast compression algorithm |
 | **`lzo`** | `2.10` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Portable lossless data compression library |
 | **`man-pages`** | `6.19` | 🟡 Belum Diuji | `glibc` | `make` | Linux system documentation manual pages |
-| **`mkinitcpio`** | `42.1` | 🟡 Belum Diuji | `bash`, `kmod`, `coreutils`, `util-linux`, `zstd`, `findutils` | `make` | Modular and fast initramfs creation utility for Linux |
+| **`mkinitcpio`** | `42.2` | 🟡 Belum Diuji | `bash`, `kmod`, `coreutils`, `util-linux`, `zstd`, `findutils` | `make` | Modular and fast initramfs creation utility for Linux |
 | **`mtdev`** | `1.1.7` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Multitouch Protocol Translation Library |
 | **`nano`** | `9.2` | 🟡 Belum Diuji | `glibc`, `ncurses`, `file` | `make`, `gcc`, `pkgconf` | Pico editor clone with enhancements |
 | **`ncurses`** | `6.5` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | System V Release 4.0 curses emulation library |
