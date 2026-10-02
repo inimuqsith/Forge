@@ -221,7 +221,7 @@
 | **`libxrandr`** | `1.5.5` | 🟡 Belum Diuji | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | X11 RandR extension library |
 | **`libxslt`** | `1.1.45` | 🟡 Belum Diuji | `glibc`, `libxml2` | `make`, `gcc`, `pkgconf` | XML stylesheet transformation library (XSLT) |
 | **`lsof`** | `4.99.7` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Lists information about files opened by processes |
-| **`mesa`** | `26.2.3` | 🟡 Belum Diuji | `glibc`, `libdrm`, `expat`, `zstd`, `zlib`, `libxkbcommon`, `wayland` | `meson`, `ninja`, `pkgconf`, `python`, `bison`, `flex`, `llvm`, `wayland-protocols`, `vulkan-headers` | Open-source OpenGL and Vulkan 3D graphics drivers |
+| **`mesa`** | `26.2.4` | 🟡 Belum Diuji | `glibc`, `libdrm`, `expat`, `zstd`, `zlib`, `libxkbcommon`, `wayland` | `meson`, `ninja`, `pkgconf`, `python`, `bison`, `flex`, `llvm`, `wayland-protocols`, `vulkan-headers` | Open-source OpenGL and Vulkan 3D graphics drivers |
 | **`mpc`** | `1.4.1` | 🟡 Belum Diuji | `glibc`, `gmp`, `mpfr` | - | Library for the arithmetic of complex numbers with arbitrarily high precision |
 | **`mpfr`** | `4.2.2` | 🟡 Belum Diuji | `glibc`, `gmp` | - | Multiple-precision floating-point arithmetic library |
 | **`neovim`** | `0.12.5` | 🟡 Belum Diuji | `glibc` | `cmake`, `ninja`, `gcc`, `pkgconf` | Vim-fork focused on extensibility and usability |
@@ -240,7 +240,7 @@
 | **`qt6-wayland`** | `6.8.2` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `libdrm`, `wayland` | `cmake`, `ninja`, `pkgconf`, `wayland-protocols`, `vulkan-headers` | Provides APIs for Wayland client and compositor support in Qt6 |
 | **`ripgrep`** | `15.2.0` | 🟡 Belum Diuji | `glibc`, `pcre2` | `cargo`, `rust`, `pkgconf` | Ultra-fast line-oriented search tool combining grep with find |
 | **`rsync`** | `3.5.1` | 🟡 Belum Diuji | `glibc`, `zstd`, `openssl`, `acl` | `make`, `gcc`, `pkgconf` | Fast and versatile remote file copying tool |
-| **`rust`** | `1.98.1` | 🟡 Belum Diuji | `glibc`, `llvm`, `zlib`, `openssl`, `curl` | `python`, `cmake`, `ninja`, `gcc`, `make` | Empowering everyone to build reliable and efficient systems programming language |
+| **`rust`** | `1.99.0` | 🟡 Belum Diuji | `glibc`, `llvm`, `zlib`, `openssl`, `curl` | `python`, `cmake`, `ninja`, `gcc`, `make` | Empowering everyone to build reliable and efficient systems programming language |
 | **`sddm`** | `0.21.0` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `pam`, `shadow` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | QML and Wayland based modern display manager |
 | **`seatd`** | `0.9.3` | 🟡 Belum Diuji | `glibc`, `eudev` | `meson`, `ninja`, `pkgconf` | A minimal seat management daemon, and a universal seat management library |
 | **`sqlite`** | `3.53.4` | 🟡 Belum Diuji | `glibc`, `readline`, `zlib` | `make`, `gcc`, `pkgconf` | Self-contained serverless SQL database engine |
@@ -253,8 +253,8 @@
 | **`tokei`** | `15.0.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `cargo` | A blazingly fast CLOC (Count Lines Of Code) program |
 | **`tree`** | `2.3.2` | 🟡 Belum Diuji | `glibc` | - | Recursive directory indentation and tree-format listing program |
 | **`vscode-oss`** | `1.135.06055` | 🟡 Belum Diuji | `glibc`, `ca-certificates`, `dbus`, `ncurses` | `tar`, `gzip` | Free/Libre Open Source Software Binaries of Visual Studio Code (VSCodium) |
-| **`vulkan-headers`** | `1.4.364` | 🟡 Belum Diuji | - | `cmake`, `ninja` | Vulkan Header files and API registry |
-| **`vulkan-loader`** | `1.4.364` | 🟡 Belum Diuji | `glibc`, `vulkan-headers`, `wayland` | `cmake`, `ninja`, `pkgconf`, `python` | Vulkan Installable Client Driver (ICD) Loader |
+| **`vulkan-headers`** | `1.4.365` | 🟡 Belum Diuji | - | `cmake`, `ninja` | Vulkan Header files and API registry |
+| **`vulkan-loader`** | `1.4.365` | 🟡 Belum Diuji | `glibc`, `vulkan-headers`, `wayland` | `cmake`, `ninja`, `pkgconf`, `python` | Vulkan Installable Client Driver (ICD) Loader |
 | **`wayland`** | `1.26.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `expat`, `libxml2` | `gcc`, `meson`, `ninja`, `pkgconf`, `libxslt` | A computer display server protocol |
 | **`wayland-protocols`** | `1.49` | 🟡 Belum Diuji | `glibc` | `gcc`, `wayland`, `meson`, `ninja` | Specifications of extended Wayland protocols |
 | **`wireplumber`** | `0.5.18` | 🟡 Belum Diuji | `glibc`, `pipewire`, `glib2` | `meson`, `ninja`, `pkgconf`, `glib2` | Modular session manager daemon and policy router for PipeWire |

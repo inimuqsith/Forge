@@ -1,6 +1,6 @@
 [package]
 name = "mesa"
-version = "26.2.3"
+version = "26.2.4"
 release = 1
 slot = "0"
 description = "Open-source OpenGL and Vulkan 3D graphics drivers"
@@ -16,7 +16,7 @@ urls = [
   "https://archive.mesa3d.org/mesa-26.2.3.tar.xz"
 ]
 sha256 = [
-  "1628058a8d2c0615975de5a15ab7bbb9638c50000b5bed9456ff423ea034a81f"
+    "bce5f7fbebb934373b86c999a064d52fb5065878dc57f287f95346648ec832e9"
 ]
 
 [build]
