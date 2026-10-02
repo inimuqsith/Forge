@@ -85,7 +85,7 @@
 | **`groff`** | `1.24.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `pkgconf` | GNU troff text-formatting system |
 | **`grub`** | `2.16` | 🟡 Belum Diuji | `glibc`, `xz` | `gcc`, `make`, `pkgconf`, `flex`, `bison`, `python` | GNU GRand Unified Bootloader (2) |
 | **`gzip`** | `1.15` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Popular data compression program |
-| **`hwdata`** | `0.411` | 🟡 Belum Diuji | `glibc` | `make` | Hardware identification databases (pci.ids, usb.ids, oui.txt) |
+| **`hwdata`** | `0.412` | 🟡 Belum Diuji | `glibc` | `make` | Hardware identification databases (pci.ids, usb.ids, oui.txt) |
 | **`intel-ucode`** | `microcode-20260925 Release` | 🟡 Belum Diuji | - | - | Microcode update files and early-initramfs image for Intel CPUs |
 | **`intltool`** | `0.51.0` | 🟡 Belum Diuji | `perl` | `make`, `gcc`, `perl` | Internationalization tool collection |
 | **`iproute2`** | `7.2.0` | 🟡 Belum Diuji | `glibc`, `libcap`, `libseccomp` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | IP routing and network device configuration suite (ip, ss, tc) |
