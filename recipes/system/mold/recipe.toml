@@ -1,7 +1,7 @@
 [package]
 name = "mold"
-version = "2.42.1"
-release = 3
+version = "3.0.0"
+release = 1
 slot = "0"
 description = "High-performance modern linker (Latest 2.42.1)"
 license = "MIT"
@@ -15,7 +15,9 @@ build = ["gcc", "cmake", "make"]
 urls = [
     "https://github.com/rui314/mold/archive/refs/tags/v2.42.1.tar.gz"
 ]
-sha256 = ["0580221bfdad7148ceeafd0ad3c1c7b3ca9e66b45950405230cc3f81a205c816"]
+sha256 = [
+    "1dee837e227b0c3f2661def602ef8ddc0b889ae5b1d28c1ddec5f29e08e5ceb5"
+]
 
 [build]
 type = "cmake"

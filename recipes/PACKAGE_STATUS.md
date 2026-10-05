@@ -39,7 +39,7 @@
 | **`m4`** | `1.4.21` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | GNU Macro Processor |
 | **`make`** | `4.4.1` | 🟡 Belum Diuji | `glibc` | - | GNU Make utility to maintain groups of programs |
 | **`meson`** | `1.12.1` | 🟡 Belum Diuji | `glibc`, `python`, `ninja` | `python` | Fast and user friendly build system |
-| **`mold`** | `2.42.1` | 🟡 Belum Diuji | `glibc`, `zlib`, `openssl` | `gcc`, `cmake`, `make` | High-performance modern linker (Latest 2.42.1) |
+| **`mold`** | `3.0.0` | 🟡 Belum Diuji | `glibc`, `zlib`, `openssl` | `gcc`, `cmake`, `make` | High-performance modern linker (Latest 2.42.1) |
 | **`ninja`** | `1.13.2` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `python` | Small build system with a focus on speed (Latest 1.13.2) |
 | **`openrc`** | `0.64.1` | 🟡 Belum Diuji | `glibc`, `ncurses` | `meson`, `ninja`, `pkgconf`, `make` | Service and init manager for Kura Linux |
 | **`patch`** | `2.8` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Utility to apply diffs to files |
@@ -187,7 +187,7 @@
 | **`helium-browser`** | `0.18.3.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
 | **`helix`** | `25.07.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A post-modern modal text editor |
 | **`htop`** | `3.5.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Interactive process viewer for Unix systems |
-| **`hyperfine`** | `1.20.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line benchmarking tool |
+| **`hyperfine`** | `1.21.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line benchmarking tool |
 | **`icu`** | `78.3` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | International Components for Unicode library |
 | **`intellij-idea`** | `2025.2.5` | 🟡 Belum Diuji | `glibc`, `ca-certificates`, `tar` | `tar`, `gzip` | Capable and Ergonomic IDE for JVM, Java, Kotlin, and Polyglot Development by JetBrains |
 | **`jq`** | `1.8.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `pkgconf` | Command-line JSON processor |
@@ -210,7 +210,7 @@
 | **`libgit2`** | `1.9.7` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `pcre2` | `cmake`, `ninja`, `gcc`, `pkgconf`, `python` | Highly portable, pure C implementation of the Git core methods |
 | **`libinput`** | `1.32.0` | 🟡 Belum Diuji | `glibc`, `eudev`, `libevdev`, `mtdev` | `meson`, `ninja`, `pkgconf` | Input device management and event handling library |
 | **`libksysguard`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `kcoreaddons`, `kconfig`, `ki18n`, `kauth`, `zlib` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Task management and system monitoring library for KDE Plasma |
-| **`libpng`** | `1.6.58` | 🟡 Belum Diuji | `glibc`, `zlib` | `make`, `gcc` | Official PNG reference library |
+| **`libpng`** | `1.6.59` | 🟡 Belum Diuji | `glibc`, `zlib` | `make`, `gcc` | Official PNG reference library |
 | **`libssh2`** | `1.11.1` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib` | `make`, `gcc`, `pkgconf` | Client-side C library implementing the SSH2 protocol |
 | **`libutf8proc`** | `2.12.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Clean C library for processing UTF-8 Unicode data |
 | **`libxcb`** | `1.17.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf`, `python` | X11 C Bindings library |
