@@ -1,6 +1,6 @@
 [package]
 name = "glib2"
-version = "2.90.0"
+version = "2.90.1"
 release = 1
 slot = "0"
 description = "Core low-level data structure and utility library from GNOME"
@@ -16,7 +16,7 @@ urls = [
     "https://github.com/GNOME/glib/archive/refs/tags/2.90.0.tar.gz"
 ]
 sha256 = [
-    "b67a1cf3630088638ac8d3d9f0129625e3df2eae7600181c45629d7c9b2d43b6"
+    "0888967a045e7ac95b940fffbb9d196b2e41ddc628fb1964bf438e35655b28f9"
 ]
 
 [build]

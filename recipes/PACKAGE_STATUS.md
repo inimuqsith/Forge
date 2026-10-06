@@ -24,7 +24,7 @@
 | **`base`** | `1.0.0` | 🟡 Belum Diuji | `glibc`, `coreutils`, `sed`, `grep`, `gawk`, `tar`, `gzip`, `bzip2`, `xz`, `zstd`, `findutils`, `diffutils`, `file`, `which`, `util-linux`, `shadow`, `openrc`, `eudev`, `kmod`, `ca-certificates`, `acl`, `attr` | - | Kura Linux Minimal Base System (Meta-Package) |
 | **`binutils`** | `2.47` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd` | `bison`, `flex` | GNU binary utilities (as, ld, readelf, objdump, strip, ar) |
 | **`bison`** | `3.8.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `gcc` | General-purpose parser generator |
-| **`clang`** | `23.1.2` | 🟡 Belum Diuji | `llvm` | - | C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm) |
+| **`clang`** | `23.1.3` | 🟡 Belum Diuji | `llvm` | - | C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm) |
 | **`cmake`** | `4.4.4` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libarchive` | `make`, `gcc`, `binutils`, `pkgconf` | Cross-platform open-source build system generator |
 | **`flex`** | `2.6.4` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
 | **`forge`** | `git` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `llvm`, `make`, `gcc`, `binutils`, `pkgconf`, `ninja`, `patch`, `linux-headers`, `git`, `ca-certificates`, `tar`, `xz`, `gzip`, `bzip2` | `rust`, `mold`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
@@ -35,7 +35,7 @@
 | **`libtool`** | `2.6.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `autoconf`, `automake`, `gcc` | Generic library support script |
 | **`linux-cachyos-bore`** | `git` | 🟡 Belum Diuji | `kmod`, `eudev` | `llvm`, `mold`, `make`, `bc`, `bison`, `flex`, `elfutils`, `openssl`, `rsync`, `kmod`, `zstd`, `diffutils` | Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO |
 | **`linux-headers`** | `7.2` | 🟡 Belum Diuji | - | - | Linux kernel API headers for userspace |
-| **`llvm`** | `23.1.2` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `libxml2` | `cmake`, `ninja`, `pkgconf`, `make`, `python` | LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22) |
+| **`llvm`** | `23.1.3` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `libxml2` | `cmake`, `ninja`, `pkgconf`, `make`, `python` | LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22) |
 | **`m4`** | `1.4.21` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | GNU Macro Processor |
 | **`make`** | `4.4.1` | 🟡 Belum Diuji | `glibc` | - | GNU Make utility to maintain groups of programs |
 | **`meson`** | `1.12.1` | 🟡 Belum Diuji | `glibc`, `python`, `ninja` | `python` | Fast and user friendly build system |
@@ -178,7 +178,7 @@
 | **`fzf`** | `0.74.4` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `go` | Command-line fuzzy finder |
 | **`gh`** | `2.102.0` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `make`, `go` | The GitHub CLI |
 | **`git`** | `2.56.0` | 🟡 Belum Diuji | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2`, `nghttp2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
-| **`glib2`** | `2.90.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `pcre2`, `zlib` | `meson`, `ninja`, `pkgconf`, `gcc` | Core low-level data structure and utility library from GNOME |
+| **`glib2`** | `2.90.1` | 🟡 Belum Diuji | `glibc`, `libffi`, `pcre2`, `zlib` | `meson`, `ninja`, `pkgconf`, `gcc` | Core low-level data structure and utility library from GNOME |
 | **`gmp`** | `6.3.0` | 🟡 Belum Diuji | `glibc` | `m4` | GNU Multiple Precision Arithmetic Library |
 | **`go`** | `1.27.1` | 🟡 Belum Diuji | `glibc`, `ca-certificates` | `make`, `gcc`, `bash` | Open source programming language that makes it easy to build simple, fast, and reliable software |
 | **`gobject-introspection`** | `1.86.0` | 🟡 Belum Diuji | `glibc`, `glib2`, `libffi` | `meson`, `ninja`, `gcc`, `pkgconf`, `python`, `bison`, `flex` | Middleware layer for creating language bindings for C libraries |
@@ -226,7 +226,7 @@
 | **`mpfr`** | `4.2.2` | 🟡 Belum Diuji | `glibc`, `gmp` | - | Multiple-precision floating-point arithmetic library |
 | **`neovim`** | `0.12.5` | 🟡 Belum Diuji | `glibc` | `cmake`, `ninja`, `gcc`, `pkgconf` | Vim-fork focused on extensibility and usability |
 | **`nushell`** | `0.116.1` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `libgit2`, `libssh2`, `openssl`, `sqlite`, `zstd` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A new type of shell |
-| **`openssh`** | `10.5p1` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libcap` | `make`, `gcc`, `pkgconf` | Premier connectivity tool for remote login with the SSH protocol |
+| **`openssh`** | `10.6p1` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libcap` | `make`, `gcc`, `pkgconf` | Premier connectivity tool for remote login with the SSH protocol |
 | **`pcre2`** | `10.49` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `readline` | `make`, `gcc`, `pkgconf` | Perl Compatible Regular Expressions 2 (PCRE2) |
 | **`pipewire`** | `1.6.9` | 🟡 Belum Diuji | `glibc`, `alsa-lib`, `dbus`, `elogind` | `meson`, `ninja`, `pkgconf` | Low-latency audio/video routing daemon and multimedia processing graph |
 | **`pixman`** | `0.46.4` | 🟡 Belum Diuji | `glibc` | `meson`, `ninja`, `pkgconf` | Low-level pixel manipulation and rasterization library |
