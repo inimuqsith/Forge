@@ -165,7 +165,7 @@
 | **`duf`** | `0.9.1` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `go` | Disk Usage/Free Utility |
 | **`duktape`** | `2.7.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Embeddable Javascript engine with a focus on portability and compact footprint |
 | **`dust`** | `1.2.6` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `git`, `rust` | A more intuitive version of du in rust |
-| **`expat`** | `R_2_8_5` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | XML parser library written in C |
+| **`expat`** | `2.9.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | XML parser library written in C |
 | **`extra-cmake-modules`** | `6.30.0` | 🟡 Belum Diuji | - | `cmake` | Extra modules and scripts for CMake used by KDE Frameworks |
 | **`eza`** | `0.23.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
 | **`fastfetch`** | `2.69.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
@@ -183,7 +183,7 @@
 | **`go`** | `1.27.1` | 🟡 Belum Diuji | `glibc`, `ca-certificates` | `make`, `gcc`, `bash` | Open source programming language that makes it easy to build simple, fast, and reliable software |
 | **`gobject-introspection`** | `1.86.0` | 🟡 Belum Diuji | `glibc`, `glib2`, `libffi` | `meson`, `ninja`, `gcc`, `pkgconf`, `python`, `bison`, `flex` | Middleware layer for creating language bindings for C libraries |
 | **`grex`** | `1.4.6` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line tool for generating regular expressions from user-provided input strings |
-| **`harfbuzz`** | `14.5.1` | 🟡 Belum Diuji | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |
+| **`harfbuzz`** | `14.6.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |
 | **`helium-browser`** | `0.18.3.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
 | **`helix`** | `25.07.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A post-modern modal text editor |
 | **`htop`** | `3.5.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Interactive process viewer for Unix systems |
@@ -204,7 +204,7 @@
 | **`kwin`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `kcoreaddons`, `kconfig`, `kwindowsystem`, `kcrash`, `kdbusaddons`, `kglobalaccel`, `kpipewire`, `layer-shell-qt`, `breeze`, `libdrm`, `libinput`, `libxkbcommon`, `mesa`, `wayland` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols`, `vulkan-headers` | Flexible, high-performance, and feature-rich Wayland window manager |
 | **`kwindowsystem`** | `6.30.0` | 🟡 Belum Diuji | `qt6-base`, `qt6-wayland`, `libxkbcommon`, `wayland` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | Access to the windowing system for KDE frameworks (Wayland and X11) |
 | **`layer-shell-qt`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `wayland` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | Qt component for Wayland wl-layer-shell protocol integration |
-| **`lazygit`** | `0.65.1` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `go` | Simple terminal UI for git commands |
+| **`lazygit`** | `0.66.0` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `go` | Simple terminal UI for git commands |
 | **`libdrm`** | `2.4.134` | 🟡 Belum Diuji | `glibc`, `libpciaccess` | `meson`, `ninja`, `pkgconf` | Userspace interface to kernel DRM services |
 | **`libffi`** | `3.8.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Portable foreign function interface library |
 | **`libgit2`** | `1.9.7` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `pcre2` | `cmake`, `ninja`, `gcc`, `pkgconf`, `python` | Highly portable, pure C implementation of the Git core methods |

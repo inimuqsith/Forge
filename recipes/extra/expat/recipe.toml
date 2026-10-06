@@ -1,6 +1,6 @@
 [package]
 name = "expat"
-version = "R_2_8_5"
+version = "2.9.0"
 release = 1
 slot = "0"
 description = "XML parser library written in C"
