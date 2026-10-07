@@ -187,7 +187,7 @@
 | **`helium-browser`** | `0.18.3.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
 | **`helix`** | `25.07.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A post-modern modal text editor |
 | **`htop`** | `3.5.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Interactive process viewer for Unix systems |
-| **`hyperfine`** | `1.21.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line benchmarking tool |
+| **`hyperfine`** | `2.0.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line benchmarking tool |
 | **`icu`** | `78.3` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | International Components for Unicode library |
 | **`intellij-idea`** | `2025.2.5` | 🟡 Belum Diuji | `glibc`, `ca-certificates`, `tar` | `tar`, `gzip` | Capable and Ergonomic IDE for JVM, Java, Kotlin, and Polyglot Development by JetBrains |
 | **`jq`** | `1.8.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `pkgconf` | Command-line JSON processor |
