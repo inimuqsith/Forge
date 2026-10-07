@@ -97,7 +97,7 @@
 | **`libcap`** | `2.78` | 🟡 Belum Diuji | `glibc` | - | POSIX 1003.1e capabilities library and tools (setcap, getcap) |
 | **`libcap-ng`** | `0.9.6` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `autoconf`, `automake`, `libtool` | Alternate POSIX capabilities library |
 | **`libedit`** | `20260512-3.1` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | NetBSD Editline library (BSD-licensed alternative to GNU readline) |
-| **`libevdev`** | `1.13.7` | 🟡 Belum Diuji | `glibc` | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | Wrapper library for evdev devices |
+| **`libevdev`** | `1.14.0` | 🟡 Belum Diuji | `glibc` | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | Wrapper library for evdev devices |
 | **`libgcrypt`** | `1.12.4` | 🟡 Belum Diuji | `glibc`, `libgpg-error` | `make`, `gcc` | General purpose cryptographic library based on the code from GnuPG |
 | **`libgpg-error`** | `1.61` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Small library with error codes and strings based on libgcrypt |
 | **`libinih`** | `62` | 🟡 Belum Diuji | `glibc` | `meson`, `ninja`, `gcc`, `pkgconf` | Simple INI file parser written in C |
