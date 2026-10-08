@@ -1,6 +1,6 @@
 [package]
 name = "helium-browser"
-version = "0.18.3.1"
+version = "0.19.1.2"
 release = 1
 slot = "0"
 description = "Lightweight, privacy-focused, bloat-free Chromium-based web browser"
