@@ -114,7 +114,7 @@
 | **`ncurses`** | `6.5` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | System V Release 4.0 curses emulation library |
 | **`nftables`** | `1.1.7` | 🟡 Belum Diuji | `glibc`, `gmp`, `readline` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | Netfilter userspace packet filtering framework |
 | **`nghttp2`** | `1.70.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `make`, `gcc`, `pkgconf` | HTTP/2 C library and tools |
-| **`openssl`** | `4.1.0-alpha1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `perl` | Robust, commercial-grade TLS/SSL cryptography toolkit |
+| **`openssl`** | `4.1.0-beta2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `perl` | Robust, commercial-grade TLS/SSL cryptography toolkit |
 | **`pam`** | `1.7.3` | 🟡 Belum Diuji | `glibc` | `gcc`, `make`, `flex`, `bison`, `linux-headers`, `pkgconf` | Pluggable Authentication Modules for Linux |
 | **`parted`** | `3.8` | 🟡 Belum Diuji | `glibc`, `util-linux` | `make`, `gcc`, `pkgconf` | A program for creating, destroying, resizing, checking and copying partitions |
 | **`pciutils`** | `3.15.0` | 🟡 Belum Diuji | `glibc`, `hwdata`, `kmod` | `pkgconf` | PCI bus configuration and diagnostic tools (lspci, setpci) |
@@ -138,7 +138,7 @@
 | **`xfsprogs`** | `7.2.0` | 🟡 Belum Diuji | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
 | **`xkeyboard-config`** | `2.48` | 🟡 Belum Diuji | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
 | **`xz`** | `5.8.4` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Free general-purpose data compression software with high compression ratio (LZMA2) |
-| **`zip`** | `8.6.0` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
+| **`zip`** | `9.0.0` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
 | **`zsh`** | `5.9.2` | 🟡 Belum Diuji | `glibc`, `ncurses`, `pcre2` | `make`, `gcc`, `pkgconf` | Advanced programmable command interpreter |
 | **`zstd`** | `1.5.7-kernel` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz` | `make`, `gcc`, `pkgconf` | Zstandard - Fast real-time compression algorithm |
 
@@ -166,7 +166,7 @@
 | **`duktape`** | `2.7.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Embeddable Javascript engine with a focus on portability and compact footprint |
 | **`dust`** | `1.2.6` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `git`, `rust` | A more intuitive version of du in rust |
 | **`expat`** | `2.9.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | XML parser library written in C |
-| **`extra-cmake-modules`** | `6.30.0` | 🟡 Belum Diuji | - | `cmake` | Extra modules and scripts for CMake used by KDE Frameworks |
+| **`extra-cmake-modules`** | `6.31.0` | 🟡 Belum Diuji | - | `cmake` | Extra modules and scripts for CMake used by KDE Frameworks |
 | **`eza`** | `0.23.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
 | **`fastfetch`** | `2.69.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
 | **`fcft`** | `3.3.3` | 🟡 Belum Diuji | `glibc`, `fontconfig`, `freetype`, `pixman`, `libutf8proc` | `meson`, `ninja`, `gcc`, `pkgconf`, `tllist` | Simple library for font loading and glyph rasterization |

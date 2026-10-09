@@ -1,6 +1,6 @@
 [package]
 name = "extra-cmake-modules"
-version = "6.30.0"
+version = "6.31.0"
 release = 1
 description = "Extra modules and scripts for CMake used by KDE Frameworks"
 license = "BSD-2-Clause"
