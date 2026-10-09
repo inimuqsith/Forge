@@ -1,6 +1,6 @@
 [package]
 name = "neovim"
-version = "0.12.5"
+version = "0.12.6"
 release = 1
 slot = "0"
 description = "Vim-fork focused on extensibility and usability"
@@ -15,7 +15,9 @@ build = ["cmake", "ninja", "gcc", "pkgconf"]
 urls = [
     "https://github.com/neovim/neovim/archive/refs/tags/v0.12.5.tar.gz"
 ]
-sha256 = ["a810c95332317bd0017e1ca07e376a8472c79075cbed00fa3737d190a8a0a45a"]
+sha256 = [
+    "8629fdc5eb951daf89a76f68cad12f2f1e03fab0d539150ba3fe6d177d254b7f"
+]
 
 [build]
 type = "cmake"
