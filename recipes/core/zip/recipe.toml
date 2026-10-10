@@ -1,6 +1,6 @@
 [package]
 name = "zip"
-version = "9.0.0"
+version = "9.0.1"
 release = 1
 slot = "0"
 description = "Compressor utility for zipfile archives"
