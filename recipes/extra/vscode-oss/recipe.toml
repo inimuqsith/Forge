@@ -1,6 +1,6 @@
 [package]
 name = "vscode-oss"
-version = "1.135.06055"
+version = "1.140.06880"
 release = 1
 slot = "0"
 description = "Free/Libre Open Source Software Binaries of Visual Studio Code (VSCodium)"
@@ -16,7 +16,7 @@ urls = [
   "https://github.com/VSCodium/vscodium/releases/download/1.135.06055/VSCodium-linux-x64-1.135.06055.tar.gz"
 ]
 sha256 = [
-  "c09d8ac8dd7f52b09ee159ee24b440541dfd8f937a0f6f88cc428c78e48ee1f2"
+    "61223b74f9e40834117311ec4177cb386d09b84c1aae4f9e674c96580569cef3"
 ]
 
 [build]
