@@ -60,7 +60,7 @@
 | **`bc`** | `1.08.2` | 🟡 Belum Diuji | `glibc`, `readline` | `make`, `gcc`, `flex`, `bison` | Arbitrary precision numeric processing language |
 | **`bluez`** | `5.87` | 🟡 Belum Diuji | `glibc`, `dbus`, `glib2`, `eudev`, `readline` | `gcc`, `make`, `pkgconf`, `libtool` | Official Linux Bluetooth protocol stack with OpenRC service |
 | **`btrfs-progs`** | `7.1` | 🟡 Belum Diuji | `glibc`, `libgcrypt`, `lzo`, `eudev`, `util-linux`, `zlib`, `zstd` | `gcc`, `e2fsprogs`, `pkgconf`, `make` | Btrfs filesystem utilities |
-| **`bubblewrap`** | `0.13.0` | 🟡 Belum Diuji | `glibc`, `libcap` | `meson`, `ninja`, `pkgconf`, `gcc` | Unprivileged sandboxing tool based on Linux user namespaces |
+| **`bubblewrap`** | `0.13.1` | 🟡 Belum Diuji | `glibc`, `libcap` | `meson`, `ninja`, `pkgconf`, `gcc` | Unprivileged sandboxing tool based on Linux user namespaces |
 | **`bzip2`** | `1.0.8` | 🟡 Belum Diuji | `glibc` | - | A high-quality data compression program |
 | **`ca-certificates`** | `20260909` | 🟡 Belum Diuji | `glibc`, `openssl` | `python` | Common CA root certificates bundle from Mozilla |
 | **`coreutils`** | `9.12` | 🟡 Belum Diuji | `glibc`, `libcap`, `acl`, `attr` | `make`, `gcc`, `pkgconf` | The basic file, shell and text manipulation utilities of the GNU operating system |
@@ -93,7 +93,7 @@
 | **`kbd`** | `2.10.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | Keytable files and keyboard utilities (loadkeys, setfont) |
 | **`kmod`** | `34.2` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz`, `zstd`, `openssl` | `gcc`, `make`, `pkgconf` | Linux kernel module management tools and library (lsmod, modprobe, insmod) |
 | **`less`** | `710` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | A terminal based program for viewing text files |
-| **`libarchive`** | `3.8.9` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `xz`, `zstd`, `openssl`, `expat` | `make`, `gcc`, `pkgconf` | Multi-format archive and compression library (bsdtar, bsdcpio) |
+| **`libarchive`** | `3.8.10` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `xz`, `zstd`, `openssl`, `expat` | `make`, `gcc`, `pkgconf` | Multi-format archive and compression library (bsdtar, bsdcpio) |
 | **`libcap`** | `2.78` | 🟡 Belum Diuji | `glibc` | - | POSIX 1003.1e capabilities library and tools (setcap, getcap) |
 | **`libcap-ng`** | `0.9.6` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `autoconf`, `automake`, `libtool` | Alternate POSIX capabilities library |
 | **`libedit`** | `20260512-3.1` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | NetBSD Editline library (BSD-licensed alternative to GNU readline) |
@@ -221,7 +221,7 @@
 | **`libxrandr`** | `1.5.5` | 🟡 Belum Diuji | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | X11 RandR extension library |
 | **`libxslt`** | `1.1.45` | 🟡 Belum Diuji | `glibc`, `libxml2` | `make`, `gcc`, `pkgconf` | XML stylesheet transformation library (XSLT) |
 | **`lsof`** | `4.99.7` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Lists information about files opened by processes |
-| **`mesa`** | `26.2.4` | 🟡 Belum Diuji | `glibc`, `libdrm`, `expat`, `zstd`, `zlib`, `libxkbcommon`, `wayland` | `meson`, `ninja`, `pkgconf`, `python`, `bison`, `flex`, `llvm`, `wayland-protocols`, `vulkan-headers` | Open-source OpenGL and Vulkan 3D graphics drivers |
+| **`mesa`** | `26.2.5` | 🟡 Belum Diuji | `glibc`, `libdrm`, `expat`, `zstd`, `zlib`, `libxkbcommon`, `wayland` | `meson`, `ninja`, `pkgconf`, `python`, `bison`, `flex`, `llvm`, `wayland-protocols`, `vulkan-headers` | Open-source OpenGL and Vulkan 3D graphics drivers |
 | **`mpc`** | `1.4.1` | 🟡 Belum Diuji | `glibc`, `gmp`, `mpfr` | - | Library for the arithmetic of complex numbers with arbitrarily high precision |
 | **`mpfr`** | `4.2.2` | 🟡 Belum Diuji | `glibc`, `gmp` | - | Multiple-precision floating-point arithmetic library |
 | **`neovim`** | `0.12.6` | 🟡 Belum Diuji | `glibc` | `cmake`, `ninja`, `gcc`, `pkgconf` | Vim-fork focused on extensibility and usability |
