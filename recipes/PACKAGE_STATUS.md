@@ -65,7 +65,7 @@
 | **`ca-certificates`** | `20260909` | 🟡 Belum Diuji | `glibc`, `openssl` | `python` | Common CA root certificates bundle from Mozilla |
 | **`coreutils`** | `9.12` | 🟡 Belum Diuji | `glibc`, `libcap`, `acl`, `attr` | `make`, `gcc`, `pkgconf` | The basic file, shell and text manipulation utilities of the GNU operating system |
 | **`cronie`** | `1.7.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Standard cron daemon and crontab scheduler |
-| **`curl`** | `8.22.0` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `zstd`, `nghttp2` | `make`, `gcc`, `pkgconf` | Command line tool and library for transferring data with URLs |
+| **`curl`** | `8.23.0` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `zstd`, `nghttp2` | `make`, `gcc`, `pkgconf` | Command line tool and library for transferring data with URLs |
 | **`dbus`** | `1.16.2` | 🟡 Belum Diuji | `glibc`, `expat`, `libcap-ng`, `eudev` | `gcc`, `meson`, `ninja`, `pkgconf`, `glib2`, `python` | Freedesktop.org message bus system |
 | **`dhcpcd`** | `10.5.2` | 🟡 Belum Diuji | `glibc`, `openssl` | `make`, `gcc`, `pkgconf` | RFC2131 and RFC3315 compliant DHCP/DHCPv6 and IPv4LL dual-stack client |
 | **`diffutils`** | `3.12` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | GNU diff, cmp, diff3 and sdiff programs |
@@ -168,7 +168,7 @@
 | **`expat`** | `2.9.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | XML parser library written in C |
 | **`extra-cmake-modules`** | `6.31.0` | 🟡 Belum Diuji | - | `cmake` | Extra modules and scripts for CMake used by KDE Frameworks |
 | **`eza`** | `0.23.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
-| **`fastfetch`** | `2.69.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
+| **`fastfetch`** | `2.70.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
 | **`fcft`** | `3.3.3` | 🟡 Belum Diuji | `glibc`, `fontconfig`, `freetype`, `pixman`, `libutf8proc` | `meson`, `ninja`, `gcc`, `pkgconf`, `tllist` | Simple library for font loading and glyph rasterization |
 | **`fd`** | `10.5.0` | 🟡 Belum Diuji | `glibc` | `cargo`, `rust` | Simple, fast and user-friendly alternative to find |
 | **`fish`** | `4.9.3` | 🟡 Belum Diuji | `glibc`, `gcc`, `pcre2` | `gcc`, `cmake`, `ninja`, `rust`, `pkgconf` | Smart and user friendly shell intended mostly for interactive use |
