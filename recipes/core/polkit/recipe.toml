@@ -1,7 +1,7 @@
 [package]
 name = "polkit"
-version = "127"
-release = 3
+version = "128"
+release = 1
 slot = "0"
 description = "Application development toolkit for controlling system-wide privileges"
 license = "LGPL-2.0-or-later"
@@ -15,7 +15,9 @@ build = ["gcc", "dbus", "glib2", "gobject-introspection", "meson", "ninja", "pkg
 urls = [
     "https://github.com/polkit-org/polkit/archive/refs/tags/127.tar.gz"
 ]
-sha256 = ["9b7bc16f086479dcc626c575976568ba4a85d34297a750d8ab3d2e57f6d8b988"]
+sha256 = [
+    "6edb06bf1448e49e428f9597a97af6a05d62146dd0b58f86eeaebcee3f5ecfaa"
+]
 
 [build]
 type = "meson"

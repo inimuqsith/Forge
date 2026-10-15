@@ -118,7 +118,7 @@
 | **`pam`** | `1.7.3` | 🟡 Belum Diuji | `glibc` | `gcc`, `make`, `flex`, `bison`, `linux-headers`, `pkgconf` | Pluggable Authentication Modules for Linux |
 | **`parted`** | `3.8` | 🟡 Belum Diuji | `glibc`, `util-linux` | `make`, `gcc`, `pkgconf` | A program for creating, destroying, resizing, checking and copying partitions |
 | **`pciutils`** | `3.15.0` | 🟡 Belum Diuji | `glibc`, `hwdata`, `kmod` | `pkgconf` | PCI bus configuration and diagnostic tools (lspci, setpci) |
-| **`polkit`** | `127` | 🟡 Belum Diuji | `glibc`, `duktape`, `expat`, `glib2`, `pam`, `eudev` | `gcc`, `dbus`, `glib2`, `gobject-introspection`, `meson`, `ninja`, `pkgconf` | Application development toolkit for controlling system-wide privileges |
+| **`polkit`** | `128` | 🟡 Belum Diuji | `glibc`, `duktape`, `expat`, `glib2`, `pam`, `eudev` | `gcc`, `dbus`, `glib2`, `gobject-introspection`, `meson`, `ninja`, `pkgconf` | Application development toolkit for controlling system-wide privileges |
 | **`popt`** | `1.19` | 🟡 Belum Diuji | `glibc` | `gcc`, `make`, `autoconf`, `automake`, `libtool`, `pkgconf` | Command line option parsing library |
 | **`procps-ng`** | `4.0.7` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Utilities for monitoring your system and its processes (ps, top, free) |
 | **`psmisc`** | `23.7` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | Miscellaneous proc-based tools (killall, fuser, pstree) |
