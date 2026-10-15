@@ -126,7 +126,7 @@
 | **`sed`** | `4.10` | 🟡 Belum Diuji | `glibc`, `acl`, `attr` | `make`, `gcc` | GNU stream editor |
 | **`shadow`** | `4.20.3` | 🟡 Belum Diuji | `glibc`, `acl`, `libcap`, `libseccomp` | `make`, `gcc`, `pkgconf` | Password and account management utilities |
 | **`squashfs-tools`** | `4.7.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `lz4`, `lzo`, `xz`, `zlib`, `zstd` | `gcc`, `make`, `pkgconf` | Tools for squashfs, a highly compressed read-only filesystem for Linux |
-| **`sysklogd`** | `2.7.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Standard Linux system and kernel logging daemons (syslogd, klogd) |
+| **`sysklogd`** | `2.8.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Standard Linux system and kernel logging daemons (syslogd, klogd) |
 | **`tar`** | `1.35` | 🟡 Belum Diuji | `glibc`, `acl` | `make`, `gcc` | Utility used to store, backup, and transport files |
 | **`unzip`** | `6.0` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Extraction utility for archives compressed in .zip format |
 | **`usbutils`** | `019` | 🟡 Belum Diuji | `glibc`, `hwdata` | `make`, `gcc`, `pkgconf` | USB device listing and inspection utilities (lsusb) |
