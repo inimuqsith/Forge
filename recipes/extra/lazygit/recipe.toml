@@ -1,6 +1,6 @@
 [package]
 name = "lazygit"
-version = "0.66.1"
+version = "0.66.2"
 release = 1
 slot = "0"
 description = "Simple terminal UI for git commands"

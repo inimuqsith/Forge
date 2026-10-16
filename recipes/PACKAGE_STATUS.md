@@ -204,7 +204,7 @@
 | **`kwin`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `kcoreaddons`, `kconfig`, `kwindowsystem`, `kcrash`, `kdbusaddons`, `kglobalaccel`, `kpipewire`, `layer-shell-qt`, `breeze`, `libdrm`, `libinput`, `libxkbcommon`, `mesa`, `wayland` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols`, `vulkan-headers` | Flexible, high-performance, and feature-rich Wayland window manager |
 | **`kwindowsystem`** | `6.30.0` | 🟡 Belum Diuji | `qt6-base`, `qt6-wayland`, `libxkbcommon`, `wayland` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | Access to the windowing system for KDE frameworks (Wayland and X11) |
 | **`layer-shell-qt`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `wayland` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | Qt component for Wayland wl-layer-shell protocol integration |
-| **`lazygit`** | `0.66.1` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `go` | Simple terminal UI for git commands |
+| **`lazygit`** | `0.66.2` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `go` | Simple terminal UI for git commands |
 | **`libdrm`** | `2.4.134` | 🟡 Belum Diuji | `glibc`, `libpciaccess` | `meson`, `ninja`, `pkgconf` | Userspace interface to kernel DRM services |
 | **`libffi`** | `3.8.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Portable foreign function interface library |
 | **`libgit2`** | `1.9.7` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `pcre2` | `cmake`, `ninja`, `gcc`, `pkgconf`, `python` | Highly portable, pure C implementation of the Git core methods |
