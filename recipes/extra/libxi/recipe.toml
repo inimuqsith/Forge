@@ -1,6 +1,6 @@
 [package]
 name = "libxi"
-version = "1.8.3"
+version = "1.8.4"
 release = 1
 slot = "0"
 description = "X11 Input extension library"
@@ -16,7 +16,7 @@ urls = [
     "https://xorg.freedesktop.org/archive/individual/lib/libXi-1.8.3.tar.xz"
 ]
 sha256 = [
-    "7ad60056f01af4f786cfe93b3a7707447711626fc8da2637bec71a90409babe5"
+    "ddd6057b89a91903bc2f884d55c8467440906945e482c36547260dff28661afc"
 ]
 
 [build]

@@ -215,7 +215,7 @@
 | **`libutf8proc`** | `2.12.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Clean C library for processing UTF-8 Unicode data |
 | **`libxcb`** | `1.17.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf`, `python` | X11 C Bindings library |
 | **`libxcursor`** | `1.2.3` | 🟡 Belum Diuji | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | Cursor management library for X |
-| **`libxi`** | `1.8.3` | 🟡 Belum Diuji | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | X11 Input extension library |
+| **`libxi`** | `1.8.4` | 🟡 Belum Diuji | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | X11 Input extension library |
 | **`libxkbcommon`** | `1.13.2` | 🟡 Belum Diuji | `glibc`, `xkeyboard-config` | `meson`, `ninja`, `pkgconf`, `bison`, `wayland`, `wayland-protocols` | Keyboard description compilation and handling library |
 | **`libxml2`** | `2.15.4` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz`, `icu` | `make`, `gcc`, `pkgconf` | XML parsing library and utility toolkit |
 | **`libxrandr`** | `1.5.5` | 🟡 Belum Diuji | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | X11 RandR extension library |
