@@ -244,7 +244,7 @@
 | **`sddm`** | `0.21.0` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `pam`, `shadow` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | QML and Wayland based modern display manager |
 | **`seatd`** | `0.9.3` | 🟡 Belum Diuji | `glibc`, `eudev` | `meson`, `ninja`, `pkgconf` | A minimal seat management daemon, and a universal seat management library |
 | **`sqlite`** | `3.54.1` | 🟡 Belum Diuji | `glibc`, `readline`, `zlib` | `make`, `gcc`, `pkgconf` | Self-contained serverless SQL database engine |
-| **`starship`** | `1.26.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cmake`, `git`, `rust` | The cross-shell prompt for astronauts |
+| **`starship`** | `1.27.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cmake`, `git`, `rust` | The cross-shell prompt for astronauts |
 | **`strace`** | `7.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Diagnostic, debugging and instructional userspace utility for Linux syscall tracing |
 | **`sudo`** | `1.9.17p2` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib` | `make`, `gcc`, `pkgconf` | Authority delegation tool allowing users to execute commands as root |
 | **`tailscale`** | `1.105.0-pre` | 🟡 Belum Diuji | `glibc`, `ca-certificates`, `iptables` | `tar`, `gzip` | Zero config VPN daemon and CLI for secure mesh networks |
