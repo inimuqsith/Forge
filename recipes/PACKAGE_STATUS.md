@@ -159,7 +159,7 @@
 | **`btop`** | `1.4.7` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Modern and beautiful resource monitor that shows usage and stats for processor, memory, disks, network and processes |
 | **`cairo`** | `1.18.6` | 🟡 Belum Diuji | `glibc`, `pixman`, `freetype`, `fontconfig`, `zlib`, `libpng` | `meson`, `ninja`, `pkgconf` | 2D graphics library with support for multiple output devices |
 | **`cargo`** | `1.85.0` | 🟡 Belum Diuji | `glibc`, `rust`, `openssl`, `curl`, `zlib` | `rust` | Rust Package Manager and Build Tool |
-| **`ccache`** | `4.14.1` | 🟡 Belum Diuji | `glibc`, `zstd` | `cmake`, `ninja`, `gcc`, `pkgconf` | Fast compiler cache for C/C++ |
+| **`ccache`** | `4.14.2` | 🟡 Belum Diuji | `glibc`, `zstd` | `cmake`, `ninja`, `gcc`, `pkgconf` | Fast compiler cache for C/C++ |
 | **`cowsay`** | `3.8.4` | 🟡 Belum Diuji | `glibc`, `perl` | `make` | Configurable talking cow (Latest 3.8.4) |
 | **`doas`** | `6.8.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `flex` | Simple OpenBSD privilege escalation tool ported to Linux |
 | **`duf`** | `0.9.1` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `go` | Disk Usage/Free Utility |
