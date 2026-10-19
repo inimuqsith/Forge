@@ -1,6 +1,6 @@
 [package]
 name = "linux-firmware"
-version = "20260916"
+version = "20261019"
 release = 1
 slot = "0"
 description = "Firmware files for Linux kernel drivers (Wi-Fi, GPU, Bluetooth, Audio SOF)"
@@ -16,7 +16,7 @@ urls = [
     "https://mirrors.edge.kernel.org/pub/linux/kernel/firmware/linux-firmware-20260916.tar.xz"
 ]
 sha256 = [
-    "f80dcb757a623deda62200c08e0e1a88c76fb6b54964f31b35fa74da1c90ccc5"
+    "a10d1ab5baf2c74ba92e8c7cf313e691696c26bddfa6df00db795e48d70cd4ca"
 ]
 
 [build]

@@ -75,7 +75,7 @@
 | **`efivar`** | `39` | 🟡 Belum Diuji | `glibc`, `popt` | `gcc`, `make`, `pkgconf`, `linux-headers` | Tools and library to manipulate EFI variables |
 | **`elfutils`** | `0.196` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `xz`, `zstd` | `make`, `gcc`, `pkgconf`, `m4`, `flex`, `bison` | Libraries and tools for handling ELF files and DWARF data |
 | **`elogind`** | `257.16` | 🟡 Belum Diuji | `glibc`, `pam`, `acl`, `libcap` | `gcc`, `intltool`, `libtool`, `gperf`, `libcap`, `meson`, `ninja`, `pkgconf` | The systemd project |
-| **`ethtool`** | `7.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Utility for examining and tuning network interfaces and drivers |
+| **`ethtool`** | `7.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Utility for examining and tuning network interfaces and drivers |
 | **`eudev`** | `3.2.15` | 🟡 Belum Diuji | `glibc`, `kmod`, `hwdata` | `make`, `gcc`, `pkgconf`, `gperf` | Standalone device manager fork of systemd-udev for OpenRC |
 | **`f2fs-tools`** | `1.16.0` | 🟡 Belum Diuji | `glibc`, `util-linux` | `gcc`, `git` | Tools for Flash-Friendly File System (F2FS) |
 | **`file`** | `5.48` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `xz`, `zstd` | `make`, `gcc`, `pkgconf` | File type identification utility and libmagic |
@@ -104,7 +104,7 @@
 | **`libpciaccess`** | `0.19` | 🟡 Belum Diuji | `glibc`, `zlib` | `meson`, `ninja`, `gcc`, `pkgconf` | Generic PCI access library |
 | **`libseccomp`** | `2.6.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Enhanced Seccomp library and kernel syscall filtering interface |
 | **`liburcu`** | `0.15.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Userspace RCU (read-copy-update) library |
-| **`linux-firmware`** | `20260916` | 🟡 Belum Diuji | - | `make` | Firmware files for Linux kernel drivers (Wi-Fi, GPU, Bluetooth, Audio SOF) |
+| **`linux-firmware`** | `20261019` | 🟡 Belum Diuji | - | `make` | Firmware files for Linux kernel drivers (Wi-Fi, GPU, Bluetooth, Audio SOF) |
 | **`lz4`** | `1.10.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Extremely fast compression algorithm |
 | **`lzo`** | `2.10` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Portable lossless data compression library |
 | **`man-pages`** | `6.19` | 🟡 Belum Diuji | `glibc` | `make` | Linux system documentation manual pages |
