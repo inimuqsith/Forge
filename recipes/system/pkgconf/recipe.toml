@@ -1,6 +1,6 @@
 [package]
 name = "pkgconf"
-version = "3.0.9"
+version = "3.0.10"
 release = 1
 slot = "0"
 description = "Package compiler and linker metadata toolkit (Latest 3.0.7)"

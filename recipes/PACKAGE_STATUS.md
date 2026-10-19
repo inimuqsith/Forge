@@ -44,7 +44,7 @@
 | **`openrc`** | `0.64.1` | 🟡 Belum Diuji | `glibc`, `ncurses` | `meson`, `ninja`, `pkgconf`, `make` | Service and init manager for Kura Linux |
 | **`patch`** | `2.8` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Utility to apply diffs to files |
 | **`perl`** | `5.44.0` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2` | `make`, `gcc` | Highly capable, feature-rich programming language |
-| **`pkgconf`** | `3.0.9` | 🟡 Belum Diuji | `glibc` | `gcc`, `make` | Package compiler and linker metadata toolkit (Latest 3.0.7) |
+| **`pkgconf`** | `3.0.10` | 🟡 Belum Diuji | `glibc` | `gcc`, `make` | Package compiler and linker metadata toolkit (Latest 3.0.7) |
 
 ---
 
@@ -135,7 +135,7 @@
 | **`which`** | `2.25` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Displays where a particular program is found in the path |
 | **`wireless-regdb`** | `2026.09.03` | 🟡 Belum Diuji | - | - | Wireless regulatory database for Linux kernel and CRDA |
 | **`wpa_supplicant`** | `2.12` | 🟡 Belum Diuji | `glibc`, `openssl`, `readline` | `make`, `gcc`, `pkgconf` | WPA/WPA2/WPA3 and IEEE 802.1X wireless client daemon |
-| **`xfsprogs`** | `7.2.0` | 🟡 Belum Diuji | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
+| **`xfsprogs`** | `7.2.1` | 🟡 Belum Diuji | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
 | **`xkeyboard-config`** | `2.48` | 🟡 Belum Diuji | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
 | **`xz`** | `5.8.4` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Free general-purpose data compression software with high compression ratio (LZMA2) |
 | **`zip`** | `9.0.3` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
