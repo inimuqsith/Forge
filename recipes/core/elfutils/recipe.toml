@@ -1,6 +1,6 @@
 [package]
 name = "elfutils"
-version = "0.196"
+version = "0.197"
 release = 1
 slot = "0"
 description = "Libraries and tools for handling ELF files and DWARF data"
@@ -16,7 +16,7 @@ urls = [
     "https://sourceware.org/elfutils/ftp/0.196/elfutils-0.196.tar.bz2"
 ]
 sha256 = [
-    "616099beae24aba11f9b63d86ca6cc8d566d968b802391334c91df54eab416b4"
+    "1fdf525f22dcf796d99a99ba3ea00a1f7b1ae5421bc62e8443a708920b99b904"
 ]
 
 [build]
