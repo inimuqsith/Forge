@@ -88,7 +88,7 @@
 | **`hwdata`** | `0.412` | 🟡 Belum Diuji | `glibc` | `make` | Hardware identification databases (pci.ids, usb.ids, oui.txt) |
 | **`intel-ucode`** | `microcode-20260925 Release` | 🟡 Belum Diuji | - | - | Microcode update files and early-initramfs image for Intel CPUs |
 | **`intltool`** | `0.51.0` | 🟡 Belum Diuji | `perl` | `make`, `gcc`, `perl` | Internationalization tool collection |
-| **`iproute2`** | `7.2.0` | 🟡 Belum Diuji | `glibc`, `libcap`, `libseccomp` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | IP routing and network device configuration suite (ip, ss, tc) |
+| **`iproute2`** | `7.3.0` | 🟡 Belum Diuji | `glibc`, `libcap`, `libseccomp` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | IP routing and network device configuration suite (ip, ss, tc) |
 | **`iptables`** | `1.8.13` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Linux kernel packet filtering and NAT control utility |
 | **`kbd`** | `2.10.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | Keytable files and keyboard utilities (loadkeys, setfont) |
 | **`kmod`** | `34.2` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz`, `zstd`, `openssl` | `gcc`, `make`, `pkgconf` | Linux kernel module management tools and library (lsmod, modprobe, insmod) |
