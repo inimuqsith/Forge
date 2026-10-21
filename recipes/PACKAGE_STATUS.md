@@ -110,7 +110,7 @@
 | **`man-pages`** | `6.20` | 🟡 Belum Diuji | `glibc` | `make` | Linux system documentation manual pages |
 | **`mkinitcpio`** | `42.2` | 🟡 Belum Diuji | `bash`, `kmod`, `coreutils`, `util-linux`, `zstd`, `findutils` | `make` | Modular and fast initramfs creation utility for Linux |
 | **`mtdev`** | `1.1.7` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Multitouch Protocol Translation Library |
-| **`nano`** | `9.2` | 🟡 Belum Diuji | `glibc`, `ncurses`, `file` | `make`, `gcc`, `pkgconf` | Pico editor clone with enhancements |
+| **`nano`** | `9.3` | 🟡 Belum Diuji | `glibc`, `ncurses`, `file` | `make`, `gcc`, `pkgconf` | Pico editor clone with enhancements |
 | **`ncurses`** | `6.5` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | System V Release 4.0 curses emulation library |
 | **`nftables`** | `1.1.7` | 🟡 Belum Diuji | `glibc`, `gmp`, `readline` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | Netfilter userspace packet filtering framework |
 | **`nghttp2`** | `1.70.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `make`, `gcc`, `pkgconf` | HTTP/2 C library and tools |
