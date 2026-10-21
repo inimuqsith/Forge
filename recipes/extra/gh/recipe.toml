@@ -1,6 +1,6 @@
 [package]
 name = "gh"
-version = "2.102.1"
+version = "2.103.0"
 release = 1
 slot = "0"
 description = "The GitHub CLI"
