@@ -136,7 +136,7 @@
 | **`wireless-regdb`** | `2026.09.03` | 🟡 Belum Diuji | - | - | Wireless regulatory database for Linux kernel and CRDA |
 | **`wpa_supplicant`** | `2.12` | 🟡 Belum Diuji | `glibc`, `openssl`, `readline` | `make`, `gcc`, `pkgconf` | WPA/WPA2/WPA3 and IEEE 802.1X wireless client daemon |
 | **`xfsprogs`** | `7.2.1` | 🟡 Belum Diuji | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
-| **`xkeyboard-config`** | `2.48` | 🟡 Belum Diuji | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
+| **`xkeyboard-config`** | `2.49` | 🟡 Belum Diuji | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
 | **`xz`** | `5.8.4` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Free general-purpose data compression software with high compression ratio (LZMA2) |
 | **`zip`** | `9.0.5` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
 | **`zsh`** | `5.9.2` | 🟡 Belum Diuji | `glibc`, `ncurses`, `pcre2` | `make`, `gcc`, `pkgconf` | Advanced programmable command interpreter |

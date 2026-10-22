@@ -1,6 +1,6 @@
 [package]
 name = "xkeyboard-config"
-version = "2.48"
+version = "2.49"
 release = 1
 slot = "0"
 description = "X Keyboard Extension configuration data"
