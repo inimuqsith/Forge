@@ -129,7 +129,7 @@
 | **`sysklogd`** | `2.8.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Standard Linux system and kernel logging daemons (syslogd, klogd) |
 | **`tar`** | `1.35` | 🟡 Belum Diuji | `glibc`, `acl` | `make`, `gcc` | Utility used to store, backup, and transport files |
 | **`unzip`** | `6.0` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Extraction utility for archives compressed in .zip format |
-| **`usbutils`** | `019` | 🟡 Belum Diuji | `glibc`, `hwdata` | `make`, `gcc`, `pkgconf` | USB device listing and inspection utilities (lsusb) |
+| **`usbutils`** | `020` | 🟡 Belum Diuji | `glibc`, `hwdata` | `make`, `gcc`, `pkgconf` | USB device listing and inspection utilities (lsusb) |
 | **`util-linux`** | `2.42.4` | 🟡 Belum Diuji | `glibc`, `ncurses`, `zlib`, `libcap`, `libseccomp` | `make`, `gcc`, `pkgconf` | Miscellaneous system utilities for Linux |
 | **`wget`** | `1.25.0` | 🟡 Belum Diuji | `glibc`, `openssl`, `pcre2`, `zlib` | `make`, `gcc`, `pkgconf` | Network utility to retrieve files from the Web using HTTP, HTTPS and FTP |
 | **`which`** | `2.25` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Displays where a particular program is found in the path |
