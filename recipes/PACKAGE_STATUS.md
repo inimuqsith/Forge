@@ -138,7 +138,7 @@
 | **`xfsprogs`** | `7.2.1` | 🟡 Belum Diuji | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
 | **`xkeyboard-config`** | `2.49` | 🟡 Belum Diuji | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
 | **`xz`** | `5.8.4` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Free general-purpose data compression software with high compression ratio (LZMA2) |
-| **`zip`** | `9.0.5` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
+| **`zip`** | `9.1.0` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
 | **`zsh`** | `5.9.2` | 🟡 Belum Diuji | `glibc`, `ncurses`, `pcre2` | `make`, `gcc`, `pkgconf` | Advanced programmable command interpreter |
 | **`zstd`** | `1.5.7-kernel` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz` | `make`, `gcc`, `pkgconf` | Zstandard - Fast real-time compression algorithm |
 
@@ -156,7 +156,7 @@
 | **`bat`** | `0.26.1` | 🟡 Belum Diuji | `glibc`, `zlib` | `cargo`, `rust` | A cat clone with syntax highlighting and Git integration |
 | **`bottom`** | `0.14.9` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `git`, `rust` | A graphical process/system monitor |
 | **`breeze`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `kcoreaddons`, `kconfig`, `kwidgetsaddons`, `kwindowsystem` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Artwork, styles and assets for the Breeze visual theme |
-| **`btop`** | `1.4.7` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Modern and beautiful resource monitor that shows usage and stats for processor, memory, disks, network and processes |
+| **`btop`** | `1.4.8` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Modern and beautiful resource monitor that shows usage and stats for processor, memory, disks, network and processes |
 | **`cairo`** | `1.18.6` | 🟡 Belum Diuji | `glibc`, `pixman`, `freetype`, `fontconfig`, `zlib`, `libpng` | `meson`, `ninja`, `pkgconf` | 2D graphics library with support for multiple output devices |
 | **`cargo`** | `1.85.0` | 🟡 Belum Diuji | `glibc`, `rust`, `openssl`, `curl`, `zlib` | `rust` | Rust Package Manager and Build Tool |
 | **`ccache`** | `4.14.2` | 🟡 Belum Diuji | `glibc`, `zstd` | `cmake`, `ninja`, `gcc`, `pkgconf` | Fast compiler cache for C/C++ |
