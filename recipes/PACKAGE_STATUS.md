@@ -176,7 +176,7 @@
 | **`foot`** | `1.28.0` | 🟡 Belum Diuji | `glibc`, `fcft`, `fontconfig`, `libutf8proc`, `libxkbcommon`, `ncurses`, `pixman`, `wayland` | `gcc`, `meson`, `ninja`, `pkgconf`, `tllist`, `wayland-protocols` | Fast, lightweight, and minimalistic Wayland terminal emulator |
 | **`freetype`** | `2.15.0` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `libpng` | `meson`, `ninja`, `pkgconf` | Freely available software library to render fonts |
 | **`fzf`** | `0.74.5` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `go` | Command-line fuzzy finder |
-| **`gh`** | `2.103.2` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `make`, `go` | The GitHub CLI |
+| **`gh`** | `2.103.3` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `make`, `go` | The GitHub CLI |
 | **`git`** | `2.56.0` | 🟡 Belum Diuji | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2`, `nghttp2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
 | **`glib2`** | `2.90.1` | 🟡 Belum Diuji | `glibc`, `libffi`, `pcre2`, `zlib` | `meson`, `ninja`, `pkgconf`, `gcc` | Core low-level data structure and utility library from GNOME |
 | **`gmp`** | `6.3.0` | 🟡 Belum Diuji | `glibc` | `m4` | GNU Multiple Precision Arithmetic Library |
