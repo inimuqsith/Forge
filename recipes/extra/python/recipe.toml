@@ -1,6 +1,6 @@
 [package]
 name = "python"
-version = "3.15.1"
+version = "3.15.2"
 release = 1
 slot = "3.13"
 description = "Next generation of the high-level scripting language Python"

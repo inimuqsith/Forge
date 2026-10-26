@@ -233,7 +233,7 @@
 | **`plasma-desktop`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `qt6-svg`, `kcoreaddons`, `kconfig`, `kwindowsystem`, `ki18n`, `kauth`, `kwidgetsaddons`, `kservice`, `kcrash`, `kdbusaddons`, `kglobalaccel`, `plasma-workspace`, `libksysguard`, `breeze` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | KDE Plasma Desktop user interface, panels, widgets and settings |
 | **`plasma-workspace`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `qt6-svg`, `kcoreaddons`, `kconfig`, `kwindowsystem`, `ki18n`, `kauth`, `kservice`, `kcrash`, `kdbusaddons`, `kglobalaccel`, `kpipewire`, `layer-shell-qt`, `libksysguard`, `breeze`, `kwin`, `pam`, `shadow` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | KDE Plasma Workspace components and session management |
 | **`procs`** | `0.14.12` | 🟡 Belum Diuji | `glibc`, `gcc` | `rust`, `mold`, `llvm`, `pkgconf` | A modern replacement for ps written in Rust |
-| **`python`** | `3.15.1` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `bzip2`, `xz`, `sqlite`, `libffi`, `expat`, `ncurses`, `readline` | `make`, `gcc`, `pkgconf` | Next generation of the high-level scripting language Python |
+| **`python`** | `3.15.2` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `bzip2`, `xz`, `sqlite`, `libffi`, `expat`, `ncurses`, `readline` | `make`, `gcc`, `pkgconf` | Next generation of the high-level scripting language Python |
 | **`qt6-base`** | `6.8.2` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `zstd`, `dbus`, `libxkbcommon`, `fontconfig`, `freetype`, `harfbuzz`, `mesa`, `libdrm` | `cmake`, `ninja`, `pkgconf`, `vulkan-headers` | Cross-platform application and UI framework (Core, Gui, Widgets, Network, DBus) |
 | **`qt6-declarative`** | `6.8.2` | 🟡 Belum Diuji | `qt6-base` | `cmake`, `ninja`, `pkgconf`, `python` | Classes for QML and JavaScript languages for Qt6 |
 | **`qt6-svg`** | `6.8.2` | 🟡 Belum Diuji | `qt6-base`, `zlib` | `cmake`, `ninja`, `pkgconf` | Classes for displaying the contents of SVG files in Qt6 |
@@ -252,7 +252,7 @@
 | **`tmux`** | `3.8-rc3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Terminal multiplexer workspace utility |
 | **`tokei`** | `15.0.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `cargo` | A blazingly fast CLOC (Count Lines Of Code) program |
 | **`tree`** | `2.3.2` | 🟡 Belum Diuji | `glibc` | - | Recursive directory indentation and tree-format listing program |
-| **`vscode-oss`** | `1.140.06880` | 🟡 Belum Diuji | `glibc`, `ca-certificates`, `dbus`, `ncurses` | `tar`, `gzip` | Free/Libre Open Source Software Binaries of Visual Studio Code (VSCodium) |
+| **`vscode-oss`** | `1.143.17183` | 🟡 Belum Diuji | `glibc`, `ca-certificates`, `dbus`, `ncurses` | `tar`, `gzip` | Free/Libre Open Source Software Binaries of Visual Studio Code (VSCodium) |
 | **`vulkan-headers`** | `1.4.366` | 🟡 Belum Diuji | - | `cmake`, `ninja` | Vulkan Header files and API registry |
 | **`vulkan-loader`** | `1.4.366` | 🟡 Belum Diuji | `glibc`, `vulkan-headers`, `wayland` | `cmake`, `ninja`, `pkgconf`, `python` | Vulkan Installable Client Driver (ICD) Loader |
 | **`wayland`** | `1.26.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `expat`, `libxml2` | `gcc`, `meson`, `ninja`, `pkgconf`, `libxslt` | A computer display server protocol |
