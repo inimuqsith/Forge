@@ -1,6 +1,6 @@
 [package]
 name = "pipewire"
-version = "1.6.10"
+version = "1.6.11"
 release = 1
 slot = "0"
 description = "Low-latency audio/video routing daemon and multimedia processing graph"
