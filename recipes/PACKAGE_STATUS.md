@@ -253,7 +253,7 @@
 | **`tokei`** | `15.0.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `cargo` | A blazingly fast CLOC (Count Lines Of Code) program |
 | **`tree`** | `2.3.2` | 🟡 Belum Diuji | `glibc` | - | Recursive directory indentation and tree-format listing program |
 | **`vscode-oss`** | `1.143.17232` | 🟡 Belum Diuji | `glibc`, `ca-certificates`, `dbus`, `ncurses` | `tar`, `gzip` | Free/Libre Open Source Software Binaries of Visual Studio Code (VSCodium) |
-| **`vulkan-headers`** | `1.4.366` | 🟡 Belum Diuji | - | `cmake`, `ninja` | Vulkan Header files and API registry |
+| **`vulkan-headers`** | `1.4.367` | 🟡 Belum Diuji | - | `cmake`, `ninja` | Vulkan Header files and API registry |
 | **`vulkan-loader`** | `1.4.366` | 🟡 Belum Diuji | `glibc`, `vulkan-headers`, `wayland` | `cmake`, `ninja`, `pkgconf`, `python` | Vulkan Installable Client Driver (ICD) Loader |
 | **`wayland`** | `1.26.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `expat`, `libxml2` | `gcc`, `meson`, `ninja`, `pkgconf`, `libxslt` | A computer display server protocol |
 | **`wayland-protocols`** | `1.50` | 🟡 Belum Diuji | `glibc` | `gcc`, `wayland`, `meson`, `ninja` | Specifications of extended Wayland protocols |
