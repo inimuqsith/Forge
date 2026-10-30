@@ -1,6 +1,6 @@
 [package]
 name = "kmod"
-version = "34.2"
+version = "34.3"
 release = 1
 description = "Linux kernel module management tools and library (lsmod, modprobe, insmod)"
 license = "GPL-2.0-or-later AND LGPL-2.1-or-later"
@@ -13,7 +13,9 @@ build = ["gcc", "make", "pkgconf"]
 
 [sources]
 urls = ["https://kernel.org/pub/linux/utils/kernel/kmod/kmod-34.2.tar.xz"]
-sha256 = ["5a5d5073070cc7e0c7a7a3c6ec2a0e1780850c8b47b3e3892226b93ffcb9cb54"]
+sha256 = [
+    "985554de49c21a58abd68c6cda2251384e1e5bb08b3b14c7f02b51f4c90c2958"
+]
 
 [build]
 compiler_override = "gcc"

@@ -91,9 +91,9 @@
 | **`iproute2`** | `7.3.0` | 🟡 Belum Diuji | `glibc`, `libcap`, `libseccomp` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | IP routing and network device configuration suite (ip, ss, tc) |
 | **`iptables`** | `1.8.13` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Linux kernel packet filtering and NAT control utility |
 | **`kbd`** | `2.10.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | Keytable files and keyboard utilities (loadkeys, setfont) |
-| **`kmod`** | `34.2` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz`, `zstd`, `openssl` | `gcc`, `make`, `pkgconf` | Linux kernel module management tools and library (lsmod, modprobe, insmod) |
+| **`kmod`** | `34.3` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz`, `zstd`, `openssl` | `gcc`, `make`, `pkgconf` | Linux kernel module management tools and library (lsmod, modprobe, insmod) |
 | **`less`** | `710` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | A terminal based program for viewing text files |
-| **`libarchive`** | `3.8.10` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `xz`, `zstd`, `openssl`, `expat` | `make`, `gcc`, `pkgconf` | Multi-format archive and compression library (bsdtar, bsdcpio) |
+| **`libarchive`** | `3.8.11` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `xz`, `zstd`, `openssl`, `expat` | `make`, `gcc`, `pkgconf` | Multi-format archive and compression library (bsdtar, bsdcpio) |
 | **`libcap`** | `2.78` | 🟡 Belum Diuji | `glibc` | - | POSIX 1003.1e capabilities library and tools (setcap, getcap) |
 | **`libcap-ng`** | `0.9.6` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `autoconf`, `automake`, `libtool` | Alternate POSIX capabilities library |
 | **`libedit`** | `20260512-3.1` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | NetBSD Editline library (BSD-licensed alternative to GNU readline) |
@@ -254,10 +254,10 @@
 | **`tree`** | `2.3.2` | 🟡 Belum Diuji | `glibc` | - | Recursive directory indentation and tree-format listing program |
 | **`vscode-oss`** | `1.143.17232` | 🟡 Belum Diuji | `glibc`, `ca-certificates`, `dbus`, `ncurses` | `tar`, `gzip` | Free/Libre Open Source Software Binaries of Visual Studio Code (VSCodium) |
 | **`vulkan-headers`** | `1.4.367` | 🟡 Belum Diuji | - | `cmake`, `ninja` | Vulkan Header files and API registry |
-| **`vulkan-loader`** | `1.4.366` | 🟡 Belum Diuji | `glibc`, `vulkan-headers`, `wayland` | `cmake`, `ninja`, `pkgconf`, `python` | Vulkan Installable Client Driver (ICD) Loader |
+| **`vulkan-loader`** | `1.4.367` | 🟡 Belum Diuji | `glibc`, `vulkan-headers`, `wayland` | `cmake`, `ninja`, `pkgconf`, `python` | Vulkan Installable Client Driver (ICD) Loader |
 | **`wayland`** | `1.26.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `expat`, `libxml2` | `gcc`, `meson`, `ninja`, `pkgconf`, `libxslt` | A computer display server protocol |
 | **`wayland-protocols`** | `1.50` | 🟡 Belum Diuji | `glibc` | `gcc`, `wayland`, `meson`, `ninja` | Specifications of extended Wayland protocols |
-| **`wireplumber`** | `0.5.18` | 🟡 Belum Diuji | `glibc`, `pipewire`, `glib2` | `meson`, `ninja`, `pkgconf`, `glib2` | Modular session manager daemon and policy router for PipeWire |
+| **`wireplumber`** | `0.5.19` | 🟡 Belum Diuji | `glibc`, `pipewire`, `glib2` | `meson`, `ninja`, `pkgconf`, `glib2` | Modular session manager daemon and policy router for PipeWire |
 | **`zellij`** | `0.45.1` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `zlib` | `rust`, `mold`, `llvm`, `pkgconf` | A terminal multiplexer |
 | **`zlib`** | `1.3.2` | 🟡 Belum Diuji | `glibc` | - | Standard compression library implementing DEFLATE algorithm |
 | **`zoxide`** | `0.10.0` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `rust` | A smarter cd command for your terminal |

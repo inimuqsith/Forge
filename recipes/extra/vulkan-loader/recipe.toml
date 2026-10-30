@@ -1,6 +1,6 @@
 [package]
 name = "vulkan-loader"
-version = "1.4.366"
+version = "1.4.367"
 release = 1
 slot = "0"
 description = "Vulkan Installable Client Driver (ICD) Loader"
