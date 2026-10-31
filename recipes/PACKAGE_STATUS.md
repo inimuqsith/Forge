@@ -154,7 +154,7 @@
 | **`antigravity-cli`** | `1.2.7` | 🟡 Belum Diuji | `glibc`, `ca-certificates` | `tar`, `gzip` | Official Google DeepMind Antigravity CLI (agy) for agentic AI pair programming |
 | **`bandwhich`** | `0.23.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | Terminal bandwidth utilization tool |
 | **`bat`** | `0.26.1` | 🟡 Belum Diuji | `glibc`, `zlib` | `cargo`, `rust` | A cat clone with syntax highlighting and Git integration |
-| **`bottom`** | `0.14.9` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `git`, `rust` | A graphical process/system monitor |
+| **`bottom`** | `0.15.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `git`, `rust` | A graphical process/system monitor |
 | **`breeze`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `kcoreaddons`, `kconfig`, `kwidgetsaddons`, `kwindowsystem` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Artwork, styles and assets for the Breeze visual theme |
 | **`btop`** | `1.4.8` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Modern and beautiful resource monitor that shows usage and stats for processor, memory, disks, network and processes |
 | **`cairo`** | `1.18.6` | 🟡 Belum Diuji | `glibc`, `pixman`, `freetype`, `fontconfig`, `zlib`, `libpng` | `meson`, `ninja`, `pkgconf` | 2D graphics library with support for multiple output devices |
