@@ -1,6 +1,6 @@
 [package]
 name = "libinih"
-version = "62"
+version = "r63: bug fixes, new settings, read error code"
 release = 1
 slot = "0"
 description = "Simple INI file parser written in C"
