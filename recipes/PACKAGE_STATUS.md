@@ -24,7 +24,7 @@
 | **`base`** | `1.0.0` | 🟡 Belum Diuji | `glibc`, `coreutils`, `sed`, `grep`, `gawk`, `tar`, `gzip`, `bzip2`, `xz`, `zstd`, `findutils`, `diffutils`, `file`, `which`, `util-linux`, `shadow`, `openrc`, `eudev`, `kmod`, `ca-certificates`, `acl`, `attr` | - | Kura Linux Minimal Base System (Meta-Package) |
 | **`binutils`** | `2.47` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd` | `bison`, `flex` | GNU binary utilities (as, ld, readelf, objdump, strip, ar) |
 | **`bison`** | `3.8.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `gcc` | General-purpose parser generator |
-| **`clang`** | `23.1.4` | 🟡 Belum Diuji | `llvm` | - | C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm) |
+| **`clang`** | `23.1.5` | 🟡 Belum Diuji | `llvm` | - | C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm) |
 | **`cmake`** | `4.4.5` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libarchive` | `make`, `gcc`, `binutils`, `pkgconf` | Cross-platform open-source build system generator |
 | **`flex`** | `2.6.4` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
 | **`forge`** | `git` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `llvm`, `make`, `gcc`, `binutils`, `pkgconf`, `ninja`, `patch`, `linux-headers`, `git`, `ca-certificates`, `tar`, `xz`, `gzip`, `bzip2` | `rust`, `mold`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
@@ -35,7 +35,7 @@
 | **`libtool`** | `2.6.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `autoconf`, `automake`, `gcc` | Generic library support script |
 | **`linux-cachyos-bore`** | `git` | 🟡 Belum Diuji | `kmod`, `eudev` | `llvm`, `mold`, `make`, `bc`, `bison`, `flex`, `elfutils`, `openssl`, `rsync`, `kmod`, `zstd`, `diffutils` | Linux CachyOS Kernel bleeding-edge Git with BORE scheduler, sched-ext, and LLVM 22 LTO |
 | **`linux-headers`** | `7.2` | 🟡 Belum Diuji | - | - | Linux kernel API headers for userspace |
-| **`llvm`** | `23.1.4` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `libxml2` | `cmake`, `ninja`, `pkgconf`, `make`, `python` | LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22) |
+| **`llvm`** | `23.1.5` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `libxml2` | `cmake`, `ninja`, `pkgconf`, `make`, `python` | LLVM Compiler Infrastructure with Clang, LLD, and Compiler-RT (v22) |
 | **`m4`** | `1.4.21` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | GNU Macro Processor |
 | **`make`** | `4.4.1` | 🟡 Belum Diuji | `glibc` | - | GNU Make utility to maintain groups of programs |
 | **`meson`** | `1.12.1` | 🟡 Belum Diuji | `glibc`, `python`, `ninja` | `python` | Fast and user friendly build system |
@@ -76,7 +76,7 @@
 | **`elfutils`** | `0.197` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `xz`, `zstd` | `make`, `gcc`, `pkgconf`, `m4`, `flex`, `bison` | Libraries and tools for handling ELF files and DWARF data |
 | **`elogind`** | `257.16` | 🟡 Belum Diuji | `glibc`, `pam`, `acl`, `libcap` | `gcc`, `intltool`, `libtool`, `gperf`, `libcap`, `meson`, `ninja`, `pkgconf` | The systemd project |
 | **`ethtool`** | `7.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Utility for examining and tuning network interfaces and drivers |
-| **`eudev`** | `3.2.15` | 🟡 Belum Diuji | `glibc`, `kmod`, `hwdata` | `make`, `gcc`, `pkgconf`, `gperf` | Standalone device manager fork of systemd-udev for OpenRC |
+| **`eudev`** | `3.3.0` | 🟡 Belum Diuji | `glibc`, `kmod`, `hwdata` | `make`, `gcc`, `pkgconf`, `gperf` | Standalone device manager fork of systemd-udev for OpenRC |
 | **`f2fs-tools`** | `1.16.0` | 🟡 Belum Diuji | `glibc`, `util-linux` | `gcc`, `git` | Tools for Flash-Friendly File System (F2FS) |
 | **`file`** | `5.48` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `xz`, `zstd` | `make`, `gcc`, `pkgconf` | File type identification utility and libmagic |
 | **`findutils`** | `4.11.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | GNU utilities for finding files (find, xargs, locate) |
@@ -85,7 +85,7 @@
 | **`groff`** | `1.24.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `pkgconf` | GNU troff text-formatting system |
 | **`grub`** | `2.16` | 🟡 Belum Diuji | `glibc`, `xz` | `gcc`, `make`, `pkgconf`, `flex`, `bison`, `python` | GNU GRand Unified Bootloader (2) |
 | **`gzip`** | `1.15` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Popular data compression program |
-| **`hwdata`** | `0.412` | 🟡 Belum Diuji | `glibc` | `make` | Hardware identification databases (pci.ids, usb.ids, oui.txt) |
+| **`hwdata`** | `0.413` | 🟡 Belum Diuji | `glibc` | `make` | Hardware identification databases (pci.ids, usb.ids, oui.txt) |
 | **`intel-ucode`** | `microcode-20260925 Release` | 🟡 Belum Diuji | - | - | Microcode update files and early-initramfs image for Intel CPUs |
 | **`intltool`** | `0.51.0` | 🟡 Belum Diuji | `perl` | `make`, `gcc`, `perl` | Internationalization tool collection |
 | **`iproute2`** | `7.3.0` | 🟡 Belum Diuji | `glibc`, `libcap`, `libseccomp` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | IP routing and network device configuration suite (ip, ss, tc) |
@@ -138,7 +138,7 @@
 | **`xfsprogs`** | `7.2.1` | 🟡 Belum Diuji | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
 | **`xkeyboard-config`** | `2.49` | 🟡 Belum Diuji | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
 | **`xz`** | `5.8.4` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Free general-purpose data compression software with high compression ratio (LZMA2) |
-| **`zip`** | `9.2.2` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
+| **`zip`** | `9.3.0` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
 | **`zsh`** | `5.9.2` | 🟡 Belum Diuji | `glibc`, `ncurses`, `pcre2` | `make`, `gcc`, `pkgconf` | Advanced programmable command interpreter |
 | **`zstd`** | `1.5.7-kernel` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz` | `make`, `gcc`, `pkgconf` | Zstandard - Fast real-time compression algorithm |
 
