@@ -1,6 +1,6 @@
 [package]
 name = "harfbuzz"
-version = "15.0.0"
+version = "15.1.0"
 release = 1
 slot = "0"
 description = "OpenType text shaping engine"

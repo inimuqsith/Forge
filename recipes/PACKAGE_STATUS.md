@@ -105,7 +105,7 @@
 | **`libseccomp`** | `2.6.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Enhanced Seccomp library and kernel syscall filtering interface |
 | **`liburcu`** | `0.15.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Userspace RCU (read-copy-update) library |
 | **`linux-firmware`** | `20261019` | 🟡 Belum Diuji | - | `make` | Firmware files for Linux kernel drivers (Wi-Fi, GPU, Bluetooth, Audio SOF) |
-| **`lz4`** | `1.10.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Extremely fast compression algorithm |
+| **`lz4`** | `1.11.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Extremely fast compression algorithm |
 | **`lzo`** | `2.10` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Portable lossless data compression library |
 | **`man-pages`** | `6.20` | 🟡 Belum Diuji | `glibc` | `make` | Linux system documentation manual pages |
 | **`mkinitcpio`** | `42.2` | 🟡 Belum Diuji | `bash`, `kmod`, `coreutils`, `util-linux`, `zstd`, `findutils` | `make` | Modular and fast initramfs creation utility for Linux |
@@ -183,7 +183,7 @@
 | **`go`** | `1.27.3` | 🟡 Belum Diuji | `glibc`, `ca-certificates` | `make`, `gcc`, `bash` | Open source programming language that makes it easy to build simple, fast, and reliable software |
 | **`gobject-introspection`** | `1.86.0` | 🟡 Belum Diuji | `glibc`, `glib2`, `libffi` | `meson`, `ninja`, `gcc`, `pkgconf`, `python`, `bison`, `flex` | Middleware layer for creating language bindings for C libraries |
 | **`grex`** | `1.4.6` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line tool for generating regular expressions from user-provided input strings |
-| **`harfbuzz`** | `15.0.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |
+| **`harfbuzz`** | `15.1.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |
 | **`helium-browser`** | `0.20.3.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
 | **`helix`** | `25.07.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A post-modern modal text editor |
 | **`htop`** | `3.5.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Interactive process viewer for Unix systems |
