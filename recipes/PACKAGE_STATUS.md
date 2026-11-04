@@ -170,7 +170,7 @@
 | **`eza`** | `0.23.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
 | **`fastfetch`** | `2.70.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
 | **`fcft`** | `3.3.3` | 🟡 Belum Diuji | `glibc`, `fontconfig`, `freetype`, `pixman`, `libutf8proc` | `meson`, `ninja`, `gcc`, `pkgconf`, `tllist` | Simple library for font loading and glyph rasterization |
-| **`fd`** | `10.5.0` | 🟡 Belum Diuji | `glibc` | `cargo`, `rust` | Simple, fast and user-friendly alternative to find |
+| **`fd`** | `10.5.1` | 🟡 Belum Diuji | `glibc` | `cargo`, `rust` | Simple, fast and user-friendly alternative to find |
 | **`fish`** | `4.9.3` | 🟡 Belum Diuji | `glibc`, `gcc`, `pcre2` | `gcc`, `cmake`, `ninja`, `rust`, `pkgconf` | Smart and user friendly shell intended mostly for interactive use |
 | **`fontconfig`** | `2.18.3` | 🟡 Belum Diuji | `glibc`, `freetype`, `expat` | `meson`, `ninja`, `pkgconf`, `gperf` | Library for configuring and customizing font access |
 | **`foot`** | `1.28.0` | 🟡 Belum Diuji | `glibc`, `fcft`, `fontconfig`, `libutf8proc`, `libxkbcommon`, `ncurses`, `pixman`, `wayland` | `gcc`, `meson`, `ninja`, `pkgconf`, `tllist`, `wayland-protocols` | Fast, lightweight, and minimalistic Wayland terminal emulator |
