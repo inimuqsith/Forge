@@ -226,7 +226,7 @@
 | **`mpfr`** | `4.2.2` | 🟡 Belum Diuji | `glibc`, `gmp` | - | Multiple-precision floating-point arithmetic library |
 | **`neovim`** | `0.12.6` | 🟡 Belum Diuji | `glibc` | `cmake`, `ninja`, `gcc`, `pkgconf` | Vim-fork focused on extensibility and usability |
 | **`nushell`** | `0.116.1` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `libgit2`, `libssh2`, `openssl`, `sqlite`, `zstd` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A new type of shell |
-| **`openssh`** | `10.6p1` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libcap` | `make`, `gcc`, `pkgconf` | Premier connectivity tool for remote login with the SSH protocol |
+| **`openssh`** | `10.6p2` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libcap` | `make`, `gcc`, `pkgconf` | Premier connectivity tool for remote login with the SSH protocol |
 | **`pcre2`** | `10.49` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `readline` | `make`, `gcc`, `pkgconf` | Perl Compatible Regular Expressions 2 (PCRE2) |
 | **`pipewire`** | `1.6.11` | 🟡 Belum Diuji | `glibc`, `alsa-lib`, `dbus`, `elogind` | `meson`, `ninja`, `pkgconf` | Low-latency audio/video routing daemon and multimedia processing graph |
 | **`pixman`** | `0.46.4` | 🟡 Belum Diuji | `glibc` | `meson`, `ninja`, `pkgconf` | Low-level pixel manipulation and rasterization library |
