@@ -1,6 +1,6 @@
 [package]
 name = "bluez"
-version = "5.87"
+version = "5.88"
 release = 1
 slot = "0"
 description = "Official Linux Bluetooth protocol stack with OpenRC service"
@@ -16,7 +16,7 @@ urls = [
     "https://mirrors.edge.kernel.org/pub/linux/bluetooth/bluez-5.87.tar.xz"
 ]
 sha256 = [
-    "26bdcf2cebd7310c6f598850606b037ef0c515fe6608ebc54d22c50c4c32b35f"
+    "6952c39eb5f8b0ee712cc50ab3bcff03be17c410dd97ca640f4849d9a1653ba3"
 ]
 
 [build]

@@ -1,6 +1,6 @@
 [package]
 name = "fastfetch"
-version = "2.70.0"
+version = "2.71.0"
 release = 1
 slot = "0"
 description = "Like neofetch, but much faster because written in C (Latest 2.38.0)"
