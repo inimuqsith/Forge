@@ -20,7 +20,7 @@
 | Paket | Versi Hulu | Status | Runtime Dependencies | Build Dependencies | Deskripsi |
 | :--- | :---: | :---: | :--- | :--- | :--- |
 | **`autoconf`** | `2.73` | 🟡 Belum Diuji | `m4`, `glibc` | `make`, `m4`, `gcc` | Extensible package of M4 macros to produce configuration scripts |
-| **`automake`** | `1.19` | 🟡 Belum Diuji | `autoconf`, `glibc` | `make`, `autoconf`, `gcc` | Tool for automatically generating Makefile.in files |
+| **`automake`** | `1.20` | 🟡 Belum Diuji | `autoconf`, `glibc` | `make`, `autoconf`, `gcc` | Tool for automatically generating Makefile.in files |
 | **`base`** | `1.0.0` | 🟡 Belum Diuji | `glibc`, `coreutils`, `sed`, `grep`, `gawk`, `tar`, `gzip`, `bzip2`, `xz`, `zstd`, `findutils`, `diffutils`, `file`, `which`, `util-linux`, `shadow`, `openrc`, `eudev`, `kmod`, `ca-certificates`, `acl`, `attr` | - | Kura Linux Minimal Base System (Meta-Package) |
 | **`binutils`** | `2.47` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd` | `bison`, `flex` | GNU binary utilities (as, ld, readelf, objdump, strip, ar) |
 | **`bison`** | `3.8.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `gcc` | General-purpose parser generator |
@@ -82,7 +82,7 @@
 | **`findutils`** | `4.11.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | GNU utilities for finding files (find, xargs, locate) |
 | **`gawk`** | `5.4.1` | 🟡 Belum Diuji | `glibc`, `readline`, `gmp`, `mpfr` | `make`, `gcc` | GNU awk pattern scanning and processing language |
 | **`grep`** | `3.12` | 🟡 Belum Diuji | `glibc`, `pcre2` | `make`, `gcc`, `pkgconf` | GNU grep, egrep and fgrep |
-| **`groff`** | `1.24.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `pkgconf` | GNU troff text-formatting system |
+| **`groff`** | `1.25.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `pkgconf` | GNU troff text-formatting system |
 | **`grub`** | `2.16` | 🟡 Belum Diuji | `glibc`, `xz` | `gcc`, `make`, `pkgconf`, `flex`, `bison`, `python` | GNU GRand Unified Bootloader (2) |
 | **`gzip`** | `1.15` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Popular data compression program |
 | **`hwdata`** | `0.413` | 🟡 Belum Diuji | `glibc` | `make` | Hardware identification databases (pci.ids, usb.ids, oui.txt) |

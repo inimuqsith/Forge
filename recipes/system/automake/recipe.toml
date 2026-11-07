@@ -1,6 +1,6 @@
 [package]
 name = "automake"
-version = "1.19"
+version = "1.20"
 release = 1
 slot = "0"
 description = "Tool for automatically generating Makefile.in files"
@@ -15,7 +15,9 @@ build = ["make", "autoconf", "gcc"]
 urls = [
     "https://ftp.gnu.org/gnu/automake/automake-1.19.tar.xz"
 ]
-sha256 = ["e3e2c2e3abf37898138db5b6c1d1dc35c9160c5978be7947d2c741705251d445"]
+sha256 = [
+    "f6f34dad4cbe395715762b0710f7c511e39bd5cf777e6b95818ccbecf7714248"
+]
 
 [build]
 type = "autotools"
