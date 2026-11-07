@@ -1,6 +1,6 @@
 [package]
 name = "fd"
-version = "10.5.1"
+version = "10.5.2"
 release = 1
 slot = "0"
 description = "Simple, fast and user-friendly alternative to find"
@@ -16,7 +16,7 @@ urls = [
     "https://github.com/sharkdp/fd/archive/refs/tags/v10.5.0.tar.gz"
 ]
 sha256 = [
-    "3ea70c258d3390a601b436b6f4c545e3a944ff3de44c8ee5542c05588e337032"
+    "e6d9e90730bf316101691e49d59cc02565278dc3779d33a77423801569484851"
 ]
 
 [build]
