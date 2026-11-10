@@ -221,11 +221,11 @@
 | **`libxrandr`** | `1.5.5` | 🟡 Belum Diuji | `glibc`, `libxcb` | `make`, `gcc`, `pkgconf` | X11 RandR extension library |
 | **`libxslt`** | `1.1.45` | 🟡 Belum Diuji | `glibc`, `libxml2` | `make`, `gcc`, `pkgconf` | XML stylesheet transformation library (XSLT) |
 | **`lsof`** | `4.99.7` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Lists information about files opened by processes |
-| **`mesa`** | `26.2.6` | 🟡 Belum Diuji | `glibc`, `libdrm`, `expat`, `zstd`, `zlib`, `libxkbcommon`, `wayland` | `meson`, `ninja`, `pkgconf`, `python`, `bison`, `flex`, `llvm`, `wayland-protocols`, `vulkan-headers` | Open-source OpenGL and Vulkan 3D graphics drivers |
+| **`mesa`** | `26.3.0` | 🟡 Belum Diuji | `glibc`, `libdrm`, `expat`, `zstd`, `zlib`, `libxkbcommon`, `wayland` | `meson`, `ninja`, `pkgconf`, `python`, `bison`, `flex`, `llvm`, `wayland-protocols`, `vulkan-headers` | Open-source OpenGL and Vulkan 3D graphics drivers |
 | **`mpc`** | `1.4.1` | 🟡 Belum Diuji | `glibc`, `gmp`, `mpfr` | - | Library for the arithmetic of complex numbers with arbitrarily high precision |
 | **`mpfr`** | `4.2.2` | 🟡 Belum Diuji | `glibc`, `gmp` | - | Multiple-precision floating-point arithmetic library |
 | **`neovim`** | `0.12.6` | 🟡 Belum Diuji | `glibc` | `cmake`, `ninja`, `gcc`, `pkgconf` | Vim-fork focused on extensibility and usability |
-| **`nushell`** | `0.116.1` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `libgit2`, `libssh2`, `openssl`, `sqlite`, `zstd` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A new type of shell |
+| **`nushell`** | `0.117.0` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `libgit2`, `libssh2`, `openssl`, `sqlite`, `zstd` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A new type of shell |
 | **`openssh`** | `10.6p2` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libcap` | `make`, `gcc`, `pkgconf` | Premier connectivity tool for remote login with the SSH protocol |
 | **`pcre2`** | `10.49` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `readline` | `make`, `gcc`, `pkgconf` | Perl Compatible Regular Expressions 2 (PCRE2) |
 | **`pipewire`** | `1.6.11` | 🟡 Belum Diuji | `glibc`, `alsa-lib`, `dbus`, `elogind` | `meson`, `ninja`, `pkgconf` | Low-latency audio/video routing daemon and multimedia processing graph |

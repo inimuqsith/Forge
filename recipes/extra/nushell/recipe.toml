@@ -1,6 +1,6 @@
 [package]
 name = "nushell"
-version = "0.116.1"
+version = "0.117.0"
 release = 1
 slot = "0"
 description = "A new type of shell"
