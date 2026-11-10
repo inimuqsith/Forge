@@ -42,7 +42,7 @@
 | **`mold`** | `3.0.0` | 🟡 Belum Diuji | `glibc`, `zlib`, `openssl` | `gcc`, `cmake`, `make` | High-performance modern linker (Latest 2.42.1) |
 | **`ninja`** | `1.13.2` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `python` | Small build system with a focus on speed (Latest 1.13.2) |
 | **`openrc`** | `0.64.1` | 🟡 Belum Diuji | `glibc`, `ncurses` | `meson`, `ninja`, `pkgconf`, `make` | Service and init manager for Kura Linux |
-| **`patch`** | `2.8` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Utility to apply diffs to files |
+| **`patch`** | `2.8.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Utility to apply diffs to files |
 | **`perl`** | `5.44.0` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2` | `make`, `gcc` | Highly capable, feature-rich programming language |
 | **`pkgconf`** | `3.0.10` | 🟡 Belum Diuji | `glibc` | `gcc`, `make` | Package compiler and linker metadata toolkit (Latest 3.0.7) |
 
@@ -86,7 +86,7 @@
 | **`grub`** | `2.16` | 🟡 Belum Diuji | `glibc`, `xz` | `gcc`, `make`, `pkgconf`, `flex`, `bison`, `python` | GNU GRand Unified Bootloader (2) |
 | **`gzip`** | `1.15` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Popular data compression program |
 | **`hwdata`** | `0.413` | 🟡 Belum Diuji | `glibc` | `make` | Hardware identification databases (pci.ids, usb.ids, oui.txt) |
-| **`intel-ucode`** | `microcode-20260925 Release` | 🟡 Belum Diuji | - | - | Microcode update files and early-initramfs image for Intel CPUs |
+| **`intel-ucode`** | `microcode-20261110 Release` | 🟡 Belum Diuji | - | - | Microcode update files and early-initramfs image for Intel CPUs |
 | **`intltool`** | `0.51.0` | 🟡 Belum Diuji | `perl` | `make`, `gcc`, `perl` | Internationalization tool collection |
 | **`iproute2`** | `7.3.0` | 🟡 Belum Diuji | `glibc`, `libcap`, `libseccomp` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | IP routing and network device configuration suite (ip, ss, tc) |
 | **`iptables`** | `1.8.13` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Linux kernel packet filtering and NAT control utility |
@@ -177,10 +177,10 @@
 | **`freetype`** | `2.15.0` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `libpng` | `meson`, `ninja`, `pkgconf` | Freely available software library to render fonts |
 | **`fzf`** | `0.75.0` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `go` | Command-line fuzzy finder |
 | **`gh`** | `2.103.3` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `make`, `go` | The GitHub CLI |
-| **`git`** | `2.56.0` | 🟡 Belum Diuji | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2`, `nghttp2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
+| **`git`** | `2.56.1` | 🟡 Belum Diuji | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2`, `nghttp2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
 | **`glib2`** | `2.90.1` | 🟡 Belum Diuji | `glibc`, `libffi`, `pcre2`, `zlib` | `meson`, `ninja`, `pkgconf`, `gcc` | Core low-level data structure and utility library from GNOME |
 | **`gmp`** | `6.3.0` | 🟡 Belum Diuji | `glibc` | `m4` | GNU Multiple Precision Arithmetic Library |
-| **`go`** | `1.27.3` | 🟡 Belum Diuji | `glibc`, `ca-certificates` | `make`, `gcc`, `bash` | Open source programming language that makes it easy to build simple, fast, and reliable software |
+| **`go`** | `1.27.4` | 🟡 Belum Diuji | `glibc`, `ca-certificates` | `make`, `gcc`, `bash` | Open source programming language that makes it easy to build simple, fast, and reliable software |
 | **`gobject-introspection`** | `1.86.0` | 🟡 Belum Diuji | `glibc`, `glib2`, `libffi` | `meson`, `ninja`, `gcc`, `pkgconf`, `python`, `bison`, `flex` | Middleware layer for creating language bindings for C libraries |
 | **`grex`** | `1.4.6` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line tool for generating regular expressions from user-provided input strings |
 | **`harfbuzz`** | `15.1.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |

@@ -1,6 +1,6 @@
 [package]
 name = "intel-ucode"
-version = "microcode-20260925 Release"
+version = "microcode-20261110 Release"
 release = 1
 slot = "0"
 description = "Microcode update files and early-initramfs image for Intel CPUs"
