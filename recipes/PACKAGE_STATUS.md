@@ -26,7 +26,7 @@
 | **`bison`** | `3.8.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `gcc` | General-purpose parser generator |
 | **`clang`** | `23.1.5` | 🟡 Belum Diuji | `llvm` | - | C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm) |
 | **`cmake`** | `4.4.5` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libarchive` | `make`, `gcc`, `binutils`, `pkgconf` | Cross-platform open-source build system generator |
-| **`flex`** | `2.6.5` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
+| **`flex`** | `2.6.6` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
 | **`forge`** | `git` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `llvm`, `make`, `gcc`, `binutils`, `pkgconf`, `ninja`, `patch`, `linux-headers`, `git`, `ca-certificates`, `tar`, `xz`, `gzip`, `bzip2` | `rust`, `mold`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
 | **`gcc`** | `16.2.0` | 🟡 Belum Diuji | `glibc`, `gmp`, `mpfr`, `mpc`, `zstd` | `bison`, `flex` | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
 | **`gettext`** | `1.0` | 🟡 Belum Diuji | `glibc`, `acl`, `ncurses` | `make`, `gcc` | GNU internationalization and localization utilities |
@@ -258,7 +258,7 @@
 | **`wayland`** | `1.26.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `expat`, `libxml2` | `gcc`, `meson`, `ninja`, `pkgconf`, `libxslt` | A computer display server protocol |
 | **`wayland-protocols`** | `1.50` | 🟡 Belum Diuji | `glibc` | `gcc`, `wayland`, `meson`, `ninja` | Specifications of extended Wayland protocols |
 | **`wireplumber`** | `0.5.19` | 🟡 Belum Diuji | `glibc`, `pipewire`, `glib2` | `meson`, `ninja`, `pkgconf`, `glib2` | Modular session manager daemon and policy router for PipeWire |
-| **`zellij`** | `0.45.1` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `zlib` | `rust`, `mold`, `llvm`, `pkgconf` | A terminal multiplexer |
+| **`zellij`** | `0.46.0` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `zlib` | `rust`, `mold`, `llvm`, `pkgconf` | A terminal multiplexer |
 | **`zlib`** | `1.4` | 🟡 Belum Diuji | `glibc` | - | Standard compression library implementing DEFLATE algorithm |
 | **`zoxide`** | `0.10.0` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `rust` | A smarter cd command for your terminal |
 
