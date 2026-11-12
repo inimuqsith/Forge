@@ -25,7 +25,7 @@
 | **`binutils`** | `2.47` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd` | `bison`, `flex` | GNU binary utilities (as, ld, readelf, objdump, strip, ar) |
 | **`bison`** | `3.8.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `gcc` | General-purpose parser generator |
 | **`clang`** | `23.1.5` | 🟡 Belum Diuji | `llvm` | - | C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm) |
-| **`cmake`** | `4.4.5` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libarchive` | `make`, `gcc`, `binutils`, `pkgconf` | Cross-platform open-source build system generator |
+| **`cmake`** | `4.5.0` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libarchive` | `make`, `gcc`, `binutils`, `pkgconf` | Cross-platform open-source build system generator |
 | **`flex`** | `2.6.10` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
 | **`forge`** | `git` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `llvm`, `make`, `gcc`, `binutils`, `pkgconf`, `ninja`, `patch`, `linux-headers`, `git`, `ca-certificates`, `tar`, `xz`, `gzip`, `bzip2` | `rust`, `mold`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
 | **`gcc`** | `16.2.0` | 🟡 Belum Diuji | `glibc`, `gmp`, `mpfr`, `mpc`, `zstd` | `bison`, `flex` | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
@@ -66,7 +66,7 @@
 | **`coreutils`** | `9.12` | 🟡 Belum Diuji | `glibc`, `libcap`, `acl`, `attr` | `make`, `gcc`, `pkgconf` | The basic file, shell and text manipulation utilities of the GNU operating system |
 | **`cronie`** | `1.7.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Standard cron daemon and crontab scheduler |
 | **`curl`** | `8.23.0` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `zstd`, `nghttp2` | `make`, `gcc`, `pkgconf` | Command line tool and library for transferring data with URLs |
-| **`dbus`** | `1.16.2` | 🟡 Belum Diuji | `glibc`, `expat`, `libcap-ng`, `eudev` | `gcc`, `meson`, `ninja`, `pkgconf`, `glib2`, `python` | Freedesktop.org message bus system |
+| **`dbus`** | `1.16.4` | 🟡 Belum Diuji | `glibc`, `expat`, `libcap-ng`, `eudev` | `gcc`, `meson`, `ninja`, `pkgconf`, `glib2`, `python` | Freedesktop.org message bus system |
 | **`dhcpcd`** | `10.5.2` | 🟡 Belum Diuji | `glibc`, `openssl` | `make`, `gcc`, `pkgconf` | RFC2131 and RFC3315 compliant DHCP/DHCPv6 and IPv4LL dual-stack client |
 | **`diffutils`** | `3.12` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | GNU diff, cmp, diff3 and sdiff programs |
 | **`dosfstools`** | `4.2` | 🟡 Belum Diuji | `glibc` | `gcc` | DOS filesystem utilities |
@@ -176,7 +176,7 @@
 | **`foot`** | `1.28.0` | 🟡 Belum Diuji | `glibc`, `fcft`, `fontconfig`, `libutf8proc`, `libxkbcommon`, `ncurses`, `pixman`, `wayland` | `gcc`, `meson`, `ninja`, `pkgconf`, `tllist`, `wayland-protocols` | Fast, lightweight, and minimalistic Wayland terminal emulator |
 | **`freetype`** | `2.15.0` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `libpng` | `meson`, `ninja`, `pkgconf` | Freely available software library to render fonts |
 | **`fzf`** | `0.75.0` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `go` | Command-line fuzzy finder |
-| **`gh`** | `2.103.3` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `make`, `go` | The GitHub CLI |
+| **`gh`** | `2.104.0` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `make`, `go` | The GitHub CLI |
 | **`git`** | `2.56.1` | 🟡 Belum Diuji | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2`, `nghttp2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
 | **`glib2`** | `2.90.1` | 🟡 Belum Diuji | `glibc`, `libffi`, `pcre2`, `zlib` | `meson`, `ninja`, `pkgconf`, `gcc` | Core low-level data structure and utility library from GNOME |
 | **`gmp`** | `6.3.0` | 🟡 Belum Diuji | `glibc` | `m4` | GNU Multiple Precision Arithmetic Library |
@@ -184,7 +184,7 @@
 | **`gobject-introspection`** | `1.86.0` | 🟡 Belum Diuji | `glibc`, `glib2`, `libffi` | `meson`, `ninja`, `gcc`, `pkgconf`, `python`, `bison`, `flex` | Middleware layer for creating language bindings for C libraries |
 | **`grex`** | `1.4.6` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line tool for generating regular expressions from user-provided input strings |
 | **`harfbuzz`** | `15.1.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |
-| **`helium-browser`** | `0.21.2.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
+| **`helium-browser`** | `0.21.3.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
 | **`helix`** | `25.07.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A post-modern modal text editor |
 | **`htop`** | `3.5.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Interactive process viewer for Unix systems |
 | **`hyperfine`** | `2.0.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line benchmarking tool |
@@ -240,7 +240,7 @@
 | **`qt6-wayland`** | `6.8.2` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `libdrm`, `wayland` | `cmake`, `ninja`, `pkgconf`, `wayland-protocols`, `vulkan-headers` | Provides APIs for Wayland client and compositor support in Qt6 |
 | **`ripgrep`** | `15.2.0` | 🟡 Belum Diuji | `glibc`, `pcre2` | `cargo`, `rust`, `pkgconf` | Ultra-fast line-oriented search tool combining grep with find |
 | **`rsync`** | `3.5.2` | 🟡 Belum Diuji | `glibc`, `zstd`, `openssl`, `acl` | `make`, `gcc`, `pkgconf` | Fast and versatile remote file copying tool |
-| **`rust`** | `1.99.1` | 🟡 Belum Diuji | `glibc`, `llvm`, `zlib`, `openssl`, `curl` | `python`, `cmake`, `ninja`, `gcc`, `make` | Empowering everyone to build reliable and efficient systems programming language |
+| **`rust`** | `1.100.0` | 🟡 Belum Diuji | `glibc`, `llvm`, `zlib`, `openssl`, `curl` | `python`, `cmake`, `ninja`, `gcc`, `make` | Empowering everyone to build reliable and efficient systems programming language |
 | **`sddm`** | `0.21.0` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `pam`, `shadow` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | QML and Wayland based modern display manager |
 | **`seatd`** | `0.9.3` | 🟡 Belum Diuji | `glibc`, `eudev` | `meson`, `ninja`, `pkgconf` | A minimal seat management daemon, and a universal seat management library |
 | **`sqlite`** | `3.54.1` | 🟡 Belum Diuji | `glibc`, `readline`, `zlib` | `make`, `gcc`, `pkgconf` | Self-contained serverless SQL database engine |

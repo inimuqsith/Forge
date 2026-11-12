@@ -1,6 +1,6 @@
 [package]
 name = "rust"
-version = "1.99.1"
+version = "1.100.0"
 release = 1
 slot = "0"
 description = "Empowering everyone to build reliable and efficient systems programming language"
