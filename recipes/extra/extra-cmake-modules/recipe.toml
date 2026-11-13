@@ -1,6 +1,6 @@
 [package]
 name = "extra-cmake-modules"
-version = "6.31.0"
+version = "6.32.0"
 release = 1
 description = "Extra modules and scripts for CMake used by KDE Frameworks"
 license = "BSD-2-Clause"
@@ -13,7 +13,9 @@ build = ["cmake"]
 
 [sources]
 urls = ["https://download.kde.org/stable/frameworks/6.30/extra-cmake-modules-6.30.0.tar.xz"]
-sha256 = ["22c9f7ff930dae7329faebf2942d2424f4a298c43bb3f11e217be6b12f227f6e"]
+sha256 = [
+    "22c9f7ff930dae7329faebf2942d2424f4a298c43bb3f11e217be6b12f227f6e"
+]
 
 [build]
 configure = """

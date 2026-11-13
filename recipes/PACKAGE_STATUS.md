@@ -135,7 +135,7 @@
 | **`which`** | `2.25` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Displays where a particular program is found in the path |
 | **`wireless-regdb`** | `2026.09.03` | 🟡 Belum Diuji | - | - | Wireless regulatory database for Linux kernel and CRDA |
 | **`wpa_supplicant`** | `2.12` | 🟡 Belum Diuji | `glibc`, `openssl`, `readline` | `make`, `gcc`, `pkgconf` | WPA/WPA2/WPA3 and IEEE 802.1X wireless client daemon |
-| **`xfsprogs`** | `7.2.1` | 🟡 Belum Diuji | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
+| **`xfsprogs`** | `7.3.0` | 🟡 Belum Diuji | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
 | **`xkeyboard-config`** | `2.49` | 🟡 Belum Diuji | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
 | **`xz`** | `5.8.4` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Free general-purpose data compression software with high compression ratio (LZMA2) |
 | **`zip`** | `9.5.1` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
@@ -166,7 +166,7 @@
 | **`duktape`** | `2.7.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Embeddable Javascript engine with a focus on portability and compact footprint |
 | **`dust`** | `1.2.7` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `git`, `rust` | A more intuitive version of du in rust |
 | **`expat`** | `2.10.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | XML parser library written in C |
-| **`extra-cmake-modules`** | `6.31.0` | 🟡 Belum Diuji | - | `cmake` | Extra modules and scripts for CMake used by KDE Frameworks |
+| **`extra-cmake-modules`** | `6.32.0` | 🟡 Belum Diuji | - | `cmake` | Extra modules and scripts for CMake used by KDE Frameworks |
 | **`eza`** | `0.23.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
 | **`fastfetch`** | `2.71.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
 | **`fcft`** | `3.3.3` | 🟡 Belum Diuji | `glibc`, `fontconfig`, `freetype`, `pixman`, `libutf8proc` | `meson`, `ninja`, `gcc`, `pkgconf`, `tllist` | Simple library for font loading and glyph rasterization |
