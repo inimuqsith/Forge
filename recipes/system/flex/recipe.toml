@@ -1,6 +1,6 @@
 [package]
 name = "flex"
-version = "2.6.12"
+version = "2.6.13"
 release = 1
 slot = "0"
 description = "Fast lexical analyzer generator"
