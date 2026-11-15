@@ -44,7 +44,7 @@
 | **`openrc`** | `0.64.1` | 🟡 Belum Diuji | `glibc`, `ncurses` | `meson`, `ninja`, `pkgconf`, `make` | Service and init manager for Kura Linux |
 | **`patch`** | `2.8.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Utility to apply diffs to files |
 | **`perl`** | `5.44.0` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2` | `make`, `gcc` | Highly capable, feature-rich programming language |
-| **`pkgconf`** | `3.0.10` | 🟡 Belum Diuji | `glibc` | `gcc`, `make` | Package compiler and linker metadata toolkit (Latest 3.0.7) |
+| **`pkgconf`** | `3.0.11` | 🟡 Belum Diuji | `glibc` | `gcc`, `make` | Package compiler and linker metadata toolkit (Latest 3.0.7) |
 
 ---
 
