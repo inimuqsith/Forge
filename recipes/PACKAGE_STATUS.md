@@ -26,7 +26,7 @@
 | **`bison`** | `3.8.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `gcc` | General-purpose parser generator |
 | **`clang`** | `23.1.5` | 🟡 Belum Diuji | `llvm` | - | C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm) |
 | **`cmake`** | `4.5.0` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libarchive` | `make`, `gcc`, `binutils`, `pkgconf` | Cross-platform open-source build system generator |
-| **`flex`** | `2.6.15` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
+| **`flex`** | `2.6.16` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
 | **`forge`** | `git` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `llvm`, `make`, `gcc`, `binutils`, `pkgconf`, `ninja`, `patch`, `linux-headers`, `git`, `ca-certificates`, `tar`, `xz`, `gzip`, `bzip2` | `rust`, `mold`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
 | **`gcc`** | `16.2.0` | 🟡 Belum Diuji | `glibc`, `gmp`, `mpfr`, `mpc`, `zstd` | `bison`, `flex` | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
 | **`gettext`** | `1.0` | 🟡 Belum Diuji | `glibc`, `acl`, `ncurses` | `make`, `gcc` | GNU internationalization and localization utilities |
@@ -138,7 +138,7 @@
 | **`xfsprogs`** | `7.3.0` | 🟡 Belum Diuji | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
 | **`xkeyboard-config`** | `2.49` | 🟡 Belum Diuji | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
 | **`xz`** | `5.8.4` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Free general-purpose data compression software with high compression ratio (LZMA2) |
-| **`zip`** | `9.6.0` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
+| **`zip`** | `9.6.1` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
 | **`zsh`** | `5.9.2` | 🟡 Belum Diuji | `glibc`, `ncurses`, `pcre2` | `make`, `gcc`, `pkgconf` | Advanced programmable command interpreter |
 | **`zstd`** | `1.5.7-kernel` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz` | `make`, `gcc`, `pkgconf` | Zstandard - Fast real-time compression algorithm |
 
