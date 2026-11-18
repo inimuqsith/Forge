@@ -138,7 +138,7 @@
 | **`xfsprogs`** | `7.3.0` | 🟡 Belum Diuji | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
 | **`xkeyboard-config`** | `2.49` | 🟡 Belum Diuji | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
 | **`xz`** | `5.8.4` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Free general-purpose data compression software with high compression ratio (LZMA2) |
-| **`zip`** | `9.6.1` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
+| **`zip`** | `9.7.0` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
 | **`zsh`** | `5.9.2` | 🟡 Belum Diuji | `glibc`, `ncurses`, `pcre2` | `make`, `gcc`, `pkgconf` | Advanced programmable command interpreter |
 | **`zstd`** | `1.5.7-kernel` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz` | `make`, `gcc`, `pkgconf` | Zstandard - Fast real-time compression algorithm |
 
@@ -176,7 +176,7 @@
 | **`foot`** | `1.28.0` | 🟡 Belum Diuji | `glibc`, `fcft`, `fontconfig`, `libutf8proc`, `libxkbcommon`, `ncurses`, `pixman`, `wayland` | `gcc`, `meson`, `ninja`, `pkgconf`, `tllist`, `wayland-protocols` | Fast, lightweight, and minimalistic Wayland terminal emulator |
 | **`freetype`** | `2.15.0` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `libpng` | `meson`, `ninja`, `pkgconf` | Freely available software library to render fonts |
 | **`fzf`** | `0.75.0` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `go` | Command-line fuzzy finder |
-| **`gh`** | `2.104.0` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `make`, `go` | The GitHub CLI |
+| **`gh`** | `2.105.0` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `make`, `go` | The GitHub CLI |
 | **`git`** | `2.56.1` | 🟡 Belum Diuji | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2`, `nghttp2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
 | **`glib2`** | `2.90.1` | 🟡 Belum Diuji | `glibc`, `libffi`, `pcre2`, `zlib` | `meson`, `ninja`, `pkgconf`, `gcc` | Core low-level data structure and utility library from GNOME |
 | **`gmp`** | `6.3.0` | 🟡 Belum Diuji | `glibc` | `m4` | GNU Multiple Precision Arithmetic Library |
