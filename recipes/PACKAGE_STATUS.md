@@ -138,7 +138,7 @@
 | **`xfsprogs`** | `7.3.0` | 🟡 Belum Diuji | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
 | **`xkeyboard-config`** | `2.49` | 🟡 Belum Diuji | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
 | **`xz`** | `5.8.4` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Free general-purpose data compression software with high compression ratio (LZMA2) |
-| **`zip`** | `9.7.1` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
+| **`zip`** | `9.8.0` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
 | **`zsh`** | `5.9.2` | 🟡 Belum Diuji | `glibc`, `ncurses`, `pcre2` | `make`, `gcc`, `pkgconf` | Advanced programmable command interpreter |
 | **`zstd`** | `1.5.7-kernel` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz` | `make`, `gcc`, `pkgconf` | Zstandard - Fast real-time compression algorithm |
 
@@ -183,7 +183,7 @@
 | **`go`** | `1.27.4` | 🟡 Belum Diuji | `glibc`, `ca-certificates` | `make`, `gcc`, `bash` | Open source programming language that makes it easy to build simple, fast, and reliable software |
 | **`gobject-introspection`** | `1.86.0` | 🟡 Belum Diuji | `glibc`, `glib2`, `libffi` | `meson`, `ninja`, `gcc`, `pkgconf`, `python`, `bison`, `flex` | Middleware layer for creating language bindings for C libraries |
 | **`grex`** | `1.4.6` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line tool for generating regular expressions from user-provided input strings |
-| **`harfbuzz`** | `15.1.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |
+| **`harfbuzz`** | `15.2.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |
 | **`helium-browser`** | `0.22.1.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
 | **`helix`** | `25.07.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A post-modern modal text editor |
 | **`htop`** | `3.5.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Interactive process viewer for Unix systems |
@@ -253,8 +253,8 @@
 | **`tokei`** | `15.0.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `cargo` | A blazingly fast CLOC (Count Lines Of Code) program |
 | **`tree`** | `2.3.2` | 🟡 Belum Diuji | `glibc` | - | Recursive directory indentation and tree-format listing program |
 | **`vscode-oss`** | `1.143.17232` | 🟡 Belum Diuji | `glibc`, `ca-certificates`, `dbus`, `ncurses` | `tar`, `gzip` | Free/Libre Open Source Software Binaries of Visual Studio Code (VSCodium) |
-| **`vulkan-headers`** | `1.4.368` | 🟡 Belum Diuji | - | `cmake`, `ninja` | Vulkan Header files and API registry |
-| **`vulkan-loader`** | `1.4.368` | 🟡 Belum Diuji | `glibc`, `vulkan-headers`, `wayland` | `cmake`, `ninja`, `pkgconf`, `python` | Vulkan Installable Client Driver (ICD) Loader |
+| **`vulkan-headers`** | `1.4.369` | 🟡 Belum Diuji | - | `cmake`, `ninja` | Vulkan Header files and API registry |
+| **`vulkan-loader`** | `1.4.369` | 🟡 Belum Diuji | `glibc`, `vulkan-headers`, `wayland` | `cmake`, `ninja`, `pkgconf`, `python` | Vulkan Installable Client Driver (ICD) Loader |
 | **`wayland`** | `1.26.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `expat`, `libxml2` | `gcc`, `meson`, `ninja`, `pkgconf`, `libxslt` | A computer display server protocol |
 | **`wayland-protocols`** | `1.50` | 🟡 Belum Diuji | `glibc` | `gcc`, `wayland`, `meson`, `ninja` | Specifications of extended Wayland protocols |
 | **`wireplumber`** | `0.5.19` | 🟡 Belum Diuji | `glibc`, `pipewire`, `glib2` | `meson`, `ninja`, `pkgconf`, `glib2` | Modular session manager daemon and policy router for PipeWire |
