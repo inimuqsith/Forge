@@ -102,7 +102,7 @@
 | **`libgpg-error`** | `1.61` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Small library with error codes and strings based on libgcrypt |
 | **`libinih`** | `r63: bug fixes, new settings, read error code` | 🟡 Belum Diuji | `glibc` | `meson`, `ninja`, `gcc`, `pkgconf` | Simple INI file parser written in C |
 | **`libpciaccess`** | `0.19` | 🟡 Belum Diuji | `glibc`, `zlib` | `meson`, `ninja`, `gcc`, `pkgconf` | Generic PCI access library |
-| **`libseccomp`** | `2.6.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Enhanced Seccomp library and kernel syscall filtering interface |
+| **`libseccomp`** | `2.6.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Enhanced Seccomp library and kernel syscall filtering interface |
 | **`liburcu`** | `0.15.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Userspace RCU (read-copy-update) library |
 | **`linux-firmware`** | `20261019` | 🟡 Belum Diuji | - | `make` | Firmware files for Linux kernel drivers (Wi-Fi, GPU, Bluetooth, Audio SOF) |
 | **`lz4`** | `1.11.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Extremely fast compression algorithm |
@@ -184,7 +184,7 @@
 | **`gobject-introspection`** | `1.86.0` | 🟡 Belum Diuji | `glibc`, `glib2`, `libffi` | `meson`, `ninja`, `gcc`, `pkgconf`, `python`, `bison`, `flex` | Middleware layer for creating language bindings for C libraries |
 | **`grex`** | `1.4.6` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line tool for generating regular expressions from user-provided input strings |
 | **`harfbuzz`** | `15.2.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |
-| **`helium-browser`** | `0.22.1.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
+| **`helium-browser`** | `0.22.2.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
 | **`helix`** | `25.07.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A post-modern modal text editor |
 | **`htop`** | `3.5.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Interactive process viewer for Unix systems |
 | **`hyperfine`** | `2.0.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line benchmarking tool |
