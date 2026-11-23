@@ -26,7 +26,7 @@
 | **`bison`** | `3.8.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `gcc` | General-purpose parser generator |
 | **`clang`** | `23.1.6` | 🟡 Belum Diuji | `llvm` | - | C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm) |
 | **`cmake`** | `4.5.1` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libarchive` | `make`, `gcc`, `binutils`, `pkgconf` | Cross-platform open-source build system generator |
-| **`flex`** | `2.7.4` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
+| **`flex`** | `2.7.6` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
 | **`forge`** | `git` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `llvm`, `make`, `gcc`, `binutils`, `pkgconf`, `ninja`, `patch`, `linux-headers`, `git`, `ca-certificates`, `tar`, `xz`, `gzip`, `bzip2` | `rust`, `mold`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
 | **`gcc`** | `16.2.0` | 🟡 Belum Diuji | `glibc`, `gmp`, `mpfr`, `mpc`, `zstd` | `bison`, `flex` | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
 | **`gettext`** | `1.0` | 🟡 Belum Diuji | `glibc`, `acl`, `ncurses` | `make`, `gcc` | GNU internationalization and localization utilities |
@@ -91,7 +91,7 @@
 | **`iproute2`** | `7.3.0` | 🟡 Belum Diuji | `glibc`, `libcap`, `libseccomp` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | IP routing and network device configuration suite (ip, ss, tc) |
 | **`iptables`** | `1.8.13` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Linux kernel packet filtering and NAT control utility |
 | **`kbd`** | `2.10.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `flex`, `pkgconf` | Keytable files and keyboard utilities (loadkeys, setfont) |
-| **`kmod`** | `34.3` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz`, `zstd`, `openssl` | `gcc`, `make`, `pkgconf` | Linux kernel module management tools and library (lsmod, modprobe, insmod) |
+| **`kmod`** | `34.4` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz`, `zstd`, `openssl` | `gcc`, `make`, `pkgconf` | Linux kernel module management tools and library (lsmod, modprobe, insmod) |
 | **`less`** | `710` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | A terminal based program for viewing text files |
 | **`libarchive`** | `3.8.11` | 🟡 Belum Diuji | `glibc`, `zlib`, `bzip2`, `xz`, `zstd`, `openssl`, `expat` | `make`, `gcc`, `pkgconf` | Multi-format archive and compression library (bsdtar, bsdcpio) |
 | **`libcap`** | `2.78` | 🟡 Belum Diuji | `glibc` | - | POSIX 1003.1e capabilities library and tools (setcap, getcap) |
@@ -140,7 +140,7 @@
 | **`xz`** | `5.8.4` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Free general-purpose data compression software with high compression ratio (LZMA2) |
 | **`zip`** | `9.8.1` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
 | **`zsh`** | `5.9.2` | 🟡 Belum Diuji | `glibc`, `ncurses`, `pcre2` | `make`, `gcc`, `pkgconf` | Advanced programmable command interpreter |
-| **`zstd`** | `1.5.7-kernel` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz` | `make`, `gcc`, `pkgconf` | Zstandard - Fast real-time compression algorithm |
+| **`zstd`** | `1.6.0` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz` | `make`, `gcc`, `pkgconf` | Zstandard - Fast real-time compression algorithm |
 
 ---
 
@@ -165,7 +165,7 @@
 | **`duf`** | `0.9.1` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `go` | Disk Usage/Free Utility |
 | **`duktape`** | `2.7.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Embeddable Javascript engine with a focus on portability and compact footprint |
 | **`dust`** | `1.2.7` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `git`, `rust` | A more intuitive version of du in rust |
-| **`expat`** | `2.10.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | XML parser library written in C |
+| **`expat`** | `2.11.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | XML parser library written in C |
 | **`extra-cmake-modules`** | `6.32.0` | 🟡 Belum Diuji | - | `cmake` | Extra modules and scripts for CMake used by KDE Frameworks |
 | **`eza`** | `0.23.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
 | **`fastfetch`** | `2.71.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
@@ -184,7 +184,7 @@
 | **`gobject-introspection`** | `1.86.0` | 🟡 Belum Diuji | `glibc`, `glib2`, `libffi` | `meson`, `ninja`, `gcc`, `pkgconf`, `python`, `bison`, `flex` | Middleware layer for creating language bindings for C libraries |
 | **`grex`** | `1.4.6` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line tool for generating regular expressions from user-provided input strings |
 | **`harfbuzz`** | `15.2.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |
-| **`helium-browser`** | `0.22.2.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
+| **`helium-browser`** | `0.22.3.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
 | **`helix`** | `25.07.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A post-modern modal text editor |
 | **`htop`** | `3.5.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Interactive process viewer for Unix systems |
 | **`hyperfine`** | `2.0.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line benchmarking tool |
@@ -247,7 +247,7 @@
 | **`starship`** | `1.27.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cmake`, `git`, `rust` | The cross-shell prompt for astronauts |
 | **`strace`** | `7.3` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Diagnostic, debugging and instructional userspace utility for Linux syscall tracing |
 | **`sudo`** | `1.9.17p2` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib` | `make`, `gcc`, `pkgconf` | Authority delegation tool allowing users to execute commands as root |
-| **`tailscale`** | `1.105.0-pre` | 🟡 Belum Diuji | `glibc`, `ca-certificates`, `iptables` | `tar`, `gzip` | Zero config VPN daemon and CLI for secure mesh networks |
+| **`tailscale`** | `1.107.0-pre` | 🟡 Belum Diuji | `glibc`, `ca-certificates`, `iptables` | `tar`, `gzip` | Zero config VPN daemon and CLI for secure mesh networks |
 | **`tllist`** | `1.1.0` | 🟡 Belum Diuji | - | `meson`, `ninja`, `pkgconf` | C header-only implementation of a typed linked list |
 | **`tmux`** | `3.8-rc3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Terminal multiplexer workspace utility |
 | **`tokei`** | `15.0.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `cargo` | A blazingly fast CLOC (Count Lines Of Code) program |

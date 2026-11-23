@@ -1,6 +1,6 @@
 [package]
 name = "zstd"
-version = "1.5.7-kernel"
+version = "1.6.0"
 release = 1
 slot = "0"
 description = "Zstandard - Fast real-time compression algorithm"
@@ -16,7 +16,7 @@ urls = [
     "https://github.com/facebook/zstd/archive/refs/tags/v1.5.7-kernel.tar.gz"
 ]
 sha256 = [
-    "be2393171a011d80539e5d243df61c4a63c035923e5b31614a757e77dbcd841a"
+    "289bb207935e5b4f241239f9832e665fa6b9636c3f87f479e125371e13842b8e"
 ]
 
 [build]
