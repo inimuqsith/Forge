@@ -26,7 +26,7 @@
 | **`bison`** | `3.8.2` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `gcc` | General-purpose parser generator |
 | **`clang`** | `23.1.6` | 🟡 Belum Diuji | `llvm` | - | C, C++, and Objective-C front-end for LLVM (Meta-package provided by monolithic llvm) |
 | **`cmake`** | `4.5.1` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `libarchive` | `make`, `gcc`, `binutils`, `pkgconf` | Cross-platform open-source build system generator |
-| **`flex`** | `2.7.3` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
+| **`flex`** | `2.7.4` | 🟡 Belum Diuji | `glibc`, `m4` | `make`, `m4`, `bison`, `gcc` | Fast lexical analyzer generator |
 | **`forge`** | `git` | 🟡 Belum Diuji | `glibc`, `zlib`, `zstd`, `bubblewrap`, `mold`, `llvm`, `make`, `gcc`, `binutils`, `pkgconf`, `ninja`, `patch`, `linux-headers`, `git`, `ca-certificates`, `tar`, `xz`, `gzip`, `bzip2` | `rust`, `mold`, `llvm`, `pkgconf`, `git` | High-Performance Source-First & Hybrid Package Manager for Kura Linux |
 | **`gcc`** | `16.2.0` | 🟡 Belum Diuji | `glibc`, `gmp`, `mpfr`, `mpc`, `zstd` | `bison`, `flex` | GNU Compiler Collection (C and C++ Compilers - Latest 15.3) |
 | **`gettext`** | `1.0` | 🟡 Belum Diuji | `glibc`, `acl`, `ncurses` | `make`, `gcc` | GNU internationalization and localization utilities |
@@ -124,7 +124,7 @@
 | **`psmisc`** | `23.7` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | Miscellaneous proc-based tools (killall, fuser, pstree) |
 | **`readline`** | `8.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc` | GNU Readline command line editing library |
 | **`sed`** | `4.10` | 🟡 Belum Diuji | `glibc`, `acl`, `attr` | `make`, `gcc` | GNU stream editor |
-| **`shadow`** | `4.20.3` | 🟡 Belum Diuji | `glibc`, `acl`, `libcap`, `libseccomp` | `make`, `gcc`, `pkgconf` | Password and account management utilities |
+| **`shadow`** | `4.20.4` | 🟡 Belum Diuji | `glibc`, `acl`, `libcap`, `libseccomp` | `make`, `gcc`, `pkgconf` | Password and account management utilities |
 | **`squashfs-tools`** | `4.7.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `lz4`, `lzo`, `xz`, `zlib`, `zstd` | `gcc`, `make`, `pkgconf` | Tools for squashfs, a highly compressed read-only filesystem for Linux |
 | **`sysklogd`** | `2.8.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Standard Linux system and kernel logging daemons (syslogd, klogd) |
 | **`tar`** | `1.35` | 🟡 Belum Diuji | `glibc`, `acl` | `make`, `gcc` | Utility used to store, backup, and transport files |
@@ -238,7 +238,7 @@
 | **`qt6-declarative`** | `6.8.2` | 🟡 Belum Diuji | `qt6-base` | `cmake`, `ninja`, `pkgconf`, `python` | Classes for QML and JavaScript languages for Qt6 |
 | **`qt6-svg`** | `6.8.2` | 🟡 Belum Diuji | `qt6-base`, `zlib` | `cmake`, `ninja`, `pkgconf` | Classes for displaying the contents of SVG files in Qt6 |
 | **`qt6-wayland`** | `6.8.2` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `libdrm`, `wayland` | `cmake`, `ninja`, `pkgconf`, `wayland-protocols`, `vulkan-headers` | Provides APIs for Wayland client and compositor support in Qt6 |
-| **`ripgrep`** | `15.2.0` | 🟡 Belum Diuji | `glibc`, `pcre2` | `cargo`, `rust`, `pkgconf` | Ultra-fast line-oriented search tool combining grep with find |
+| **`ripgrep`** | `16.0.0` | 🟡 Belum Diuji | `glibc`, `pcre2` | `cargo`, `rust`, `pkgconf` | Ultra-fast line-oriented search tool combining grep with find |
 | **`rsync`** | `3.5.2` | 🟡 Belum Diuji | `glibc`, `zstd`, `openssl`, `acl` | `make`, `gcc`, `pkgconf` | Fast and versatile remote file copying tool |
 | **`rust`** | `1.100.0` | 🟡 Belum Diuji | `glibc`, `llvm`, `zlib`, `openssl`, `curl` | `python`, `cmake`, `ninja`, `gcc`, `make` | Empowering everyone to build reliable and efficient systems programming language |
 | **`sddm`** | `0.21.0` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `pam`, `shadow` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | QML and Wayland based modern display manager |
