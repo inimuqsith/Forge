@@ -258,7 +258,7 @@
 | **`wayland`** | `1.26.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `expat`, `libxml2` | `gcc`, `meson`, `ninja`, `pkgconf`, `libxslt` | A computer display server protocol |
 | **`wayland-protocols`** | `1.50` | 🟡 Belum Diuji | `glibc` | `gcc`, `wayland`, `meson`, `ninja` | Specifications of extended Wayland protocols |
 | **`wireplumber`** | `0.5.19` | 🟡 Belum Diuji | `glibc`, `pipewire`, `glib2` | `meson`, `ninja`, `pkgconf`, `glib2` | Modular session manager daemon and policy router for PipeWire |
-| **`zellij`** | `0.46.0` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `zlib` | `rust`, `mold`, `llvm`, `pkgconf` | A terminal multiplexer |
+| **`zellij`** | `0.46.1` | 🟡 Belum Diuji | `glibc`, `curl`, `gcc`, `zlib` | `rust`, `mold`, `llvm`, `pkgconf` | A terminal multiplexer |
 | **`zlib`** | `1.4` | 🟡 Belum Diuji | `glibc` | - | Standard compression library implementing DEFLATE algorithm |
 | **`zoxide`** | `0.10.0` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `rust` | A smarter cd command for your terminal |
 
