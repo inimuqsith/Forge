@@ -164,7 +164,7 @@
 | **`doas`** | `6.8.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `bison`, `flex` | Simple OpenBSD privilege escalation tool ported to Linux |
 | **`duf`** | `0.9.1` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `go` | Disk Usage/Free Utility |
 | **`duktape`** | `2.7.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Embeddable Javascript engine with a focus on portability and compact footprint |
-| **`dust`** | `1.2.7` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `git`, `rust` | A more intuitive version of du in rust |
+| **`dust`** | `1.2.8` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `git`, `rust` | A more intuitive version of du in rust |
 | **`expat`** | `2.11.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | XML parser library written in C |
 | **`extra-cmake-modules`** | `6.32.0` | 🟡 Belum Diuji | - | `cmake` | Extra modules and scripts for CMake used by KDE Frameworks |
 | **`eza`** | `0.23.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
@@ -178,13 +178,13 @@
 | **`fzf`** | `0.75.0` | 🟡 Belum Diuji | `glibc` | `gcc`, `git`, `go` | Command-line fuzzy finder |
 | **`gh`** | `2.105.0` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `make`, `go` | The GitHub CLI |
 | **`git`** | `2.56.1` | 🟡 Belum Diuji | `glibc`, `curl`, `openssl`, `zlib`, `expat`, `pcre2`, `nghttp2` | `make`, `gcc`, `pkgconf` | Fast, scalable, distributed revision control system |
-| **`glib2`** | `2.90.1` | 🟡 Belum Diuji | `glibc`, `libffi`, `pcre2`, `zlib` | `meson`, `ninja`, `pkgconf`, `gcc` | Core low-level data structure and utility library from GNOME |
+| **`glib2`** | `2.91.0` | 🟡 Belum Diuji | `glibc`, `libffi`, `pcre2`, `zlib` | `meson`, `ninja`, `pkgconf`, `gcc` | Core low-level data structure and utility library from GNOME |
 | **`gmp`** | `6.3.0` | 🟡 Belum Diuji | `glibc` | `m4` | GNU Multiple Precision Arithmetic Library |
 | **`go`** | `1.27.4` | 🟡 Belum Diuji | `glibc`, `ca-certificates` | `make`, `gcc`, `bash` | Open source programming language that makes it easy to build simple, fast, and reliable software |
 | **`gobject-introspection`** | `1.86.0` | 🟡 Belum Diuji | `glibc`, `glib2`, `libffi` | `meson`, `ninja`, `gcc`, `pkgconf`, `python`, `bison`, `flex` | Middleware layer for creating language bindings for C libraries |
 | **`grex`** | `1.4.6` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line tool for generating regular expressions from user-provided input strings |
 | **`harfbuzz`** | `15.2.0` | 🟡 Belum Diuji | `glibc`, `freetype`, `glib2`, `icu` | `meson`, `ninja`, `pkgconf` | OpenType text shaping engine |
-| **`helium-browser`** | `0.22.4.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
+| **`helium-browser`** | `0.22.5.1` | 🟡 Belum Diuji | `glibc`, `dbus`, `ncurses` | `tar`, `xz` | Lightweight, privacy-focused, bloat-free Chromium-based web browser |
 | **`helix`** | `25.07.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `rust`, `mold`, `llvm`, `pkgconf`, `git` | A post-modern modal text editor |
 | **`htop`** | `3.5.3` | 🟡 Belum Diuji | `glibc`, `ncurses` | `make`, `gcc`, `pkgconf` | Interactive process viewer for Unix systems |
 | **`hyperfine`** | `2.0.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | A command-line benchmarking tool |
@@ -206,7 +206,7 @@
 | **`layer-shell-qt`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `qt6-wayland`, `wayland` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf`, `wayland-protocols` | Qt component for Wayland wl-layer-shell protocol integration |
 | **`lazygit`** | `0.66.3` | 🟡 Belum Diuji | `glibc`, `git` | `gcc`, `go` | Simple terminal UI for git commands |
 | **`libdrm`** | `2.4.134` | 🟡 Belum Diuji | `glibc`, `libpciaccess` | `meson`, `ninja`, `pkgconf` | Userspace interface to kernel DRM services |
-| **`libffi`** | `3.8.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Portable foreign function interface library |
+| **`libffi`** | `3.8.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Portable foreign function interface library |
 | **`libgit2`** | `1.9.7` | 🟡 Belum Diuji | `glibc`, `openssl`, `zlib`, `pcre2` | `cmake`, `ninja`, `gcc`, `pkgconf`, `python` | Highly portable, pure C implementation of the Git core methods |
 | **`libinput`** | `1.32.0` | 🟡 Belum Diuji | `glibc`, `eudev`, `libevdev`, `mtdev` | `meson`, `ninja`, `pkgconf` | Input device management and event handling library |
 | **`libksysguard`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `kcoreaddons`, `kconfig`, `ki18n`, `kauth`, `zlib` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Task management and system monitoring library for KDE Plasma |
