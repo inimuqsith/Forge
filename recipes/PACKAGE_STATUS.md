@@ -104,7 +104,7 @@
 | **`libpciaccess`** | `0.19` | 🟡 Belum Diuji | `glibc`, `zlib` | `meson`, `ninja`, `gcc`, `pkgconf` | Generic PCI access library |
 | **`libseccomp`** | `2.6.2` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Enhanced Seccomp library and kernel syscall filtering interface |
 | **`liburcu`** | `0.15.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Userspace RCU (read-copy-update) library |
-| **`linux-firmware`** | `20261019` | 🟡 Belum Diuji | - | `make` | Firmware files for Linux kernel drivers (Wi-Fi, GPU, Bluetooth, Audio SOF) |
+| **`linux-firmware`** | `20261124` | 🟡 Belum Diuji | - | `make` | Firmware files for Linux kernel drivers (Wi-Fi, GPU, Bluetooth, Audio SOF) |
 | **`lz4`** | `1.11.1` | 🟡 Belum Diuji | `glibc` | `make`, `gcc`, `pkgconf` | Extremely fast compression algorithm |
 | **`lzo`** | `2.10` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Portable lossless data compression library |
 | **`man-pages`** | `6.20` | 🟡 Belum Diuji | `glibc` | `make` | Linux system documentation manual pages |

@@ -1,6 +1,6 @@
 [package]
 name = "linux-firmware"
-version = "20261019"
+version = "20261124"
 release = 1
 slot = "0"
 description = "Firmware files for Linux kernel drivers (Wi-Fi, GPU, Bluetooth, Audio SOF)"
