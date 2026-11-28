@@ -138,7 +138,7 @@
 | **`xfsprogs`** | `7.3.0` | 🟡 Belum Diuji | `glibc`, `libedit`, `libinih`, `liburcu`, `util-linux` | `gcc`, `git`, `icu` | XFS filesystem utilities |
 | **`xkeyboard-config`** | `2.49` | 🟡 Belum Diuji | - | `meson`, `ninja`, `gcc`, `pkgconf`, `python` | X Keyboard Extension configuration data |
 | **`xz`** | `5.8.4` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Free general-purpose data compression software with high compression ratio (LZMA2) |
-| **`zip`** | `9.8.2` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
+| **`zip`** | `9.9.0` | 🟡 Belum Diuji | `glibc`, `bzip2` | `make`, `gcc` | Compressor utility for zipfile archives |
 | **`zsh`** | `5.9.2` | 🟡 Belum Diuji | `glibc`, `ncurses`, `pcre2` | `make`, `gcc`, `pkgconf` | Advanced programmable command interpreter |
 | **`zstd`** | `1.6.0` | 🟡 Belum Diuji | `glibc`, `zlib`, `xz` | `make`, `gcc`, `pkgconf` | Zstandard - Fast real-time compression algorithm |
 
@@ -153,7 +153,7 @@
 | **`alsa-utils`** | `1.2.16` | 🟡 Belum Diuji | `glibc`, `alsa-lib`, `ncurses` | `autoconf`, `automake`, `libtool`, `make`, `pkgconf`, `gettext` | Advanced Linux Sound Architecture (ALSA) utilities (alsamixer, amixer, aplay) |
 | **`antigravity-cli`** | `1.2.7` | 🟡 Belum Diuji | `glibc`, `ca-certificates` | `tar`, `gzip` | Official Google DeepMind Antigravity CLI (agy) for agentic AI pair programming |
 | **`bandwhich`** | `0.23.1` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `cargo` | Terminal bandwidth utilization tool |
-| **`bat`** | `0.26.1` | 🟡 Belum Diuji | `glibc`, `zlib` | `cargo`, `rust` | A cat clone with syntax highlighting and Git integration |
+| **`bat`** | `0.27.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `cargo`, `rust` | A cat clone with syntax highlighting and Git integration |
 | **`bottom`** | `0.15.0` | 🟡 Belum Diuji | `glibc`, `gcc` | `gcc`, `git`, `rust` | A graphical process/system monitor |
 | **`breeze`** | `6.7.5` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `kcoreaddons`, `kconfig`, `kwidgetsaddons`, `kwindowsystem` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | Artwork, styles and assets for the Breeze visual theme |
 | **`btop`** | `1.4.8` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | Modern and beautiful resource monitor that shows usage and stats for processor, memory, disks, network and processes |
@@ -168,7 +168,7 @@
 | **`expat`** | `2.11.0` | 🟡 Belum Diuji | `glibc` | `make`, `gcc` | XML parser library written in C |
 | **`extra-cmake-modules`** | `6.32.0` | 🟡 Belum Diuji | - | `cmake` | Extra modules and scripts for CMake used by KDE Frameworks |
 | **`eza`** | `0.23.5` | 🟡 Belum Diuji | `glibc`, `gcc`, `libgit2` | `rust`, `mold`, `llvm`, `pkgconf` | A modern replacement for ls (community fork of exa) |
-| **`fastfetch`** | `2.71.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
+| **`fastfetch`** | `2.72.0` | 🟡 Belum Diuji | `glibc`, `zlib` | `cmake`, `ninja`, `pkgconf`, `gcc` | Like neofetch, but much faster because written in C (Latest 2.38.0) |
 | **`fcft`** | `3.3.3` | 🟡 Belum Diuji | `glibc`, `fontconfig`, `freetype`, `pixman`, `libutf8proc` | `meson`, `ninja`, `gcc`, `pkgconf`, `tllist` | Simple library for font loading and glyph rasterization |
 | **`fd`** | `10.5.2` | 🟡 Belum Diuji | `glibc` | `cargo`, `rust` | Simple, fast and user-friendly alternative to find |
 | **`fish`** | `4.9.3` | 🟡 Belum Diuji | `glibc`, `gcc`, `pcre2` | `gcc`, `cmake`, `ninja`, `rust`, `pkgconf` | Smart and user friendly shell intended mostly for interactive use |
@@ -240,7 +240,7 @@
 | **`qt6-wayland`** | `6.8.2` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `libdrm`, `wayland` | `cmake`, `ninja`, `pkgconf`, `wayland-protocols`, `vulkan-headers` | Provides APIs for Wayland client and compositor support in Qt6 |
 | **`ripgrep`** | `16.0.0` | 🟡 Belum Diuji | `glibc`, `pcre2` | `cargo`, `rust`, `pkgconf` | Ultra-fast line-oriented search tool combining grep with find |
 | **`rsync`** | `3.5.2` | 🟡 Belum Diuji | `glibc`, `zstd`, `openssl`, `acl` | `make`, `gcc`, `pkgconf` | Fast and versatile remote file copying tool |
-| **`rust`** | `1.100.0` | 🟡 Belum Diuji | `glibc`, `llvm`, `zlib`, `openssl`, `curl` | `python`, `cmake`, `ninja`, `gcc`, `make` | Empowering everyone to build reliable and efficient systems programming language |
+| **`rust`** | `1.100.1` | 🟡 Belum Diuji | `glibc`, `llvm`, `zlib`, `openssl`, `curl` | `python`, `cmake`, `ninja`, `gcc`, `make` | Empowering everyone to build reliable and efficient systems programming language |
 | **`sddm`** | `0.21.0` | 🟡 Belum Diuji | `qt6-base`, `qt6-declarative`, `libxkbcommon`, `pam`, `shadow` | `cmake`, `ninja`, `extra-cmake-modules`, `pkgconf` | QML and Wayland based modern display manager |
 | **`seatd`** | `0.9.3` | 🟡 Belum Diuji | `glibc`, `eudev` | `meson`, `ninja`, `pkgconf` | A minimal seat management daemon, and a universal seat management library |
 | **`sqlite`** | `3.54.1` | 🟡 Belum Diuji | `glibc`, `readline`, `zlib` | `make`, `gcc`, `pkgconf` | Self-contained serverless SQL database engine |
